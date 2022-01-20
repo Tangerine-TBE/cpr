@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 整体的背景颜色 -->
+    <item>
+        <color android:color="@color/theme_color" />
+    </item>
+    <!-- 顶部 -->
+    <!--    <item>-->
+    <!--        <bitmap-->
+    <!--            android:gravity="center"-->
+    <!--            android:src="@drawable/splash_center" />-->
+    <!--    </item>-->
+    <!-- 底部 -->
+    <item android:bottom="@dimen/dp_40">
+        <bitmap
+            android:gravity="bottom|center_horizontal"
+            android:src="@mipmap/icon_wm_logo" />
+    </item>
+</layer-list>

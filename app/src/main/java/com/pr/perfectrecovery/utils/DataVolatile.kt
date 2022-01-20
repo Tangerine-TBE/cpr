@@ -1,0 +1,269 @@
+package com.pr.perfectrecovery.utils
+
+import com.pr.perfectrecovery.bean.BaseDataDTO
+
+object DataVolatile {
+    //电量值：  0-100%
+    var VI_Value = 0
+
+    //距离值：  30-150
+    var L_Value = 0
+
+    //气压值：  0-2000ml
+    var QY_Value = 0
+
+    //蓝牙连接状态：   0-断开 1-连接
+    var BLS_Value = 0
+
+    //USB连接状态: 0-断开 1-连接
+    var ULS_Value = 0
+
+    //通道打开状态 0-关闭 1-打开
+    var TOS_Value = 0
+
+    //连接方式  0-蓝牙 1-连接USB
+    var LKS_Value = 0
+
+    //按压位置正确  0-错误  1-正确
+    var PSR_Value = 0
+
+    //工作方式：00——休眠   01——工作    02——待机
+    var WS_Value = 0
+
+    //按压频率：0-200
+    var PF_Value = 0
+
+    //吹气频率：0-200
+    var CF_Value = 0
+
+    var PT_value = false
+
+    val dataDTO = BaseDataDTO()
+
+    var L_valueSet = intArrayOf(1)
+    var QY_valueSet = intArrayOf()
+    var pt_valueSet = mutableListOf<Int>()
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val data = "fe06040a0b01052d5303030405010723090ab261" //1、先将接收到的数据转调用工具类的方法换成字符串
+        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+        parseString(data)
+    }
+
+    /**
+     * 解析蓝发送的数据
+     *
+     * @param data
+     */
+    fun parseString(data: String?): BaseDataDTO {
+        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+        if (data != null && data.length == 40) {
+            //按压距离
+            val L_d1 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        12,
+                        14
+                    )
+                )
+            )
+            val L_d2 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        14,
+                        16
+                    )
+                )
+            )
+            val L_d3 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        16,
+                        18
+                    )
+                )
+            )
+            L_Value = selectValue(L_d1, L_d2, L_d3)
+            PT_value = pt(L_Value)
+            //吹气数据
+            val QY_d1 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        18,
+                        20
+                    )
+                )
+            )
+            val QY_d2 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        20,
+                        22
+                    )
+                )
+            )
+            val QY_d3 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        22,
+                        24
+                    )
+                )
+            )
+
+            //频率
+            //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
+            //模型状态
+            val state = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        28,
+                        30
+                    )
+                )
+            )
+            if (state and 1 == 1) {
+                BLS_Value = 1
+            } else {
+                BLS_Value = 0
+            }
+            if (state and 2 == 2) {
+                ULS_Value = 1
+            } else {
+                ULS_Value = 0
+            }
+            if (state and 4 == 4) {
+                TOS_Value = 1
+            } else {
+                TOS_Value = 0
+            }
+            if (state and 8 == 8) {
+                LKS_Value = 1
+            } else {
+                LKS_Value = 0
+            }
+            if (state and 16 == 16) {
+                PSR_Value = 1
+            } else {
+                PSR_Value = 0
+            }
+            VI_Value = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        30,
+                        32
+                    )
+                )
+            )
+        }
+        val stringBuffer = StringBuffer()
+        stringBuffer.append("电量值：").append(VI_Value)
+        stringBuffer.append("距离值：").append(L_Value)
+        stringBuffer.append("气压值：").append(QY_Value)
+        stringBuffer.append("蓝牙连接值：").append(BLS_Value)
+        stringBuffer.append("USB连接值：").append(ULS_Value)
+        stringBuffer.append("通道打开状态值：").append(TOS_Value)
+        stringBuffer.append("连接方式值：").append(LKS_Value)
+        stringBuffer.append("按压位置正确值：").append(PSR_Value)
+        stringBuffer.append("工作方式值：").append(WS_Value)
+        stringBuffer.append("按压频率值：").append(PF_Value)
+        stringBuffer.append("吹气频率值：").append(CF_Value)
+        dataDTO.pressInterrupt = PT_value
+        dataDTO.electricity = VI_Value
+        dataDTO.distance = L_Value
+        dataDTO.bpValue = QY_Value
+        dataDTO.blsType = BLS_Value
+        dataDTO.usbConnectType = ULS_Value
+        dataDTO.aisleType = TOS_Value
+        dataDTO.connectType = LKS_Value
+        dataDTO.psrType = PSR_Value
+        dataDTO.workType = WS_Value
+        dataDTO.cf = PF_Value
+        dataDTO.bf = CF_Value
+        return dataDTO
+    }
+
+    fun setPF_Value() {
+        PF_Value = 0
+    }
+
+    var preTimePress: Long = 0
+
+    /*根据有效距离值计算按压累加次数。
+    * */
+    fun cal_PreSum(a: Int): Int {
+        var sum = 0
+        //  L_valueSet[0]=0;
+        if (L_valueSet[0] == 0) {
+            L_valueSet[0] = a
+            val preTimePress = System.currentTimeMillis() //获取开始时间
+        } else {
+            if (a >= 170 && a - L_valueSet[0] > 10) {
+                sum++
+                val changTimePress = System.currentTimeMillis()
+                val time = changTimePress - preTimePress
+                PF_Value = (60000 / time).toInt()
+                preTimePress = changTimePress
+            }
+            L_valueSet[0] = a
+        }
+        return sum
+    }
+
+    /*
+    * 根据三次相邻的距离值找到有效值。
+    * */
+    fun selectValue(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+        var value = 0
+        value = if (L_d1 >= L_d2) {
+            if (L_d2 >= L_d3) {
+                L_d3
+            } else {
+                L_d2
+            }
+        } else if (L_d2 <= L_d3) {
+            L_d3
+        } else {
+            L_d2
+        }
+        /* if(L_d1>=L_d2){
+            if(L_d2>=L_d3){
+                if(L_d2>145) {
+                    value = L_d1;
+                }else{
+                    value=L_d3;
+                }
+            }else {
+                value=L_d2;
+            }
+        }else if(L_d2<=L_d3){
+            if(L_d2<145){
+                value=L_d1;
+            }else{
+                value=L_d3;
+            }
+        }else if(L_d2>L_d3){
+            value=L_d2;
+        }*/
+        return value
+    }
+
+    //判断按压是否停止
+    private fun pt(p: Int): Boolean {
+        if (pt_valueSet.size == 3) pt_valueSet.removeFirst()
+        pt_valueSet.add(p)
+        if (pt_valueSet.size == 3) {
+            if (pt_valueSet[0] > 175 && pt_valueSet[1] > 175 && pt_valueSet[2] > 175) {
+                return true
+            }
+        }
+        return false
+    }
+
+    fun getData(): BaseDataDTO? {
+        return dataDTO
+    }
+}

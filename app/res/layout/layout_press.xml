@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/dp_100"
+    android:layout_height="126dp"
+    android:layout_gravity="center"
+    android:background="@color/theme_color">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <CheckedTextView
+            android:id="@+id/viewTop"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="18dp"
+            android:background="@drawable/press_bg"
+            android:checked="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/viewCenter"
+            android:layout_width="66dp"
+            android:layout_height="78dp"
+            android:background="@color/color_text_normal"
+            app:layout_constraintEnd_toEndOf="@+id/viewTop"
+            app:layout_constraintStart_toStartOf="@+id/viewTop"
+            app:layout_constraintTop_toBottomOf="@+id/viewTop" />
+
+        <CheckedTextView
+            android:id="@+id/viewBottom"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="18dp"
+            android:background="@drawable/press_bg"
+            android:checked="false"
+            app:layout_constraintEnd_toEndOf="@+id/viewCenter"
+            app:layout_constraintStart_toStartOf="@+id/viewCenter"
+            app:layout_constraintTop_toBottomOf="@+id/viewCenter" />
+
+        <ImageView
+            android:id="@+id/ivArrowUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_30"
+            android:rotation="180"
+            android:src="@mipmap/icon_wm_arrow"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@+id/viewCenter"
+            app:layout_constraintStart_toStartOf="@+id/viewCenter"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivArrowDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_40"
+            android:src="@mipmap/icon_wm_arrow"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/viewCenter"
+            app:layout_constraintStart_toStartOf="@+id/viewCenter"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/dp_2"
+        android:gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/viewPress"
+            android:layout_width="66dp"
+            android:layout_height="12dp"
+            android:background="@color/white"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

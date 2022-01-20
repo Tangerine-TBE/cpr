@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/theme_color">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_4"
+        android:src="@mipmap/icon_wm_single"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="@dimen/dp_40"
+        android:text="学员姓名："
+        android:textColor="#ffffffff"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_20"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:background="@null"
+        android:hint="输入训练人姓名"
+        android:text="无名"
+        android:textColor="@color/white"
+        android:textColorHint="@color/color_text_normal"
+        android:textSize="@dimen/text_16"
+        app:layout_constraintBottom_toBottomOf="@+id/textView9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textView9"
+        app:layout_constraintTop_toTopOf="@+id/textView9"
+        app:layout_constraintVertical_bias="0.476" />
+
+    <View
+        android:id="@+id/viewline"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:background="#1eFFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="操作模式："
+        android:textColor="#ffffffff"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView9"
+        app:layout_constraintTop_toBottomOf="@+id/viewline" />
+
+    <CheckBox
+        android:id="@+id/cbTraining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_24"
+        android:button="@drawable/checkbox_bg"
+        android:checked="true"
+        android:paddingStart="@dimen/dp_4"
+        android:text="练习"
+        android:textColor="@color/color_37B48B"
+        android:textSize="@dimen/text_16"
+        app:layout_constraintBottom_toBottomOf="@+id/textView10"
+        app:layout_constraintStart_toEndOf="@+id/textView10"
+        app:layout_constraintTop_toTopOf="@+id/textView10" />
+
+    <CheckBox
+        android:id="@+id/cbCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_24"
+        android:button="@drawable/checkbox_bg"
+        android:checked="false"
+        android:paddingStart="@dimen/dp_4"
+        android:text="考核"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_16"
+        app:layout_constraintBottom_toBottomOf="@+id/cbTraining"
+        app:layout_constraintStart_toEndOf="@+id/cbTraining"
+        app:layout_constraintTop_toTopOf="@+id/cbTraining" />
+
+    <View
+        android:id="@+id/viewline2"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:background="#1eFFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="节拍提示："
+        android:textColor="#ffffffff"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView10"
+        app:layout_constraintTop_toBottomOf="@+id/viewline2" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchBeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:checked="false"
+        app:thumbTint="@color/white"
+        app:track="@drawable/switch_white_circle_selector"
+        app:layout_constraintBottom_toBottomOf="@+id/textView11"
+        app:layout_constraintStart_toStartOf="@+id/cbTraining"
+        app:layout_constraintTop_toTopOf="@+id/textView11" />
+
+    <View
+        android:id="@+id/viewline3"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:background="#1eFFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+    <TextView
+        android:id="@+id/textview12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:text="语音提示："
+        android:textColor="#ffffffff"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/textView11"
+        app:layout_constraintTop_toBottomOf="@+id/viewline3" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchVoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:checked="false"
+        app:thumbTint="@color/white"
+        app:track="@drawable/switch_white_circle_selector"
+        app:layout_constraintBottom_toBottomOf="@+id/textview12"
+        app:layout_constraintStart_toStartOf="@+id/cbTraining"
+        app:layout_constraintTop_toTopOf="@+id/textview12" />
+</androidx.constraintlayout.widget.ConstraintLayout>
