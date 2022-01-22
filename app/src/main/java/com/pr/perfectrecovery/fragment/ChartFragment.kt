@@ -61,21 +61,13 @@ class ChartFragment : Fragment() {
             addEntry(data, viewBinding.chart1, it.distance.toFloat())
             LogUtils.e("距离值： ${it.distance.toFloat()}")
         })
-
     }
 
     private fun getData(): LineData {
         val values = ArrayList<Entry>()
-//        for (i in 0 until count) {
-////            float val = (float) (Math.random() * range) + 3;
-//            val va = (Math.random() / range).toFloat()
-//            values.add(Entry(i.toFloat(), va))
-//        }
         values.add(Entry(0f, 180f))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        // set1.setFillAlpha(110);
-        // set1.setFillColor(Color.RED);
         lineDataSet.lineWidth = 1.75f
         lineDataSet.circleRadius = 5f
         lineDataSet.circleHoleRadius = 2.5f
@@ -84,7 +76,6 @@ class ChartFragment : Fragment() {
         lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
         lineDataSet.highLightColor = Color.parseColor("#3DB38E")
         lineDataSet.setDrawValues(true)
-
         // create a data object with the data sets
         return LineData(lineDataSet)
     }
@@ -101,29 +92,19 @@ class ChartFragment : Fragment() {
 
         // no description text
         chart.description.isEnabled = false
-        // chart.setDrawHorizontalGrid(false);
-        //
-        // enable / disable grid background
         chart.setDrawGridBackground(false)
-        //        chart.getRenderer().getGridPaint().setGridColor(Color.WHITE & 0x70FFFFFF);
-
         // enable touch gestures
         chart.setTouchEnabled(false)
-
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
-
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
         chart.setBackgroundColor(Color.TRANSPARENT)
-
         // set custom chart offsets (automatic offset calculation is hereby disabled)
         chart.setViewPortOffsets(10f, 0f, 10f, 0f)
-
         // add data
         chart.data = data
-
         // get the legend (only possible after setting data)
         val l = chart.legend
         l.isEnabled = false
@@ -146,7 +127,6 @@ class ChartFragment : Fragment() {
         // 最小值
         leftAxis.mAxisMinimum = 180f
         leftAxis.setDrawGridLines(true)
-
         val xAxis: XAxis = chart.xAxis
 //        xAxis.setLabelCount(20, false) // 设置X轴的刻度数量，第二个参数表示是否平均分配
         xAxis.granularity = 10f
@@ -169,14 +149,6 @@ class ChartFragment : Fragment() {
         val entry = Entry(
             entryCount.toFloat(), yValues
         )
-
-        if (yValues < 120) {
-
-        }
-
-        if (yValues > 130) {
-
-        }
         // 创建一个点
         lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
         lineChart.data = lineData
@@ -196,7 +168,6 @@ class ChartFragment : Fragment() {
             //启动刷新界面数据
             viewBinding.ivLung.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_lung_red))
             viewBinding.ivHeart.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_heart_red))
-
         }
     }
 

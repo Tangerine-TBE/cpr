@@ -211,7 +211,7 @@ class CycleFragment : Fragment() {
      * 播放节奏音乐
      */
     private fun startMP3() {
-        if (isYY == true) {//节奏音
+        if (isYY) {//节奏音
             mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_bg)
             mMediaPlayer?.isLooping = true
             mMediaPlayer?.seekTo(0)
@@ -225,9 +225,6 @@ class CycleFragment : Fragment() {
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
 
     private var time: Long = 5000
-    private var pressTimeOutCount = 0
-    private var bfCount = 0
-
     private var isTime = false
 
     private inner class Counter : Runnable {
@@ -314,7 +311,8 @@ class CycleFragment : Fragment() {
 
                     if (dataDTO.pressInterrupt && !isPT) {
                         isPT = true
-                        mHandler.postDelayed(runnable, 2000)
+                        DataVolatile.setPF_Value()
+                        //mHandler.postDelayed(runnable, 2000)
                     }
                 }
             }
