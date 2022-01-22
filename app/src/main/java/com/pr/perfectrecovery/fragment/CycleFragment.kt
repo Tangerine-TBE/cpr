@@ -248,8 +248,12 @@ class CycleFragment : Fragment() {
         }
     }
 
+    private var pfValue = 0
+    private var bfValue = 0
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
+            pfValue = dataDTO.distance
+            bfValue = dataDTO.bf
             //计算循环次数
             if (pressCount > cycleCount && pressCount / 30 > cycleCount
                 && blowCount > cycleCount && blowCount / 2 > cycleCount
@@ -281,20 +285,20 @@ class CycleFragment : Fragment() {
                             viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                         }
                         dataDTO.bpValue > 600 -> {//通气过大
-                            serBlowError()
+//                            serBlowError()
                             viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
                             viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                             setPlayVoice(VOICE_MP3_CQGD)
                         }
                         dataDTO.bpValue < 400 -> {//通气不足
-                            serBlowError()
+//                            serBlowError()
                             viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
                             viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                             setPlayVoice(VOICE_MP3_CQBZ)
                         }
                         else -> {
                             //通气进胃
-                            serBlowError()
+//                            serBlowError()
                             viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
                             viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                             setPlayVoice(VOICE_MP3_CQJW)
@@ -311,8 +315,11 @@ class CycleFragment : Fragment() {
 
                     if (dataDTO.pressInterrupt && !isPT) {
                         isPT = true
-                        DataVolatile.setPF_Value()
-                        //mHandler.postDelayed(runnable, 2000)
+                        mHandler.postDelayed(runnable, 2000)
+                    }
+
+                    if (dataDTO.distance < 175) {
+                        isPT = false
                     }
                 }
             }
@@ -320,13 +327,20 @@ class CycleFragment : Fragment() {
     }
 
     private var isPT = false
+
+    //按压中断 - 开启计时器 频率清零
     private val runnable = Runnable {
-        //按压中断 - 开启计时器 频率清零
-        isPT = false
         mHandler.removeCallbacksAndMessages(null)
         DataVolatile.setPF_Value()
         time = 5000
         mHandler.post(counter!!)
+    }
+
+    private var isCF = false;
+
+    //吹气频率-清零
+    private val blowRunnable = Runnable {
+        DataVolatile.setCF_Value()
     }
 
     private fun serPressError() {

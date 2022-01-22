@@ -58,7 +58,6 @@ object DataVolatile {
      */
     fun parseString(data: String?): BaseDataDTO {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
         if (data != null && data.length == 40) {
             //按压距离
             val L_d1 = DataFormatUtils.byteArrayToInt(
@@ -85,8 +84,7 @@ object DataVolatile {
                     )
                 )
             )
-            L_Value = selectValue(L_d1, L_d2, L_d3)
-            PT_value = pt(L_Value)
+            L_Value = selectValue_P(L_d1, L_d2, L_d3)
             //吹气数据
             val QY_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -112,7 +110,8 @@ object DataVolatile {
                     )
                 )
             )
-
+            //不做气压值的算法处理
+            QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
             //频率
             //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
@@ -190,6 +189,10 @@ object DataVolatile {
         PF_Value = 0
     }
 
+    fun setCF_Value() {
+        CF_Value = 0;
+    }
+
     var preTimePress: Long = 0
 
     /*根据有效距离值计算按压累加次数。
@@ -213,54 +216,84 @@ object DataVolatile {
         return sum
     }
 
-    /*
-    * 根据三次相邻的距离值找到有效值。
-    * */
-    fun selectValue(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-        value = if (L_d1 >= L_d2) {
+        // int low_flag=0;
+        if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
-                L_d3
+                value = L_d3
+                TestVolatile.low_flag = 0
             } else {
-                L_d2
+                value = L_d2
+                // preTimePress = System.currentTimeMillis();    //获取开始时间
+                TestVolatile.low_flag = 1
+                TestVolatile.PR_SUM++
+                val changTimePress = System.currentTimeMillis()
+                if (TestVolatile.PR_SUM > 1) {
+                    val time = changTimePress - TestVolatile.preTimePress
+                    TestVolatile.PF_Value = (60000 / time).toInt()
+                }
+                TestVolatile.preTimePress = changTimePress
             }
         } else if (L_d2 <= L_d3) {
-            L_d3
-        } else {
-            L_d2
-        }
-        /* if(L_d1>=L_d2){
-            if(L_d2>=L_d3){
-                if(L_d2>145) {
-                    value = L_d1;
-                }else{
-                    value=L_d3;
+            if (TestVolatile.low_flag == 0) {
+                TestVolatile.low_flag = 1
+                TestVolatile.PR_SUM++
+                val changTimePress = System.currentTimeMillis()
+                if (TestVolatile.PR_SUM > 1) {
+                    val time = changTimePress - TestVolatile.preTimePress
+                    TestVolatile.PF_Value = (60000 / time).toInt()
                 }
-            }else {
-                value=L_d2;
+                TestVolatile.preTimePress = changTimePress
             }
-        }else if(L_d2<=L_d3){
-            if(L_d2<145){
-                value=L_d1;
-            }else{
-                value=L_d3;
-            }
-        }else if(L_d2>L_d3){
-            value=L_d2;
-        }*/
+            value = L_d3
+        } else {
+            value = L_d2
+        }
         return value
     }
 
-    //判断按压是否停止
-    private fun pt(p: Int): Boolean {
-        if (pt_valueSet.size == 3) pt_valueSet.removeFirst()
-        pt_valueSet.add(p)
-        if (pt_valueSet.size == 3) {
-            if (pt_valueSet[0] > 175 && pt_valueSet[1] > 175 && pt_valueSet[2] > 175) {
-                return true
+    var preTimeQY: Long = 0
+
+    /*
+     * 根据吹气三次相邻的气压值找到有效值。
+     * */
+    fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
+        var value = 0
+        var top_flag = 0
+        if (QY_d1 <= QY_d2) {
+            if (QY_d2 <= QY_d3) {
+                top_flag = 0
+                value = QY_d3
+            } else {
+                top_flag = 1
+                value = QY_d2
+                TestVolatile.QY_SUM++
+                val changTimePress = System.currentTimeMillis()
+                if (TestVolatile.QY_SUM > 1) {
+                    val time = changTimePress - preTimeQY
+                    TestVolatile.CF_Value = (60000 / time).toInt()
+                }
+                preTimeQY = changTimePress
+            }
+        } else {
+            if (QY_d2 <= QY_d3) {
+                if (top_flag == 0) {
+                    top_flag = 1
+                    TestVolatile.QY_SUM++
+                    val changTimePress = System.currentTimeMillis()
+                    if (TestVolatile.QY_SUM > 1) {
+                        val time = changTimePress - preTimeQY
+                        TestVolatile.CF_Value = (60000 / time).toInt()
+                    }
+                    preTimeQY = changTimePress
+                }
+                value = QY_d3
+            } else {
+                value = QY_d2
             }
         }
-        return false
+        return value
     }
 
     fun getData(): BaseDataDTO? {

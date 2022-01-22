@@ -1,5 +1,6 @@
 package com.pr.perfectrecovery.utils;
 
+
 public class TestVolatile {
    // public static int DType=0;
     //电量值：  0-100%
@@ -24,6 +25,16 @@ public class TestVolatile {
     public static  int  PF_Value=0;
     //吹气频率：0-200
     public static  int  CF_Value=0;
+    //按压次数
+    public static  int  PR_SUM=0;
+    //吹气次数
+    public static  int  QY_SUM=0;
+   //按压上升或下降标志位
+    public static int low_flag=0;
+    //吹气上升或下降标志位
+    public static int top_flag=0;
+
+
 
     public static int[] L_valueSet;
     public static int[] QY_valueSet;
@@ -37,6 +48,7 @@ public class TestVolatile {
 02-05：XX XX XX XX <eg：22A00001---软件版本22,类型A,编号00001>
 06-08:距离数据<间隔30ms>
 09-11:气压数据<间隔30ms>
+
    12:按压频率(上一个按压或弹回持续时间：600/持续时间,2s超时,次数/每秒)
    13:吹气频率(吹气持续计时<大于80时>，100代表10s)
    14:模型状态0
@@ -81,12 +93,13 @@ WMFS-XXXXXX   <eg：A00001---类型A,编号00001，蓝牙显示为WMFS-A00001>
             int L_d1=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(12, 14)));
             int L_d2=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(14, 16)));
             int L_d3=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(16, 18)));
-            L_Value=selectValue(L_d1,L_d2,L_d3);
+            L_Value=selectValue_P(L_d1,L_d2,L_d3);
             //吹气数据
             int QY_d1=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(18, 20)));
             int QY_d2=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(20, 22)));
             int QY_d3=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(22, 24)));
-
+            //不做气压值的算法处理
+             QY_Value= selectValue_QY(QY_d1, QY_d2,QY_d3);
             //频率
             //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
@@ -134,9 +147,10 @@ WMFS-XXXXXX   <eg：A00001---类型A,编号00001，蓝牙显示为WMFS-A00001>
     }
 
     public static long preTimePress=0;
+
     /*根据有效距离值计算按压累加次数。
     * */
-    public static int cal_PreSum(int a) {
+  /*  public static int cal_PreSum(int a) {
           int sum=0;
         //  L_valueSet[0]=0;
         if(L_valueSet[0]==0){
@@ -153,48 +167,90 @@ WMFS-XXXXXX   <eg：A00001---类型A,编号00001，蓝牙显示为WMFS-A00001>
             L_valueSet[0]=a;
         }
         return sum;
-    }
+    }*/
     /*
-    * 根据三次相邻的距离值找到有效值。
+    * 根据按压三次相邻的距离值找到有效值。
     * */
-    public static int selectValue(int L_d1 ,int L_d2,int L_d3){
+    public static int selectValue_P(int L_d1 ,int L_d2,int L_d3){
         int value=0;
+       // int low_flag=0;
         if(L_d1>=L_d2){
             if(L_d2>=L_d3){
                 value=L_d3;
+                low_flag=0;
             }else {
                 value=L_d2;
+               // preTimePress = System.currentTimeMillis();    //获取开始时间
+                low_flag=1;
+                PR_SUM++;
+                long changTimePress= System.currentTimeMillis();
+                if( PR_SUM>1){
+                        long time=changTimePress-preTimePress;
+                        PF_Value= (int) (60000/time);
+                }
+                preTimePress=changTimePress;
             }
         }else if(L_d2<=L_d3){
+            if(low_flag==0){
+                low_flag=1;
+                PR_SUM++;
+                long changTimePress= System.currentTimeMillis();
+                if( PR_SUM>1){
+                    long time=changTimePress-preTimePress;
+                    PF_Value= (int) (60000/time);
+                }
+                preTimePress=changTimePress;
+             }
             value=L_d3;
-
         }else {
             value=L_d2;
         }
-       /* if(L_d1>=L_d2){
-            if(L_d2>=L_d3){
-                if(L_d2>145) {
-                    value = L_d1;
-                }else{
-                    value=L_d3;
-                }
-            }else {
-                value=L_d2;
-            }
-        }else if(L_d2<=L_d3){
-            if(L_d2<145){
-                value=L_d1;
-            }else{
-                value=L_d3;
-            }
-        }else if(L_d2>L_d3){
-            value=L_d2;
-        }*/
         return value;
+    }
+    public static long preTimeQY=0;
+    /*
+     * 根据吹气三次相邻的气压值找到有效值。
+     * */
+    public static int selectValue_QY(int QY_d1 ,int QY_d2,int QY_d3){
+        int value=0;
+        int top_flag=0;
+        if(QY_d1<=QY_d2){
+            if(QY_d2<=QY_d3){
+               top_flag=0;
+                value=QY_d3;
+            }else{
+                top_flag=1;
+                value=QY_d2;
+                QY_SUM++;
+                long changTimePress= System.currentTimeMillis();
+                if( QY_SUM>1){
+                    long time=changTimePress-preTimeQY;
+                    CF_Value= (int) (60000/time);
+                }
+                preTimeQY=changTimePress;
+            }
+        }else{
+            if(QY_d2<=QY_d3){
+                if( top_flag==0){
+                    top_flag=1;
+                    QY_SUM++;
+                    long changTimePress= System.currentTimeMillis();
+                    if( QY_SUM>1){
+                        long time=changTimePress-preTimeQY;
+                        CF_Value= (int) (60000/time);
+                    }
+                    preTimeQY=changTimePress;
+                }
+                value=QY_d3;
+            }else{
+                value=QY_d2;
+            }
+        }
+       return value;
     }
 
     public static void main(String[] args) {
-        int a=selectValue(15,180,160);
+        int a=selectValue_P(15,180,160);
         System.out.println(a);
     }
 }
