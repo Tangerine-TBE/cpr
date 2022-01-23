@@ -84,16 +84,17 @@ public class PressLayoutView extends LinearLayout {
 
     private int numberY = 0;
     private int newY;
+    private int prCount = 0;
 
-    public void smoothScrollTo(int destY) {
+    public void smoothScrollTo(int destY, int prSum) {
         //距离值：  30-150
         destY = getNumber(destY);
         int topHeight = viewTop.getHeight();
         int height = getHeight() - (viewPress.getHeight() + 10);
         newY = (int) (((float) height / 10) * destY);
-        Log.d("smoothScrollTo", "destY : " + destY);
-        Log.d("smoothScrollTo", "newY : " + newY);
-        Log.d("smoothScrollTo", "height : " + height);
+//        Log.d("smoothScrollTo", "destY : " + destY);
+//        Log.d("smoothScrollTo", "newY : " + newY);
+//        Log.d("smoothScrollTo", "height : " + height);
         viewPress.setVisibility(View.VISIBLE);
         ivArrowUp.setVisibility(View.INVISIBLE);
         ivArrowDown.setVisibility(View.INVISIBLE);
@@ -102,46 +103,49 @@ public class PressLayoutView extends LinearLayout {
         if (destY == 0) {
             numberY = destY;
         }
+
         int scrollY = linearLayout.getScrollY();
-        if (scrollY - newY > 5) {//向上滚动
-            Log.e("smoothScrollTo", "向上滚动" + (scrollY - newY + 30));
-            scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, scrollY - newY + 30);
-        } else if (newY - scrollY > 5) {//向下滚动
-            Log.e("smoothScrollTo", "向下滚动" + (-newY - scrollY));
-            scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, -newY - scrollY);
-        }
+//        if (newY - scrollY > 5) {//向上滚动
+//            Log.e("smoothScrollTo", "向上滚动" + (scrollY - newY + 30));
+//            scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, -newY - scrollY);
+//        } else if (newY - scrollY < 0) {//向下滚动
+        Log.e("smoothScrollTo", "向下滚动" + (-newY - scrollY));
+        scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, -newY - scrollY);
+//        }
+
         if (destY == 9) {//正确的按压
             viewBottom.setChecked(true);
             Log.e("smoothScrollTo", "按压正确");
             viewPress.setVisibility(View.INVISIBLE);
             ivArrowUp.setVisibility(View.INVISIBLE);
             ivArrowDown.setVisibility(View.INVISIBLE);
-        } else {
-//            if (destY != 0 && numberY > 1) {//按压未回弹
+        }
+
+        if (prSum != prCount) {
+            Log.e("smoothScrollTo2", prCount + "");
+            prCount = prSum;
+            if (destY > 9) {//按压过大
+                Log.e("smoothScrollTo", "按压过大");
+                if (mScrollerCallBack != null) {
+                    mScrollerCallBack.onScrollerState(TYPE_MAX);
+                }
+            } else if (numberY < 9) {
+                ivArrowUp.setVisibility(View.INVISIBLE);
+                ivArrowDown.setVisibility(View.VISIBLE);
+                Log.e("smoothScrollTo", "按压不足");
+                if (mScrollerCallBack != null) {
+                    mScrollerCallBack.onScrollerState(TYPE_MIN);
+                }
+            } else if (destY - numberY > 1) {//按压未回弹
 //                ivArrowUp.setVisibility(View.VISIBLE);
+                ivArrowDown.setVisibility(View.INVISIBLE);
 //                Log.e("smoothScrollTo", "按压未回弹");
 //                if (mScrollerCallBack != null) {
 //                    mScrollerCallBack.onScrollerState(TYPE_UP);
 //                }
-//            }
-//
-//            if (numberY - destY > 0) {//按压不足
-//                ivArrowUp.setVisibility(View.INVISIBLE);
-//                ivArrowDown.setVisibility(View.VISIBLE);
-//                Log.e("smoothScrollTo", "按压不足");
-//                if (mScrollerCallBack != null) {
-//                    mScrollerCallBack.onScrollerState(TYPE_MIN);
-//                }
-//            }
-//
-//            if (destY > 9) {//按压过大
-//                Log.e("smoothScrollTo", "按压过大");
-//                if (mScrollerCallBack != null) {
-//                    mScrollerCallBack.onScrollerState(TYPE_MAX);
-//                }
-//            }
-//            numberY = destY;
+            }
         }
+        numberY = destY;
         invalidate();
     }
 
@@ -181,9 +185,9 @@ public class PressLayoutView extends LinearLayout {
     }
 
     private int state = 0;
-    private final static int TYPE_UP = 1;//未回弹
-    private final static int TYPE_MAX = 2;//按压过大
-    private final static int TYPE_MIN = 3;//按压不足
+    public final static int TYPE_UP = 1;//未回弹
+    public final static int TYPE_MAX = 2;//按压过大
+    public final static int TYPE_MIN = 3;//按压不足
     private ScrollerCallBack mScrollerCallBack;
 
     public void setScrollerCallBack(ScrollerCallBack mScrollerCallBack) {

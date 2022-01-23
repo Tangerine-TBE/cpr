@@ -172,6 +172,8 @@ class CPRActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         showConnectedDevice()
+//        startRefresh()
+//        checkPermissions()
     }
 
     private fun initBluetooth() {

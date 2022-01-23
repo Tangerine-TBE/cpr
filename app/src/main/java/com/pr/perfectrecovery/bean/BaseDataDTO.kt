@@ -12,7 +12,12 @@ data class BaseDataDTO(
     var workType: Int = -1,//工作方式：0——休眠   1——工作    2——待机
     var cf: Int = 0,//按压频率：0-200
     var bf: Int = 0,//吹气频率：0-200
-    var pressInterrupt : Boolean = false//按压中断状态
+    var prSum: Int = 0,//按压次数
+    var qySum: Int = 0,//吹起次数
+    var q1 : Int = 0,
+    var q2 : Int = 0,
+    var q3 : Int = 0,
+    var pressInterrupt: Boolean = false//按压中断状态
 ) {
 
 }
