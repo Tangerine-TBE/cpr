@@ -28,6 +28,7 @@ import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.PressLayoutView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
+import java.util.*
 import java.util.prefs.PreferenceChangeListener
 
 private const val ARG_PARAM1 = "param1"
@@ -101,9 +102,6 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress6.text = "吹气频率：${it.bf}"
             viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
-            viewBinding.tvPress9.text = "Q1_ : ${it.q1}"
-            viewBinding.tvPress10.text = "Q2_ : ${it.q2}"
-            viewBinding.tvPress11.text = "Q3_ : ${it.q3}"
         })
 
         viewBinding.pressLayoutView.setOnClickListener {
@@ -126,15 +124,14 @@ class CycleFragment : Fragment() {
         }
         // viewBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
         // viewBinding.tvLog.setMovementMethod(LinkMovementMethod.getInstance())
-
-    }
-
-    private fun addText(textView: TextView, content: String) {
-        textView.append(content)
-        textView.append("\n")
-        val offset = textView.lineCount * textView.lineHeight
-        if (offset > textView.height) {
-            textView.scrollTo(0, offset - textView.height)
+        viewBinding.chart.setOnClickListener {
+            val max = 200
+            val min = 0
+            val random = Random()
+            val p = random.nextInt(max) % (max - min + 1) + min
+            val pf = p / 200f
+            viewBinding.chart.setCurrentStatus(pf)
+            viewBinding.chart.invalidate()
         }
     }
 
@@ -303,26 +300,41 @@ class CycleFragment : Fragment() {
                 qyValue = dataDTO.qySum
                 when {
                     dataDTO.bpValue in 40..80 -> {//通气正常
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
+//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
                     dataDTO.bpValue in 80..100 -> {//通气过大
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
+//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
                     dataDTO.bpValue < 40 -> {//通气不足
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
+//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
                     dataDTO.bpValue > 100 -> {
                         //吹气进胃
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
+//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
                 }
+                //吹气频率
+                when {
+                    dataDTO.bf in 100..120 -> {//通气频率正常
+                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
+                    }
+                    dataDTO.bf > 120 -> {//通气频率过大
+                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
+                        setPlayVoice(VOICE_MP3_CQGD)
+                    }
+                    dataDTO.bf < 100 -> {//通气频率过小
+                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
+                        setPlayVoice(VOICE_MP3_CQBZ)
+                    }
+                }
+
             } else if (dataDTO.bpValue == 0) {
 //                viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
 //                viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)

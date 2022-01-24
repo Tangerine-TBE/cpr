@@ -23,8 +23,8 @@ class BarCharts {
         val yValues = ArrayList<BarEntry>()
         val colors = ArrayList<Int>()
         if (numbers != null && numbers.size > 0 && numbers.size < 2) {
-//            numbers.add(SchoolHomeAttend("", "0", 0.0))
-//            numbers.add(SchoolHomeAttend("", "0", 0.0))
+            numbers.add(0)
+            numbers.add(0)
         }
         numbers?.forEachIndexed { index, item ->
             yValues.add(
@@ -33,7 +33,7 @@ class BarCharts {
                     item.toFloat()
                 )
             )
-            colors.add(Color.parseColor("#2C8AFF"))
+            colors.add(Color.parseColor("#3DB38E"))
         }
         // y轴的数据集合
         val barDataSet = BarDataSet(yValues, "")
@@ -44,7 +44,7 @@ class BarCharts {
         // 设置栏阴影颜色
 //        barDataSet.barShadowColor = Color.parseColor("#01000000")
         val barDataSets = mutableListOf<BarDataSet>()
-        barDataSet.valueTextColor = Color.parseColor("#909399")
+        barDataSet.valueTextColor = Color.parseColor("#FFFFFF")
         barDataSet.valueTextSize = 10f
         barDataSets.add(barDataSet)
         // 绘制值
@@ -195,7 +195,7 @@ class BarCharts {
         //设置值显示在柱状图的上边或者下边
         barChart.setDrawValueAboveBar(true)
         //设置绘制网格背景
-        barChart.setDrawGridBackground(true)
+        barChart.setDrawGridBackground(false)
         //设置双击缩放功能
         barChart.isDoubleTapToZoomEnabled = false
         //禁止点击柱状图（每个柱子）
@@ -238,8 +238,6 @@ class BarCharts {
         barChart.setBackgroundColor(Color.parseColor("#01000000"))
         // 如果打开，背景矩形将出现在已经画好的绘图区域的后边。
         //        barChart.setDrawGridBackground(false)
-        // 集拉杆阴影
-        barChart.setDrawBarShadow(false)
         // 图例
         barChart.legend.isEnabled = false
         // 设置数据
@@ -263,10 +261,10 @@ class BarCharts {
         // 字体
         mLegend.formSize = 10f
         // 字体颜色
-        mLegend.textColor = Color.parseColor("#909399")
+        mLegend.textColor = Color.parseColor("#FFFFFFF")
         val axisLeft = barChart.axisLeft
         axisLeft.enableGridDashedLine(10f, 10f, 0f)
-        axisLeft.textColor = Color.parseColor("#909399")
+        axisLeft.textColor = Color.parseColor("#FFFFFFF")
         axisLeft.textSize = 10f
         axisLeft.axisMinimum = 0f
         axisLeft.axisMaximum = 100f

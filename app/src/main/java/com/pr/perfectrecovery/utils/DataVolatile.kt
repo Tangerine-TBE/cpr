@@ -51,9 +51,6 @@ object DataVolatile {
 
     val dataDTO = BaseDataDTO()
 
-    var qy_1 = 0
-    var qy_2 = 0
-    var qy_3 = 0
     var L_valueSet = intArrayOf(1)
     var QY_valueSet = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
@@ -138,10 +135,6 @@ object DataVolatile {
 
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
-            //本次最大值
-            qy_1 = QY_d1
-            qy_2 = QY_d2
-            qy_3 = QY_d3
             //频率
             //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
@@ -200,9 +193,6 @@ object DataVolatile {
         stringBuffer.append("工作方式值：").append(WS_Value)
         stringBuffer.append("按压频率值：").append(PF_Value)
         stringBuffer.append("吹气频率值：").append(CF_Value)
-        dataDTO.q1 = qy_1
-        dataDTO.q2 = qy_2
-        dataDTO.q3 = qy_3
 
         dataDTO.prSum = PR_SUM
         dataDTO.qySum = QY_SUM
@@ -279,8 +269,8 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    preTimePress = changTimePress
                 }
+                preTimePress = changTimePress
             }
             value = L_d3
         } else {

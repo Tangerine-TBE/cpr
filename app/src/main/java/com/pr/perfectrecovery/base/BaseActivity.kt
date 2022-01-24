@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.tencent.mmkv.MMKV
 
 open class BaseActivity : AppCompatActivity() {
 
     var mActivity: Activity? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStatusBar(resources.getColor(R.color.theme_color))

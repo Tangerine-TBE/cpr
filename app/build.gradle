@@ -65,6 +65,8 @@ dependencies {
 //    implementation 'com.github.AAChartModel:AAChartCore-Kotlin:-SNAPSHOT'
     //autoSize 适配框架
     implementation 'me.jessyan:autosize:1.2.1'
+
+    implementation 'org.xclcharts:lib:2.4'
     //tabLayout
     implementation 'com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar'
     //万能适配器

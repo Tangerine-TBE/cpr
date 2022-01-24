@@ -7,12 +7,21 @@
     android:background="@color/theme_color"
     tools:context=".fragment.CycleFragment">
 
+    <com.pr.perfectrecovery.view.DialChart07View
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/dashBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_26"
         android:src="@mipmap/icon_wm_bp_1"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -56,7 +65,7 @@
         android:layout_marginStart="44dp"
         android:layout_marginTop="36dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toTopOf="@+id/ivPress" />
 
     <TextView
@@ -66,7 +75,7 @@
         android:layout_marginStart="44dp"
         android:layout_marginTop="36dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toTopOf="@+id/ivLung" />
 
     <TextView
@@ -75,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toBottomOf="@+id/tv_press3" />
 
     <TextView
@@ -84,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toBottomOf="@+id/tv_press5" />
 
     <TextView
@@ -93,7 +102,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toBottomOf="@+id/tv_press6" />
 
     <TextView
@@ -102,35 +111,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
         app:layout_constraintTop_toBottomOf="@+id/tv_press7" />
-
-    <TextView
-        android:id="@+id/tv_press9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press8" />
-
-    <TextView
-        android:id="@+id/tv_press10"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press9" />
-
-    <TextView
-        android:id="@+id/tv_press11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press10" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -139,54 +121,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_15"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dashBoard">
-
-        <View
-            android:id="@+id/viewTop"
-            android:layout_width="@dimen/dp_100"
-            android:layout_height="18dp"
-            android:background="@color/color_text_normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="66dp"
-            android:layout_height="78dp"
-            android:background="@color/color_text_normal"
-            app:layout_constraintBottom_toTopOf="@+id/viewBottom"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/viewTop"
-            app:layout_constraintTop_toBottomOf="@+id/viewTop" />
-
-        <View
-            android:id="@+id/viewBottom"
-            android:layout_width="@dimen/dp_100"
-            android:layout_height="18dp"
-            android:background="@color/color_text_normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintlayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_10"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/pressLayoutView">
 
         <TextView
             android:id="@+id/tvPress"
@@ -214,7 +156,7 @@
         android:id="@+id/pressLayoutView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dashBoard" />

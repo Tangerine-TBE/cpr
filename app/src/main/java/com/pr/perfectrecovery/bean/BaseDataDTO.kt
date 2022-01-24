@@ -14,9 +14,6 @@ data class BaseDataDTO(
     var bf: Int = 0,//吹气频率：0-200
     var prSum: Int = 0,//按压次数
     var qySum: Int = 0,//吹起次数
-    var q1 : Int = 0,
-    var q2 : Int = 0,
-    var q3 : Int = 0,
     var pressInterrupt: Boolean = false//按压中断状态
 ) {
 

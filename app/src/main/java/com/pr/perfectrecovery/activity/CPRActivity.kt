@@ -279,7 +279,11 @@ class CPRActivity : BaseActivity() {
                 mDeviceAdapter.remove(bleDevice)
                 bleDevice.isLoading = false
                 bleDevice.count = count
-                mDeviceAdapter.addData(count - 1, bleDevice)
+                if (mDeviceAdapter.data.size == 0) {
+                    mDeviceAdapter.addData(bleDevice)
+                } else {
+                    mDeviceAdapter.addData(count - 1, bleDevice)
+                }
 //                viewBinding.textView.text = "$count"
                 bleList.add(bleDevice)
                 viewBinding.tvConnections.text = "设备连接数：${count}"

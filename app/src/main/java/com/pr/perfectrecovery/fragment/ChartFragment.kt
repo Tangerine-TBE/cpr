@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -24,11 +25,15 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import com.github.mikephil.charting.components.YAxis
+import com.pr.perfectrecovery.bean.BaseDataDTO
+import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 
 
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
+    private lateinit var configBean: ScoringConfigBean
 
     companion object {
         fun newInstance() = ChartFragment()
@@ -48,6 +53,8 @@ class ChartFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         EventBus.getDefault().register(this)
         viewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
+        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
+        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
         initView()
     }
 
@@ -59,9 +66,17 @@ class ChartFragment : Fragment() {
 
         StatusLiveData.data.observe(requireActivity(), {
             addEntry(data, viewBinding.chart1, it.distance.toFloat())
-            LogUtils.e("距离值： ${it.distance.toFloat()}")
+            setData(it)
         })
     }
+
+    private fun setData(data: BaseDataDTO) {
+        viewBinding.tvLungTotal.text = "/150"
+        viewBinding.tvLungCount.text = "${data.qySum}"
+        viewBinding.tvHeartTotal.text = "/10"
+        viewBinding.tvHeartCount.text = "${data.prSum}"
+    }
+
 
     private fun getData(): LineData {
         val values = ArrayList<Entry>()
