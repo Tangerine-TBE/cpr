@@ -1,19 +1,18 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
+import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IValueFormatter
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
@@ -25,12 +24,19 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ScoringConfigBean
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import org.w3c.dom.Entity
 
-
+/**
+ * 曲线
+ */
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
     private lateinit var configBean: ScoringConfigBean
@@ -58,6 +64,7 @@ class ChartFragment : Fragment() {
         initView()
     }
 
+    private var count = 0f
     private fun initView() {
         //曲线图表
         val data: LineData = getData()
@@ -68,6 +75,88 @@ class ChartFragment : Fragment() {
             addEntry(data, viewBinding.chart1, it.distance.toFloat())
             setData(it)
         })
+
+        initBarChart()
+//        val barCharts = BarCharts()
+//        val list = ArrayList<Int>()
+//        list.add(790)
+//        val barData = barCharts.getBarData(list)
+//        barCharts.showBarChart(viewBinding.barChart, barData, false)
+        viewBinding.constraintlayout2.setOnClickListener {
+            addEntry(450, BarEntry(450f, 0f))
+        }
+    }
+
+    private fun initBarChart() {
+        viewBinding.barChart.apply {
+            setDrawBorders(true) //显示边界
+            setDrawBarShadow(false) //设置每个直方图阴影为false
+            setDrawValueAboveBar(true) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+            description.isEnabled = false //设置描述文字不显示，默认显示
+            setDrawGridBackground(false) //设置不显示网格
+            //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
+            legend.isEnabled = false //设置不显示比例图
+            setScaleEnabled(true) //设置是否可以缩放
+            //x轴设置
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
+                setDrawGridLines(false);  //是否绘制X轴上的网格线（背景里面的竖线）
+                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
+                granularity = 1f
+                labelCount = 100
+                /*valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                      //TODO 自定义X轴label格式
+                    }
+                }*/
+            }
+            //保证Y轴从0开始，不然会上移一点
+            axisLeft.axisMinimum = 0f
+            axisRight.axisMinimum = 0f
+        }
+    }
+
+    //这里要进行图像绘制，所以要切回UI线程，否则会报错
+    private fun addEntry(value: Int, entry: BarEntry) {
+        //第一次查询要添加一个空的BarDataSet
+        if (viewBinding.barChart.barData == null) {
+            viewBinding.barChart.data =
+                BarData(BarDataSet(mutableListOf<BarEntry>(), "测温点").apply {
+                    // 柱子的颜色
+                    when {
+                        value in 401..599 -> {
+                            color = ContextCompat.getColor(requireContext(), R.color.color_37B48B)
+                        }
+                        value < 400 -> {
+                            color = ContextCompat.getColor(requireContext(), R.color.color_FDC457)
+                        }
+                        value > 600 -> {
+                            color =
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.color_text_selected
+                                )
+                        }
+                    }
+                    // 设置点击某个柱子时，柱子的颜色
+//                    highLightColor = ContextCompat.getColor(mContext, R.color.xiancaizi)
+                    //barDataSet.setHighlightEnabled(false);//选中柱子是否高亮显示  默认为true
+                    viewBinding.barChart.invalidate()
+                })
+        }
+        viewBinding.barChart.apply {
+            barData.addEntry(entry, 0)
+            //通知数据已经改变
+            //lineData.notifyDataChanged()
+            notifyDataSetChanged()
+            //设置在图表中显示的最大X轴数量
+            setVisibleXRangeMaximum(30f)
+            //当图表中显示的X轴数量超过30时，就开始向右移动
+            // moveViewToX(barData.entryCount.toFloat() - 30)
+            //这里用29是因为30的话，最后一条柱子只显示了一半
+            moveViewToX(barData.entryCount.toFloat() - 29)
+            invalidate()
+        }
     }
 
     private fun setData(data: BaseDataDTO) {
@@ -76,7 +165,6 @@ class ChartFragment : Fragment() {
         viewBinding.tvHeartTotal.text = "/10"
         viewBinding.tvHeartCount.text = "${data.prSum}"
     }
-
 
     private fun getData(): LineData {
         val values = ArrayList<Entry>()

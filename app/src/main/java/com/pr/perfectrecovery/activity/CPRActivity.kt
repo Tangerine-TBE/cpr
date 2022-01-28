@@ -7,9 +7,7 @@ import android.bluetooth.BluetoothGatt
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.os.Build
-import android.os.Bundle
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.method.ScrollingMovementMethod
@@ -100,18 +98,6 @@ class CPRActivity : BaseActivity() {
             val intent = Intent(this, TrainingSingleActivity::class.java)
             intent.putParcelableArrayListExtra("blueTooth", connectList)
             startActivity(intent)
-//            if (isStart) {
-//                bindBluetooth()
-//                viewBinding.tvLog.visibility = View.VISIBLE
-//                viewBinding.tvConnections.visibility = View.VISIBLE
-//                viewBinding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
-//            } else {
-//                viewBinding.tvLog.visibility = View.GONE
-//                viewBinding.tvConnections.visibility = View.GONE
-//                unBindBluetooth()
-//                viewBinding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start)
-//            }
-//            isStart = !isStart
         }
 
         viewBinding.progressCircular.setOnClickListener {
@@ -156,11 +142,12 @@ class CPRActivity : BaseActivity() {
     private val itemClick =
         OnItemClickListener { adapter, view, position ->
             if (isItemClick) {
-                if (count >= 6) {//处理提示语设备连接过多时提示
-                    ToastUtils.showShort("最多连接6台蓝牙设备")
-                }
                 val bleDevice = mDeviceAdapter.getItem(position)
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
+                    if (count >= 6) {//处理提示语设备连接过多提示
+                        viewBinding.tvModelNum.text = "当前版本最多同时支持6台模型"
+                        hintHandler.postDelayed(this::setTextNull, 2000)
+                    }
                     BleManager.getInstance().cancelScan()
                     connect(bleDevice, position)
                 } else {
@@ -168,6 +155,16 @@ class CPRActivity : BaseActivity() {
                 }
             }
         }
+
+    private val hintHandler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+        }
+    }
+
+    private fun setTextNull() {
+        viewBinding.tvModelNum.text = ""
+    }
 
     override fun onResume() {
         super.onResume()
@@ -181,7 +178,7 @@ class CPRActivity : BaseActivity() {
         BleManager.getInstance()
             .enableLog(true)
             .setReConnectCount(1, 5000)
-            .setConnectOverTime(20000).operateTimeout = 5000
+            .setConnectOverTime(10000).operateTimeout = 5000
 
     }
 
@@ -257,67 +254,77 @@ class CPRActivity : BaseActivity() {
     private var isItemClick = true
     private var count = 0
     private fun connect(bleDevice: BleDevice, position: Int) {
-        BleManager.getInstance().connect(bleDevice, object : BleGattCallback() {
-            override fun onStartConnect() {
-                isItemClick = false
-                bleDevice.isLoading = true
-                mDeviceAdapter.remove(bleDevice)
-                mDeviceAdapter.addData(position, bleDevice)
-            }
-
-            override fun onConnectFail(bleDevice: BleDevice, exception: BleException) {
-                bleDevice.isLoading = false
-                mDeviceAdapter.remove(bleDevice)
-                mDeviceAdapter.addData(position, bleDevice)
-                ToastUtils.showLong(getString(R.string.connect_fail))
-                isItemClick = true
-            }
-
-            override fun onConnectSuccess(bleDevice: BleDevice, gatt: BluetoothGatt, status: Int) {
-                count++
-                //处理已连接的设备靠前
-                mDeviceAdapter.remove(bleDevice)
-                bleDevice.isLoading = false
-                bleDevice.count = count
-                if (mDeviceAdapter.data.size == 0) {
-                    mDeviceAdapter.addData(bleDevice)
-                } else {
-                    mDeviceAdapter.addData(count - 1, bleDevice)
+        BleManager.getInstance()
+            .setConnectOverTime(5000)
+            .setOperateTimeout(5000)
+            .connect(bleDevice, object : BleGattCallback() {
+                override fun onStartConnect() {
+                    isItemClick = false
+                    bleDevice.isLoading = true
+                    mDeviceAdapter.remove(bleDevice)
+                    mDeviceAdapter.addData(position, bleDevice)
                 }
+
+                override fun onConnectFail(bleDevice: BleDevice, exception: BleException) {
+                    bleDevice.isLoading = false
+                    mDeviceAdapter.remove(bleDevice)
+                    mDeviceAdapter.addData(position, bleDevice)
+                    ToastUtils.showLong(getString(R.string.connect_fail))
+                    isItemClick = true
+                    if (exception.code == BleException.ERROR_CODE_TIMEOUT) {
+                        viewBinding.tvModelNum.text = "连接超时，请重新连接"
+                    }
+                }
+
+                override fun onConnectSuccess(
+                    bleDevice: BleDevice,
+                    gatt: BluetoothGatt,
+                    status: Int
+                ) {
+                    count++
+                    //处理已连接的设备靠前
+                    mDeviceAdapter.remove(bleDevice)
+                    bleDevice.isLoading = false
+                    bleDevice.count = count
+                    if (mDeviceAdapter.data.size == 0) {
+                        mDeviceAdapter.addData(bleDevice)
+                    } else {
+                        mDeviceAdapter.addData(count - 1, bleDevice)
+                    }
 //                viewBinding.textView.text = "$count"
-                bleList.add(bleDevice)
-                viewBinding.tvConnections.text = "设备连接数：${count}"
-                //bind(bleDevice)
-                isItemClick = true
-            }
+                    bleList.add(bleDevice)
+                    viewBinding.tvConnections.text = "设备连接数：${count}"
+                    //bind(bleDevice)
+                    isItemClick = true
+                }
 
-            override fun onDisConnected(
-                isActiveDisConnected: Boolean,
-                bleDevice: BleDevice,
-                gatt: BluetoothGatt,
-                status: Int
-            ) {
-                count--
-                bleList.remove(bleDevice)
-                if (isActiveDisConnected) {
-                    ToastUtils.showLong(bleDevice.name + getString(R.string.active_disconnected))
-                } else {
-                    ToastUtils.showLong(bleDevice.name + getString(R.string.disconnected))
-                    ObserverManager.getInstance().notifyObserver(bleDevice)
-                }
-                viewBinding.tvConnections.text = "设备连接数：${count}"
-                //断开蓝牙连接
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().disconnect(bleDevice)
-                }
+                override fun onDisConnected(
+                    isActiveDisConnected: Boolean,
+                    bleDevice: BleDevice,
+                    gatt: BluetoothGatt,
+                    status: Int
+                ) {
+                    count--
+                    bleList.remove(bleDevice)
+                    if (isActiveDisConnected) {
+                        ToastUtils.showLong(bleDevice.name + getString(R.string.active_disconnected))
+                    } else {
+                        ToastUtils.showLong(bleDevice.name + getString(R.string.disconnected))
+                        ObserverManager.getInstance().notifyObserver(bleDevice)
+                    }
+                    viewBinding.tvConnections.text = "设备连接数：${count}"
+                    //断开蓝牙连接
+                    if (BleManager.getInstance().isConnected(bleDevice)) {
+                        BleManager.getInstance().disconnect(bleDevice)
+                    }
 //                unBind(bleDevice)
-                mDeviceAdapter.remove(bleDevice)
-                bleDevice.isLoading = false
-                bleDevice.count = 0
-                mDeviceAdapter.addData(bleDevice)
-                isItemClick = true
-            }
-        })
+                    mDeviceAdapter.remove(bleDevice)
+                    bleDevice.isLoading = false
+                    bleDevice.count = 0
+                    mDeviceAdapter.addData(bleDevice)
+                    isItemClick = true
+                }
+            })
     }
 
     private fun setScanRule() {
@@ -352,7 +359,7 @@ class CPRActivity : BaseActivity() {
             .setDeviceName(true, *names) // 只扫描指定广播名的设备，可选
             .setDeviceMac(mac) // 只扫描指定mac的设备，可选
             .setAutoConnect(isAutoConnect) // 连接时的autoConnect参数，可选，默认false
-            .setScanTimeOut(10000) // 扫描超时时间，可选，默认10秒
+            .setScanTimeOut(5000) // 扫描超时时间，可选，默认10秒
             .build()
         BleManager.getInstance().initScanRule(scanRuleConfig)
     }
@@ -376,6 +383,12 @@ class CPRActivity : BaseActivity() {
             }
 
             override fun onScanFinished(scanResultList: List<BleDevice>) {
+                mDeviceAdapter.data.let {
+                    if (it.size == 0) {
+                        viewBinding.tvModelNum.visibility = View.VISIBLE
+
+                    }
+                }
                 stopRefresh()
                 isRefresh = false
             }
@@ -674,31 +687,6 @@ class CPRActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    /**
-     * 将byte[]数组转化为String类型
-     *
-     * @param arg    需要转换的byte[]数组
-     * @param length 需要转换的数组长度
-     * @return 转换后的String队形
-     */
-    private fun toHexString(arg: ByteArray?, length: Int): String {
-        var result = String()
-        if (arg != null) {
-            for (i in 0 until length) {
-                result = (result
-                        + (if (Integer.toHexString(
-                        (if (arg[i] < 0) arg[i] + 256 else arg[i]) as Int
-                    ).length == 1
-                ) "0"
-                        + Integer.toHexString((if (arg[i] < 0) arg[i] + 256 else arg[i]) as Int) else Integer.toHexString(
-                    (if (arg[i] < 0) arg[i] + 256 else arg[i]) as Int
-                )) + " ")
-            }
-            return result
-        }
-        return ""
     }
 
 }

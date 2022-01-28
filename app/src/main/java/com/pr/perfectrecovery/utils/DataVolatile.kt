@@ -51,6 +51,8 @@ object DataVolatile {
 
     val dataDTO = BaseDataDTO()
 
+    var Qliang = 0
+
     var L_valueSet = intArrayOf(1)
     var QY_valueSet = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
@@ -107,6 +109,7 @@ object DataVolatile {
                 )
             )
             L_Value = selectValue_P(L_d1, L_d2, L_d3)
+            PT_value = pt(L_Value)
             //吹气数据
             val QY_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -211,10 +214,6 @@ object DataVolatile {
         return dataDTO
     }
 
-    fun setPF_Value() {
-        PF_Value = 0
-    }
-
     fun setCF_Value() {
         CF_Value = 0;
     }
@@ -245,7 +244,8 @@ object DataVolatile {
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
         // int low_flag=0;
-        if (L_d1 >= L_d2) {
+        //防止抖动
+        if (L_d1 >= L_d2 && L_d1 - L_d2 >= 5) {
             if (L_d2 >= L_d3) {
                 value = L_d3
                 low_flag = 0
@@ -261,7 +261,7 @@ object DataVolatile {
                 }
                 preTimePress = changTimePress
             }
-        } else if (L_d2 <= L_d3) {
+        } else if (L_d2 <= L_d3 && L_d3 - L_d2 >= 5) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
@@ -288,12 +288,14 @@ object DataVolatile {
         var value = 0
         if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
             top_flag = 1
+            Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
             if (top_flag == 1) {
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
+                Qliang = 0
                 if (QY_SUM > 1) {
                     val time = changTimePress - preTimeQY
                     CF_Value = (60000 / time).toInt()
@@ -318,6 +320,25 @@ object DataVolatile {
         QY_valueSet.add(value)
         return value
     }
+
+    //判断按压是否停止
+    private val count = 20
+    private fun pt(p: Int): Boolean {
+        if (pt_valueSet.size == count) pt_valueSet.removeFirst()
+        pt_valueSet.add(p)
+        if (pt_valueSet.size == count) {
+            val listArray = ArrayList<Int>()
+            pt_valueSet.forEachIndexed { index, i ->
+                listArray.add(pt_valueSet[index])
+            }
+            if (listArray.size == count) {
+                PF_Value = 0
+            }
+            return listArray.size == 20
+        }
+        return false
+    }
+
 
     fun getData(): BaseDataDTO? {
         return dataDTO

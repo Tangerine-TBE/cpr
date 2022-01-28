@@ -284,7 +284,7 @@ class CycleFragment : Fragment() {
                         )
                     )
             }
-            //0-错误  1-正确
+            //按压位置 0-错误  1-正确
             viewBinding.ivPressAim.visibility =
                 if (dataDTO.psrType == 0) View.VISIBLE else View.INVISIBLE
 
@@ -346,15 +346,6 @@ class CycleFragment : Fragment() {
                 pressCount += DataVolatile.cal_PreSum(dataDTO.distance)
                 viewBinding.tvPress.text = "${dataDTO.prSum}"
                 viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
-
-                if (dataDTO.pressInterrupt && !isPT) {
-                    isPT = true
-                    mHandler.postDelayed(runnable, 2000)
-                }
-
-                if (dataDTO.distance < 175) {
-                    isPT = false
-                }
             }
 
         }
@@ -364,8 +355,8 @@ class CycleFragment : Fragment() {
 
     //按压中断 - 开启计时器 频率清零
     private val runnable = Runnable {
+        isPT = false
         mHandler.removeCallbacksAndMessages(null)
-        DataVolatile.setPF_Value()
         time = 5000
         mHandler.post(counter!!)
     }
