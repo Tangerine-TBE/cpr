@@ -148,6 +148,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <View
+                        android:id="@+id/view2"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginStart="@dimen/dp_10"
@@ -180,6 +181,16 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/textView17"
                         app:layout_constraintTop_toTopOf="@+id/textView17" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChart"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/textView6"
+                        app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -187,6 +198,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_30"
+                    app:layout_constraintStart_toStartOf="@+id/barChart"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
 
                     <TextView
@@ -240,10 +252,10 @@
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/barChart"
                     android:layout_width="match_parent"
-                    android:layout_height="116dp"
-                    android:layout_marginBottom="@dimen/dp_10"
+                    android:layout_height="140dp"
                     android:layout_marginStart="@dimen/dp_60"
-                    app:layout_constraintBottom_toBottomOf="@+id/constraintlayout2"
+                    android:layout_marginTop="@dimen/dp_40"
+                    app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
@@ -326,11 +338,11 @@
                         app:layout_constraintTop_toTopOf="@+id/textView14" />
 
                     <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/chart1"
+                        android:id="@+id/lineChart1"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@+id/viewline"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/viewline"
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -354,6 +366,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <View
+                        android:id="@+id/view3"
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginStart="@dimen/dp_10"
@@ -386,6 +399,16 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/textView13"
                         app:layout_constraintTop_toTopOf="@+id/textView13" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChart2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/textView9"
+                        app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>

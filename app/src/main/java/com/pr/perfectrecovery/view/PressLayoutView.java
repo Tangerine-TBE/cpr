@@ -85,6 +85,9 @@ public class PressLayoutView extends LinearLayout {
     private int numberY = 0;
     private int newY;
     private int prCount = 0;
+    private int up = 0;
+    private int down = 0;
+    private boolean isDown = false;
 
     public void smoothScrollTo(int destY, int prSum) {
         //距离值：  30-150
@@ -101,7 +104,9 @@ public class PressLayoutView extends LinearLayout {
         viewPress.setVisibility(View.VISIBLE);
         viewBottom.setChecked(false);
         if (destY == 0) {
-            numberY = destY;
+            numberY = 0;
+            up = 0;
+            down = 0;
         }
 
         int scrollY = linearLayout.getScrollY();
@@ -113,12 +118,24 @@ public class PressLayoutView extends LinearLayout {
         scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, -newY - scrollY);
 //        }
 
-        if (destY == 9) {//正确的按压
-            viewBottom.setChecked(true);
-            Log.e("smoothScrollTo", "按压正确");
-            viewPress.setVisibility(View.INVISIBLE);
-            ivArrowUp.setVisibility(View.INVISIBLE);
-            ivArrowDown.setVisibility(View.INVISIBLE);
+        if (newY - scrollY > 5 && numberY < 9 && down != 0) {//向上滚动
+//            down = 0;
+//            ivArrowUp.setVisibility(View.INVISIBLE);
+//            ivArrowDown.setVisibility(View.VISIBLE);
+//            Log.e("smoothScrollTo", "按压不足");
+//            if (mScrollerCallBack != null) {
+//                mScrollerCallBack.onScrollerState(TYPE_MIN);
+//            }
+        } else {//向下滚动
+            if (numberY > 0 && down > 0) {//按压未回弹
+                down = destY;
+                ivArrowUp.setVisibility(View.VISIBLE);
+                ivArrowDown.setVisibility(View.INVISIBLE);
+                Log.e("smoothScrollTo", "按压未回弹");
+                if (mScrollerCallBack != null) {
+                    mScrollerCallBack.onScrollerState(TYPE_UP);
+                }
+            }
         }
 
         if (prSum != prCount) {
@@ -129,22 +146,19 @@ public class PressLayoutView extends LinearLayout {
                 if (mScrollerCallBack != null) {
                     mScrollerCallBack.onScrollerState(TYPE_MAX);
                 }
-            } else if (numberY < 9) {
-                ivArrowUp.setVisibility(View.INVISIBLE);
-                ivArrowDown.setVisibility(View.VISIBLE);
-                Log.e("smoothScrollTo", "按压不足");
-                if (mScrollerCallBack != null) {
-                    mScrollerCallBack.onScrollerState(TYPE_MIN);
-                }
-            } else if (destY - numberY > 1) {//按压未回弹
-//                ivArrowUp.setVisibility(View.VISIBLE);
-                ivArrowDown.setVisibility(View.INVISIBLE);
-//                Log.e("smoothScrollTo", "按压未回弹");
-//                if (mScrollerCallBack != null) {
-//                    mScrollerCallBack.onScrollerState(TYPE_UP);
-//                }
             }
+            down = destY;
         }
+
+        if (destY == 9) {//正确的按压
+            isDown = true;
+            viewBottom.setChecked(true);
+            Log.e("smoothScrollTo", "按压正确");
+            viewPress.setVisibility(View.INVISIBLE);
+            ivArrowUp.setVisibility(View.INVISIBLE);
+            ivArrowDown.setVisibility(View.INVISIBLE);
+        }
+        up = destY;
         numberY = destY;
         invalidate();
     }

@@ -247,7 +247,6 @@
                         android:id="@+id/etProcess"
                         style="@style/EditTextStyle"
                         android:layout_marginEnd="@dimen/dp_4"
-                        android:text="5"
                         app:layout_constraintBottom_toBottomOf="@+id/textView"
                         app:layout_constraintEnd_toStartOf="@+id/textView"
                         app:layout_constraintTop_toTopOf="@+id/textView"
@@ -315,7 +314,6 @@
                         android:id="@+id/etCompressions"
                         style="@style/EditTextStyle"
                         android:layout_marginEnd="@dimen/dp_4"
-                        android:text="50"
                         app:layout_constraintBottom_toBottomOf="@+id/tvProcess"
                         app:layout_constraintEnd_toStartOf="@+id/textView4"
                         app:layout_constraintTop_toTopOf="@+id/tvProcess" />
@@ -381,8 +379,7 @@
                     <EditText
                         android:id="@+id/etVentilation"
                         style="@style/EditTextStyle"
-                        android:layout_marginEnd="@dimen/dp_4"
-                        android:text="45"
+                        android:layout_marginEnd="8dp"
                         app:layout_constraintBottom_toBottomOf="@+id/tvProcess3"
                         app:layout_constraintEnd_toStartOf="@+id/textView5"
                         app:layout_constraintTop_toTopOf="@+id/tvProcess3" />
@@ -460,7 +457,6 @@
                         android:id="@+id/etDeduction"
                         style="@style/EditTextStyle"
                         android:layout_marginEnd="@dimen/dp_4"
-                        android:text="0.5"
                         app:layout_constraintBottom_toBottomOf="@+id/textView8"
                         app:layout_constraintEnd_toStartOf="@+id/textView7"
                         app:layout_constraintTop_toTopOf="@+id/textView8" />

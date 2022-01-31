@@ -3,6 +3,7 @@ package com.pr.perfectrecovery
 import android.content.Intent
 import android.os.Bundle
 import android.os.Message
+import android.text.TextUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.blankj.utilcode.util.AppUtils
@@ -56,22 +57,30 @@ class MainActivity : BaseActivity() {
      * 初始化设置
      */
     private fun initConfigData() {
-        val data = ScoringConfigBean()
-        data.process = 5
-        data.compressions = 50
-        data.ventilation = 45
-        data.deduction = 0.5f
-        data.depth = -1
-        data.depthEnd = 6
-        data.depthFrequency = 100
-        data.depthFrequencyEnd = 120
-        data.tidalVolume = 400
-        data.tidalVolumeEnd = 600
-        data.tidalFrequency = 6
-        data.tidalFrequencyEnd = 98
-        data.interrupt = "02:00"
-        //保存配置信息
-        MMKV.defaultMMKV().encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(data))
+        val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
+        if (TextUtils.isEmpty(decodeString)) {
+            val data = ScoringConfigBean()
+            data.process = 5
+            data.compressions = 50
+            data.ventilation = 45
+            data.deduction = 0.5f
+
+            data.depth = 0
+            data.depthEnd = 6
+            data.depthFrequency = 100
+            data.depthFrequencyEnd = 120
+            data.tidalVolume = 400
+            data.tidalVolumeEnd = 600
+            data.tidalFrequency = 6
+            data.tidalFrequencyEnd = 8
+            data.operationTime = "02:00"
+            data.interrupt = "02:00"
+            data.cycles = 5
+            data.cprRatio = 30
+            data.cprRatioEnd = 2
+            //保存配置信息
+            MMKV.defaultMMKV().encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(data))
+        }
     }
 
     private fun showExit() {

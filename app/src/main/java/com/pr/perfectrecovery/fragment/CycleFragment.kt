@@ -91,8 +91,9 @@ class CycleFragment : Fragment() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
-        viewBinding.tvPressTotal.text = "/30"
-        viewBinding.tvPressLungTotal.text = "/2"
+        //按压通气比列
+        viewBinding.tvPressTotal.text = "/${configBean.cprRatio}"
+        viewBinding.tvPressLungTotal.text = "/${configBean.cprRatioEnd}"
         StatusLiveData.data.observe(requireActivity(), Observer {
             Log.i("CPRActivity", "${count++}")
             setViewDate(it)
@@ -103,10 +104,6 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
         })
-
-        viewBinding.pressLayoutView.setOnClickListener {
-            initRandom()
-        }
 
         //监听按压事件回调-处理结果语音提示
         viewBinding.pressLayoutView.setScrollerCallBack { state ->
@@ -133,12 +130,6 @@ class CycleFragment : Fragment() {
             viewBinding.chart.setCurrentStatus(pf)
             viewBinding.chart.invalidate()
         }
-    }
-
-    private fun initRandom() {
-        val random = (0..180).random()
-        viewBinding.pressLayoutView.smoothScrollTo(random, 0)
-        viewBinding.tvPress3.text = "距离值：${random}"
     }
 
     private val VOICE_MP3_BGM: Int = 1//节奏音乐
@@ -320,6 +311,7 @@ class CycleFragment : Fragment() {
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
                 }
+
                 //吹气频率
                 when {
                     dataDTO.bf in 100..120 -> {//通气频率正常

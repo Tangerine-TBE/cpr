@@ -182,7 +182,7 @@
                 <EditText
                     android:id="@+id/etDepth"
                     style="@style/EditTextStyle"
-                    android:text="-1"
+
                     app:layout_constraintBottom_toBottomOf="@+id/textview1"
                     app:layout_constraintStart_toEndOf="@+id/textview1"
                     app:layout_constraintTop_toTopOf="@+id/textview1" />
@@ -190,7 +190,7 @@
                 <EditText
                     android:id="@+id/etDepthFrequency"
                     style="@style/EditTextStyle"
-                    android:text="100"
+
                     app:layout_constraintBottom_toBottomOf="@+id/textview2"
                     app:layout_constraintStart_toEndOf="@+id/textview2"
                     app:layout_constraintTop_toTopOf="@+id/textview2" />
@@ -198,7 +198,6 @@
                 <EditText
                     android:id="@+id/etTidalVolume"
                     style="@style/EditTextStyle"
-                    android:text="400"
                     app:layout_constraintBottom_toBottomOf="@+id/textview4"
                     app:layout_constraintStart_toEndOf="@+id/textview4"
                     app:layout_constraintTop_toTopOf="@+id/textview4"
@@ -207,7 +206,6 @@
                 <EditText
                     android:id="@+id/etTidalFrequency"
                     style="@style/EditTextStyle"
-                    android:text="6"
                     app:layout_constraintBottom_toBottomOf="@+id/textview5"
                     app:layout_constraintStart_toEndOf="@+id/textview5"
                     app:layout_constraintTop_toTopOf="@+id/textview5" />
@@ -275,17 +273,18 @@
                 <EditText
                     android:id="@+id/etDepthEnd"
                     style="@style/EditTextStyle"
-                    android:layout_marginStart="@dimen/dp_10"
-                    android:text="6"
+                    android:layout_width="58dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
                     app:layout_constraintBottom_toBottomOf="@+id/tvd1"
                     app:layout_constraintStart_toEndOf="@+id/tvd1"
-                    app:layout_constraintTop_toTopOf="@+id/tvd1" />
+                    app:layout_constraintTop_toTopOf="@+id/tvd1"
+                    app:layout_constraintVertical_bias="0.444" />
 
                 <EditText
                     android:id="@+id/etDepthFrequencyEnd"
                     style="@style/EditTextStyle"
                     android:layout_marginStart="@dimen/dp_10"
-                    android:text="120"
                     app:layout_constraintBottom_toBottomOf="@+id/tvd2"
                     app:layout_constraintStart_toEndOf="@+id/tvd2"
                     app:layout_constraintTop_toTopOf="@+id/tvd2" />
@@ -293,19 +292,15 @@
                 <EditText
                     android:id="@+id/etInterrupt"
                     style="@style/EditTextStyle"
-                    android:layout_marginStart="@dimen/dp_10"
-                    android:text="0:20"
                     app:layout_constraintBottom_toBottomOf="@+id/tvd3"
-                    app:layout_constraintStart_toEndOf="@+id/tvd3"
+                    app:layout_constraintStart_toStartOf="@+id/etDepthFrequencyEnd"
                     app:layout_constraintTop_toTopOf="@+id/tvd3" />
 
                 <EditText
                     android:id="@+id/etTidalVolumeEnd"
                     style="@style/EditTextStyle"
-                    android:layout_marginStart="8dp"
-                    android:text="600"
                     app:layout_constraintBottom_toBottomOf="@+id/tvd4"
-                    app:layout_constraintStart_toEndOf="@+id/tvd4"
+                    app:layout_constraintStart_toStartOf="@+id/etInterrupt"
                     app:layout_constraintTop_toTopOf="@+id/tvd4"
                     app:layout_constraintVertical_bias="0.555" />
 
@@ -313,7 +308,6 @@
                     android:id="@+id/etTidalFrequencyEnd"
                     style="@style/EditTextStyle"
                     android:layout_marginStart="@dimen/dp_10"
-                    android:text="8"
                     app:layout_constraintBottom_toBottomOf="@+id/tvd5"
                     app:layout_constraintStart_toEndOf="@+id/tvd5"
                     app:layout_constraintTop_toTopOf="@+id/tvd5" />
@@ -384,7 +378,6 @@
                     android:id="@+id/etTime"
                     style="@style/EditTextStyle2"
                     android:layout_marginEnd="@dimen/dp_30"
-                    android:text="2:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -427,7 +420,6 @@
                     android:id="@+id/etCycles"
                     style="@style/EditTextStyle"
                     android:layout_marginEnd="@dimen/dp_30"
-                    android:text="5"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -470,7 +462,6 @@
                     android:id="@+id/etCompression"
                     style="@style/EditTextStyle"
                     android:layout_marginEnd="@dimen/dp_10"
-                    android:text="30"
                     app:layout_constraintBottom_toBottomOf="@+id/etCompression2"
                     app:layout_constraintEnd_toStartOf="@+id/textView3"
                     app:layout_constraintTop_toTopOf="@+id/etCompression2" />
@@ -481,7 +472,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/dp_10"
                     android:gravity="center"
-                    android:text=":"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_18"
                     app:layout_constraintBottom_toBottomOf="@+id/etCompression2"
@@ -491,8 +481,7 @@
                 <EditText
                     android:id="@+id/etCompression2"
                     style="@style/EditTextStyle"
-                    android:layout_marginEnd="@dimen/dp_30"
-                    android:text="6"
+                    android:layout_marginEnd="28dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.fragment
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import com.tencent.mmkv.MMKV
  */
 class CPRScoreFragment : Fragment() {
 
+    private var isInit = false
     private lateinit var viewBinding: CprScoreFragmentBinding
     private var dataDTO: ScoringConfigBean? = null
 
@@ -51,6 +53,7 @@ class CPRScoreFragment : Fragment() {
         viewBinding.etCompressions.addTextChangedListener(editText)
         viewBinding.etVentilation.addTextChangedListener(editText)
         setData()
+        isInit = true
     }
 
     private fun setData() {
@@ -79,7 +82,8 @@ class CPRScoreFragment : Fragment() {
             //中断扣分
             dataDTO?.deduction = viewBinding.etDeduction.text.toString().trim().toFloat()
             dataDTO.let {
-                MMKV.defaultMMKV().encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                MMKV.defaultMMKV()
+                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
             }
         }
     }
@@ -94,21 +98,39 @@ class CPRScoreFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            //流程分数
-            val process = viewBinding.etProcess.text.toString().trim().toInt()
-            //胸外按压
-            val compressions = viewBinding.etCompressions.text.toString().trim().toInt()
-            //人工通气
-            val ventilation = viewBinding.etVentilation.text.toString().trim().toInt()
-            val number = process + compressions + ventilation
-            if (number > 100) {
-                viewBinding.tvDesc.text = "三项加起来总分 ＜ 100分"
-            } else {
-                dataDTO?.process = process
-                dataDTO?.compressions = compressions
-                dataDTO?.ventilation = ventilation
-                dataDTO.let {
-                    MMKV.defaultMMKV().encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            if (isInit) {
+                //流程分数
+                val process =
+                    if (!TextUtils.isEmpty(viewBinding.etProcess.text.toString().trim())) {
+                        viewBinding.etProcess.text.toString().trim().toInt()
+                    } else {
+                        0
+                    }
+                //胸外按压
+                val compressions =
+                    if (!TextUtils.isEmpty(viewBinding.etCompressions.text.toString().trim())) {
+                        viewBinding.etCompressions.text.toString().trim().toInt()
+                    } else {
+                        0
+                    }
+                //人工通气
+                val ventilation =
+                    if (!TextUtils.isEmpty(viewBinding.etVentilation.text.toString().trim())) {
+                        viewBinding.etVentilation.text.toString().trim().toInt()
+                    } else {
+                        0
+                    }
+                val number = process + compressions + ventilation
+                if (number > 100) {
+                    viewBinding.tvDesc.text = "三项加起来总分 ＜ 100分"
+                } else {
+                    dataDTO?.process = process
+                    dataDTO?.compressions = compressions
+                    dataDTO?.ventilation = ventilation
+                    dataDTO.let {
+                        MMKV.defaultMMKV()
+                            .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                    }
                 }
             }
         }

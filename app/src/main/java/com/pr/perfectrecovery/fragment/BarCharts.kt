@@ -67,7 +67,7 @@ class BarCharts {
         //设置规模X启用
         barChart.isScaleXEnabled = false
         //启用设置阻力
-        barChart.setScaleEnabled(false)
+        barChart.setScaleEnabled(true)
         //设置每个拖动启用的高亮显示
         barChart.isHighlightPerDragEnabled = false
         // 设置硬件加速功能
@@ -134,13 +134,6 @@ class BarCharts {
 //        axisLeft.textColor = Color.parseColor("#909399")
 //        axisLeft.textSize = 10f
 //        axisLeft.axisMinimum = 0f
-        var maxSize = 10f
-        //设置柱子的左侧数值
-        if (barData != null && barData.dataSets != null) {
-            barData.dataSets.forEach { item ->
-                maxSize = item.yMax
-            }
-        }
         //axisLeft.axisMaximum = if (maxSize <= 5) 10f else maxSize + 50
 //        axisLeft.setLabelCount(6, true)
 //        axisLeft.valueFormatter = IAxisValueFormatter { value, axis ->
@@ -151,7 +144,7 @@ class BarCharts {
             // 为了使 柱状图成为可滑动的,将水平方向 放大 2.5倍
             barChart.invalidate()
             val mMatrix = Matrix()
-            mMatrix.postScale(2f, 1f)
+            mMatrix.postScale(1.5f, 1f)
             barChart.viewPortHandler.refresh(mMatrix, barChart, false)
             barChart.animateY(1000)
         } else {

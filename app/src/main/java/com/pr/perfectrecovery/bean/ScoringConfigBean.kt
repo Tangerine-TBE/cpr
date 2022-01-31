@@ -16,6 +16,10 @@ data class ScoringConfigBean(
     var tidalFrequency: Int = 0,//吹气（潮气）频率开始
     var tidalFrequencyEnd: Int = 0,//吹气（潮气）频率结束
     var interrupt: String = "",//中断
+    var operationTime: String = "",//操作时长
+    var cycles: Int = 0,//循环次数
+    var cprRatio: Int = 0,//按压通气比列start
+    var cprRatioEnd: Int = 0,//按压通气比列end
 
     var process: Int = 0,//流程分数
     var compressions: Int = 0,//按压分数

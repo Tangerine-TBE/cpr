@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.fragment
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -80,6 +81,11 @@ class CPRStandardFragment : Fragment() {
                 viewBinding.etTidalVolumeEnd.setText("${it.tidalVolumeEnd}")
                 viewBinding.etTidalFrequency.setText("${it.tidalFrequency}")
                 viewBinding.etTidalFrequencyEnd.setText("${it.tidalFrequencyEnd}")
+                viewBinding.etTime.setText("${it.operationTime}")
+                viewBinding.etCycles.setText("${it.cycles}")
+                viewBinding.etCompression.setText("${it.cprRatio}")
+                viewBinding.etCompression2.setText("${it.cprRatioEnd}")
+
             }
         }
     }
@@ -94,8 +100,12 @@ class CPRStandardFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
-            dataDTO?.depthEnd = viewBinding.etDepthEnd.text.toString().trim().toInt()
+            if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
+                dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
+            }
+            if (!TextUtils.isEmpty(viewBinding.etDepthEnd.text.toString().trim())) {
+                dataDTO?.depthEnd = viewBinding.etDepthEnd.text.toString().trim().toInt()
+            }
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
@@ -114,9 +124,13 @@ class CPRStandardFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.depthFrequency = viewBinding.etDepthFrequency.text.toString().trim().toInt()
-            dataDTO?.depthFrequencyEnd =
-                viewBinding.etDepthFrequencyEnd.text.toString().trim().toInt()
+            if (!TextUtils.isEmpty(viewBinding.etDepthFrequency.text.toString().trim())) {
+                dataDTO?.depthFrequency = viewBinding.etDepthFrequency.text.toString().trim().toInt()
+            }
+            if (!TextUtils.isEmpty(viewBinding.etDepthFrequencyEnd.text.toString().trim())) {
+                dataDTO?.depthFrequencyEnd =
+                    viewBinding.etDepthFrequencyEnd.text.toString().trim().toInt()
+            }
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
@@ -154,9 +168,13 @@ class CPRStandardFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.tidalFrequency = viewBinding.etTidalFrequency.text.toString().trim().toInt()
-            dataDTO?.tidalFrequencyEnd =
-                viewBinding.etTidalFrequencyEnd.text.toString().trim().toInt()
+            if (!TextUtils.isEmpty(viewBinding.etTidalFrequency.text.toString().trim())) {
+                dataDTO?.tidalFrequency = viewBinding.etTidalFrequency.text.toString().trim().toInt()
+            }
+            if (!TextUtils.isEmpty(viewBinding.etTidalFrequencyEnd.text.toString().trim())) {
+                dataDTO?.tidalFrequencyEnd =
+                    viewBinding.etTidalFrequencyEnd.text.toString().trim().toInt()
+            }
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
@@ -175,8 +193,13 @@ class CPRStandardFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.tidalFrequency = viewBinding.etTidalVolume.text.toString().trim().toInt()
-            dataDTO?.tidalFrequencyEnd = viewBinding.etTidalVolumeEnd.text.toString().trim().toInt()
+            if (!TextUtils.isEmpty(viewBinding.etTidalVolume.text.toString().trim())) {
+                dataDTO?.tidalVolume = viewBinding.etTidalVolume.text.toString().trim().toInt()
+            }
+            if (!TextUtils.isEmpty(viewBinding.etTidalVolumeEnd.text.toString().trim())) {
+                dataDTO?.tidalVolumeEnd =
+                    viewBinding.etTidalVolumeEnd.text.toString().trim().toInt()
+            }
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))

@@ -269,10 +269,11 @@ class CPRActivity : BaseActivity() {
                     bleDevice.isLoading = false
                     mDeviceAdapter.remove(bleDevice)
                     mDeviceAdapter.addData(position, bleDevice)
-                    ToastUtils.showLong(getString(R.string.connect_fail))
                     isItemClick = true
                     if (exception.code == BleException.ERROR_CODE_TIMEOUT) {
                         viewBinding.tvModelNum.text = "连接超时，请重新连接"
+                    } else {
+                        viewBinding.tvModelNum.text = "连接失败，请重新连接"
                     }
                 }
 
