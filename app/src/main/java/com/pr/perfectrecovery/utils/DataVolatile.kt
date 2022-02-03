@@ -139,7 +139,14 @@ object DataVolatile {
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
             //频率
-            //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+            PF_Value = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        24,
+                        26
+                    )
+                )
+            );
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
             //模型状态
             val state = DataFormatUtils.byteArrayToInt(
@@ -209,8 +216,8 @@ object DataVolatile {
         dataDTO.connectType = LKS_Value
         dataDTO.psrType = PSR_Value
         dataDTO.workType = WS_Value
-        dataDTO.cf = PF_Value
-        dataDTO.bf = CF_Value
+        dataDTO.cf = CF_Value
+        dataDTO.pf = PF_Value
         return dataDTO
     }
 
@@ -334,7 +341,7 @@ object DataVolatile {
             if (listArray.size == count) {
                 PF_Value = 0
             }
-            return listArray.size == 20
+            return listArray.size == count
         }
         return false
     }

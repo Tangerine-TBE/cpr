@@ -118,17 +118,17 @@ public class PressLayoutView extends LinearLayout {
         scroller.startScroll(linearLayout.getScrollX(), scrollY, 0, -newY - scrollY);
 //        }
 
-        if (newY - scrollY > 5 && numberY < 9 && down != 0) {//向上滚动
-//            down = 0;
-//            ivArrowUp.setVisibility(View.INVISIBLE);
-//            ivArrowDown.setVisibility(View.VISIBLE);
-//            Log.e("smoothScrollTo", "按压不足");
-//            if (mScrollerCallBack != null) {
-//                mScrollerCallBack.onScrollerState(TYPE_MIN);
-//            }
+        if ((-newY - scrollY) > 5 && down < 9) {//向上滚动
+            down = 0;
+            ivArrowUp.setVisibility(View.INVISIBLE);
+            ivArrowDown.setVisibility(View.VISIBLE);
+            Log.e("smoothScrollTo", "按压不足");
+            if (mScrollerCallBack != null) {
+                mScrollerCallBack.onScrollerState(TYPE_MIN);
+            }
         } else {//向下滚动
-            if (numberY > 0 && down > 0) {//按压未回弹
-                down = destY;
+            if (down - destY > 0 && down > 0) {//按压未回弹
+                Log.e("smoothScrollTo", "按压未回弹");
                 ivArrowUp.setVisibility(View.VISIBLE);
                 ivArrowDown.setVisibility(View.INVISIBLE);
                 Log.e("smoothScrollTo", "按压未回弹");
@@ -136,6 +136,7 @@ public class PressLayoutView extends LinearLayout {
                     mScrollerCallBack.onScrollerState(TYPE_UP);
                 }
             }
+            down = destY;
         }
 
         if (prSum != prCount) {
@@ -158,7 +159,6 @@ public class PressLayoutView extends LinearLayout {
             ivArrowUp.setVisibility(View.INVISIBLE);
             ivArrowDown.setVisibility(View.INVISIBLE);
         }
-        up = destY;
         numberY = destY;
         invalidate();
     }

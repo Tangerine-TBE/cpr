@@ -99,8 +99,8 @@ class CycleFragment : Fragment() {
             setViewDate(it)
             viewBinding.tvPress3.text = "距离值：${it.distance}"
             viewBinding.tvPress4.text = "气压值：${it.bpValue}"
-            viewBinding.tvPress5.text = "按压频率：${it.cf}"
-            viewBinding.tvPress6.text = "吹气频率：${it.bf}"
+            viewBinding.tvPress5.text = "按压频率：${it.pf}"
+            viewBinding.tvPress6.text = "吹气频率：${it.cf}"
             viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
         })
@@ -261,7 +261,7 @@ class CycleFragment : Fragment() {
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             pfValue = dataDTO.distance
-            bfValue = dataDTO.bf
+            bfValue = dataDTO.pf
             //计算循环次数
             if (dataDTO.prSum / 30 > cycleCount && dataDTO.qySum / 2 > cycleCount) {
                 cycleCount++
@@ -314,14 +314,14 @@ class CycleFragment : Fragment() {
 
                 //吹气频率
                 when {
-                    dataDTO.bf in 100..120 -> {//通气频率正常
+                    dataDTO.pf in 100..120 -> {//通气频率正常
                         viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
                     }
-                    dataDTO.bf > 120 -> {//通气频率过大
+                    dataDTO.pf > 120 -> {//通气频率过大
                         viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    dataDTO.bf < 100 -> {//通气频率过小
+                    dataDTO.pf < 100 -> {//通气频率过小
                         viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }

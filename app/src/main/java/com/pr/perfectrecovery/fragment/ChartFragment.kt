@@ -107,7 +107,7 @@ class ChartFragment : Fragment() {
 
             }
 
-            addEntry(data, viewBinding.lineChart, it.bf.toFloat())
+            addEntry(data, viewBinding.lineChart, it.pf.toFloat())
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
             addEntry(data2, viewBinding.lineChart2, it.cf.toFloat())
 

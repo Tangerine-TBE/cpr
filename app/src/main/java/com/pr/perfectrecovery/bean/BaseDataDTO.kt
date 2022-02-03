@@ -10,8 +10,8 @@ data class BaseDataDTO(
     var connectType: Int = -1,//连接方式  0-蓝牙 1-连接USB
     var psrType: Int = -1,//按压位置正确  0-错误  1-正确
     var workType: Int = -1,//工作方式：0——休眠   1——工作    2——待机
-    var cf: Int = 0,//按压频率：0-200
-    var bf: Int = 0,//吹气频率：0-200
+    var pf: Int = 0,//按压频率：0-200
+    var cf: Int = 0,//吹气频率：0-200
     var prSum: Int = 0,//按压次数
     var qySum: Int = 0,//吹起次数
     var pressInterrupt: Boolean = false//按压中断状态
