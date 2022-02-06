@@ -339,6 +339,7 @@ object DataVolatile {
                 listArray.add(pt_valueSet[index])
             }
             if (listArray.size == count) {
+                listArray.clear()
                 PF_Value = 0
             }
             return listArray.size == count
