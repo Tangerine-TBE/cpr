@@ -109,7 +109,6 @@ object DataVolatile {
                 )
             )
             L_Value = selectValue_P(L_d1, L_d2, L_d3)
-            PT_value = pt(L_Value)
             //吹气数据
             val QY_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -147,6 +146,9 @@ object DataVolatile {
                     )
                 )
             );
+
+            //清空频率
+            PT_value = pt(L_Value)
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
             //模型状态
             val state = DataFormatUtils.byteArrayToInt(
