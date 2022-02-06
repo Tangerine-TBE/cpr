@@ -70,20 +70,20 @@ class ChartFragment : Fragment() {
         viewBinding.tvLungTotal.text = "/${configBean.tidalFrequencyEnd}"
         viewBinding.tvHeartTotal.text = "/${configBean.depthFrequencyEnd}"
         //曲线图表
-        val data: LineData = getData()
-        val data1: LineData = getData()
-        val data2: LineData = getData()
+        val data: LineData = getData(8)
+        val data1: LineData = getData(180)
+        val data2: LineData = getData(120)
 
         //柱状图
         val barCharts = BarCharts()
         val list = ArrayList<Int>()
         list.add(0)
-        val barData = barCharts.getBarData(list)
-        barCharts.showBarChart(viewBinding.barChart, barData, true)
+//        val barData = barCharts.getBarData(list)
+//        barCharts.showBarChart(viewBinding.barChart, barData, true)
         // add some transparency to the color with "& 0x90FFFFFF"
-        setLineChart(viewBinding.lineChart, data, false)
-        setLineChart(viewBinding.lineChart1, data1, true)
-        setLineChart(viewBinding.lineChart2, data2, false)
+        LineChartUtils.setLineChart(viewBinding.lineChart, data, 8)
+        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)
+        LineChartUtils.setLineChart(viewBinding.lineChart2, data2, 120)
         StatusLiveData.data.observe(requireActivity(), {
             setData(it)
             //数据清空
@@ -104,21 +104,20 @@ class ChartFragment : Fragment() {
                 viewBinding.lineChart1.invalidate()
                 viewBinding.lineChart2.notifyDataSetChanged()
                 viewBinding.lineChart2.invalidate()
-
             }
 
-            addEntry(data, viewBinding.lineChart, it.pf.toFloat())
+            addEntry(data, viewBinding.lineChart, it.cf.toFloat())
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
-            addEntry(data2, viewBinding.lineChart2, it.cf.toFloat())
+            addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
 
-            val entryCount2 = (barData.getDataSetByIndex(0) as BarDataSet).entryCount
-            if(entryCount2 == 10){
-                (barData.getDataSetByIndex(0) as BarDataSet).clear()
-            }
+//            val entryCount2 = (barData.getDataSetByIndex(0) as BarDataSet).entryCount
+//            if(entryCount2 == 10){
+//                (barData.getDataSetByIndex(0) as BarDataSet).clear()
+//            }
             addBarEntry(it.bpValue)
         })
 
-//        initBarChart()
+        initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
             addBarEntry(Random().nextInt(800))
         }
@@ -220,9 +219,9 @@ class ChartFragment : Fragment() {
         viewBinding.tvHeartCount.text = "${data.prSum}"
     }
 
-    private fun getData(): LineData {
+    private fun getData(value: Int): LineData {
         val values = ArrayList<Entry>()
-        values.add(Entry(0f, 0f))
+        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
         lineDataSet.lineWidth = 1.75f

@@ -3,7 +3,6 @@ package com.pr.perfectrecovery.utils
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.utils.TestVolatile.top_flag
 
-
 object DataVolatile {
     //电量值：  0-100%
     var VI_Value = 0
@@ -137,19 +136,29 @@ object DataVolatile {
 
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+
             //频率
-            PF_Value = DataFormatUtils.byteArrayToInt(
-                DataFormatUtils.hexStr2Bytes(
-                    "00" + data.substring(
-                        24,
-                        26
-                    )
-                )
-            );
+//            PF_Value = DataFormatUtils.byteArrayToInt(
+//                DataFormatUtils.hexStr2Bytes(
+//                    "00" + data.substring(
+//                        24,
+//                        26
+//                    )
+//                )
+//            );
+//
+//            CF_Value = DataFormatUtils.byteArrayToInt(
+//                DataFormatUtils.hexStr2Bytes(
+//                    "00" + data.substring(
+//                        26,
+//                        28
+//                    )
+//                )
+//            );
 
             //清空频率
-            PT_value = pt(L_Value)
-            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
+//            PT_value = pt(L_Value)
+
             //模型状态
             val state = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -159,30 +168,30 @@ object DataVolatile {
                     )
                 )
             )
-            if (state and 1 == 1) {
-                BLS_Value = 1
+            BLS_Value = if (state and 1 == 1) {
+                1
             } else {
-                BLS_Value = 0
+                0
             }
-            if (state and 2 == 2) {
-                ULS_Value = 1
+            ULS_Value = if (state and 2 == 2) {
+                1
             } else {
-                ULS_Value = 0
+                0
             }
-            if (state and 4 == 4) {
-                TOS_Value = 1
+            TOS_Value = if (state and 4 == 4) {
+                1
             } else {
-                TOS_Value = 0
+                0
             }
-            if (state and 8 == 8) {
-                LKS_Value = 1
+            LKS_Value = if (state and 8 == 8) {
+                1
             } else {
-                LKS_Value = 0
+                0
             }
-            if (state and 16 == 16) {
-                PSR_Value = 1
+            PSR_Value = if (state and 16 == 16) {
+                1
             } else {
-                PSR_Value = 0
+                0
             }
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -243,6 +252,7 @@ object DataVolatile {
                 val changTimePress = System.currentTimeMillis()
                 val time = changTimePress - preTimePress
                 PF_Value = (60000 / time).toInt()
+                if(PF_Value>=180) PF_Value=180
                 preTimePress = changTimePress
             }
             L_valueSet[0] = a
@@ -267,6 +277,7 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
+                    if(PF_Value>=180) PF_Value=180
                 }
                 preTimePress = changTimePress
             }
@@ -278,6 +289,7 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
+                    if(PF_Value>=180) PF_Value=180
                 }
                 preTimePress = changTimePress
             }

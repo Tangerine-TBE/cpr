@@ -289,6 +289,11 @@ class CycleFragment : Fragment() {
             if (qyValue != dataDTO.qySum) {
                 dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
                 qyValue = dataDTO.qySum
+                if (qyValue > 1) {
+                    //吹气频率清零
+                    mHandler.removeCallbacks(runnableCF)
+                    mHandler.postDelayed(runnableCF, 10000)
+                }
                 when {
                     dataDTO.bpValue in 40..80 -> {//通气正常
 //                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
@@ -353,10 +358,8 @@ class CycleFragment : Fragment() {
         mHandler.post(counter!!)
     }
 
-    private var isCF = false;
-
-    //吹气频率-清零
-    private val blowRunnable = Runnable {
+    //按压中断 - 开启计时器 频率清零
+    private val runnableCF = Runnable {
         DataVolatile.setCF_Value()
     }
 
