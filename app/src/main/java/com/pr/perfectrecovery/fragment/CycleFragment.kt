@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.activity.DATADTO
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
@@ -51,7 +52,7 @@ class CycleFragment : Fragment() {
     //错误吹起数统计
     private var errorBlowCount: Int = 0
 
-    //压数统计
+    //按压总数统计
     private var pressCount: Int = 0
 
     //总吹起数统计
@@ -92,8 +93,6 @@ class CycleFragment : Fragment() {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
         //按压通气比列
-        viewBinding.tvPressTotal.text = "/${configBean.cprRatio}"
-        viewBinding.tvPressLungTotal.text = "/${configBean.cprRatioEnd}"
         StatusLiveData.data.observe(requireActivity(), Observer {
             Log.i("CPRActivity", "${count++}")
             setViewDate(it)
@@ -141,6 +140,7 @@ class CycleFragment : Fragment() {
     private val VOICE_MP3_CQJW: Int = 7//吹气进胃
     private val VOICE_MP3_WDKQD: Int = 8//未打开气道
     private val VOICE_MP3_WHT: Int = 9//未回弹
+    private val VOICE_MP3_DIS: Int = 10//蓝牙断开连接
 
     private var mpType = -1
     private var isPlay = false
@@ -177,6 +177,9 @@ class CycleFragment : Fragment() {
                 VOICE_MP3_WHT -> {
                     mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_wht)
                 }
+                VOICE_MP3_DIS -> {
+                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_blueooth)
+                }
             }
             //如果是其他MP3播完后播节奏
             mMediaPlayer?.setOnCompletionListener {
@@ -196,7 +199,10 @@ class CycleFragment : Fragment() {
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
         viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
-
+        viewBinding.ivPress.visibility = View.INVISIBLE
+        viewBinding.pressLayoutView.visibility = View.VISIBLE
+        viewBinding.dashBoard.visibility = View.INVISIBLE
+        viewBinding.chart.visibility = View.VISIBLE
 //        viewBinding.ivAim.visibility = View.VISIBLE
         //viewBinding.ctTime.visibility = View.VISIBLE
         startMP3()
@@ -212,6 +218,10 @@ class CycleFragment : Fragment() {
             mMediaPlayer?.reset()
             mMediaPlayer = null
         }
+    }
+
+    fun bluetoothDisconnected() {
+        setPlayVoice(VOICE_MP3_DIS)
     }
 
     /**
@@ -258,9 +268,9 @@ class CycleFragment : Fragment() {
     private var pfValue = 0
     private var bfValue = 0
     private var qyValue = 0
+
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
-            pfValue = dataDTO.distance
             bfValue = dataDTO.pf
             //计算循环次数
             if (dataDTO.prSum / 30 > cycleCount && dataDTO.qySum / 2 > cycleCount) {
@@ -278,70 +288,63 @@ class CycleFragment : Fragment() {
             //按压位置 0-错误  1-正确
             viewBinding.ivPressAim.visibility =
                 if (dataDTO.psrType == 0) View.VISIBLE else View.INVISIBLE
-
-            //通气道是否打开
-//            if (dataDTO.aisleType == 1) {
-            viewBinding.ivAim.visibility = View.INVISIBLE
-            //气压值状态
-            blowCount++
-            viewBinding.tvPressLung.text = "${dataDTO.qySum}"
-
-            if (qyValue != dataDTO.qySum) {
-                dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
-                qyValue = dataDTO.qySum
-                if (qyValue > 1) {
-                    //吹气频率清零
-                    mHandler.removeCallbacks(runnableCF)
-                    mHandler.postDelayed(runnableCF, 10000)
-                }
-                when {
-                    dataDTO.bpValue in 40..80 -> {//通气正常
-//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
-                    }
-                    dataDTO.bpValue in 80..100 -> {//通气过大
-//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
-                        setPlayVoice(VOICE_MP3_CQGD)
-                    }
-                    dataDTO.bpValue < 40 -> {//通气不足
-//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
-                        setPlayVoice(VOICE_MP3_CQBZ)
-                    }
-                    dataDTO.bpValue > 100 -> {
-                        //吹气进胃
-//                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
-                        setPlayVoice(VOICE_MP3_CQJW)
-                    }
-                }
-
-                //吹气频率
-                when {
-                    dataDTO.pf in 100..120 -> {//通气频率正常
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_center_select)
-                    }
-                    dataDTO.pf > 120 -> {//通气频率过大
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_right_select)
-                        setPlayVoice(VOICE_MP3_CQGD)
-                    }
-                    dataDTO.pf < 100 -> {//通气频率过小
-                        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
-                        setPlayVoice(VOICE_MP3_CQBZ)
-                    }
-                }
-
-            } else if (dataDTO.bpValue == 0) {
-//                viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_left_select)
-//                viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+            //按压频率
+            if (dataDTO.prSum != pfValue) {
+                val max = 200
+                val min = 0
+                val p = dataDTO.pf % (max - min + 1) + min
+                val pf = p / 200f
+                viewBinding.chart.setCurrentStatus(pf)
+                viewBinding.chart.invalidate()
             }
+            pfValue = dataDTO.prSum
+            //通气道是否打开 0-关闭 1-打开
+            if (dataDTO.aisleType == 1) {
+                viewBinding.ivAim.visibility = View.INVISIBLE
+                blowCount++
+                viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
+                viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
+                if (qyValue != dataDTO.qySum) {
+                    dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
+                    qyValue = dataDTO.qySum
+                    if (qyValue > 1) {
+                        //吹气频率清零
+                        mHandler.removeCallbacks(runnableCF)
+                        mHandler.postDelayed(runnableCF, 10000)
+                    }
+                    when {
+                        dataDTO.bpValue in 40..80 -> {//通气正常
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+                        }
+                        dataDTO.bpValue in 80..100 -> {//通气过大
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
+                            setPlayVoice(VOICE_MP3_CQGD)
+                        }
+                        dataDTO.bpValue < 40 -> {//通气不足
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
+                            setPlayVoice(VOICE_MP3_CQBZ)
+                        }
+                        dataDTO.bpValue > 100 -> {//吹气进胃
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
+                            setPlayVoice(VOICE_MP3_CQJW)
+                        }
+                    }
+                }
+            } else {
+                setPlayVoice(VOICE_MP3_WDKQD)
+            }
+            //吹气错误数统计
+            viewBinding.tvLungError.text =
+                "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
+            //按压错误数统计
+            viewBinding.tvPress.text =
+                "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH)}"
+            //按压总数
+            viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
 //            } else {
 //            viewBinding.ivAim.visibility = View.VISIBLE
             if (dataDTO.distance > 0) {
-                LogUtils.e("按压次数：$pressCount")
-                pressCount += DataVolatile.cal_PreSum(dataDTO.distance)
-                viewBinding.tvPress.text = "${dataDTO.prSum}"
+                pressCount = dataDTO.prSum
                 viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
             }
 
@@ -375,6 +378,13 @@ class CycleFragment : Fragment() {
         DataVolatile.PR_SUM = 0
         DataVolatile.CF_Value = 0
         DataVolatile.PF_Value = 0
+        DataVolatile.ERR_PR_HIGH = 0
+        DataVolatile.ERR_PR_LOW = 0
+        DataVolatile.ERR_PR_POSI = 0
+        DataVolatile.ERR_QY_CLOSE = 0
+        DataVolatile.ERR_QY_DEAD = 0
+        DataVolatile.ERR_QY_HIGH = 0
+        DataVolatile.ERR_QY_LOW = 0
     }
 
     private var alphaAniShow: AlphaAnimation? = null

@@ -57,14 +57,19 @@ object LineChartUtils {
 //        chart.scaleX = 1f
         // 图表左边的y坐标轴线
         val leftAxis: YAxis = chart.axisLeft
-        chart.setVisibleXRangeMaximum(30f)
+        val rightAxis: YAxis = chart.axisRight
+
+//        chart.setVisibleXRangeMaximum(10f)
         leftAxis.textColor = Color.WHITE
         // 最小值
         leftAxis.mAxisMinimum = 0f
+        rightAxis.mAxisMinimum = 0f
         // 最大值
         leftAxis.mAxisMaximum = value.toFloat()
+
         leftAxis.setDrawGridLines(false)
         val xAxis: XAxis = chart.xAxis
+        //保证Y轴从0开始，不然会上移一点
 //        xAxis.setLabelCount(30, false) // 设置X轴的刻度数量，第二个参数表示是否平均分配
 //        xAxis.granularity = 30f
 //        xAxis.labelCount = 30

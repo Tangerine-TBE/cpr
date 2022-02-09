@@ -13,5 +13,6 @@ object BaseConstant {
     val EVENT_SINGLE_DATA_CYCLE = 10003
     val EVENT_CPR_START = 10004
     val EVENT_CPR_STOP = 10005
+    val EVENT_CPR_DISCONNENT = 10006
 
 }

@@ -27,6 +27,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.PathDashPathEffect;
+import android.graphics.PathEffect;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -70,9 +72,8 @@ public class DialChart07View extends GraphicalView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        chart180.setChartRange(w, h / 3);
+        chart180.setChartRange(w, (float) (h / 2.4));
     }
-
 
     public void chartRender180() {
         try {
@@ -118,9 +119,11 @@ public class DialChart07View extends GraphicalView {
     public void getPointerPaint() {
         mPaintPoint = chart180.getPointer().getPointerPaint();
         mPaintPoint.setColor(Color.rgb(6, 7, 9));
-        mPaintPoint.setStrokeWidth(15);
-        mPaintPoint.setStyle(Style.STROKE);
-        mPaintPoint.setAntiAlias(true);
+        mPaintPoint.setStrokeWidth(10);
+        mPaintPoint.setStrokeCap(Paint.Cap.SQUARE);
+//        mPaintPoint.setStrokeMiter(2);
+        mPaintPoint.setStrokeJoin(Paint.Join.MITER);
+        mPaintPoint.setStyle(Style.FILL_AND_STROKE);
         mPaintPoint.setAntiAlias(true);
     }
 

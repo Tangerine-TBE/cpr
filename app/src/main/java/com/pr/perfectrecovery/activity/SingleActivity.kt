@@ -3,7 +3,6 @@ package com.pr.perfectrecovery.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -14,6 +13,7 @@ import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
+import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivitySingleBinding
 import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
@@ -30,6 +30,9 @@ class SingleActivity : BaseActivity() {
     private lateinit var binding: ActivitySingleBinding
     private var counter: Counter? = null
     private var mTrainingBean: TrainingBean? = null
+
+    //训练模式成绩结果类
+    private val mTrainingDTO = TrainingDTO()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +88,9 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter?.let { mHandler.removeCallbacks(it) }
+
+                TrainResultActivity.start(this, TrainingDTO("测试名称"))
+                finish()
             }
         }
 
@@ -98,6 +104,8 @@ class SingleActivity : BaseActivity() {
         if (event.code == BaseConstant.EVENT_SINGLE_DATA_CYCLE) {
             //循环次数
             binding.tvCycle.text = "${event.cycleCount}"
+        } else if (event.code == BaseConstant.EVENT_CPR_DISCONNENT) {
+            cycleFragment.bluetoothDisconnected()
         }
     }
 

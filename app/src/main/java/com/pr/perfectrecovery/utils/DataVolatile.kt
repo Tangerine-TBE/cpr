@@ -37,8 +37,6 @@ object DataVolatile {
     //吹气频率：0-200
     var CF_Value = 0
 
-    var PT_value = false
-
     //按压次数
     var PR_SUM = 0
 
@@ -82,6 +80,40 @@ object DataVolatile {
     fun parseString(data: String?): BaseDataDTO {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
         if (data != null && data.length == 40) {
+            //模型状态需先判断
+            val state = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        28,
+                        30
+                    )
+                )
+            )
+            if (state and 1 == 1) {
+                BLS_Value = 1
+            } else {
+                BLS_Value = 0
+            }
+            if (state and 2 == 2) {
+                ULS_Value = 1
+            } else {
+                ULS_Value = 0
+            }
+            if (state and 4 == 4) {
+                TOS_Value = 1
+            } else {
+                TOS_Value = 0
+            }
+            if (state and 8 == 8) {
+                LKS_Value = 1
+            } else {
+                LKS_Value = 0
+            }
+            if (state and 16 == 16) {
+                PSR_Value = 1
+            } else {
+                PSR_Value = 0
+            }
             //按压距离
             val L_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -133,66 +165,13 @@ object DataVolatile {
                     )
                 )
             )
-
+            //清空频率
+            pt(L_Value)
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
-
             //频率
-//            PF_Value = DataFormatUtils.byteArrayToInt(
-//                DataFormatUtils.hexStr2Bytes(
-//                    "00" + data.substring(
-//                        24,
-//                        26
-//                    )
-//                )
-//            );
-//
-//            CF_Value = DataFormatUtils.byteArrayToInt(
-//                DataFormatUtils.hexStr2Bytes(
-//                    "00" + data.substring(
-//                        26,
-//                        28
-//                    )
-//                )
-//            );
-
-            //清空频率
-//            PT_value = pt(L_Value)
-
-            //模型状态
-            val state = DataFormatUtils.byteArrayToInt(
-                DataFormatUtils.hexStr2Bytes(
-                    "00" + data.substring(
-                        28,
-                        30
-                    )
-                )
-            )
-            BLS_Value = if (state and 1 == 1) {
-                1
-            } else {
-                0
-            }
-            ULS_Value = if (state and 2 == 2) {
-                1
-            } else {
-                0
-            }
-            TOS_Value = if (state and 4 == 4) {
-                1
-            } else {
-                0
-            }
-            LKS_Value = if (state and 8 == 8) {
-                1
-            } else {
-                0
-            }
-            PSR_Value = if (state and 16 == 16) {
-                1
-            } else {
-                0
-            }
+            //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
@@ -217,7 +196,6 @@ object DataVolatile {
 
         dataDTO.prSum = PR_SUM
         dataDTO.qySum = QY_SUM
-        dataDTO.pressInterrupt = PT_value
         dataDTO.electricity = VI_Value
         dataDTO.distance = L_Value
         dataDTO.bpValue = QY_Value
@@ -229,6 +207,14 @@ object DataVolatile {
         dataDTO.workType = WS_Value
         dataDTO.cf = CF_Value
         dataDTO.pf = PF_Value
+        dataDTO.ERR_PR_HIGH = ERR_PR_HIGH
+        dataDTO.ERR_PR_LOW = ERR_PR_LOW
+        dataDTO.ERR_PR_POSI = ERR_PR_POSI
+        dataDTO.ERR_QY_CLOSE = ERR_QY_CLOSE
+        dataDTO.ERR_QY_DEAD = ERR_QY_DEAD
+        dataDTO.ERR_QY_HIGH = ERR_QY_HIGH
+        dataDTO.ERR_QY_LOW = ERR_QY_LOW
+
         return dataDTO
     }
 
@@ -252,7 +238,7 @@ object DataVolatile {
                 val changTimePress = System.currentTimeMillis()
                 val time = changTimePress - preTimePress
                 PF_Value = (60000 / time).toInt()
-                if(PF_Value>=180) PF_Value=180
+                if (PF_Value >= 180) PF_Value = 180
                 preTimePress = changTimePress
             }
             L_valueSet[0] = a
@@ -260,11 +246,13 @@ object DataVolatile {
         return sum
     }
 
+    /*
+     * 根据按压三次相邻的距离值找到有效值。
+     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
         // int low_flag=0;
-        //防止抖动
-        if (L_d1 >= L_d2 && L_d1 - L_d2 >= 5) {
+        if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
                 value = L_d3
                 low_flag = 0
@@ -273,23 +261,23 @@ object DataVolatile {
                 // preTimePress = System.currentTimeMillis();    //获取开始时间
                 low_flag = 1
                 PR_SUM++
+                Err_PrTotal(value)
                 val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    if(PF_Value>=180) PF_Value=180
                 }
                 preTimePress = changTimePress
             }
-        } else if (L_d2 <= L_d3 && L_d3 - L_d2 >= 5) {
+        } else if (L_d2 <= L_d3) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
+                Err_PrTotal(L_d3)
                 val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    if(PF_Value>=180) PF_Value=180
                 }
                 preTimePress = changTimePress
             }
@@ -300,67 +288,115 @@ object DataVolatile {
         return value
     }
 
+
+    //按压错误-按压不足
+    var ERR_PR_LOW = 0
+
+    //按压错误-按压过大
+    var ERR_PR_HIGH = 0
+
+    //按压错误-按压位置错误
+    var ERR_PR_POSI = 0
+
+    fun Err_PrTotal(l: Int) {
+        if (PSR_Value == 0) {
+            ERR_PR_POSI++
+        } else {
+            if (l < 120) {
+                ERR_PR_HIGH++
+            } else if (l > 130) {
+                ERR_PR_LOW++
+            }
+        }
+    }
+
+    //吹气错误-气压不足
+    var ERR_QY_LOW = 0
+
+    //吹气错误-气压过大
+    var ERR_QY_HIGH = 0
+
+    //吹气错误-气压进胃
+    var ERR_QY_DEAD = 0
+
+    //吹气错误-气道未打开错误
+    var ERR_QY_CLOSE = 0
+
+    fun ERR_QyTotal(value: Int) {
+        if (TOS_Value == 0) {
+            ERR_PR_POSI++
+        } else {
+            if (value in 1..39) {
+                ERR_QY_LOW++
+            } else if (value in 81..120) {
+                ERR_QY_HIGH++
+            } else if (value > 120) {
+                ERR_QY_DEAD++
+            }
+        }
+    }
+
     var preTimeQY: Long = 0
 
     /*
- * 根据吹气三次相邻的气压值找到有效值。
- * */
+     * 根据吹气三次相邻的气压值找到有效值。
+     * */
     fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
         var value = 0
-        if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
-            top_flag = 1
-            Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
-        }
-        if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
-            if (top_flag == 1) {
-                val changTimePress = System.currentTimeMillis()
-                ++QY_SUM
+        var top_flag = 0
+        if (QY_d1 <= QY_d2) {
+            if (QY_d2 <= QY_d3) {
                 top_flag = 0
-                Qliang = 0
+                value = QY_d3
+            } else {
+                top_flag = 1
+                value = QY_d2
+                QY_SUM++
+                ERR_QyTotal(value)
+                val changTimePress = System.currentTimeMillis()
                 if (QY_SUM > 1) {
                     val time = changTimePress - preTimeQY
                     CF_Value = (60000 / time).toInt()
                 }
                 preTimeQY = changTimePress
             }
-        }
-        value = if (QY_d1 <= QY_d2) {
-            if (QY_d2 <= QY_d3) {
-                QY_d3
-            } else {
-                //  top_flag=1;
-                QY_d2
-            }
         } else {
-            if (QY_d2 >= QY_d3) {
-                QY_d3
+            if (QY_d2 <= QY_d3) {
+                if (top_flag == 0) {
+                    top_flag = 1
+                    QY_SUM++
+                    ERR_QyTotal(QY_d3)
+                    val changTimePress = System.currentTimeMillis()
+                    if (QY_SUM > 1) {
+                        val time = changTimePress - preTimeQY
+                        CF_Value = (60000 / time).toInt()
+                    }
+                    preTimeQY = changTimePress
+                }
+                value = QY_d3
             } else {
-                QY_d2
+                value = QY_d2
             }
         }
-        QY_valueSet.add(value)
         return value
     }
 
     //判断按压是否停止
-    private val count = 20
+    private const val count = 20
     private fun pt(p: Int): Boolean {
-        if (pt_valueSet.size == count) pt_valueSet.removeFirst()
-        pt_valueSet.add(p)
-        if (pt_valueSet.size == count) {
-            val listArray = ArrayList<Int>()
-            pt_valueSet.forEachIndexed { index, i ->
-                listArray.add(pt_valueSet[index])
-            }
-            if (listArray.size == count) {
-                listArray.clear()
+        if (p > 175) {
+            if (pt_valueSet.size == count) pt_valueSet.removeFirst()
+            pt_valueSet.add(p)
+            if (pt_valueSet.size == count) {
+                pt_valueSet.clear()
                 PF_Value = 0
+                return true
             }
-            return listArray.size == count
+        } else {
+            pt_valueSet.clear()
         }
         return false
     }
-
 
     fun getData(): BaseDataDTO? {
         return dataDTO

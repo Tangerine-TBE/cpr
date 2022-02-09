@@ -253,6 +253,7 @@ class CPRActivity : BaseActivity() {
 
     private var isItemClick = true
     private var count = 0
+    private var position = -1
     private fun connect(bleDevice: BleDevice, position: Int) {
         BleManager.getInstance()
             .setConnectOverTime(5000)
@@ -314,10 +315,23 @@ class CPRActivity : BaseActivity() {
                         ObserverManager.getInstance().notifyObserver(bleDevice)
                     }
                     viewBinding.tvConnections.text = "设备连接数：${count}"
+
                     //断开蓝牙连接
                     if (BleManager.getInstance().isConnected(bleDevice)) {
                         BleManager.getInstance().disconnect(bleDevice)
                     }
+
+                    if (count == 0) {
+                        EventBus.getDefault()
+                            .post(
+                                MessageEventData(
+                                    BaseConstant.EVENT_CPR_DISCONNENT,
+                                    "",
+                                    null
+                                )
+                            )
+                    }
+
 //                unBind(bleDevice)
                     mDeviceAdapter.remove(bleDevice)
                     bleDevice.isLoading = false

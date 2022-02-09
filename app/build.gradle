@@ -36,6 +36,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    // 自定义打包名称
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "PR_APK_${buildType.name}_V${versionName}_${generateTime()}.apk"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -47,6 +55,10 @@ android {
     buildFeatures {
         viewBinding true
     }
+}
+//构建时间
+static def generateTime() {
+    return new Date().format("yyyy_MM_dd_HH_mm")
 }
 
 dependencies {

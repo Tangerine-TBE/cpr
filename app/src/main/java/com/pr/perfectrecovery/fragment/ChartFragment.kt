@@ -146,10 +146,10 @@ class ChartFragment : Fragment() {
                     }
                 }*/
             }
-
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
+//            data.barWidth = 0.3f
             // if more than 60 entries are displayed in the chart, no values will be
             // drawny
 //            setMaxVisibleValueCount(6)

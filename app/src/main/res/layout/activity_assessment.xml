@@ -126,7 +126,6 @@
                 android:id="@+id/tvProcess"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10分"
                 android:textColor="#ffffff"
                 android:textSize="13sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -151,7 +150,6 @@
                 android:id="@+id/tvPress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="80分"
                 android:textColor="#ffffff"
                 android:textSize="13sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -176,7 +174,6 @@
                 android:id="@+id/tvDeduction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="t*0.5分"
                 android:textColor="#ffffff"
                 android:textSize="13sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -201,7 +198,6 @@
                 android:id="@+id/tvVentilation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10分"
                 android:textColor="#ffffff"
                 android:textSize="13sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -244,7 +240,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_4"
-            android:layout_marginBottom="@dimen/dp_6"
+            android:layout_marginBottom="@dimen/dp_8"
             android:text="分"
             android:textColor="@color/color_text_normal"
             android:textSize="18sp"
@@ -288,7 +284,6 @@
                 android:id="@+id/tvPressScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="60"
                 android:textColor="#ffffffff"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -342,7 +337,6 @@
                 android:id="@+id/tvInterruptScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="-10"
                 android:textColor="@color/color_text_selected"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -396,7 +390,6 @@
                 android:id="@+id/tvVentilationScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="20"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -470,4 +463,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/tv6" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

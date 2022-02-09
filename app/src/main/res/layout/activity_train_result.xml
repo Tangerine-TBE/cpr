@@ -42,7 +42,7 @@
                         android:id="@+id/tvName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_38"
+                        android:layout_marginStart="@dimen/dp_20"
                         android:textColor="#ffffffff"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -110,11 +110,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/dp_48"
                     android:src="@mipmap/icon_wm_chart_heart_red"
-                    app:layout_constraintEnd_toStartOf="@+id/textView15"
-                    app:layout_constraintTop_toTopOf="@+id/textView15" />
+                    app:layout_constraintEnd_toStartOf="@+id/tvCycleCount"
+                    app:layout_constraintTop_toTopOf="@+id/tvCycleCount" />
 
                 <TextView
-                    android:id="@+id/textView15"
+                    android:id="@+id/tvCycleCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_16"
@@ -132,8 +132,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_48"
                     android:src="@mipmap/icon_wm_chart_lung_red"
-                    app:layout_constraintStart_toEndOf="@+id/textView15"
-                    app:layout_constraintTop_toTopOf="@+id/textView15" />
+                    app:layout_constraintStart_toEndOf="@+id/tvCycleCount"
+                    app:layout_constraintTop_toTopOf="@+id/tvCycleCount" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView1"
@@ -278,7 +278,7 @@
                             app:layout_constraintTop_toTopOf="@+id/textView18" />
 
                         <TextView
-                            android:id="@+id/textView19"
+                            android:id="@+id/tvLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10次"
@@ -288,7 +288,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
                         <TextView
-                            android:id="@+id/tv20"
+                            android:id="@+id/tvInsufficient"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10次"
@@ -305,11 +305,11 @@
                             android:text="过大"
                             android:textColor="#ffffffff"
                             android:textSize="14sp"
-                            app:layout_constraintStart_toStartOf="@+id/textView19"
-                            app:layout_constraintTop_toBottomOf="@+id/textView19" />
+                            app:layout_constraintStart_toStartOf="@+id/tvLocation"
+                            app:layout_constraintTop_toBottomOf="@+id/tvLocation" />
 
                         <TextView
-                            android:id="@+id/tv22"
+                            android:id="@+id/tvPressBig"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/dp_12"
@@ -328,11 +328,11 @@
                             android:text="回弹"
                             android:textColor="#ffffffff"
                             android:textSize="14sp"
-                            app:layout_constraintStart_toStartOf="@+id/tv20"
-                            app:layout_constraintTop_toBottomOf="@+id/tv20" />
+                            app:layout_constraintStart_toStartOf="@+id/tvInsufficient"
+                            app:layout_constraintTop_toBottomOf="@+id/tvInsufficient" />
 
                         <TextView
-                            android:id="@+id/tv24"
+                            android:id="@+id/tvRebound"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/dp_12"
@@ -387,7 +387,7 @@
                             app:layout_constraintTop_toTopOf="@+id/tv1" />
 
                         <TextView
-                            android:id="@+id/tv3"
+                            android:id="@+id/tvAirway"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10次"
@@ -397,7 +397,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/tv1" />
 
                         <TextView
-                            android:id="@+id/tv4"
+                            android:id="@+id/tvCInsufficient"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10次"
@@ -414,11 +414,11 @@
                             android:text="过大"
                             android:textColor="#ffffffff"
                             android:textSize="14sp"
-                            app:layout_constraintStart_toStartOf="@+id/tv3"
-                            app:layout_constraintTop_toBottomOf="@+id/tv4" />
+                            app:layout_constraintStart_toStartOf="@+id/tvAirway"
+                            app:layout_constraintTop_toBottomOf="@+id/tvCInsufficient" />
 
                         <TextView
-                            android:id="@+id/tv6"
+                            android:id="@+id/tvBLowBig"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/dp_12"
@@ -437,11 +437,11 @@
                             android:text="进胃"
                             android:textColor="#ffffffff"
                             android:textSize="14sp"
-                            app:layout_constraintStart_toStartOf="@+id/tv4"
-                            app:layout_constraintTop_toBottomOf="@+id/tv4" />
+                            app:layout_constraintStart_toStartOf="@+id/tvCInsufficient"
+                            app:layout_constraintTop_toBottomOf="@+id/tvCInsufficient" />
 
                         <TextView
-                            android:id="@+id/tv8"
+                            android:id="@+id/tvIntoStomach"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/dp_12"
@@ -455,7 +455,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <TextView
-                    android:id="@+id/textView20"
+                    android:id="@+id/tvAverageCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_30"
@@ -467,6 +467,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardView3" />
 
                 <TextView
+                    android:id="@+id/tvBlowAverageCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/dp_30"
@@ -474,13 +475,13 @@
                     android:textColor="#ffffffff"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="@+id/cardView4"
-                    app:layout_constraintTop_toTopOf="@+id/textView20" />
+                    app:layout_constraintTop_toTopOf="@+id/tvAverageCount" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_16"
-                    app:layout_constraintTop_toBottomOf="@+id/textView20">
+                    app:layout_constraintTop_toBottomOf="@+id/tvAverageCount">
 
                     <TextView
                         android:id="@+id/tvClock1"
@@ -531,6 +532,7 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
+                            android:id="@+id/tvPressTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_4"
@@ -578,7 +580,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/view4" />
 
                     <TextView
-                        android:id="@+id/textView21"
+                        android:id="@+id/tvPressBottom"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dp_10"
@@ -589,6 +591,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/tvPressEnd" />
 
                     <TextView
+                        android:id="@+id/tvPressCenter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableTop="@mipmap/icon_wm_score"
@@ -596,12 +599,12 @@
                         android:text="60%"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView21"
-                        app:layout_constraintEnd_toStartOf="@+id/textView23"
-                        app:layout_constraintStart_toEndOf="@+id/textView21" />
+                        app:layout_constraintBottom_toBottomOf="@+id/tvPressBottom"
+                        app:layout_constraintEnd_toStartOf="@+id/tvClock2"
+                        app:layout_constraintStart_toEndOf="@+id/tvClock1" />
 
                     <TextView
-                        android:id="@+id/textView23"
+                        android:id="@+id/tvBlow"
                         android:layout_width="88dp"
                         android:layout_height="77dp"
                         android:layout_marginTop="@dimen/dp_16"
@@ -616,14 +619,15 @@
                         app:layout_constraintTop_toBottomOf="@+id/tvClock2" />
 
                     <TextView
+                        android:id="@+id/tvBlowEnd"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="平均：400ml"
                         android:textColor="#ffffffff"
                         android:textSize="16sp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@+id/textView23"
-                        app:layout_constraintStart_toStartOf="@+id/textView23" />
+                        app:layout_constraintEnd_toEndOf="@+id/tvBlow"
+                        app:layout_constraintStart_toStartOf="@+id/tvBlow" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>

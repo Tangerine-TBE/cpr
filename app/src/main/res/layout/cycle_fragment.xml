@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,9 +44,9 @@
         android:id="@+id/ivPress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_50"
         android:src="@mipmap/icon_wm_press"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
@@ -159,6 +160,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_50"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
@@ -203,7 +205,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ivLung">
 
         <TextView
-            android:id="@+id/tvPressLung"
+            android:id="@+id/tvLungError"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
@@ -213,14 +215,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvPressLungTotal"
+            android:id="@+id/tvLungTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="/0"
             android:textColor="#ffffffff"
             android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/tvPressLung"
-            app:layout_constraintTop_toTopOf="@+id/tvPressLung" />
+            app:layout_constraintStart_toEndOf="@+id/tvLungError"
+            app:layout_constraintTop_toTopOf="@+id/tvLungError" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
