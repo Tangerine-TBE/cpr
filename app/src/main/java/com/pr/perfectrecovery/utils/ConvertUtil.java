@@ -13,6 +13,30 @@ public class ConvertUtil {
     }
 
     /**
+     * 将byte[]数组转化为String类型
+     *
+     * @param arg    需要转换的byte[]数组
+     * @param length 需要转换的数组长度
+     * @return 转换后的String队形
+     */
+    public static String toHexString(byte[] arg, int length) {
+        String result = new String();
+        if (arg != null) {
+            for (int i = 0; i < length; i++) {
+                result = result
+                        + (Integer.toHexString(
+                        arg[i] < 0 ? arg[i] + 256 : arg[i]).length() == 1 ? "0"
+                        + Integer.toHexString(arg[i] < 0 ? arg[i] + 256
+                        : arg[i])
+                        : Integer.toHexString(arg[i] < 0 ? arg[i] + 256
+                        : arg[i])) + " ";
+            }
+            return result;
+        }
+        return "";
+    }
+
+    /**
      * 16进制字符串转化为字母ASCALL码
      *
      * @param hex 要转化的16进制数，用空格隔开

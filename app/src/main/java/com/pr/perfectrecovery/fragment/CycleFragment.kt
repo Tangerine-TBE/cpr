@@ -22,6 +22,7 @@ import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
@@ -42,6 +43,7 @@ class CycleFragment : Fragment() {
     private var isTS: Boolean = false
     private var isYY: Boolean = false
     private var cycleCount = 0
+    private var mBaseDataDTO: BaseDataDTO? = null
 
     //中断计时累加
     private var timeOut: Long = 0
@@ -104,20 +106,20 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
         })
 
-        //监听按压事件回调-处理结果语音提示
-        viewBinding.pressLayoutView.setScrollerCallBack { state ->
-            when (state) {
-                PressLayoutView.TYPE_UP -> {//未回弹
-                    setPlayVoice(VOICE_MP3_WHT)
-                }
-                PressLayoutView.TYPE_MIN -> {//按压不足
-                    setPlayVoice(VOICE_MP3_AYBZ)
-                }
-                PressLayoutView.TYPE_MAX -> {//按压过大
-                    setPlayVoice(VOICE_MP3_AYGD)
-                }
-            }
-        }
+//        //监听按压事件回调-处理结果语音提示
+//        viewBinding.pressLayoutView.setScrollerCallBack { state ->
+//            when (state) {
+//                PressLayoutView.TYPE_UP -> {//未回弹
+//                    setPlayVoice(VOICE_MP3_WHT)
+//                }
+//                PressLayoutView.TYPE_MIN -> {//按压不足
+//                    setPlayVoice(VOICE_MP3_AYBZ)
+//                }
+//                PressLayoutView.TYPE_MAX -> {//按压过大
+//                    setPlayVoice(VOICE_MP3_AYGD)
+//                }
+//            }
+//        }
         // viewBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
         // viewBinding.tvLog.setMovementMethod(LinkMovementMethod.getInstance())
         viewBinding.chart.setOnClickListener {
@@ -210,7 +212,24 @@ class CycleFragment : Fragment() {
         mHandler.post(counter!!)
     }
 
-    fun stop() {
+    fun stop(): TrainingDTO {
+        //返回成绩结果类
+        val trainingDTO = TrainingDTO()
+        mBaseDataDTO?.apply {
+            trainingDTO.pressHigh = ERR_PR_HIGH
+            trainingDTO.pressLow = ERR_PR_LOW
+            trainingDTO.pressLocation = ERR_PR_POSI
+            //按压总错误数
+            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI
+            trainingDTO.blowHigh = ERR_QY_HIGH
+            trainingDTO.blowLow = ERR_QY_LOW
+            trainingDTO.blowIntoStomach = ERR_QY_DEAD
+            trainingDTO.blowClose = ERR_QY_CLOSE
+            //吹气总错误数
+            trainingDTO.blowErrorCount = ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE
+            trainingDTO.pressTotal = prSum
+            trainingDTO.blowTotal = qySum
+        }
         counter?.let { mHandler.removeCallbacks(it) }
         viewBinding.ctTime.stop()
         if (mMediaPlayer != null) {
@@ -218,6 +237,7 @@ class CycleFragment : Fragment() {
             mMediaPlayer?.reset()
             mMediaPlayer = null
         }
+        return trainingDTO
     }
 
     fun bluetoothDisconnected() {
@@ -269,8 +289,13 @@ class CycleFragment : Fragment() {
     private var bfValue = 0
     private var qyValue = 0
 
+//    private var err_pr_posi = -1
+//    private var ERR_PR_LOW = -1
+//    private var err_pr_posi = -1
+
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
+            mBaseDataDTO = dataDTO
             bfValue = dataDTO.pf
             //计算循环次数
             if (dataDTO.prSum / 30 > cycleCount && dataDTO.qySum / 2 > cycleCount) {
@@ -331,6 +356,12 @@ class CycleFragment : Fragment() {
             } else {
                 setPlayVoice(VOICE_MP3_WDKQD)
             }
+
+
+//            setPlayVoice(VOICE_MP3_WHT)//未回弹
+//            setPlayVoice(VOICE_MP3_AYBZ)//按压不足
+//            setPlayVoice(VOICE_MP3_AYGD)//按压过大
+
             //吹气错误数统计
             viewBinding.tvLungError.text =
                 "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"

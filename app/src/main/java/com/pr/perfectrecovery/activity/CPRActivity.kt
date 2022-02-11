@@ -62,7 +62,6 @@ class CPRActivity : BaseActivity() {
     private val mDeviceAdapter = DeviceBluetoothAdapter()
     private var bleList = mutableListOf<BleDevice>()
     private var connectList = arrayListOf<BleDevice>()
-    private var isStart = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,8 +218,6 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private var pageSize = 0
-
     private fun onPermissionGranted(permission: String) {
         when (permission) {
             Manifest.permission.ACCESS_FINE_LOCATION -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkGPSIsOpen()) {
@@ -365,7 +362,6 @@ class CPRActivity : BaseActivity() {
             }
         }
 
-//        val str_name: String = et_name.getText().toString()
         var names = arrayOf("WMFS", "D87A")
         val mac: String = ""
         val isAutoConnect: Boolean = false
@@ -513,29 +509,29 @@ class CPRActivity : BaseActivity() {
 //                    EventBus.getDefault()
 //                        .post(MessageEventData(BaseConstant.EVENT_SINGLE_DATA_REFRESH, "", dataDTO))
                     StatusLiveData.data.postValue(dataDTO)
-                    runOnUiThread(Runnable {
-                        Log.i(
-                            "CPRActivity", ConvertUtil.hexToString(
-                                HexUtil.formatHexString(
-                                    characteristic.value,
-                                    false
-                                )
-                            )
-                        )
-                        addText(viewBinding.tvLog, "deviceName：${bleDevice?.name}")
-                        addText(viewBinding.tvLog, "MAC：${bleDevice?.mac}")
-                        addText(viewBinding.tvLog, "电量值：" + DataVolatile.VI_Value)
-                        addText(viewBinding.tvLog, "距离值：" + DataVolatile.L_Value)
-                        addText(viewBinding.tvLog, "气压值：" + DataVolatile.QY_Value)
-                        addText(viewBinding.tvLog, "蓝牙连接值：" + DataVolatile.BLS_Value)
-                        addText(viewBinding.tvLog, "USB连接值：" + DataVolatile.ULS_Value)
-                        addText(viewBinding.tvLog, "通道打开状态值：" + DataVolatile.TOS_Value)
-                        addText(viewBinding.tvLog, "连接方式值：" + DataVolatile.LKS_Value)
-                        addText(viewBinding.tvLog, "按压位置正确值：" + DataVolatile.PSR_Value)
-                        addText(viewBinding.tvLog, "工作方式值：" + DataVolatile.WS_Value)
-                        addText(viewBinding.tvLog, "按压频率值：" + DataVolatile.PF_Value)
-                        addText(viewBinding.tvLog, "吹气频率值：" + DataVolatile.CF_Value)
-                    })
+                    runOnUiThread {
+//                        Log.i(
+//                            "CPRActivity", ConvertUtil.hexToString(
+//                                HexUtil.formatHexString(
+//                                    characteristic.value,
+//                                    false
+//                                )
+//                            )
+//                        )
+//                        addText(viewBinding.tvLog, "deviceName：${bleDevice?.name}")
+//                        addText(viewBinding.tvLog, "MAC：${bleDevice?.mac}")
+//                        addText(viewBinding.tvLog, "电量值：" + DataVolatile.VI_Value)
+//                        addText(viewBinding.tvLog, "距离值：" + DataVolatile.L_Value)
+//                        addText(viewBinding.tvLog, "气压值：" + DataVolatile.QY_Value)
+//                        addText(viewBinding.tvLog, "蓝牙连接值：" + DataVolatile.BLS_Value)
+//                        addText(viewBinding.tvLog, "USB连接值：" + DataVolatile.ULS_Value)
+//                        addText(viewBinding.tvLog, "通道打开状态值：" + DataVolatile.TOS_Value)
+//                        addText(viewBinding.tvLog, "连接方式值：" + DataVolatile.LKS_Value)
+//                        addText(viewBinding.tvLog, "按压位置正确值：" + DataVolatile.PSR_Value)
+//                        addText(viewBinding.tvLog, "工作方式值：" + DataVolatile.WS_Value)
+//                        addText(viewBinding.tvLog, "按压频率值：" + DataVolatile.PF_Value)
+//                        addText(viewBinding.tvLog, "吹气频率值：" + DataVolatile.CF_Value)
+                    }
                 }
             })
     }
@@ -625,7 +621,7 @@ class CPRActivity : BaseActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                     isOpen = true
-                    readThread().start() //开启读线程读取串口接收的数据
+                    ReadThread().start() //开启读线程读取串口接收的数据
                 }
                 else -> {
                     val builder = androidx.appcompat.app.AlertDialog.Builder(this)
@@ -661,7 +657,7 @@ class CPRActivity : BaseActivity() {
 
     private var isOpen = false
 
-    inner class readThread : Thread() {
+    inner class ReadThread : Thread() {
         override fun run() {
             val buffer = ByteArray(64)
             while (true) {
@@ -671,16 +667,12 @@ class CPRActivity : BaseActivity() {
                 }
                 val length: Int = BaseApplication.driver!!.ReadData(buffer, 64)
                 if (length > 0) {
-                    //if (md_switch == 1) {
-                    runOnUiThread(Runnable {
-                        Log.i(
-                            "CPRActivity", ConvertUtil.hexToString(
-                                HexUtil.formatHexString(
-                                    buffer,
-                                    false
-                                )
-                            )
-                        )
+                    runOnUiThread {
+                        Log.i("CPRActivity", ConvertUtil.toHexString(buffer, length))
+                        val dataDTO =
+                            DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))
+                        //发布数据
+                        StatusLiveData.data.postValue(dataDTO)
                         addText(viewBinding.tvLog, "deviceTTL：调试")
                         addText(viewBinding.tvLog, "电量值：" + DataVolatile.VI_Value)
                         addText(viewBinding.tvLog, "距离值：" + DataVolatile.L_Value)
@@ -693,12 +685,8 @@ class CPRActivity : BaseActivity() {
                         addText(viewBinding.tvLog, "工作方式值：" + DataVolatile.WS_Value)
                         addText(viewBinding.tvLog, "按压频率值：" + DataVolatile.PF_Value)
                         addText(viewBinding.tvLog, "吹气频率值：" + DataVolatile.CF_Value)
-                    })
-//                    } else {
-//                        val recv = String(buffer, 0, length)
-//                        msg.obj = recv
-//                    }
-                    //handler.sendMessage(msg)
+
+                    }
                 }
             }
         }

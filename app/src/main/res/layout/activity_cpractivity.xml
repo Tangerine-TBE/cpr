@@ -103,14 +103,13 @@
     <TextView
         android:id="@+id/tvLog"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="200dp"
         android:background="@color/white"
         android:fadeScrollbars="true"
         android:scrollbars="vertical"
         android:textColor="@color/black"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerview"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerview" />
 
     <TextView
         android:id="@+id/tvConnections"

@@ -83,13 +83,16 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 counter?.let { mHandler.post(it) }
             } else {
-                cycleFragment.stop()
+                val mTrainingDTO = cycleFragment.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter?.let { mHandler.removeCallbacks(it) }
-
-//                TrainResultActivity.start(this, TrainingDTO("测试名称"))
+                if (mTrainingDTO != null) {
+                    mTrainingDTO.name = binding.tvName.text.toString().trim()
+                    mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                }
+//                TrainResultActivity.start(this, mTrainingDTO)
 //                finish()
             }
         }

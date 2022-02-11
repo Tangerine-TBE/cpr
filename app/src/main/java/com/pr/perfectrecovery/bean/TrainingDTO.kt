@@ -3,7 +3,7 @@ package com.pr.perfectrecovery.bean
 import org.litepal.crud.LitePalSupport
 import java.io.Serializable
 
-data class TrainingDTO(val name: String = "") : Serializable, LitePalSupport() {
+data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var id: Int = 0
     var trainingTime: String = ""//训练时长
     var cycleCount: Int = 0//循环次数
@@ -23,7 +23,7 @@ data class TrainingDTO(val name: String = "") : Serializable, LitePalSupport() {
 
     var blowErrorCount: Int = 0//吹气错误数
     var blowTotal: Int = 0//吹气总数
-    var blowAirway: Int = 0//吹气气道错误数
+    var blowClose: Int = 0//吹气气道错误数
     var blowLow: Int = 0//吹气不足错误数
     var blowHigh: Int = 0//吹气过大错误数
     var blowIntoStomach: Int = 0//吹气进胃错误数

@@ -80,7 +80,7 @@ class TrainResultActivity : BaseActivity() {
         //吹气总数
         viewBinding.tvHeartTotal.text = "${trainingDTO.blowTotal}"
         //吹气错误
-        viewBinding.tvAirway.text = "${trainingDTO.blowAirway}"
+        viewBinding.tvAirway.text = "${trainingDTO.blowClose}"
         //吹气不足
         viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow}"
         //吹气过大
