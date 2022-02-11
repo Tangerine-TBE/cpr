@@ -160,6 +160,11 @@ public class PressLayoutView extends LinearLayout {
         invalidate();
     }
 
+    public void setDown() {
+        ivArrowUp.setVisibility(View.INVISIBLE);
+        ivArrowDown.setVisibility(View.VISIBLE);
+    }
+
     private void setViewStatus() {
         Log.d("viewY", "" + newY);
         if (newY > viewTop.getHeight()) {

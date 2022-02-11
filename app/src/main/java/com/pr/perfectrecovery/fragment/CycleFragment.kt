@@ -10,14 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.LogUtils
 import com.pr.perfectrecovery.R
-import com.pr.perfectrecovery.activity.DATADTO
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
@@ -31,7 +28,6 @@ import com.pr.perfectrecovery.view.PressLayoutView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import java.util.*
-import java.util.prefs.PreferenceChangeListener
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -107,19 +103,20 @@ class CycleFragment : Fragment() {
         })
 
 //        //监听按压事件回调-处理结果语音提示
-//        viewBinding.pressLayoutView.setScrollerCallBack { state ->
-//            when (state) {
-//                PressLayoutView.TYPE_UP -> {//未回弹
-//                    setPlayVoice(VOICE_MP3_WHT)
-//                }
-//                PressLayoutView.TYPE_MIN -> {//按压不足
+        viewBinding.pressLayoutView.setScrollerCallBack { state ->
+            when (state) {
+                PressLayoutView.TYPE_UP -> {//未回弹
+                    setPlayVoice(VOICE_MP3_WHT)
+                }
+                PressLayoutView.TYPE_MIN -> {//按压不足
+                    //放在按压不足错误数据中处理
 //                    setPlayVoice(VOICE_MP3_AYBZ)
-//                }
-//                PressLayoutView.TYPE_MAX -> {//按压过大
-//                    setPlayVoice(VOICE_MP3_AYGD)
-//                }
-//            }
-//        }
+                }
+                PressLayoutView.TYPE_MAX -> {//按压过大
+                    setPlayVoice(VOICE_MP3_AYGD)
+                }
+            }
+        }
         // viewBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
         // viewBinding.tvLog.setMovementMethod(LinkMovementMethod.getInstance())
         viewBinding.chart.setOnClickListener {
@@ -289,9 +286,9 @@ class CycleFragment : Fragment() {
     private var bfValue = 0
     private var qyValue = 0
 
-//    private var err_pr_posi = -1
-//    private var ERR_PR_LOW = -1
-//    private var err_pr_posi = -1
+    private var err_pr_posi = 0
+    private var err_pr_low = 0
+    private var err_pr_high = 0
 
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
@@ -354,13 +351,15 @@ class CycleFragment : Fragment() {
                     }
                 }
             } else {
-                setPlayVoice(VOICE_MP3_WDKQD)
+                //setPlayVoice(VOICE_MP3_WDKQD)
             }
 
-
+            if (err_pr_posi != dataDTO.ERR_PR_LOW) {
+                err_pr_posi = dataDTO.ERR_PR_LOW
+                setPlayVoice(VOICE_MP3_AYBZ)//按压不足
+                viewBinding.pressLayoutView.setDown()
+            }
 //            setPlayVoice(VOICE_MP3_WHT)//未回弹
-//            setPlayVoice(VOICE_MP3_AYBZ)//按压不足
-//            setPlayVoice(VOICE_MP3_AYGD)//按压过大
 
             //吹气错误数统计
             viewBinding.tvLungError.text =

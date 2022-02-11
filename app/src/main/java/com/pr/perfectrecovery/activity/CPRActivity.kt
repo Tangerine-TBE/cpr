@@ -119,7 +119,6 @@ class CPRActivity : BaseActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         if (event.code == BaseConstant.EVENT_CPR_START) {
-            //循环次数
             bindBluetooth()
         } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
             unBindBluetooth()
