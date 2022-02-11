@@ -302,8 +302,6 @@ class CycleFragment : Fragment() {
             if (dataDTO.aisleType == 1) {
                 viewBinding.ivAim.visibility = View.INVISIBLE
                 blowCount++
-                viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
-                viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
                 if (qyValue != dataDTO.qySum) {
                     dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
                     qyValue = dataDTO.qySum
@@ -341,6 +339,8 @@ class CycleFragment : Fragment() {
                 "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH)}"
             //按压总数
             viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
+            viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
+
 //            } else {
 //            viewBinding.ivAim.visibility = View.VISIBLE
             if (dataDTO.distance > 0) {

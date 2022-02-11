@@ -89,8 +89,8 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter?.let { mHandler.removeCallbacks(it) }
 
-                TrainResultActivity.start(this, TrainingDTO("测试名称"))
-                finish()
+//                TrainResultActivity.start(this, TrainingDTO("测试名称"))
+//                finish()
             }
         }
 

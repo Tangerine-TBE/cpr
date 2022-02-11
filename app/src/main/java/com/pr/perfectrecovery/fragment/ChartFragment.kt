@@ -67,59 +67,43 @@ class ChartFragment : Fragment() {
 
     private fun initView() {
 
-        viewBinding.tvLungTotal.text = "/${configBean.tidalFrequencyEnd}"
-        viewBinding.tvHeartTotal.text = "/${configBean.depthFrequencyEnd}"
         //曲线图表
         val data: LineData = getData(8)
         val data1: LineData = getData(180)
-        val data2: LineData = getData(120)
+        val data2: LineData = getData(0)
 
         //柱状图
-        val barCharts = BarCharts()
-        val list = ArrayList<Int>()
-        list.add(0)
+//        val barCharts = BarCharts()
 //        val barData = barCharts.getBarData(list)
 //        barCharts.showBarChart(viewBinding.barChart, barData, true)
         // add some transparency to the color with "& 0x90FFFFFF"
         LineChartUtils.setLineChart(viewBinding.lineChart, data, 8)
         LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)
-        LineChartUtils.setLineChart(viewBinding.lineChart2, data2, 120)
+        LineChartUtils.setLineChart(viewBinding.lineChart2, data2, 0)
         StatusLiveData.data.observe(requireActivity(), {
             setData(it)
-            //数据清空
-            val entryCount = (data1.getDataSetByIndex(0) as LineDataSet).entryCount
-            if (entryCount == 30) {
-                (data.getDataSetByIndex(0) as LineDataSet).entries.clear()
-                (data1.getDataSetByIndex(0) as LineDataSet).entries.clear()
-                (data2.getDataSetByIndex(0) as LineDataSet).entries.clear()
-                //lineData.clearValues()
-                //通知数据已经改变
-                data.notifyDataChanged()
-                data.notifyDataChanged()
-                data.notifyDataChanged()
-
-                viewBinding.lineChart.notifyDataSetChanged()
-                viewBinding.lineChart.invalidate()
-                viewBinding.lineChart1.notifyDataSetChanged()
-                viewBinding.lineChart1.invalidate()
-                viewBinding.lineChart2.notifyDataSetChanged()
-                viewBinding.lineChart2.invalidate()
-            }
-
             addEntry(data, viewBinding.lineChart, it.cf.toFloat())
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
-
-//            val entryCount2 = (barData.getDataSetByIndex(0) as BarDataSet).entryCount
-//            if(entryCount2 == 10){
-//                (barData.getDataSetByIndex(0) as BarDataSet).clear()
-//            }
             addBarEntry(it.bpValue)
+            //吹气错误数统计
+            viewBinding.tvLungCount.text =
+                "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
+            //按压错误数统计
+            viewBinding.tvHeartCount.text =
+                "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
+            //按压总数
+            viewBinding.tvLungTotal.text = "/${it.qySum}"
+            viewBinding.tvHeartTotal.text = "/${it.prSum}"
         })
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
             addBarEntry(Random().nextInt(800))
+        }
+
+        viewBinding.constraintlayout.setOnClickListener {
+            addEntry(data, viewBinding.lineChart, 0f)
         }
     }
 
@@ -133,6 +117,7 @@ class ChartFragment : Fragment() {
             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
+            setTouchEnabled(true)
             //x轴设置
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
@@ -156,6 +141,15 @@ class ChartFragment : Fragment() {
             //保证Y轴从0开始，不然会上移一点
             axisLeft.axisMinimum = 0f
             axisRight.axisMinimum = 0f
+            var set1: BarDataSet? = null
+            set1 = BarDataSet(values, "Data Set")
+            set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+            set1.setDrawValues(false)
+            val dataSets = ArrayList<IBarDataSet>()
+            dataSets.add(set1)
+            val barData = BarData(dataSets)
+            data = barData
+            data.barWidth = 0.3f
         }
     }
 
@@ -163,51 +157,19 @@ class ChartFragment : Fragment() {
 
     //这里要进行图像绘制，所以要切回UI线程，否则会报错
     private fun addBarEntry(value: Int) {
-        //第一次查询要添加一个空的BarDataSet
-        var set1: BarDataSet? = null
-        if (viewBinding.barChart.barData == null) {
-            values.add(BarEntry(790f, 0f))
-            set1 = BarDataSet(values, "Data Set")
-            set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-            set1.setDrawValues(false)
-
-            val dataSets = ArrayList<IBarDataSet>()
-            dataSets.add(set1)
-
-            val data = BarData(dataSets)
-            viewBinding.barChart.data = data
-//            viewBinding.barChart.setFitBars(true)
-            data.barWidth = 0.3f
-        }
         viewBinding.barChart.apply {
-            //barData.addEntry(BarEntry(value.toFloat(), 0f), 0)
-            //通知数据已经改变
-            //lineData.notifyDataChanged()
-//            set1 = data.getDataSetByIndex(0) as BarDataSet
-//            when {
-//                value in 401..600 -> {
-//                    set1!!.color = ContextCompat.getColor(requireContext(), R.color.color_37B48B)
-//                }
-//                value < 400 -> {
-//                    set1!!.color = ContextCompat.getColor(requireContext(), R.color.color_FDC457)
-//                }
-//                value > 600 -> {
-//                    set1!!.color =
-//                        ContextCompat.getColor(
-//                            requireContext(),
-//                            R.color.color_text_selected
-//                        )
-//                }
-//            }
-            val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
-            data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
-            data.notifyDataChanged()
-            notifyDataSetChanged()
-            //设置在图表中显示的最大X轴数量
-            setVisibleXRangeMaximum(30f)
-            //这里用29是因为30的话，最后一条柱子只显示了一半
-            moveViewToX(barData.entryCount.toFloat() - 29)
-//            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
+            if (barData != null) {
+//                barData.addEntry(BarEntry(value.toFloat(), 0f), 0)
+                val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
+                data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
+                data.notifyDataChanged()
+                notifyDataSetChanged()
+                //设置在图表中显示的最大X轴数量
+                setVisibleXRangeMaximum(30f)
+                //这里用29是因为30的话，最后一条柱子只显示了一半
+                moveViewToX(barData.entryCount.toFloat() - 29)
+                //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
+            }
         }
         viewBinding.barChart.invalidate()
     }
@@ -221,7 +183,7 @@ class ChartFragment : Fragment() {
 
     private fun getData(value: Int): LineData {
         val values = ArrayList<Entry>()
-        values.add(Entry(0f, value.toFloat()))
+//        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
         lineDataSet.lineWidth = 1.75f
@@ -234,77 +196,6 @@ class ChartFragment : Fragment() {
         lineDataSet.setDrawValues(true)
         // create a data object with the data sets
         return LineData(lineDataSet)
-    }
-
-    private fun setLineChart(chart: LineChart, data: LineData, isSort: Boolean) {
-        (data.getDataSetByIndex(0) as LineDataSet).circleHoleColor = Color.TRANSPARENT
-        (data.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)
-        (data.getDataSetByIndex(0) as LineDataSet).valueFormatter =
-            IValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
-                //val df = DecimalFormat(".00")
-                //                return df.format(value) + "%";
-                "${value.toInt()}"
-            }
-
-        // no description text
-        chart.description.isEnabled = false
-        chart.setDrawGridBackground(false)
-        //设置规模Y启用
-        chart.isScaleYEnabled = false
-        //设置规模X启用
-        chart.isScaleXEnabled = false
-//        chart.axisLeft.axisMinimum = 0f
-//        chart.axisRight.axisMinimum = 0f
-        // enable touch gestures
-        chart.setTouchEnabled(false)
-        // enable scaling and dragging
-        chart.isDragEnabled = true
-        chart.setScaleEnabled(true)
-        // if disabled, scaling can be done on x- and y-axis separately
-        chart.setPinchZoom(false)
-        chart.setBackgroundColor(Color.TRANSPARENT)
-        // set custom chart offsets (automatic offset calculation is hereby disabled)
-        chart.setViewPortOffsets(10f, 0f, 10f, 0f)
-        // add data
-        chart.data = data
-        // get the legend (only possible after setting data)
-        val l = chart.legend
-        l.isEnabled = false
-        chart.xAxis.textColor = Color.WHITE
-        chart.axisLeft.isEnabled = false
-        chart.axisLeft.spaceTop = 10f
-        chart.axisLeft.spaceBottom = 10f
-        chart.axisRight.isEnabled = false
-        chart.xAxis.isEnabled = false
-        chart.axisLeft.spaceBottom = 0f
-
-        //是否缩放X轴
-        chart.isScaleXEnabled = true
-        //X轴缩放比例
-//        chart.scaleX = 1f
-        // 图表左边的y坐标轴线
-        val leftAxis: YAxis = chart.axisLeft
-        chart.setVisibleXRangeMaximum(30f)
-        leftAxis.textColor = Color.WHITE
-        if (isSort) {
-            // 最小值
-            leftAxis.mAxisMinimum = 180f
-            // 最大值
-            leftAxis.mAxisMaximum = 180f
-        } else {
-            // 最小值
-            leftAxis.mAxisMinimum = 120f
-            // 最大值
-            leftAxis.mAxisMaximum = 120f
-        }
-        leftAxis.setDrawGridLines(false)
-        val xAxis: XAxis = chart.xAxis
-//        xAxis.setLabelCount(30, false) // 设置X轴的刻度数量，第二个参数表示是否平均分配
-//        xAxis.granularity = 30f
-//        xAxis.labelCount = 30
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        // animate calls invalidate()...
-        chart.animateX(1500)
     }
 
     /**
@@ -325,10 +216,14 @@ class ChartFragment : Fragment() {
         //通知数据已经改变
         lineData.notifyDataChanged()
         lineChart.notifyDataSetChanged()
-
+        //通知数据已经改变
+        lineData.notifyDataChanged()
+        lineChart.notifyDataSetChanged()
         //把yValues移到指定索引的位置
         lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)
+        lineChart.setVisibleXRangeMaximum(10f)
 //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
+        lineChart.moveViewToX((lineData.entryCount - 10).toFloat())
         lineChart.invalidate()
     }
 

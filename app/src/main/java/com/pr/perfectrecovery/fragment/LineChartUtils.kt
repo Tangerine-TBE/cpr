@@ -29,7 +29,7 @@ object LineChartUtils {
 //        chart.axisLeft.axisMinimum = 0f
 //        chart.axisRight.axisMinimum = 0f
         // enable touch gestures
-        chart.setTouchEnabled(false)
+        chart.setTouchEnabled(true)
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
