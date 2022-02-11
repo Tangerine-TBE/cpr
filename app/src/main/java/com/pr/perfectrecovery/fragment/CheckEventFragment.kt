@@ -9,11 +9,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.pr.perfectrecovery.databinding.EventFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.EventViewModel
 
-class EventFragment : Fragment() {
+class CheckEventFragment : Fragment() {
     private lateinit var viewBinding: EventFragmentBinding
 
     companion object {
-        fun newInstance() = EventFragment()
+        fun newInstance() = CheckEventFragment()
     }
 
     private lateinit var viewModel: EventViewModel

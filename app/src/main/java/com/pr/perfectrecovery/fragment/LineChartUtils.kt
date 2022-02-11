@@ -43,12 +43,12 @@ object LineChartUtils {
         // get the legend (only possible after setting data)
         val l = chart.legend
         l.isEnabled = false
-        chart.xAxis.textColor = Color.WHITE
+        chart.axisRight.isEnabled = false
         chart.axisLeft.isEnabled = false
+        chart.xAxis.isEnabled = false
+        chart.xAxis.textColor = Color.WHITE
         chart.axisLeft.spaceTop = 10f
         chart.axisLeft.spaceBottom = 10f
-        chart.axisRight.isEnabled = false
-        chart.xAxis.isEnabled = false
         chart.axisLeft.spaceBottom = 0f
 
         //是否缩放X轴

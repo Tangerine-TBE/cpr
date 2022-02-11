@@ -1,8 +1,10 @@
 package com.pr.perfectrecovery.bean
 
+import org.litepal.crud.LitePalSupport
 import java.io.Serializable
 
-data class TrainingDTO(val name: String = "") : Serializable {
+data class TrainingDTO(val name: String = "") : Serializable, LitePalSupport() {
+    var id: Int = 0
     var trainingTime: String = ""//训练时长
     var cycleCount: Int = 0//循环次数
     var pressErrorCount: Int = 0//按压错误数

@@ -1,7 +1,6 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
-import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,30 +9,25 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.LogUtils
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.formatter.IValueFormatter
-import com.pr.perfectrecovery.R
-import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.MessageEventData
-import com.pr.perfectrecovery.databinding.ChartFragmentBinding
-import com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel
-import com.pr.perfectrecovery.livedata.StatusLiveData
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
-import java.util.*
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
+import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
+import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.databinding.ChartFragmentBinding
+import com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel
+import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
-import org.w3c.dom.Entity
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.*
 
 /**
  * 曲线
@@ -68,19 +62,14 @@ class ChartFragment : Fragment() {
     private fun initView() {
 
         //曲线图表
-        val data: LineData = getData(8)
+        val data: LineData = getData(0)
         val data1: LineData = getData(180)
         val data2: LineData = getData(0)
-
-        //柱状图
-//        val barCharts = BarCharts()
-//        val barData = barCharts.getBarData(list)
-//        barCharts.showBarChart(viewBinding.barChart, barData, true)
         // add some transparency to the color with "& 0x90FFFFFF"
-        LineChartUtils.setLineChart(viewBinding.lineChart, data, 8)
+        initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)
-        LineChartUtils.setLineChart(viewBinding.lineChart2, data2, 0)
-        StatusLiveData.data.observe(requireActivity(), {
+        initLineChart(viewBinding.lineChart2, data2)
+        StatusLiveData.data.observe(requireActivity()) {
             setData(it)
             addEntry(data, viewBinding.lineChart, it.cf.toFloat())
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
@@ -95,7 +84,7 @@ class ChartFragment : Fragment() {
             //按压总数
             viewBinding.tvLungTotal.text = "/${it.qySum}"
             viewBinding.tvHeartTotal.text = "/${it.prSum}"
-        })
+        }
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
@@ -107,6 +96,50 @@ class ChartFragment : Fragment() {
         }
     }
 
+    private fun initLineChart(lineChart: LineChart, lineData: LineData) {
+        // apply styling
+        // holder.chart.setValueTypeface(mTf);
+
+        // apply styling
+        // holder.chart.setValueTypeface(mTf);
+        lineChart.description.isEnabled = false
+        lineChart.setDrawGridBackground(false)
+
+        val xAxis: XAxis = lineChart.xAxis
+        xAxis.position = XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.setDrawAxisLine(true)
+
+        val leftAxis: YAxis = lineChart.axisLeft
+        leftAxis.setLabelCount(5, false)
+        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+
+        val rightAxis: YAxis = lineChart.axisRight
+        rightAxis.setLabelCount(5, false)
+        rightAxis.setDrawGridLines(false)
+        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+        (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)
+
+        xAxis.isEnabled = false
+        leftAxis.isEnabled = false
+        rightAxis.isEnabled = false
+        xAxis.textColor = Color.WHITE
+
+        val l = lineChart.legend
+        l.isEnabled = false
+
+        // set data
+        lineChart.data = lineData
+
+        // do not forget to refresh the chart
+        // holder.chart.invalidate();
+
+        // do not forget to refresh the chart
+        // holder.chart.invalidate();
+        lineChart.animateX(750)
+    }
+
+    var mBarDataSet: BarDataSet? = null
     private fun initBarChart() {
         viewBinding.barChart.apply {
             setDrawBorders(false) //显示边界
@@ -124,7 +157,7 @@ class ChartFragment : Fragment() {
                 setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
                 //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
                 granularity = 1f // only intervals of 1 day
-                labelCount = 100
+//                labelCount = 100
                 /*valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                       //TODO 自定义X轴label格式
@@ -134,6 +167,7 @@ class ChartFragment : Fragment() {
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
+
 //            data.barWidth = 0.3f
             // if more than 60 entries are displayed in the chart, no values will be
             // drawny
@@ -141,19 +175,19 @@ class ChartFragment : Fragment() {
             //保证Y轴从0开始，不然会上移一点
             axisLeft.axisMinimum = 0f
             axisRight.axisMinimum = 0f
-            var set1: BarDataSet? = null
-            set1 = BarDataSet(values, "Data Set")
-            set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-            set1.setDrawValues(false)
+            mBarDataSet = BarDataSet(values, "Data Set")
+            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+            mBarDataSet!!.setDrawValues(false)
             val dataSets = ArrayList<IBarDataSet>()
-            dataSets.add(set1)
+            dataSets.add(mBarDataSet!!)
             val barData = BarData(dataSets)
             data = barData
-            data.barWidth = 0.3f
+//            data.barWidth = 0.3f
         }
     }
 
     private val values = ArrayList<BarEntry>()
+    private val colors = ArrayList<Int>()
 
     //这里要进行图像绘制，所以要切回UI线程，否则会报错
     private fun addBarEntry(value: Int) {
@@ -163,12 +197,34 @@ class ChartFragment : Fragment() {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
                 data.notifyDataChanged()
+                when {
+                    value in 400..600 -> {
+                        colors.add(
+                            ContextCompat.getColor(requireContext(), R.color.color_37B48B)
+                        )
+                    }
+                    value < 400 -> {
+                        colors.add(
+                            ContextCompat.getColor(requireContext(), R.color.color_FDC457)
+                        )
+                    }
+                    value > 600 -> {
+                        colors.add(
+                            ContextCompat.getColor(requireContext(), R.color.color_text_selected)
+                        )
+                    }
+                }
+                mBarDataSet!!.colors = colors
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(30f)
+                setVisibleXRangeMaximum(20f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 29)
+                moveViewToX(barData.entryCount.toFloat() - 19)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
+//                val mMatrix = Matrix()
+//                mMatrix.postScale(1.5f, 1f)
+//                viewPortHandler.refresh(mMatrix, this, false)
+//                animateY(1000)
             }
         }
         viewBinding.barChart.invalidate()

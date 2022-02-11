@@ -2,18 +2,24 @@ package com.pr.perfectrecovery.activity
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.CheckBox
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
+import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityStatisticalBinding
+import com.pr.perfectrecovery.databinding.ItemStatisticalBinding
 import com.pr.perfectrecovery.utils.TimeUtils
 import com.yanzhenjie.recyclerview.OnItemMenuClickListener
 import com.yanzhenjie.recyclerview.SwipeMenuCreator
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 
-
+/**
+ * 统计管理
+ */
 class StatisticalActivity : BaseActivity() {
 
     private lateinit var binding: ActivityStatisticalBinding
@@ -36,12 +42,25 @@ class StatisticalActivity : BaseActivity() {
         // 菜单点击监听。
         binding.recyclerview.setOnItemMenuClickListener(mItemMenuClickListener)
         binding.recyclerview.adapter = adapter
-        val listData = mutableListOf<String>()
+        val listData = mutableListOf<TrainingDTO>()
         for (item in 1..10) {
-            listData.add("完美复苏$item")
+            val listItem = TrainingDTO()
+            listData.add(listItem)
         }
         adapter.setList(listData)
+
+        binding.top.tvRight.setOnClickListener {
+            isDel = !isDel
+            if (isDel) {
+                binding.top.tvRight.text = "编辑"
+            } else {
+                binding.top.tvRight.text = "管理"
+            }
+            adapter.notifyItemRangeChanged(0, adapter.data.size)
+        }
     }
+
+    private var isDel = false
 
     // 创建菜单：
     private val mSwipeMenuCreator =
@@ -66,12 +85,18 @@ class StatisticalActivity : BaseActivity() {
         }
 
     private val adapter = object :
-        BaseQuickAdapter<String, BaseViewHolder>(R.layout.item_statistical) {
-        override fun convert(holder: BaseViewHolder, item: String) {
+        BaseQuickAdapter<TrainingDTO, BaseViewHolder>(R.layout.item_statistical) {
+        override fun convert(holder: BaseViewHolder, item: TrainingDTO) {
             holder.setText(R.id.tvName, "刘XX" + holder.adapterPosition)
                 .setText(R.id.tvModel, "练习")
                 .setText(R.id.tvTime, TimeUtils.stampToDate(System.currentTimeMillis()))
                 .setText(R.id.tvResult, "优秀")
+            val cbCheck = holder.getView<CheckBox>(R.id.cbCheck)
+            if (isDel) {
+                cbCheck.visibility = View.VISIBLE
+            } else {
+                cbCheck.visibility = View.INVISIBLE
+            }
         }
     }
 }
