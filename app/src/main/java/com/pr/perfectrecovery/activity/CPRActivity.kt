@@ -71,6 +71,7 @@ class CPRActivity : BaseActivity() {
         initView()
         //初始化蓝牙管理器
         initBluetooth()
+        ttl()
     }
 
     private fun initView() {
@@ -85,8 +86,6 @@ class CPRActivity : BaseActivity() {
             //ttl()
             openTTL()
         }
-
-        viewBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
 
         viewBinding.recyclerview.layoutManager = LinearLayoutManager(this)
         // 是否抵用滚动事件监听
@@ -505,32 +504,7 @@ class CPRActivity : BaseActivity() {
                     )
                     runOnUiThread { Log.i("CPRActivity", "${bleDevice?.name}") }
                     //发送数据
-//                    EventBus.getDefault()
-//                        .post(MessageEventData(BaseConstant.EVENT_SINGLE_DATA_REFRESH, "", dataDTO))
                     StatusLiveData.data.postValue(dataDTO)
-                    runOnUiThread {
-//                        Log.i(
-//                            "CPRActivity", ConvertUtil.hexToString(
-//                                HexUtil.formatHexString(
-//                                    characteristic.value,
-//                                    false
-//                                )
-//                            )
-//                        )
-//                        addText(viewBinding.tvLog, "deviceName：${bleDevice?.name}")
-//                        addText(viewBinding.tvLog, "MAC：${bleDevice?.mac}")
-//                        addText(viewBinding.tvLog, "电量值：" + DataVolatile.VI_Value)
-//                        addText(viewBinding.tvLog, "距离值：" + DataVolatile.L_Value)
-//                        addText(viewBinding.tvLog, "气压值：" + DataVolatile.QY_Value)
-//                        addText(viewBinding.tvLog, "蓝牙连接值：" + DataVolatile.BLS_Value)
-//                        addText(viewBinding.tvLog, "USB连接值：" + DataVolatile.ULS_Value)
-//                        addText(viewBinding.tvLog, "通道打开状态值：" + DataVolatile.TOS_Value)
-//                        addText(viewBinding.tvLog, "连接方式值：" + DataVolatile.LKS_Value)
-//                        addText(viewBinding.tvLog, "按压位置正确值：" + DataVolatile.PSR_Value)
-//                        addText(viewBinding.tvLog, "工作方式值：" + DataVolatile.WS_Value)
-//                        addText(viewBinding.tvLog, "按压频率值：" + DataVolatile.PF_Value)
-//                        addText(viewBinding.tvLog, "吹气频率值：" + DataVolatile.CF_Value)
-                    }
                 }
             })
     }
@@ -550,11 +524,11 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun initTTL() {
-        if (!BaseApplication.driver!!.isConnected) {
+        if (BaseApplication.driver!!.isConnected) {
             val retval: Int? = BaseApplication.driver?.ResumeUsbPermission()
             if (retval == 0) {
                 if (BaseApplication.driver!!.SetConfig(
-                        9600, 8, 1, 0, 0
+                        115200, 8, 1, 0, 0
                     )//配置串口波特率，函数说明可参照编程手册
                 ) {
                     Toast.makeText(
@@ -593,8 +567,7 @@ class CPRActivity : BaseActivity() {
 
     private fun openTTL() {
         if (!isOpen) {
-            val retval = BaseApplication.driver?.ResumeUsbList()
-            when (retval) {
+            when (BaseApplication.driver?.ResumeUsbList()) {
                 -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备
                     Toast.makeText(
                         this, "打开设备失败!",
@@ -619,6 +592,7 @@ class CPRActivity : BaseActivity() {
                         this, "打开设备成功!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    initTTL()
                     isOpen = true
                     ReadThread().start() //开启读线程读取串口接收的数据
                 }
@@ -672,19 +646,6 @@ class CPRActivity : BaseActivity() {
                             DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))
                         //发布数据
                         StatusLiveData.data.postValue(dataDTO)
-                        addText(viewBinding.tvLog, "deviceTTL：调试")
-                        addText(viewBinding.tvLog, "电量值：" + DataVolatile.VI_Value)
-                        addText(viewBinding.tvLog, "距离值：" + DataVolatile.L_Value)
-                        addText(viewBinding.tvLog, "气压值：" + DataVolatile.QY_Value)
-                        addText(viewBinding.tvLog, "蓝牙连接值：" + DataVolatile.BLS_Value)
-                        addText(viewBinding.tvLog, "USB连接值：" + DataVolatile.ULS_Value)
-                        addText(viewBinding.tvLog, "通道打开状态值：" + DataVolatile.TOS_Value)
-                        addText(viewBinding.tvLog, "连接方式值：" + DataVolatile.LKS_Value)
-                        addText(viewBinding.tvLog, "按压位置正确值：" + DataVolatile.PSR_Value)
-                        addText(viewBinding.tvLog, "工作方式值：" + DataVolatile.WS_Value)
-                        addText(viewBinding.tvLog, "按压频率值：" + DataVolatile.PF_Value)
-                        addText(viewBinding.tvLog, "吹气频率值：" + DataVolatile.CF_Value)
-
                     }
                 }
             }

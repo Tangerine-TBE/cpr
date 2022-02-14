@@ -144,8 +144,7 @@ public class PressLayoutView extends LinearLayout {
                     }
                 }
             } else {//向下滚动
-                isDown = false;
-                if (down - destY > 0 && down > 0) {//按压未回弹
+                if (down > 0 && !isDown) {//按压未回弹
                     Log.e("smoothScrollTo", "按压未回弹");
                     ivArrowUp.setVisibility(View.VISIBLE);
                     ivArrowDown.setVisibility(View.INVISIBLE);
@@ -154,6 +153,7 @@ public class PressLayoutView extends LinearLayout {
                         mScrollerCallBack.onScrollerState(TYPE_UP);
                     }
                 }
+                isDown = false;
                 down = destY;
             }
         }
@@ -169,8 +169,10 @@ public class PressLayoutView extends LinearLayout {
         Log.d("viewY", "" + newY);
         if (newY > viewTop.getHeight()) {
             viewPress.setVisibility(View.VISIBLE);
+            viewTop.setChecked(false);
         } else {
             viewPress.setVisibility(View.INVISIBLE);
+            viewTop.setChecked(true);
         }
     }
 
@@ -200,7 +202,6 @@ public class PressLayoutView extends LinearLayout {
         }
     }
 
-    private int state = 0;
     public final static int TYPE_UP = 1;//未回弹
     public final static int TYPE_MAX = 2;//按压过大
     public final static int TYPE_MIN = 3;//按压不足

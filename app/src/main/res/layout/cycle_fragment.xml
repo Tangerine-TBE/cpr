@@ -21,7 +21,7 @@
         android:id="@+id/dashBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         android:src="@mipmap/icon_wm_bp_1"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,18 +33,20 @@
         android:id="@+id/ctTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_50"
         android:textColor="@color/color_text_selected"
         android:textSize="16sp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/dashBoard"
         app:layout_constraintEnd_toEndOf="@+id/dashBoard"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard" />
+        app:layout_constraintStart_toStartOf="@+id/dashBoard"
+        app:layout_constraintTop_toTopOf="@+id/dashBoard" />
 
     <ImageView
         android:id="@+id/ivPress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_20"
         android:src="@mipmap/icon_wm_press"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,13 +55,13 @@
 
     <ImageView
         android:id="@+id/ivPressAim"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@mipmap/icon_wm_aim"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/dashBoard"
-        app:layout_constraintEnd_toEndOf="@+id/dashBoard"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard" />
+        app:layout_constraintEnd_toEndOf="@+id/ctTime"
+        app:layout_constraintStart_toStartOf="@+id/ctTime"
+        app:layout_constraintTop_toTopOf="@+id/ctTime" />
 
     <TextView
         android:id="@+id/tv_press3"
@@ -159,7 +161,7 @@
         android:id="@+id/pressLayoutView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_20"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -177,13 +179,14 @@
 
     <ImageView
         android:id="@+id/ivAim"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@mipmap/icon_wm_aim"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/dashBoard2"
         app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard2" />
+        app:layout_constraintStart_toStartOf="@+id/dashBoard2"
+        app:layout_constraintTop_toBottomOf="@+id/dashBoard2" />
 
     <ImageView
         android:id="@+id/ivLung"

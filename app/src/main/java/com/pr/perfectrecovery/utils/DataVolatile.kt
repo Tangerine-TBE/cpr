@@ -169,6 +169,8 @@ object DataVolatile {
             pt(L_Value)
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+
+            //qyMax()
             //频率
             //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
@@ -339,45 +341,42 @@ object DataVolatile {
     var preTimeQY: Long = 0
 
     /*
-     * 根据吹气三次相邻的气压值找到有效值。
-     * */
+ * 根据吹气三次相邻的气压值找到有效值。
+ * */
     fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
         var value = 0
-        var top_flag = 0
-        if (QY_d1 <= QY_d2) {
-            if (QY_d2 <= QY_d3) {
-                top_flag = 0
-                value = QY_d3
-            } else {
-                top_flag = 1
-                value = QY_d2
-                QY_SUM++
-                ERR_QyTotal(value)
+        if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
+            top_flag = 1
+            Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
+        }
+        if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
+            if (top_flag == 1) {
                 val changTimePress = System.currentTimeMillis()
+                ++QY_SUM
+                top_flag = 0
+                Qliang = 0
                 if (QY_SUM > 1) {
                     val time = changTimePress - preTimeQY
                     CF_Value = (60000 / time).toInt()
                 }
                 preTimeQY = changTimePress
             }
-        } else {
+        }
+        value = if (QY_d1 <= QY_d2) {
             if (QY_d2 <= QY_d3) {
-                if (top_flag == 0) {
-                    top_flag = 1
-                    QY_SUM++
-                    ERR_QyTotal(QY_d3)
-                    val changTimePress = System.currentTimeMillis()
-                    if (QY_SUM > 1) {
-                        val time = changTimePress - preTimeQY
-                        CF_Value = (60000 / time).toInt()
-                    }
-                    preTimeQY = changTimePress
-                }
-                value = QY_d3
+                QY_d3
             } else {
-                value = QY_d2
+                //  top_flag=1;
+                QY_d2
+            }
+        } else {
+            if (QY_d2 >= QY_d3) {
+                QY_d3
+            } else {
+                QY_d2
             }
         }
+        QY_valueSet.add(value)
         return value
     }
 

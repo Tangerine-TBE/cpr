@@ -23,6 +23,7 @@ import com.pr.perfectrecovery.bean.ScoringConfigBean
 import com.pr.perfectrecovery.databinding.ChartFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -59,6 +60,9 @@ class ChartFragment : Fragment() {
         initView()
     }
 
+    //吹气量统计
+    private var qyValue = 0
+
     private fun initView() {
 
         //曲线图表
@@ -74,7 +78,11 @@ class ChartFragment : Fragment() {
             addEntry(data, viewBinding.lineChart, it.cf.toFloat())
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
-            addBarEntry(it.bpValue)
+            if (qyValue != it.qySum) {
+                it.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
+                qyValue = it.qySum
+                addBarEntry(it.bpValue)
+            }
             //吹气错误数统计
             viewBinding.tvLungCount.text =
                 "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
@@ -103,6 +111,8 @@ class ChartFragment : Fragment() {
         // apply styling
         // holder.chart.setValueTypeface(mTf);
         lineChart.description.isEnabled = false
+        lineChart.setTouchEnabled(false)
+        lineChart.setPinchZoom(false)
         lineChart.setDrawGridBackground(false)
 
         val xAxis: XAxis = lineChart.xAxis
@@ -150,7 +160,7 @@ class ChartFragment : Fragment() {
             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
-            setTouchEnabled(true)
+            setTouchEnabled(false)
             //x轴设置
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
@@ -168,7 +178,6 @@ class ChartFragment : Fragment() {
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
 
-//            data.barWidth = 0.3f
             // if more than 60 entries are displayed in the chart, no values will be
             // drawny
 //            setMaxVisibleValueCount(6)
@@ -182,7 +191,13 @@ class ChartFragment : Fragment() {
             dataSets.add(mBarDataSet!!)
             val barData = BarData(dataSets)
             data = barData
-//            data.barWidth = 0.3f
+            //初始化默认值
+            addBarEntry(0)
+            addBarEntry(0)
+            addBarEntry(0)
+            addBarEntry(0)
+            addBarEntry(0)
+            addBarEntry(0)
         }
     }
 
@@ -198,17 +213,17 @@ class ChartFragment : Fragment() {
                 data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
                 data.notifyDataChanged()
                 when {
-                    value in 400..600 -> {
+                    value in 40..80 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_37B48B)
                         )
                     }
-                    value < 400 -> {
+                    value < 40 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )
                     }
-                    value > 600 -> {
+                    value > 80 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_text_selected)
                         )
@@ -220,6 +235,7 @@ class ChartFragment : Fragment() {
                 setVisibleXRangeMaximum(20f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
                 moveViewToX(barData.entryCount.toFloat() - 19)
+                setBorderWidth(0.3f)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
@@ -277,9 +293,9 @@ class ChartFragment : Fragment() {
         lineChart.notifyDataSetChanged()
         //把yValues移到指定索引的位置
         lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)
-        lineChart.setVisibleXRangeMaximum(10f)
+        lineChart.setVisibleXRangeMaximum(20f)
 //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
-        lineChart.moveViewToX((lineData.entryCount - 10).toFloat())
+        lineChart.moveViewToX((lineData.entryCount - 20).toFloat())
         lineChart.invalidate()
     }
 

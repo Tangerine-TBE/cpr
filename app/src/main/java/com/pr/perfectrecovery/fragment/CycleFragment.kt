@@ -32,6 +32,9 @@ import java.util.*
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
+/**
+ * CPR按压页
+ */
 class CycleFragment : Fragment() {
     private lateinit var viewBinding: CycleFragmentBinding
     private var counter: Counter? = null
@@ -349,6 +352,8 @@ class CycleFragment : Fragment() {
                             setPlayVoice(VOICE_MP3_CQJW)
                         }
                     }
+                    mHandler.removeCallbacks(blowRunnable)
+                    mHandler.postDelayed(blowRunnable, 2000)
                 }
             } else {
                 //setPlayVoice(VOICE_MP3_WDKQD)
@@ -356,8 +361,8 @@ class CycleFragment : Fragment() {
 
             if (err_pr_posi != dataDTO.ERR_PR_LOW) {
                 err_pr_posi = dataDTO.ERR_PR_LOW
-                setPlayVoice(VOICE_MP3_AYBZ)//按压不足
                 viewBinding.pressLayoutView.setDown()
+                setPlayVoice(VOICE_MP3_AYBZ)//按压不足
             }
 //            setPlayVoice(VOICE_MP3_WHT)//未回弹
 
@@ -389,6 +394,13 @@ class CycleFragment : Fragment() {
         mHandler.removeCallbacksAndMessages(null)
         time = 5000
         mHandler.post(counter!!)
+    }
+
+    /**
+     * 吹气图恢复状态
+     */
+    private val blowRunnable = Runnable {
+        viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
     }
 
     //按压中断 - 开启计时器 频率清零
