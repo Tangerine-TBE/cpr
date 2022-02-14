@@ -98,7 +98,7 @@ class SingleActivity : BaseActivity() {
         }
 
         StatusLiveData.data.observe(this, Observer {
-            binding.tvBattery.text = "${it.electricity}%"
+            binding.tvBattery.power = it.electricity
         })
     }
 

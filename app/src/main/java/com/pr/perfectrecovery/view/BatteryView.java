@@ -69,20 +69,26 @@ public class BatteryView extends View {
      */
     private void drawHorizontalBattery(Canvas canvas) {
         Paint paint = new Paint();
-        paint.setColor(mColor);
+
+        //画电池头
+        RectF r3 = new RectF(0, height * 0.25f, width / 20.f, height * 0.75f);
+        //设置电池头颜色为黑色
+        paint.setColor(Color.WHITE);
+        canvas.drawRect(r3, paint);
+
         paint.setStyle(Paint.Style.STROKE);
         float strokeWidth = width / 20.f;
         float strokeWidth_2 = strokeWidth / 2;
         paint.setStrokeWidth(strokeWidth);
-        RectF r1 = new RectF(strokeWidth_2, strokeWidth_2, width - strokeWidth - strokeWidth_2, height - strokeWidth_2);
+        RectF r1 = new RectF(strokeWidth_2 + width / 20.f, strokeWidth_2, width - strokeWidth - strokeWidth_2, height - strokeWidth_2);
         //设置外边框颜色
-        paint.setColor(Color.BLUE);
+        paint.setColor(Color.WHITE);
         canvas.drawRect(r1, paint);
+
+        //画电池内矩形电量
         paint.setStrokeWidth(0);
         paint.setStyle(Paint.Style.FILL);
-        //画电池内矩形电量
-        float offset = (width - strokeWidth * 2) * mPower / 100.f;
-        RectF r2 = new RectF(strokeWidth, strokeWidth, offset, height - strokeWidth);
+        RectF r2 = new RectF(width / 20.f + strokeWidth + (100 - mPower)/100.0f *(width - strokeWidth * 2 - width / 20.f), strokeWidth, width - width / 20.f  - strokeWidth, height - strokeWidth);
         //根据电池电量决定电池内矩形电量颜色
         if (mPower < 30) {
             paint.setColor(Color.RED);
@@ -94,11 +100,10 @@ public class BatteryView extends View {
             paint.setColor(Color.GREEN);
         }
         canvas.drawRect(r2, paint);
-        //画电池头
-        RectF r3 = new RectF(width - strokeWidth, height * 0.25f, width, height * 0.75f);
-        //设置电池头颜色为黑色
-        paint.setColor(Color.BLUE);
-        canvas.drawRect(r3, paint);
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(25f);
+        canvas.drawText(mPower + "%", width / 4, (float) (height / 1.5), paint);
+
     }
 
     /**

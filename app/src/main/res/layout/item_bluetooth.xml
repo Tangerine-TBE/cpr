@@ -63,12 +63,11 @@
                 android:layout_height="18dp"
                 android:layout_marginStart="@dimen/dp_10"
                 android:layout_marginEnd="@dimen/dp_12"
-                android:background="#fff"
+                android:background="#22231D"
                 android:gravity="center"
                 android:visibility="gone"
                 app:batteryColor="@android:color/white"
                 app:batteryOrientation="horizontal"
-                app:batteryPower="70"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

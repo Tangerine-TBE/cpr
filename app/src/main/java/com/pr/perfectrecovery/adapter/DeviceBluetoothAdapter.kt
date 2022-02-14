@@ -29,6 +29,7 @@ class DeviceBluetoothAdapter :
             viewBinding.loadingDot2.visibility =
                 if (item.isLoading) View.VISIBLE else View.INVISIBLE
             viewBinding.loadingDot.visibility = View.INVISIBLE
+            viewBinding.battery.visibility = View.VISIBLE
         } else {
             viewBinding.loadingDot2.visibility = View.INVISIBLE
             viewBinding.loadingDot.visibility = if (item.isLoading) View.VISIBLE else View.INVISIBLE
