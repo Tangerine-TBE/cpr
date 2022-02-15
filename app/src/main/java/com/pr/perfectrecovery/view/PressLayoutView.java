@@ -107,6 +107,7 @@ public class PressLayoutView extends LinearLayout {
             up = 0;
             down = 0;
             isDown = false;
+            viewTop.setChecked(true);
         }
 
         int scrollY = linearLayout.getScrollY();
@@ -144,14 +145,18 @@ public class PressLayoutView extends LinearLayout {
                     }
                 }
             } else {//向下滚动
-                if (down > 0 && !isDown) {//按压未回弹
-                    Log.e("smoothScrollTo", "按压未回弹");
-                    ivArrowUp.setVisibility(View.VISIBLE);
-                    ivArrowDown.setVisibility(View.INVISIBLE);
-                    Log.e("smoothScrollTo", "按压未回弹");
-                    if (mScrollerCallBack != null) {
-                        mScrollerCallBack.onScrollerState(TYPE_UP);
+                if (destY > 0) {
+                    viewTop.setChecked(false);
+                    if (up > 0) {//按压未回弹
+                        Log.e("smoothScrollTo", "按压未回弹");
+                        ivArrowUp.setVisibility(View.VISIBLE);
+                        ivArrowDown.setVisibility(View.INVISIBLE);
+                        Log.e("smoothScrollTo", "按压未回弹");
+                        if (mScrollerCallBack != null) {
+                            mScrollerCallBack.onScrollerState(TYPE_UP);
+                        }
                     }
+                    up = destY;
                 }
                 isDown = false;
                 down = destY;
@@ -169,10 +174,8 @@ public class PressLayoutView extends LinearLayout {
         Log.d("viewY", "" + newY);
         if (newY > viewTop.getHeight()) {
             viewPress.setVisibility(View.VISIBLE);
-            viewTop.setChecked(false);
         } else {
             viewPress.setVisibility(View.INVISIBLE);
-            viewTop.setChecked(true);
         }
     }
 

@@ -50,16 +50,8 @@ class SingleActivity : BaseActivity() {
         binding.tvName.text = mTrainingBean?.name
 
         if (mTrainingBean?.isCheck == true) {
-            counter = Counter()
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
-                null,
-                null,
-                null
-            )
-        } else {
-            binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                resources.getDrawable(R.mipmap.icon_wm_time),
                 null,
                 null,
                 null
@@ -81,6 +73,14 @@ class SingleActivity : BaseActivity() {
                 cycleFragment.start()
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
+                binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
+                binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
+                binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
+                    resources.getDrawable(R.mipmap.icon_wm_time),
+                    null,
+                    null,
+                    null
+                )
                 counter?.let { mHandler.post(it) }
             } else {
                 val mTrainingDTO = cycleFragment.stop()

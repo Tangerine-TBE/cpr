@@ -140,6 +140,8 @@ object DataVolatile {
                 )
             )
             L_Value = selectValue_P(L_d1, L_d2, L_d3)
+            //清空频率
+            pt(L_Value)
             //吹气数据
             val QY_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -165,12 +167,10 @@ object DataVolatile {
                     )
                 )
             )
-            //清空频率
-            pt(L_Value)
+
             //不做气压值的算法处理
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
 
-            //qyMax()
             //频率
             //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
@@ -221,7 +221,7 @@ object DataVolatile {
     }
 
     fun setCF_Value() {
-        CF_Value = 0;
+        CF_Value = 0
     }
 
     var preTimePress: Long = 0
@@ -290,7 +290,6 @@ object DataVolatile {
         return value
     }
 
-
     //按压错误-按压不足
     var ERR_PR_LOW = 0
 
@@ -300,7 +299,7 @@ object DataVolatile {
     //按压错误-按压位置错误
     var ERR_PR_POSI = 0
 
-    fun Err_PrTotal(l: Int) {
+    private fun Err_PrTotal(l: Int) {
         if (PSR_Value == 0) {
             ERR_PR_POSI++
         } else {
@@ -326,7 +325,7 @@ object DataVolatile {
 
     fun ERR_QyTotal(value: Int) {
         if (TOS_Value == 0) {
-            ERR_PR_POSI++
+            ERR_QY_CLOSE++
         } else {
             if (value in 1..39) {
                 ERR_QY_LOW++

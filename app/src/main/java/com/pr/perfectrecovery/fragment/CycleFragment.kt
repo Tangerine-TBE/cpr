@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
+import android.widget.Chronometer
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +28,7 @@ import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.PressLayoutView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val ARG_PARAM1 = "param1"
@@ -37,7 +39,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class CycleFragment : Fragment() {
     private lateinit var viewBinding: CycleFragmentBinding
-    private var counter: Counter? = null
+    private var counter = Counter()
     private var mMediaPlayer: MediaPlayer? = null
     private var isTS: Boolean = false
     private var isYY: Boolean = false
@@ -120,18 +122,24 @@ class CycleFragment : Fragment() {
                 }
             }
         }
-        // viewBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
-        // viewBinding.tvLog.setMovementMethod(LinkMovementMethod.getInstance())
-        viewBinding.chart.setOnClickListener {
-            val max = 200
-            val min = 0
-            val random = Random()
-            val p = random.nextInt(max) % (max - min + 1) + min
-            val pf = p / 200f
-            viewBinding.chart.setCurrentStatus(pf)
-            viewBinding.chart.invalidate()
-        }
+
+        //按压超时倒计时
+//        viewBinding.ctTime.onChronometerTickListener = Chronometer.OnChronometerTickListener {
+//            timeCount++
+//            setChronometerText()
+//            if (timeCount > 5) {
+//                timeOut = timeCount
+//            }
+//        }
+
     }
+
+//    private var timeCount: Long = 0
+//
+//    private fun setChronometerText() {
+//        viewBinding.ctTime.format = "mm:ss"
+//        viewBinding.ctTime.text = "${timeCount * 1000}s"
+//    }
 
     private val VOICE_MP3_BGM: Int = 1//节奏音乐
     private val VOICE_MP3_AYBZ: Int = 2//按压不足
@@ -208,7 +216,6 @@ class CycleFragment : Fragment() {
 //        viewBinding.ivAim.visibility = View.VISIBLE
         //viewBinding.ctTime.visibility = View.VISIBLE
         startMP3()
-        counter = Counter()
         mHandler.post(counter!!)
     }
 
@@ -260,20 +267,21 @@ class CycleFragment : Fragment() {
     }
 
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
+    private val mHandler1 = object : Handler(Looper.getMainLooper()) {}
+    private val mHandler2 = object : Handler(Looper.getMainLooper()) {}
 
     private var time: Long = 5000
     private var isTime = false
 
     private inner class Counter : Runnable {
         override fun run() {
+            viewBinding.ctTime.visibility = View.VISIBLE
             mHandler.postDelayed(this, 1000)//一秒钟循环计时一次
-//            initRandom()
             if (time <= 0) {
                 //记录一次按压超时
                 timeOut += 1000
                 if (!isTime) {
                     isTime = true
-//                    viewBinding.ctTime.visibility = View.VISIBLE
                     viewBinding.ctTime.base = SystemClock.elapsedRealtime()
                     viewBinding.ctTime.start()
                 }
@@ -282,6 +290,7 @@ class CycleFragment : Fragment() {
                 viewBinding.ctTime.visibility = View.INVISIBLE
             }
             time -= 1000
+            //viewBinding.ctTime.visibility = View.INVISIBLE
         }
     }
 
@@ -290,8 +299,7 @@ class CycleFragment : Fragment() {
     private var qyValue = 0
 
     private var err_pr_posi = 0
-    private var err_pr_low = 0
-    private var err_pr_high = 0
+    private var isTimeOut = false
 
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
@@ -314,57 +322,48 @@ class CycleFragment : Fragment() {
             viewBinding.ivPressAim.visibility =
                 if (dataDTO.psrType == 0) View.VISIBLE else View.INVISIBLE
             //按压频率
-            if (dataDTO.prSum != pfValue) {
-                val max = 200
-                val min = 0
-                val p = dataDTO.pf % (max - min + 1) + min
-                val pf = p / 200f
-                viewBinding.chart.setCurrentStatus(pf)
-                viewBinding.chart.invalidate()
-            }
+            setPrpl(dataDTO)
             pfValue = dataDTO.prSum
             //通气道是否打开 0-关闭 1-打开
-            if (dataDTO.aisleType == 1) {
-                viewBinding.ivAim.visibility = View.INVISIBLE
-                blowCount++
-                if (qyValue != dataDTO.qySum) {
-                    dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
-                    qyValue = dataDTO.qySum
-                    if (qyValue > 1) {
-                        //吹气频率清零
-                        mHandler.removeCallbacks(runnableCF)
-                        mHandler.postDelayed(runnableCF, 10000)
+//            if (dataDTO.aisleType == 1) {
+            viewBinding.ivAim.visibility = View.INVISIBLE
+            blowCount++
+            if (qyValue != dataDTO.qySum) {
+                dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
+                qyValue = dataDTO.qySum
+                when {
+                    dataDTO.bpValue in 40..80 -> {//通气正常
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
-                    when {
-                        dataDTO.bpValue in 40..80 -> {//通气正常
-                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
-                        }
-                        dataDTO.bpValue in 80..100 -> {//通气过大
-                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
-                            setPlayVoice(VOICE_MP3_CQGD)
-                        }
-                        dataDTO.bpValue < 40 -> {//通气不足
-                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
-                            setPlayVoice(VOICE_MP3_CQBZ)
-                        }
-                        dataDTO.bpValue > 100 -> {//吹气进胃
-                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
-                            setPlayVoice(VOICE_MP3_CQJW)
-                        }
+                    dataDTO.bpValue in 80..100 -> {//通气过大
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
+                        setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    mHandler.removeCallbacks(blowRunnable)
-                    mHandler.postDelayed(blowRunnable, 2000)
+                    dataDTO.bpValue < 40 -> {//通气不足
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
+                        setPlayVoice(VOICE_MP3_CQBZ)
+                    }
+                    dataDTO.bpValue > 100 -> {//吹气进胃
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
+                        setPlayVoice(VOICE_MP3_CQJW)
+                    }
                 }
-            } else {
-                //setPlayVoice(VOICE_MP3_WDKQD)
+                //吹气变灰
+                mHandler1.removeCallbacks(blowRunnable)
+                mHandler1.postDelayed(blowRunnable, 2000)
+                //吹气频率清零
+                mHandler2.removeCallbacks(runnableCF)
+                mHandler2.postDelayed(runnableCF, 10000)
             }
+//            } else {
+//                //setPlayVoice(VOICE_MP3_WDKQD)
+//            }
 
             if (err_pr_posi != dataDTO.ERR_PR_LOW) {
                 err_pr_posi = dataDTO.ERR_PR_LOW
                 viewBinding.pressLayoutView.setDown()
                 setPlayVoice(VOICE_MP3_AYBZ)//按压不足
             }
-//            setPlayVoice(VOICE_MP3_WHT)//未回弹
 
             //吹气错误数统计
             viewBinding.tvLungError.text =
@@ -381,9 +380,30 @@ class CycleFragment : Fragment() {
             if (dataDTO.distance > 0) {
                 pressCount = dataDTO.prSum
                 viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
+                //暂停超时时间
+                if (dataDTO.distance < 180) {
+                    isTimeOut = false
+                    viewBinding.ctTime.stop()
+                }
+            }
+
+            if (!isTimeOut) {
+                isTimeOut = true
+                mHandler.removeCallbacks(blowRunnable)
+                mHandler.postDelayed(runnable, 0)
             }
 
         }
+    }
+
+    //按压频率
+    private fun setPrpl(dataDTO: BaseDataDTO) {
+        val max = 200
+        val min = 0
+        val p = dataDTO.pf % (max - min + 1) + min
+        val pf = p / 200f
+        viewBinding.chart.setCurrentStatus(pf)
+        viewBinding.chart.invalidate()
     }
 
     private var isPT = false
@@ -393,7 +413,7 @@ class CycleFragment : Fragment() {
         isPT = false
         mHandler.removeCallbacksAndMessages(null)
         time = 5000
-        mHandler.post(counter!!)
+        mHandler.post(counter)
     }
 
     /**

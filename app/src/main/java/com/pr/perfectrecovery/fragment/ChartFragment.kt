@@ -82,6 +82,7 @@ class ChartFragment : Fragment() {
                 it.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
                 qyValue = it.qySum
                 addBarEntry(it.bpValue)
+                addBarEntry(0)
             }
             //吹气错误数统计
             viewBinding.tvLungCount.text =
@@ -192,7 +193,6 @@ class ChartFragment : Fragment() {
             val barData = BarData(dataSets)
             data = barData
             //初始化默认值
-            addBarEntry(0)
             addBarEntry(0)
             addBarEntry(0)
             addBarEntry(0)
