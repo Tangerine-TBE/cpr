@@ -45,6 +45,7 @@ class CycleFragment : Fragment() {
     private var isYY: Boolean = false
     private var cycleCount = 0
     private var mBaseDataDTO: BaseDataDTO? = null
+    private var isStart = false
 
     //中断计时累加
     private var timeOut: Long = 0
@@ -122,24 +123,7 @@ class CycleFragment : Fragment() {
                 }
             }
         }
-
-        //按压超时倒计时
-//        viewBinding.ctTime.onChronometerTickListener = Chronometer.OnChronometerTickListener {
-//            timeCount++
-//            setChronometerText()
-//            if (timeCount > 5) {
-//                timeOut = timeCount
-//            }
-//        }
-
     }
-
-//    private var timeCount: Long = 0
-//
-//    private fun setChronometerText() {
-//        viewBinding.ctTime.format = "mm:ss"
-//        viewBinding.ctTime.text = "${timeCount * 1000}s"
-//    }
 
     private val VOICE_MP3_BGM: Int = 1//节奏音乐
     private val VOICE_MP3_AYBZ: Int = 2//按压不足
@@ -196,6 +180,8 @@ class CycleFragment : Fragment() {
                 isPlay = false
                 if (mpType > 0) {
                     setPlayVoice(mpType)
+                } else {
+                    startMP3()
                 }
             }
             mMediaPlayer?.start()
@@ -215,12 +201,14 @@ class CycleFragment : Fragment() {
         viewBinding.chart.visibility = View.VISIBLE
 //        viewBinding.ivAim.visibility = View.VISIBLE
         //viewBinding.ctTime.visibility = View.VISIBLE
+        isStart = true
         startMP3()
         mHandler.post(counter!!)
     }
 
     fun stop(): TrainingDTO {
         //返回成绩结果类
+        isStart = false
         val trainingDTO = TrainingDTO()
         mBaseDataDTO?.apply {
             trainingDTO.pressHigh = ERR_PR_HIGH
@@ -255,7 +243,7 @@ class CycleFragment : Fragment() {
      * 播放节奏音乐
      */
     private fun startMP3() {
-        if (isYY) {//节奏音
+        if (isYY && isStart) {//节奏音
             mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_bg)
             mMediaPlayer?.isLooping = true
             mMediaPlayer?.seekTo(0)
@@ -325,39 +313,39 @@ class CycleFragment : Fragment() {
             setPrpl(dataDTO)
             pfValue = dataDTO.prSum
             //通气道是否打开 0-关闭 1-打开
-//            if (dataDTO.aisleType == 1) {
-            viewBinding.ivAim.visibility = View.INVISIBLE
-            blowCount++
-            if (qyValue != dataDTO.qySum) {
-                dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
-                qyValue = dataDTO.qySum
-                when {
-                    dataDTO.bpValue in 40..80 -> {//通气正常
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+            if (dataDTO.aisleType == 1) {
+                viewBinding.ivAim.visibility = View.INVISIBLE
+                blowCount++
+                if (qyValue != dataDTO.qySum) {
+                    dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
+                    qyValue = dataDTO.qySum
+                    when {
+                        dataDTO.bpValue in 40..80 -> {//通气正常
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+                        }
+                        dataDTO.bpValue in 80..100 -> {//通气过大
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
+                            setPlayVoice(VOICE_MP3_CQGD)
+                        }
+                        dataDTO.bpValue < 40 -> {//通气不足
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
+                            setPlayVoice(VOICE_MP3_CQBZ)
+                        }
+                        dataDTO.bpValue > 100 -> {//吹气进胃
+                            viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
+                            setPlayVoice(VOICE_MP3_CQJW)
+                        }
                     }
-                    dataDTO.bpValue in 80..100 -> {//通气过大
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
-                        setPlayVoice(VOICE_MP3_CQGD)
-                    }
-                    dataDTO.bpValue < 40 -> {//通气不足
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
-                        setPlayVoice(VOICE_MP3_CQBZ)
-                    }
-                    dataDTO.bpValue > 100 -> {//吹气进胃
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
-                        setPlayVoice(VOICE_MP3_CQJW)
-                    }
+                    //吹气变灰
+                    mHandler1.removeCallbacks(blowRunnable)
+                    mHandler1.postDelayed(blowRunnable, 2000)
+                    //吹气频率清零
+                    mHandler2.removeCallbacks(runnableCF)
+                    mHandler2.postDelayed(runnableCF, 10000)
                 }
-                //吹气变灰
-                mHandler1.removeCallbacks(blowRunnable)
-                mHandler1.postDelayed(blowRunnable, 2000)
-                //吹气频率清零
-                mHandler2.removeCallbacks(runnableCF)
-                mHandler2.postDelayed(runnableCF, 10000)
+            } else {
+                //setPlayVoice(VOICE_MP3_WDKQD)
             }
-//            } else {
-//                //setPlayVoice(VOICE_MP3_WDKQD)
-//            }
 
             if (err_pr_posi != dataDTO.ERR_PR_LOW) {
                 err_pr_posi = dataDTO.ERR_PR_LOW

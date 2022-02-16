@@ -65,6 +65,18 @@ object DataVolatile {
         return maximum
     }
 
+    /**
+     * 获取吹气值和
+     */
+    fun qyValue(array: List<Int>): Int {
+        var sum = 0
+        for (i in array.indices) {
+            sum += i
+        }
+        QY_valueSet.clear()
+        return sum
+    }
+
     @JvmStatic
     fun main(args: Array<String>) {
         val data = "fe06040a0b01052d5303030405010723090ab261" //1、先将接收到的数据转调用工具类的方法换成字符串
@@ -256,34 +268,40 @@ object DataVolatile {
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
-                value = L_d3
-                low_flag = 0
-            } else {
-                value = L_d2
-                // preTimePress = System.currentTimeMillis();    //获取开始时间
-                low_flag = 1
-                PR_SUM++
-                Err_PrTotal(value)
-                val changTimePress = System.currentTimeMillis()
-                if (PR_SUM > 1) {
-                    val time = changTimePress - preTimePress
-                    PF_Value = (60000 / time).toInt()
+                if (L_d1 - L_d3 > 10) {
+                    value = L_d3
+                    low_flag = 0
                 }
-                preTimePress = changTimePress
+            } else {
+                if (L_d1 - L_d2 > 10) {
+                    value = L_d2
+                    // preTimePress = System.currentTimeMillis();    //获取开始时间
+                    low_flag = 1
+                    PR_SUM++
+                    Err_PrTotal(value)
+                    val changTimePress = System.currentTimeMillis()
+                    if (PR_SUM > 1) {
+                        val time = changTimePress - preTimePress
+                        PF_Value = (60000 / time).toInt()
+                    }
+                    preTimePress = changTimePress
+                }
             }
         } else if (L_d2 <= L_d3) {
-            if (low_flag == 0) {
-                low_flag = 1
-                PR_SUM++
-                Err_PrTotal(L_d3)
-                val changTimePress = System.currentTimeMillis()
-                if (PR_SUM > 1) {
-                    val time = changTimePress - preTimePress
-                    PF_Value = (60000 / time).toInt()
+            if (L_d3 - L_d1 > 10) {
+                if (low_flag == 0) {
+                    low_flag = 1
+                    PR_SUM++
+                    Err_PrTotal(L_d3)
+                    val changTimePress = System.currentTimeMillis()
+                    if (PR_SUM > 1) {
+                        val time = changTimePress - preTimePress
+                        PF_Value = (60000 / time).toInt()
+                    }
+                    preTimePress = changTimePress
                 }
-                preTimePress = changTimePress
+                value = L_d3
             }
-            value = L_d3
         } else {
             value = L_d2
         }
@@ -375,7 +393,9 @@ object DataVolatile {
                 QY_d2
             }
         }
-        QY_valueSet.add(value)
+        if (value > 0) {
+            QY_valueSet.add(value)
+        }
         return value
     }
 

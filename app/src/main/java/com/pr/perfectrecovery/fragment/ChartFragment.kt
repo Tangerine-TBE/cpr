@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,10 +80,11 @@ class ChartFragment : Fragment() {
             addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
             if (qyValue != it.qySum) {
-                it.bpValue = DataVolatile.max(DataVolatile.QY_valueSet)
                 qyValue = it.qySum
-                addBarEntry(it.bpValue)
-                addBarEntry(0)
+                addBarEntry(
+                    DataVolatile.qyValue(DataVolatile.QY_valueSet2),
+                    DataVolatile.max(DataVolatile.QY_valueSet)
+                )
             }
             //吹气错误数统计
             viewBinding.tvLungCount.text =
@@ -97,7 +99,7 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            addBarEntry(Random().nextInt(800))
+            //addBarEntry(Random().nextInt(800))
         }
 
         viewBinding.constraintlayout.setOnClickListener {
@@ -193,11 +195,11 @@ class ChartFragment : Fragment() {
             val barData = BarData(dataSets)
             data = barData
             //初始化默认值
-            addBarEntry(0)
-            addBarEntry(0)
-            addBarEntry(0)
-            addBarEntry(0)
-            addBarEntry(0)
+            addBarEntry(0, 0)
+            addBarEntry(0, 0)
+            addBarEntry(0, 0)
+            addBarEntry(0, 0)
+            addBarEntry(0, 0)
         }
     }
 
@@ -205,7 +207,8 @@ class ChartFragment : Fragment() {
     private val colors = ArrayList<Int>()
 
     //这里要进行图像绘制，所以要切回UI线程，否则会报错
-    private fun addBarEntry(value: Int) {
+    private fun addBarEntry(value: Int, value2: Int) {
+        Log.e("addBarEntry", "$value")
         viewBinding.barChart.apply {
             if (barData != null) {
 //                barData.addEntry(BarEntry(value.toFloat(), 0f), 0)
@@ -213,17 +216,17 @@ class ChartFragment : Fragment() {
                 data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
                 data.notifyDataChanged()
                 when {
-                    value in 40..80 -> {
+                    value2 in 40..80 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_37B48B)
                         )
                     }
-                    value < 40 -> {
+                    value2 < 40 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )
                     }
-                    value > 80 -> {
+                    value2 > 80 -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_text_selected)
                         )
