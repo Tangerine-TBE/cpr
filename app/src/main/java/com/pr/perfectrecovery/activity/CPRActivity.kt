@@ -496,12 +496,12 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
-                    val dataDTO = DataVolatile.parseString(
-                        HexUtil.formatHexString(
-                            characteristic.value,
-                            false
-                        )
+                    val formatHexString = HexUtil.formatHexString(
+                        characteristic.value,
+                        false
                     )
+                    val dataDTO = DataVolatile.parseString(formatHexString)
+                    DataVolatile.initPreDistance(formatHexString)
                     runOnUiThread { Log.i("CPRActivity", "${bleDevice?.name}") }
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)

@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.utils
 
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.utils.TestVolatile.top_flag
+import kotlin.math.abs
 
 object DataVolatile {
     //电量值：  0-100%
@@ -238,72 +239,88 @@ object DataVolatile {
 
     var preTimePress: Long = 0
 
-    /*根据有效距离值计算按压累加次数。
-    * */
-    fun cal_PreSum(a: Int): Int {
-        var sum = 0
-        //  L_valueSet[0]=0;
-        if (L_valueSet[0] == 0) {
-            L_valueSet[0] = a
-            val preTimePress = System.currentTimeMillis() //获取开始时间
-        } else {
-            if (a >= 170 && a - L_valueSet[0] > 10) {
-                sum++
-                val changTimePress = System.currentTimeMillis()
-                val time = changTimePress - preTimePress
-                PF_Value = (60000 / time).toInt()
-                if (PF_Value >= 180) PF_Value = 180
-                preTimePress = changTimePress
-            }
-            L_valueSet[0] = a
+    /*
+* 获取初始位置，每次连接成功后调用一次初始化方法
+* */
+    var preDistance: Long = 180
+    fun initPreDistance(data: String?) {
+        // long value=180;
+        if (data != null && data.length == 40) {
+            //按压距离
+            val L_d1 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        12,
+                        14
+                    )
+                )
+            )
+            val L_d2 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        14,
+                        16
+                    )
+                )
+            )
+            val L_d3 = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        16,
+                        18
+                    )
+                )
+            )
+            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
         }
-        return sum
     }
 
     /*
-     * 根据按压三次相邻的距离值找到有效值。
-     * */
+    * 根据按压三次相邻的距离值找到有效值。
+    * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
-                if (L_d1 - L_d3 > 5) {
-                    value = L_d3
-                    low_flag = 0
-                }
+//                if (abs(preDistance - L_d3) > 10) {
+                value = L_d3
+                low_flag = 0
+//                }
             } else {
-                if (L_d1 - L_d2 > 5) {
-                    value = L_d2
-                    // preTimePress = System.currentTimeMillis();    //获取开始时间
-                    low_flag = 1
-                    PR_SUM++
-                    Err_PrTotal(value)
-                    val changTimePress = System.currentTimeMillis()
-                    if (PR_SUM > 1) {
-                        val time = changTimePress - preTimePress
-                        PF_Value = (60000 / time).toInt()
-                    }
-                    preTimePress = changTimePress
+//                if (abs(preDistance - L_d2) > 10) {
+                value = L_d2
+                // preTimePress = System.currentTimeMillis();    //获取开始时间
+                low_flag = 1
+                PR_SUM++
+                Err_PrTotal(value)
+                val changTimePress = System.currentTimeMillis()
+                if (PR_SUM > 1) {
+                    val time = changTimePress - preTimePress
+                    PF_Value = (60000 / time).toInt()
                 }
+                preTimePress = changTimePress
+//                }
             }
         } else if (L_d2 <= L_d3) {
-            if (L_d3 - L_d1 > 5) {
-                if (low_flag == 0) {
-                    low_flag = 1
-                    PR_SUM++
-                    Err_PrTotal(L_d3)
-                    val changTimePress = System.currentTimeMillis()
-                    if (PR_SUM > 1) {
-                        val time = changTimePress - preTimePress
-                        PF_Value = (60000 / time).toInt()
-                    }
-                    preTimePress = changTimePress
+//            if (abs(preDistance - L_d3) > 10) {
+            if (low_flag == 0) {
+                low_flag = 1
+                PR_SUM++
+                Err_PrTotal(L_d3)
+                val changTimePress = System.currentTimeMillis()
+                if (PR_SUM > 1) {
+                    val time = changTimePress - preTimePress
+                    PF_Value = (60000 / time).toInt()
                 }
-                value = L_d3
+                preTimePress = changTimePress
             }
+            value = L_d3
+//            }
         } else {
+//            if (abs(preDistance - L_d2) > 10) {
             value = L_d2
+//            }
         }
         return value
     }
@@ -321,9 +338,9 @@ object DataVolatile {
         if (PSR_Value == 0) {
             ERR_PR_POSI++
         } else {
-            if (l < 120) {
+            if (l > 60) {
                 ERR_PR_HIGH++
-            } else if (l > 130) {
+            } else if (l > 45) {
                 ERR_PR_LOW++
             }
         }

@@ -316,7 +316,17 @@ class CycleFragment : Fragment() {
             setRate(viewBinding.chart, dataDTO.pf)
             //吹气频率
             setRate(viewBinding.chartQy, dataDTO.cf)
-
+//            if (dataDTO.psrType == 1) {
+//                when {
+//                    dataDTO.distance < 45 -> {
+//                        viewBinding.pressLayoutView.setDown()
+//                        setPlayVoice(VOICE_MP3_AYBZ)//按压不足
+//                    }
+//                    dataDTO.distance > 60 -> {
+//                        setPlayVoice(VOICE_MP3_AYGD)
+//                    }
+//                }
+//            }
             pfValue = dataDTO.prSum
             //通气道是否打开 0-关闭 1-打开
             if (dataDTO.aisleType == 1) {
@@ -352,12 +362,6 @@ class CycleFragment : Fragment() {
                 }
             } else {
                 //setPlayVoice(VOICE_MP3_WDKQD)
-            }
-
-            if (err_pr_posi != dataDTO.ERR_PR_LOW) {
-                err_pr_posi = dataDTO.ERR_PR_LOW
-                viewBinding.pressLayoutView.setDown()
-                setPlayVoice(VOICE_MP3_AYBZ)//按压不足
             }
 
             //吹气错误数统计
@@ -422,6 +426,12 @@ class CycleFragment : Fragment() {
     //按压中断 - 开启计时器 频率清零
     private val runnableCF = Runnable {
         DataVolatile.setCF_Value()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewBinding.chart.invalidate()
+        viewBinding.chartQy.invalidate()
     }
 
     override fun onDestroy() {
