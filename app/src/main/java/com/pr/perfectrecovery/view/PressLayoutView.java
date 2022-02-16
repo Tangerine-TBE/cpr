@@ -87,7 +87,7 @@ public class PressLayoutView extends LinearLayout {
     private int up = 0;
     private int down = 0;
     private boolean isDown = false;
-    private boolean isME = false;
+    private boolean isRate = false;
 
     public void smoothScrollTo(int destY, int prSum) {
         //距离值：  30-150
@@ -107,6 +107,7 @@ public class PressLayoutView extends LinearLayout {
             up = 0;
             down = 0;
             isDown = false;
+            isRate = false;
             viewTop.setChecked(true);
         }
 
@@ -144,8 +145,10 @@ public class PressLayoutView extends LinearLayout {
                         mScrollerCallBack.onScrollerState(TYPE_MIN);
                     }
                 }
+                //为滚动到顶部时向下按压提示 未回弹
+                isRate = true;
             } else {//向下滚动
-                if (destY > 0) {
+                if (destY > 0 && isRate) {
                     viewTop.setChecked(false);
                     if (up > 0) {//按压未回弹
                         Log.e("smoothScrollTo", "按压未回弹");

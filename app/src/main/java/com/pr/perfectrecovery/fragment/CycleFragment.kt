@@ -25,6 +25,7 @@ import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.DataVolatile
+import com.pr.perfectrecovery.view.DialChart07View
 import com.pr.perfectrecovery.view.PressLayoutView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -198,7 +199,9 @@ class CycleFragment : Fragment() {
         viewBinding.ivPress.visibility = View.INVISIBLE
         viewBinding.pressLayoutView.visibility = View.VISIBLE
         viewBinding.dashBoard.visibility = View.INVISIBLE
+        viewBinding.dashBoard2.visibility = View.INVISIBLE
         viewBinding.chart.visibility = View.VISIBLE
+        viewBinding.chartQy.visibility = View.VISIBLE
 //        viewBinding.ivAim.visibility = View.VISIBLE
         //viewBinding.ctTime.visibility = View.VISIBLE
         isStart = true
@@ -225,7 +228,7 @@ class CycleFragment : Fragment() {
             trainingDTO.pressTotal = prSum
             trainingDTO.blowTotal = qySum
         }
-        counter?.let { mHandler.removeCallbacks(it) }
+        counter.let { mHandler.removeCallbacks(it) }
         viewBinding.ctTime.stop()
         if (mMediaPlayer != null) {
             mMediaPlayer?.stop()
@@ -310,7 +313,10 @@ class CycleFragment : Fragment() {
             viewBinding.ivPressAim.visibility =
                 if (dataDTO.psrType == 0) View.VISIBLE else View.INVISIBLE
             //按压频率
-            setPrpl(dataDTO)
+            setRate(viewBinding.chart, dataDTO.pf)
+            //吹气频率
+            setRate(viewBinding.chartQy, dataDTO.cf)
+
             pfValue = dataDTO.prSum
             //通气道是否打开 0-关闭 1-打开
             if (dataDTO.aisleType == 1) {
@@ -377,21 +383,21 @@ class CycleFragment : Fragment() {
 
             if (!isTimeOut) {
                 isTimeOut = true
-                mHandler.removeCallbacks(blowRunnable)
+                mHandler.removeCallbacks(runnable)
                 mHandler.postDelayed(runnable, 0)
             }
 
         }
     }
 
-    //按压频率
-    private fun setPrpl(dataDTO: BaseDataDTO) {
+    //按压吹气频率
+    private fun setRate(view: DialChart07View, value: Int) {
         val max = 200
         val min = 0
-        val p = dataDTO.pf % (max - min + 1) + min
+        val p = value % (max - min + 1) + min
         val pf = p / 200f
-        viewBinding.chart.setCurrentStatus(pf)
-        viewBinding.chart.invalidate()
+        view.setCurrentStatus(pf)
+        view.invalidate()
     }
 
     private var isPT = false
@@ -409,6 +415,7 @@ class CycleFragment : Fragment() {
      */
     private val blowRunnable = Runnable {
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+        setRate(viewBinding.chartQy, 0)
     }
 
     //按压中断 - 开启计时器 频率清零

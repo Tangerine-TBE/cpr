@@ -50,7 +50,6 @@ public class DialChart07View extends GraphicalView {
 
     public DialChart07View(Context context) {
         super(context);
-        // TODO Auto-generated constructor stub
         initView();
     }
 
@@ -71,8 +70,8 @@ public class DialChart07View extends GraphicalView {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        chart180.setChartRange(w, (float) (h / 2.4));
+        //super.onSizeChanged(w, h, oldw, oldh);
+        chart180.setChartRange(w, (float) h);
     }
 
     public void chartRender180() {

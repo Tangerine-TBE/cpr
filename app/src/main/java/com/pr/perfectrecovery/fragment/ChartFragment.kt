@@ -82,7 +82,7 @@ class ChartFragment : Fragment() {
             if (qyValue != it.qySum) {
                 qyValue = it.qySum
                 addBarEntry(
-                    DataVolatile.qyValue(DataVolatile.QY_valueSet2),
+                    DataVolatile.qyValue(DataVolatile.QY_valueSet),
                     DataVolatile.max(DataVolatile.QY_valueSet)
                 )
             }
