@@ -268,12 +268,12 @@ object DataVolatile {
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
-                if (L_d1 - L_d3 > 10) {
+                if (L_d1 - L_d3 > 5) {
                     value = L_d3
                     low_flag = 0
                 }
             } else {
-                if (L_d1 - L_d2 > 10) {
+                if (L_d1 - L_d2 > 5) {
                     value = L_d2
                     // preTimePress = System.currentTimeMillis();    //获取开始时间
                     low_flag = 1
@@ -288,7 +288,7 @@ object DataVolatile {
                 }
             }
         } else if (L_d2 <= L_d3) {
-            if (L_d3 - L_d1 > 10) {
+            if (L_d3 - L_d1 > 5) {
                 if (low_flag == 0) {
                     low_flag = 1
                     PR_SUM++

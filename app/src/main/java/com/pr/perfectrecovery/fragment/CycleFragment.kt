@@ -342,6 +342,7 @@ class CycleFragment : Fragment() {
                             setPlayVoice(VOICE_MP3_CQJW)
                         }
                     }
+                    DataVolatile.ERR_QyTotal(DataVolatile.max(DataVolatile.QY_valueSet))
                     //吹气变灰
                     mHandler1.removeCallbacks(blowRunnable)
                     mHandler1.postDelayed(blowRunnable, 2000)
