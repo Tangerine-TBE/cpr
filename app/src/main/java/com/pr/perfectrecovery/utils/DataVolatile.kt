@@ -74,6 +74,7 @@ object DataVolatile {
         for (i in array.indices) {
             sum += i
         }
+
         QY_valueSet.clear()
         return sum
     }
@@ -382,6 +383,7 @@ object DataVolatile {
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
+            ERR_QyTotal(max(QY_valueSet));//每次筛选最大吹气值，去做错误次数的判断
             if (top_flag == 1) {
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
