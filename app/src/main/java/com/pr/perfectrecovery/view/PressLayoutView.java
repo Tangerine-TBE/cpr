@@ -126,7 +126,7 @@ public class PressLayoutView extends LinearLayout {
                 mScrollerCallBack.onScrollerState(TYPE_MAX);
             }
         } else if (!isDown) {
-            if (-newY - scrollY > 10) {//向上滚动
+            if (-newY - scrollY > 20) {//向上滚动
 //                if (down != 0 && down < 9) {
 //                    isDown = true;
 //                    ivArrowUp.setVisibility(View.INVISIBLE);
@@ -142,7 +142,7 @@ public class PressLayoutView extends LinearLayout {
             } else {//向下滚动
                 if (destY > 0) {
                     viewTop.setChecked(false);
-                    if (down > 0 && isRate) {//按压未回弹
+                    if ((-newY - scrollY > 20) && isRate) {//按压未回弹
                         isRate = false;
                         Log.e("smoothScrollTo", "按压未回弹");
                         ivArrowUp.setVisibility(View.VISIBLE);
@@ -174,25 +174,25 @@ public class PressLayoutView extends LinearLayout {
     }
 
     private int getNumber(int number) {
-        if (number < 120) {
+        if (number < 45) {
             return 10;
-        } else if (number <= 130) {
+        } else if (number <= 60) {
             return 9;
-        } else if (number <= 135) {
+        } else if (number < 70) {
             return 8;
-        } else if (number <= 140) {
+        } else if (number < 80) {
             return 7;
-        } else if (number <= 145) {
+        } else if (number < 90) {
             return 6;
-        } else if (number <= 150) {
+        } else if (number < 100) {
             return 5;
-        } else if (number <= 155) {
+        } else if (number < 110) {
             return 4;
-        } else if (number <= 160) {
+        } else if (number < 130) {
             return 3;
-        } else if (number <= 165) {
+        } else if (number < 150) {
             return 2;
-        } else if (number <= 170) {
+        } else if (number < 170) {
             return 1;
         } else {
             return 0;

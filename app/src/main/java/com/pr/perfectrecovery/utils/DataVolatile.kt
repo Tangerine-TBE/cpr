@@ -280,17 +280,20 @@ object DataVolatile {
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
+        if (PR_SUM == 0 && abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
+                preDistance - L_d3
+            ) < 10
+        ) {
+            return preDistance.toInt()
+        }
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             if (L_d2 >= L_d3) {
-//                if (abs(preDistance - L_d3) > 10) {
                 value = L_d3
                 low_flag = 0
-//                }
             } else {
-//                if (abs(preDistance - L_d2) > 10) {
                 value = L_d2
-                // preTimePress = System.currentTimeMillis();    //获取开始时间
+                //preTimePress = System.currentTimeMillis()    //获取开始时间
                 low_flag = 1
                 PR_SUM++
                 Err_PrTotal(value)
@@ -300,10 +303,8 @@ object DataVolatile {
                     PF_Value = (60000 / time).toInt()
                 }
                 preTimePress = changTimePress
-//                }
             }
         } else if (L_d2 <= L_d3) {
-//            if (abs(preDistance - L_d3) > 10) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
@@ -316,11 +317,8 @@ object DataVolatile {
                 preTimePress = changTimePress
             }
             value = L_d3
-//            }
         } else {
-//            if (abs(preDistance - L_d2) > 10) {
             value = L_d2
-//            }
         }
         return value
     }
@@ -338,9 +336,9 @@ object DataVolatile {
         if (PSR_Value == 0) {
             ERR_PR_POSI++
         } else {
-            if (l > 60) {
+            if (l < 45) {
                 ERR_PR_HIGH++
-            } else if (l > 45) {
+            } else if (l > 60) {
                 ERR_PR_LOW++
             }
         }

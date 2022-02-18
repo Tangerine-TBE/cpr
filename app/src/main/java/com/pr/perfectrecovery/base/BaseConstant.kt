@@ -14,5 +14,6 @@ object BaseConstant {
     val EVENT_CPR_START = 10004
     val EVENT_CPR_STOP = 10005
     val EVENT_CPR_DISCONNENT = 10006
+    val EVENT_CPR_TIMEING = 10007
 
 }

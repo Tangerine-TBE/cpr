@@ -200,7 +200,7 @@
         android:id="@+id/ivLung"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_15"
+        android:layout_marginTop="@dimen/dp_24"
         android:src="@mipmap/icon_wm_lung"
         app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
         app:layout_constraintStart_toStartOf="@+id/dashBoard2"

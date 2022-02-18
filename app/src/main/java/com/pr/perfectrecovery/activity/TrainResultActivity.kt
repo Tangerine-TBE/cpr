@@ -52,7 +52,7 @@ class TrainResultActivity : BaseActivity() {
         //按压错误数
         viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
         //按压总数
-        viewBinding.tvLungTotal.text = "${trainingDTO.pressTotal}"
+        viewBinding.tvLungTotal.text = "/${trainingDTO.pressTotal}"
         //按压位置错误
         viewBinding.tvLocation.text = "${trainingDTO.pressLocation}"
         //按压不足
@@ -78,7 +78,7 @@ class TrainResultActivity : BaseActivity() {
         //吹气错误数
         viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount}"
         //吹气总数
-        viewBinding.tvHeartTotal.text = "${trainingDTO.blowTotal}"
+        viewBinding.tvHeartTotal.text = "/${trainingDTO.blowTotal}"
         //吹气错误
         viewBinding.tvAirway.text = "${trainingDTO.blowClose}"
         //吹气不足

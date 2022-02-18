@@ -47,6 +47,7 @@ class CycleFragment : Fragment() {
     private var cycleCount = 0
     private var mBaseDataDTO: BaseDataDTO? = null
     private var isStart = false
+    private var isTimeing = true
 
     //中断计时累加
     private var timeOut: Long = 0
@@ -359,9 +360,23 @@ class CycleFragment : Fragment() {
                     //吹气频率清零
                     mHandler2.removeCallbacks(runnableCF)
                     mHandler2.postDelayed(runnableCF, 10000)
+                    //有吹气移除超时线程
+                    mHandler.removeCallbacks(runnable)
+                    //暂停超时时间
+//                    if (dataDTO.distance < 180) {
+//                        isTimeOut = false
+//                        viewBinding.ctTime.stop()
+//                    }
                 }
-            } else {
+            } else if (dataDTO.bpValue > 10) {
                 //setPlayVoice(VOICE_MP3_WDKQD)
+                viewBinding.ivAim.visibility = View.VISIBLE
+            }
+
+            if (err_pr_posi != dataDTO.ERR_PR_LOW) {
+                err_pr_posi = dataDTO.ERR_PR_LOW
+                viewBinding.pressLayoutView.setDown()
+                setPlayVoice(VOICE_MP3_AYBZ)//按压不足
             }
 
             //吹气错误数统计
@@ -377,13 +392,26 @@ class CycleFragment : Fragment() {
 //            } else {
 //            viewBinding.ivAim.visibility = View.VISIBLE
             if (dataDTO.distance > 0) {
-                pressCount = dataDTO.prSum
                 viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
                 //暂停超时时间
                 if (dataDTO.distance < 180) {
                     isTimeOut = false
                     viewBinding.ctTime.stop()
+                    mHandler.removeCallbacks(runnable)
                 }
+                if (pressCount != dataDTO.prSum && dataDTO.distance < 150 && isTimeing) {
+                    isTimeing = false
+                    //更新循环次数
+                    EventBus.getDefault()
+                        .post(
+                            MessageEventData(
+                                BaseConstant.EVENT_CPR_TIMEING,
+                                "",
+                                null
+                            )
+                        )
+                }
+                pressCount = dataDTO.prSum
             }
 
             if (!isTimeOut) {

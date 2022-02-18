@@ -13,7 +13,6 @@ import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
-import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivitySingleBinding
 import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
@@ -28,11 +27,8 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class SingleActivity : BaseActivity() {
     private lateinit var binding: ActivitySingleBinding
-    private var counter: Counter? = null
+    private var counter = Counter()
     private var mTrainingBean: TrainingBean? = null
-
-    //训练模式成绩结果类
-    private val mTrainingDTO = TrainingDTO()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,19 +77,16 @@ class SingleActivity : BaseActivity() {
                     null,
                     null
                 )
-                counter?.let { mHandler.post(it) }
             } else {
                 val mTrainingDTO = cycleFragment.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                counter?.let { mHandler.removeCallbacks(it) }
-                if (mTrainingDTO != null) {
-                    mTrainingDTO.name = binding.tvName.text.toString().trim()
-                    mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
-                }
-//                TrainResultActivity.start(this, mTrainingDTO)
-//                finish()
+                counter.let { mHandler.removeCallbacks(it) }
+                mTrainingDTO.name = binding.tvName.text.toString().trim()
+                mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                TrainResultActivity.start(this, mTrainingDTO)
+                finish()
             }
         }
 
@@ -109,6 +102,8 @@ class SingleActivity : BaseActivity() {
             binding.tvCycle.text = "${event.cycleCount}"
         } else if (event.code == BaseConstant.EVENT_CPR_DISCONNENT) {
             cycleFragment.bluetoothDisconnected()
+        } else if (event.code == BaseConstant.EVENT_CPR_TIMEING) {
+            counter.let { mHandler.post(it) }
         }
     }
 
@@ -152,12 +147,13 @@ class SingleActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        counter?.let { mHandler.removeCallbacks(it) }
+        counter.let { mHandler.removeCallbacks(it) }
         super.onDestroy()
         EventBus.getDefault().unregister(this)
     }
 
     private var time: Long = 1000 * 60 * 2
+    private var timeZero: Long = 0
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
 
     private inner class Counter : Runnable {
@@ -166,12 +162,18 @@ class SingleActivity : BaseActivity() {
             if (time <= 0) {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                mHandler.removeCallbacks(counter!!)
+                mHandler.removeCallbacks(counter)
                 cycleFragment.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
             }
-            binding.tvTime.text = TimeUtils.timeParse(time)
-            time -= 1000
+            if (!mTrainingBean?.isCheck!!) {
+                timeZero += 1000
+                binding.tvTime.text = TimeUtils.timeParse(timeZero)
+            } else {
+                binding.tvTime.text = TimeUtils.timeParse(time)
+                time -= 1000
+            }
+
         }
     }
 }
