@@ -138,11 +138,12 @@ public class PressLayoutView extends LinearLayout {
 //                }
                 //为滚动到顶部时向下按压提示 未回弹
                 isRate = true;
-                Log.e("smoothScrollTo", "向上滚动");
+                Log.e("smoothScrollTo", "向上滚动：" + (-newY - scrollY));
             } else {//向下滚动
                 if (destY > 0) {
                     viewTop.setChecked(false);
-                    if ((-newY - scrollY > 20) && isRate) {//按压未回弹
+                    Log.e("smoothScrollTo", "向下滚动：" + (-newY - scrollY));
+                    if (down > 0 && down > destY && isRate) {
                         isRate = false;
                         Log.e("smoothScrollTo", "按压未回弹");
                         ivArrowUp.setVisibility(View.VISIBLE);

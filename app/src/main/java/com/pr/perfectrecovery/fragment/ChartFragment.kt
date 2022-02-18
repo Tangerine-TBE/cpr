@@ -302,6 +302,20 @@ class ChartFragment : Fragment() {
         lineChart.invalidate()
     }
 
+    private fun addEntryList(lineData: LineData, lineChart: LineChart, value: Int) {
+        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
+        for (index in 0..value) {
+            val entry = Entry(entryCount.toFloat(), index.toFloat())
+            lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
+        }
+
+        //倒序循环-回落线
+        for (index in value downTo 0) {
+            val entry2 = Entry(entryCount.toFloat(), index.toFloat())
+            lineData.addEntry(entry2, 0)
+        }
+    }
+
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         if (event.code == BaseConstant.EVENT_SINGLE_CHART_START) {
