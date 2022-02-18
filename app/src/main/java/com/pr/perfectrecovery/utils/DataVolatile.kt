@@ -347,10 +347,10 @@ object DataVolatile {
         if (PSR_Value == 0) {
             ERR_PR_POSI++
         } else {
-            if (l < 45) {
-                ERR_PR_HIGH++
-            } else if (l > 60) {
+            if (abs(preDistance - l)< 45) {
                 ERR_PR_LOW++
+            } else if (abs(preDistance - l)> 60) {
+                ERR_PR_HIGH++
             }
         }
     }
