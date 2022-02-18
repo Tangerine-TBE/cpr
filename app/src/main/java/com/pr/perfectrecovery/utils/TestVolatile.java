@@ -108,17 +108,12 @@ WMFS-XXXXXX   <eg：A00001---类型A,编号00001，蓝牙显示为WMFS-A00001>
             }
 
             if ((state & 8) == 8) {
-                LKS_Value = 1;
-            } else {
-                LKS_Value = 0;
-            }
-            ;
-            if ((state & 16) == 16) {
                 PSR_Value = 1;
             } else {
                 PSR_Value = 0;
             }
             ;
+
             //按压距离
             int L_d1 = DataFormatUtils.byteArrayToInt(DataFormatUtils.hexStr2Bytes("00" + data.substring(12, 14)));
             int L_d2 = DataFormatUtils.byteArrayToInt(DataFormatUtils.hexStr2Bytes("00" + data.substring(14, 16)));

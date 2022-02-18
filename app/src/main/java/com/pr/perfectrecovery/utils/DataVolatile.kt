@@ -393,8 +393,9 @@ object DataVolatile {
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
-            ERR_QyTotal(max(QY_valueSet));//每次筛选最大吹气值，去做错误次数的判断
+
             if (top_flag == 1) {
+                ERR_QyTotal(max(QY_valueSet));//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
@@ -425,7 +426,6 @@ object DataVolatile {
         }
         return value
     }
-
     //判断按压是否停止
     private const val count = 20
     private fun pt(p: Int): Boolean {
