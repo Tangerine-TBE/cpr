@@ -302,6 +302,11 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
+                    if(PF_Value>180){
+                        PF_Value=180;
+                    }else if(PF_Value<60){
+                        PF_Value=60;
+                    }
                 }
                 preTimePress = changTimePress
             }
@@ -314,6 +319,11 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
+                    if(PF_Value>180){
+                        PF_Value=180;
+                    }else if(PF_Value<60){
+                        PF_Value=60;
+                    }
                 }
                 preTimePress = changTimePress
             }
