@@ -33,6 +33,7 @@ object LineChartUtils {
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
+        chart.setNoDataText("")
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
         chart.setBackgroundColor(Color.TRANSPARENT)

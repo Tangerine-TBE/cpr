@@ -42,4 +42,21 @@ object TimeUtils {
         }
         return ""
     }
+
+    /**
+     * 将时间戳转换为时间
+     *
+     * s就是时间戳
+     */
+    fun formatDate(milli: Long): String {
+        try {
+            val simpleDateFormat = SimpleDateFormat("mm分ss秒")
+            //如果它本来就是long类型的,则不用写这一步
+            val date = Date(milli)
+            return simpleDateFormat.format(date)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return ""
+    }
 }

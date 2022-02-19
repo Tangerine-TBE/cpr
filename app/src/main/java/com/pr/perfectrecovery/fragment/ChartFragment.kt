@@ -68,7 +68,7 @@ class ChartFragment : Fragment() {
 
         //曲线图表
         val data: LineData = getData(0)
-        val data1: LineData = getData(180)
+        val data1: LineData = getData(DataVolatile.preDistance.toInt())
         val data2: LineData = getData(0)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
@@ -83,7 +83,7 @@ class ChartFragment : Fragment() {
                 qyValue = it.qySum
                 addBarEntry(
                     DataVolatile.qyValue(DataVolatile.QY_valueSet),
-                    DataVolatile.max(DataVolatile.QY_valueSet)
+                    DataVolatile.max(DataVolatile.QY_valueSet, true)
                 )
             }
             //吹气错误数统计
@@ -117,11 +117,13 @@ class ChartFragment : Fragment() {
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
         lineChart.setDrawGridBackground(false)
-
+        lineChart.setNoDataText("")
         val xAxis: XAxis = lineChart.xAxis
-        xAxis.position = XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
-        xAxis.setDrawAxisLine(true)
+        xAxis.setDrawAxisLine(false)
+        xAxis.granularity = 1f
+//        xAxis.setLabelCount(50, true)
+        xAxis.position = XAxisPosition.BOTTOM
 
         val leftAxis: YAxis = lineChart.axisLeft
         leftAxis.setLabelCount(5, false)
@@ -143,7 +145,6 @@ class ChartFragment : Fragment() {
 
         // set data
         lineChart.data = lineData
-
         // do not forget to refresh the chart
         // holder.chart.invalidate();
 
@@ -235,9 +236,9 @@ class ChartFragment : Fragment() {
                 mBarDataSet!!.colors = colors
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(20f)
+                setVisibleXRangeMaximum(10f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 19)
+                moveViewToX(barData.entryCount.toFloat() - 10)
                 setBorderWidth(0.3f)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
@@ -269,6 +270,8 @@ class ChartFragment : Fragment() {
         lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
         lineDataSet.highLightColor = Color.parseColor("#3DB38E")
         lineDataSet.setDrawValues(true)
+        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
+        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
         // create a data object with the data sets
         return LineData(lineDataSet)
     }
@@ -296,24 +299,10 @@ class ChartFragment : Fragment() {
         lineChart.notifyDataSetChanged()
         //把yValues移到指定索引的位置
         lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)
-        lineChart.setVisibleXRangeMaximum(20f)
+        lineChart.setVisibleXRangeMaximum(30f)
 //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
-        lineChart.moveViewToX((lineData.entryCount - 20).toFloat())
+        lineChart.moveViewToX((lineData.entryCount - 29).toFloat())
         lineChart.invalidate()
-    }
-
-    private fun addEntryList(lineData: LineData, lineChart: LineChart, value: Int) {
-        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
-        for (index in 0..value) {
-            val entry = Entry(entryCount.toFloat(), index.toFloat())
-            lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
-        }
-
-        //倒序循环-回落线
-        for (index in value downTo 0) {
-            val entry2 = Entry(entryCount.toFloat(), index.toFloat())
-            lineData.addEntry(entry2, 0)
-        }
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)

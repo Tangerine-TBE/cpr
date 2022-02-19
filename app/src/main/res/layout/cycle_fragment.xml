@@ -1,239 +1,255 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color"
-    tools:context=".fragment.CycleFragment">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_color"
+        tools:context=".fragment.CycleFragment">
 
     <com.pr.perfectrecovery.view.DialChart07View
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.pr.perfectrecovery.view.DialChart07View
-        android:id="@+id/chartQy"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
-
-    <ImageView
-        android:id="@+id/dashBoard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:src="@mipmap/icon_wm_bp_1"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Chronometer
-        android:id="@+id/ctTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_50"
-        android:textColor="@color/color_text_selected"
-        android:textSize="16sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/dashBoard"
-        app:layout_constraintEnd_toEndOf="@+id/dashBoard"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard"
-        app:layout_constraintTop_toTopOf="@+id/dashBoard" />
-
-    <ImageView
-        android:id="@+id/ivPress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
-        android:src="@mipmap/icon_wm_press"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
-
-    <ImageView
-        android:id="@+id/ivPressAim"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@mipmap/icon_wm_aim"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="@+id/ctTime"
-        app:layout_constraintStart_toStartOf="@+id/ctTime"
-        app:layout_constraintTop_toTopOf="@+id/ctTime" />
-
-    <TextView
-        android:id="@+id/tv_press3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="36dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toTopOf="@+id/ivPress" />
-
-    <TextView
-        android:id="@+id/tv_press4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="36dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toTopOf="@+id/ivLung" />
-
-    <TextView
-        android:id="@+id/tv_press5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press3" />
-
-    <TextView
-        android:id="@+id/tv_press6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press5" />
-
-    <TextView
-        android:id="@+id/tv_press7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press6" />
-
-    <TextView
-        android:id="@+id/tv_press8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-        app:layout_constraintTop_toBottomOf="@+id/tv_press7" />
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintlayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pressLayoutView">
-
-        <TextView
-            android:id="@+id/tvPress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textColor="@color/color_text_selected"
-            android:textSize="18sp"
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvPressTotal"
+    <com.pr.perfectrecovery.view.DialChart07View
+            android:id="@+id/chartQy"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
+
+    <ImageView
+            android:id="@+id/dashBoard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="/0"
-            android:textColor="#ffffffff"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/tvPress"
-            app:layout_constraintTop_toTopOf="@+id/tvPress" />
+            android:layout_marginTop="30dp"
+            android:src="@mipmap/icon_wm_bp_1"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <Chronometer
+            android:id="@+id/ctTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_50"
+            android:textColor="@color/color_text_selected"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/dashBoard"
+            app:layout_constraintEnd_toEndOf="@+id/dashBoard"
+            app:layout_constraintStart_toStartOf="@+id/dashBoard"
+            app:layout_constraintTop_toTopOf="@+id/dashBoard" />
+
+    <ImageView
+            android:id="@+id/ivPress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:src="@mipmap/icon_wm_press"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
+
+    <ImageView
+            android:id="@+id/ivPressAim"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@mipmap/icon_wm_aim"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@+id/ctTime"
+            app:layout_constraintStart_toStartOf="@+id/ctTime"
+            app:layout_constraintTop_toTopOf="@+id/ctTime" />
+
+    <TextView
+            android:id="@+id/tv_press3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="36dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toTopOf="@+id/ivPress" />
+
+    <TextView
+            android:id="@+id/tv_press4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="36dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toTopOf="@+id/ivLung" />
+
+    <TextView
+            android:id="@+id/tv_press5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press3" />
+
+    <TextView
+            android:id="@+id/tv_press6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press5" />
+
+    <TextView
+            android:id="@+id/tv_press7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press6" />
+
+    <TextView
+            android:id="@+id/tv_press8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press7" />
+
+    <TextView
+            android:id="@+id/tv_press9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press8" />
+    <TextView
+            android:id="@+id/tv_press10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press8" />
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintlayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pressLayoutView">
+
+        <TextView
+                android:id="@+id/tvPress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/color_text_selected"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/tvPressTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/0"
+                android:textColor="#ffffffff"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@+id/tvPress"
+                app:layout_constraintTop_toTopOf="@+id/tvPress" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.pr.perfectrecovery.view.PressLayoutView
-        android:id="@+id/pressLayoutView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
+            android:id="@+id/pressLayoutView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
 
     <ImageView
-        android:id="@+id/dashBoard2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_38"
-        android:src="@mipmap/icon_wm_bp_1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
+            android:id="@+id/dashBoard2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_38"
+            android:src="@mipmap/icon_wm_bp_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
 
     <ImageView
-        android:id="@+id/ivAim"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@mipmap/icon_wm_aim"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/dashBoard2"
-        app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard2"
-        app:layout_constraintTop_toBottomOf="@+id/dashBoard2" />
+            android:id="@+id/ivAim"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@mipmap/icon_wm_qy_error"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/dashBoard2"
+            app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
+            app:layout_constraintStart_toStartOf="@+id/dashBoard2"
+            app:layout_constraintTop_toBottomOf="@+id/dashBoard2" />
 
     <ImageView
-        android:id="@+id/ivLung"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_24"
-        android:src="@mipmap/icon_wm_lung"
-        app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
-        app:layout_constraintStart_toStartOf="@+id/dashBoard2"
-        app:layout_constraintTop_toBottomOf="@+id/dashBoard2" />
+            android:id="@+id/ivLung"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_24"
+            android:src="@mipmap/icon_wm_lung"
+            app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
+            app:layout_constraintStart_toStartOf="@+id/dashBoard2"
+            app:layout_constraintTop_toBottomOf="@+id/dashBoard2" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintlayout3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivLung">
-
-        <TextView
-            android:id="@+id/tvLungError"
+            android:id="@+id/constraintlayout3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textColor="@color/color_text_selected"
-            android:textSize="18sp"
+            android:layout_marginTop="@dimen/dp_10"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/ivLung">
 
         <TextView
-            android:id="@+id/tvLungTotal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="/0"
-            android:textColor="#ffffffff"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/tvLungError"
-            app:layout_constraintTop_toTopOf="@+id/tvLungError" />
+                android:id="@+id/tvLungError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/color_text_selected"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/tvLungTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/0"
+                android:textColor="#ffffffff"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@+id/tvLungError"
+                app:layout_constraintTop_toTopOf="@+id/tvLungError" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

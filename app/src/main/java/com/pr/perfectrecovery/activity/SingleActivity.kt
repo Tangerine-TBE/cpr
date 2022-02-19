@@ -20,6 +20,7 @@ import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.utils.TimeUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -66,7 +67,7 @@ class SingleActivity : BaseActivity() {
             }
 
             if (isStart) {
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
+                DataVolatile.dataClear()
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment.start()
@@ -88,6 +89,7 @@ class SingleActivity : BaseActivity() {
                 counter.let { mHandler.removeCallbacks(it) }
                 mTrainingDTO.name = binding.tvName.text.toString().trim()
                 mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                mTrainingDTO.trainingTime = TimeUtils.formatDate(timeZero)
                 TrainResultActivity.start(this, mTrainingDTO)
                 finish()
             }
@@ -120,20 +122,20 @@ class SingleActivity : BaseActivity() {
         if (isCheck == true) {
             fragments.add(CheckEventFragment.newInstance())
             binding.ctEvent.visibility = View.VISIBLE
-            val indexEvent = curItem ++
+            val indexEvent = curItem++
             binding.ctEvent.setOnClickListener { binding.viewPager.currentItem = indexEvent }
             titleBtns.add(binding.ctEvent)
         }
 
         cycleFragment = CycleFragment.newInstance(mTrainingBean!!.isVoice, mTrainingBean!!.isBeat)
         fragments.add(cycleFragment)
-        val indexChar = curItem ++
+        val indexChar = curItem++
         binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }
         binding.ctChart.isChecked = indexChar == 0
         titleBtns.add(binding.ctChart)
 
         fragments.add(ChartFragment.newInstance())
-        val indexCure = curItem ++
+        val indexCure = curItem++
         binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = indexCure }
         titleBtns.add(binding.ctCurve)
 
@@ -164,6 +166,8 @@ class SingleActivity : BaseActivity() {
     override fun onDestroy() {
         counter.let { mHandler.removeCallbacks(it) }
         super.onDestroy()
+        DataVolatile.dataClear()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         EventBus.getDefault().unregister(this)
     }
 

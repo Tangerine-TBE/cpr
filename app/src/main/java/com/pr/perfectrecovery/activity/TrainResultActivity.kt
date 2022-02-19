@@ -7,6 +7,7 @@ import android.view.View
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
+import com.pr.perfectrecovery.utils.TimeUtils
 
 /**
  * 训练结果-操作明细 成绩结果
@@ -66,7 +67,7 @@ class TrainResultActivity : BaseActivity() {
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
         //按压百仪表分比
-        viewBinding.tvClock1.text = "${trainingDTO.pressMeterPercentage}"
+        viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
         //按压百分比
         viewBinding.tvPress.text = "${trainingDTO.pressTopPercentage}"
         viewBinding.tvPressEnd.text = "${trainingDTO.pressBottomPercentage}"
