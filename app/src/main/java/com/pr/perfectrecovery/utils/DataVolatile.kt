@@ -288,29 +288,30 @@ object DataVolatile {
             return preDistance.toInt()
         }
         // int low_flag=0;
-        if (L_d1 >= L_d2) {
-            if (L_d2 >= L_d3) {
+        if (L_d1 > L_d2) {
+            if (L_d2 > L_d3&&L_d2-L_d3>5) {
                 value = L_d3
                 low_flag = 0
             } else {
-                value = L_d2
-                //preTimePress = System.currentTimeMillis()    //获取开始时间
-                low_flag = 1
-                PR_SUM++
-                Err_PrTotal(value)
-                val changTimePress = System.currentTimeMillis()
-                if (PR_SUM > 1) {
-                    val time = changTimePress - preTimePress
-                    PF_Value = (60000 / time).toInt()
-                    if(PF_Value>180){
-                        PF_Value=180;
-                    }else if(PF_Value<60){
-                        PF_Value=60;
+                if (L_d3 - L_d2 > 5) {
+                    value = L_d2
+                    low_flag = 1
+                    PR_SUM++
+                    Err_PrTotal(value)
+                    val changTimePress = System.currentTimeMillis()
+                    if (PR_SUM > 1) {
+                        val time = changTimePress - preTimePress
+                        PF_Value = (60000 / time).toInt()
+                        if (PF_Value > 180) {
+                            PF_Value = 180;
+                        } else if (PF_Value < 60) {
+                            PF_Value = 60;
+                        }
                     }
+                    preTimePress = changTimePress
                 }
-                preTimePress = changTimePress
             }
-        } else if (L_d2 <= L_d3) {
+        } else if (L_d2 < L_d3&&L_d3 - L_d2>5) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
@@ -393,7 +394,6 @@ object DataVolatile {
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
-
             if (top_flag == 1) {
                 ERR_QyTotal(max(QY_valueSet));//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
