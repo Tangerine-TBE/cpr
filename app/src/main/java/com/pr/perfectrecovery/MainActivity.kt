@@ -1,14 +1,16 @@
 package com.pr.perfectrecovery
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.os.Message
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.JsonUtils
 import com.pr.perfectrecovery.activity.CPRActivity
 import com.pr.perfectrecovery.activity.ConfigActivity
 import com.pr.perfectrecovery.activity.StatisticalActivity
@@ -26,11 +28,34 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val BLUETOOTH_PERMISSIONS = arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initView()
+        checkPermission()
+    }
+
+    private fun checkPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                requestPermissions(BLUETOOTH_PERMISSIONS, 0)
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            0 -> {
+                if (!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    Toast.makeText(this,"请在设置中打开应用权限",Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun initView() {

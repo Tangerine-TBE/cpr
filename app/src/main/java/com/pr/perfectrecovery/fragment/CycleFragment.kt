@@ -458,8 +458,8 @@ class CycleFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewBinding.chart.invalidate()
-        viewBinding.chartQy.invalidate()
+        setRate(viewBinding.chart, 0)
+        setRate(viewBinding.chartQy, 0)
     }
 
     override fun onDestroy() {
