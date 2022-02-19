@@ -1,5 +1,6 @@
 package com.pr.perfectrecovery.utils
 
+import android.util.Log
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.utils.TestVolatile.top_flag
 import kotlin.math.abs
@@ -317,6 +318,7 @@ object DataVolatile {
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
+        Log.e("TAG", "$L_d1  $L_d2  $L_d3")
         if (PR_SUM == 0 && abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
                 preDistance - L_d3
             ) < 10
@@ -330,7 +332,7 @@ object DataVolatile {
                 low_flag = 0
             } else {
                 if (L_d3 - L_d2 > 5) {
-                    value = L_d2
+                   // value = L_d2
                     low_flag = 1
                     PR_SUM++
                     Err_PrTotal(value)
@@ -346,6 +348,7 @@ object DataVolatile {
                     }
                     preTimePress = changTimePress
                 }
+                value = L_d2
             }
         } else if (L_d2 < L_d3 && L_d3 - L_d2 > 5) {
             if (low_flag == 0) {
@@ -368,6 +371,7 @@ object DataVolatile {
         } else {
             value = L_d2
         }
+        Log.e("TAG1", "$value")
         return value
     }
 
