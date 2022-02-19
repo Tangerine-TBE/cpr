@@ -536,7 +536,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_4"
-                            android:text="0:23"
                             android:textColor="@color/color_text_selected"
                             android:textSize="13sp"
                             app:layout_constraintStart_toEndOf="@+id/tv10"

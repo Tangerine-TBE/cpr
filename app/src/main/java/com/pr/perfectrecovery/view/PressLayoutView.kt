@@ -116,7 +116,7 @@ class PressLayoutView : LinearLayout {
             viewPress!!.visibility = INVISIBLE
             ivArrowUp!!.visibility = INVISIBLE
             ivArrowDown!!.visibility = INVISIBLE
-        } else if (prSum != prCount && destY > 2) { //按压过大
+        } else if (prSum != prCount && destY > 9) { //按压过大
             isDown = true
             prCount = prSum
             Log.e("smoothScrollTo", "按压过大")
@@ -162,6 +162,11 @@ class PressLayoutView : LinearLayout {
         ivArrowDown!!.visibility = VISIBLE
     }
 
+    fun setHigh() {
+        ivArrowUp!!.visibility = VISIBLE
+        ivArrowDown!!.visibility = INVISIBLE
+    }
+
     private fun setViewStatus() {
         Log.d("viewY", "" + newY)
         if (newY > viewTop!!.height) {
@@ -178,31 +183,31 @@ class PressLayoutView : LinearLayout {
             return 0
         }
         return when {
-            number < 10 -> {
+            number < 4 -> {
                 1
             }
-            number < 15 -> {
+            number < 8 -> {
                 2
             }
-            number < 20 -> {
+            number < 12 -> {
                 3
             }
-            number < 25 -> {
+            number < 16 -> {
                 4
             }
-            number < 30 -> {
+            number < 20 -> {
                 5
             }
-            number < 35 -> {
+            number < 24 -> {
                 6
             }
-            number < 40 -> {
+            number < 26 -> {
                 7
             }
-            number < 45 -> {
+            number < 30 -> {
                 8
             }
-            number <= 65 -> {
+            number <= 70 -> {
                 9
             }
             number > 65 -> {
@@ -213,31 +218,6 @@ class PressLayoutView : LinearLayout {
             }
         }
     }
-//    private fun getNumber(number: Int): Int {
-//        return if (number < 45) {
-//            10
-//        } else if (number <= 60) {
-//            9
-//        } else if (number < 70) {
-//            8
-//        } else if (number < 80) {
-//            7
-//        } else if (number < 90) {
-//            6
-//        } else if (number < 100) {
-//            5
-//        } else if (number < 110) {
-//            4
-//        } else if (number < 130) {
-//            3
-//        } else if (number < 150) {
-//            2
-//        } else if (number < 170) {
-//            1
-//        } else {
-//            0
-//        }
-//    }
 
     private var mScrollerCallBack: ScrollerCallBack? = null
     fun setScrollerCallBack(mScrollerCallBack: ScrollerCallBack?) {

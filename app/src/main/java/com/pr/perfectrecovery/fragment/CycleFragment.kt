@@ -125,7 +125,7 @@ class CycleFragment : Fragment() {
 //                    setPlayVoice(VOICE_MP3_AYBZ)
                     }
                     PressLayoutView.TYPE_MAX -> {//按压过大
-                        setPlayVoice(VOICE_MP3_AYGD)
+                        //setPlayVoice(VOICE_MP3_AYGD)
                     }
                 }
             }
@@ -219,7 +219,7 @@ class CycleFragment : Fragment() {
         isStart = false
         val trainingDTO = TrainingDTO()
         mBaseDataDTO?.apply {
-            trainingDTO.pressOutTime = TimeUtils.stampToDate(timeOut)
+            trainingDTO.pressOutTime = TimeUtils.timeParse(timeOut).toString()
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
             trainingDTO.pressLocation = ERR_PR_POSI
@@ -295,7 +295,8 @@ class CycleFragment : Fragment() {
     private var prValue = 0
     private var qyValue = 0
 
-    private var err_pr_posi = 0
+    private var err_pr_low = 0
+    private var err_pr_high = 0
     private var isTimeOut = false
 
     private fun setViewDate(dataDTO: BaseDataDTO?) {
@@ -377,10 +378,6 @@ class CycleFragment : Fragment() {
             "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
     }
 
-    private fun setPrAimVisibility() {
-        viewBinding.ivPressAim.visibility = View.INVISIBLE
-    }
-
     private fun setQyAimVisibility() {
         viewBinding.ivAim.visibility = View.INVISIBLE
     }
@@ -397,9 +394,22 @@ class CycleFragment : Fragment() {
                 if (dataDTO.distance < (DataVolatile.preDistance - 5)) {
                     stopOutTime()
                 }
+
+                //按压不足
+                if (err_pr_low != dataDTO.ERR_PR_LOW) {
+                    err_pr_low = dataDTO.ERR_PR_LOW
+                    viewBinding.pressLayoutView.setDown()
+                    setPlayVoice(VOICE_MP3_AYBZ)
+                }
+
+                //按压过大
+                if (err_pr_high != dataDTO.ERR_PR_HIGH) {
+                    err_pr_high = dataDTO.ERR_PR_HIGH
+                    viewBinding.pressLayoutView.setHigh()
+                    setPlayVoice(VOICE_MP3_AYGD)
+                }
                 pressCount = dataDTO.prSum
             }
-
         } else {
             viewBinding.ivPressAim.visibility = View.VISIBLE
 //            mHandler3.removeCallbacksAndMessages(null)
@@ -423,11 +433,7 @@ class CycleFragment : Fragment() {
         //按压总数
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
-        if (err_pr_posi != dataDTO.ERR_PR_LOW) {
-            err_pr_posi = dataDTO.ERR_PR_LOW
-            viewBinding.pressLayoutView.setDown()
-            setPlayVoice(VOICE_MP3_AYBZ)//按压不足
-        }
+
     }
 
     private fun stopOutTime() {
@@ -477,12 +483,10 @@ class CycleFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         //数据清零
         DataVolatile.dataClear()
-
+        super.onDestroy()
         if (mMediaPlayer != null) {
-            1
             mMediaPlayer!!.stop()
             mMediaPlayer!!.release()
             mMediaPlayer = null
