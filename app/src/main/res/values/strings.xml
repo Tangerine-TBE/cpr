@@ -26,4 +26,5 @@
     <string name="please_select_model">请选择模式</string>
 
     <string name="searching_for_available_models">正在搜索可用的模型</string>
+    <string name="available_models">可用的模型如下:</string>
 </resources>

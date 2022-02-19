@@ -36,6 +36,7 @@ class DeviceBluetoothAdapter :
             viewBinding.root.setBackgroundColor(context.resources.getColor(R.color.theme_color))
             viewBinding.tvBluetoothName.setTextColor(context.resources.getColor(R.color.white))
             viewBinding.tvBluetoothStatus.setTextColor(context.resources.getColor(R.color.white))
+            viewBinding.battery.visibility = View.GONE
         }
 
         //处理动画效果不生效问题

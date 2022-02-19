@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_6"
-        android:text="可用的模型如下："
+        android:text="@string/available_models"
         android:textColor="#3DB38E"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/view"
@@ -125,10 +125,11 @@
         app:layout_constraintTop_toBottomOf="@+id/tvConnections" />
 
     <include
-        android:id="@+id/bottom"
-        layout="@layout/layout_bottom_right"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+            android:id="@+id/bottom"
+            layout="@layout/layout_bottom_right"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -41,29 +41,29 @@ class TrainingSingleActivity : BaseActivity() {
     private fun initSingle() {
         binding.bottom.ivBack.setOnClickListener { finish() }
         val mTrainingBean = TrainingBean()
-        //考核模式
-        binding.single.cbCheck.setOnCheckedChangeListener { compoundButton, b ->
-            //MMKV.defaultMMKV().encode("", );
-            if (b) {
-                binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
-                mTrainingBean.isCheck = true
-                binding.single.cbTraining.isChecked = false
-            } else {
-                binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
-            }
-            //考核模式  禁止使用语音和提示音
-            binding.single.switchBeat.isChecked = false
-            binding.single.switchVoice.isChecked = false
-        }
 
-        //练习模式
-        binding.single.cbTraining.setOnCheckedChangeListener { compoundButton, b ->
-            if (b) {
-                mTrainingBean.isCheck = false
-                binding.single.cbCheck.isChecked = false
-                binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
-            } else {
-                binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
+        binding.single.oprMod.setOnCheckedChangeListener { radioGroup, _ ->
+            when (radioGroup.checkedRadioButtonId) {
+                //考核模式
+                R.id.cbCheck -> {
+                    binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
+                    binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
+                    mTrainingBean.isCheck = true
+                    //考核模式  禁止使用语音和提示音
+                    binding.single.switchBeat.isChecked = false
+                    binding.single.switchVoice.isChecked = false
+                    binding.single.switchBeat.isEnabled = false
+                    binding.single.switchVoice.isEnabled = false
+                }
+                //练习模式
+                R.id.cbTraining -> {
+                    binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
+                    binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
+                    mTrainingBean.isCheck = false
+                    //考核模式  禁止使用语音和提示音
+                    binding.single.switchBeat.isEnabled = true
+                    binding.single.switchVoice.isEnabled = true
+                }
             }
         }
 

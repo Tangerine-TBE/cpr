@@ -443,6 +443,7 @@ class CPRActivity : BaseActivity() {
      * 开始刷新动画
      */
     private fun startRefresh() {
+        viewBinding.tvDesc.setText(R.string.searching_for_available_models)
         viewBinding.progressCircular.indeterminateDrawable =
             resources.getDrawable(R.drawable.progressbar_circle)
         viewBinding.progressCircular.progressDrawable =
@@ -453,6 +454,7 @@ class CPRActivity : BaseActivity() {
      * 停止刷新动画
      */
     private fun stopRefresh() {
+        viewBinding.tvDesc.setText(R.string.available_models)
         viewBinding.progressCircular.indeterminateDrawable =
             resources.getDrawable(R.drawable.icon_wm_refresh)
         viewBinding.progressCircular.progressDrawable =

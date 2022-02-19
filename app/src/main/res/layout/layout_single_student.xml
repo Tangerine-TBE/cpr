@@ -69,35 +69,41 @@
         app:layout_constraintStart_toStartOf="@+id/textView9"
         app:layout_constraintTop_toBottomOf="@+id/viewline" />
 
-    <CheckBox
-        android:id="@+id/cbTraining"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_24"
-        android:button="@drawable/checkbox_bg"
-        android:checked="true"
-        android:paddingStart="@dimen/dp_4"
-        android:text="练习"
-        android:textColor="@color/color_37B48B"
-        android:textSize="@dimen/text_16"
-        app:layout_constraintBottom_toBottomOf="@+id/textView10"
-        app:layout_constraintStart_toEndOf="@+id/textView10"
-        app:layout_constraintTop_toTopOf="@+id/textView10" />
+    <RadioGroup
+            android:id="@+id/opr_mod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_24"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="@+id/textView10"
+            app:layout_constraintBottom_toBottomOf="@+id/textView10"
+            app:layout_constraintStart_toEndOf="@+id/textView10">
 
-    <CheckBox
-        android:id="@+id/cbCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_24"
-        android:button="@drawable/checkbox_bg"
-        android:checked="false"
-        android:paddingStart="@dimen/dp_4"
-        android:text="考核"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_16"
-        app:layout_constraintBottom_toBottomOf="@+id/cbTraining"
-        app:layout_constraintStart_toEndOf="@+id/cbTraining"
-        app:layout_constraintTop_toTopOf="@+id/cbTraining" />
+        <RadioButton
+            android:id="@+id/cbTraining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_37B48B"
+            android:paddingStart="@dimen/dp_4"
+            android:textSize="@dimen/text_16"
+            android:checked="true"
+            android:text="练习"
+            android:button="@drawable/checkbox_bg"
+            />
+
+        <RadioButton
+            android:id="@+id/cbCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_24"
+            android:textColor="@color/white"
+            android:paddingStart="@dimen/dp_4"
+            android:textSize="@dimen/text_16"
+            android:text="考核"
+            android:button="@drawable/checkbox_bg"
+            />
+
+    </RadioGroup>
 
     <View
         android:id="@+id/viewline2"
@@ -123,16 +129,16 @@
         app:layout_constraintTop_toBottomOf="@+id/viewline2" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchBeat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:checked="false"
-        app:thumbTint="@color/white"
-        app:track="@drawable/switch_white_circle_selector"
-        app:layout_constraintBottom_toBottomOf="@+id/textView11"
-        app:layout_constraintStart_toStartOf="@+id/cbTraining"
-        app:layout_constraintTop_toTopOf="@+id/textView11" />
+            android:id="@+id/switchBeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:checked="false"
+            app:thumbTint="@color/white"
+            app:track="@drawable/switch_white_circle_selector"
+            app:layout_constraintBottom_toBottomOf="@+id/textView11"
+            app:layout_constraintStart_toStartOf="@+id/opr_mod"
+            app:layout_constraintTop_toTopOf="@+id/textView11" />
 
     <View
         android:id="@+id/viewline3"
@@ -166,6 +172,6 @@
         app:thumbTint="@color/white"
         app:track="@drawable/switch_white_circle_selector"
         app:layout_constraintBottom_toBottomOf="@+id/textview12"
-        app:layout_constraintStart_toStartOf="@+id/cbTraining"
+        app:layout_constraintStart_toStartOf="@+id/opr_mod"
         app:layout_constraintTop_toTopOf="@+id/textview12" />
 </androidx.constraintlayout.widget.ConstraintLayout>
