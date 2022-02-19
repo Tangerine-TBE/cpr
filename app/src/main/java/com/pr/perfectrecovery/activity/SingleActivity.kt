@@ -3,6 +3,8 @@ package com.pr.perfectrecovery.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import android.widget.CheckedTextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -15,6 +17,7 @@ import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivitySingleBinding
 import com.pr.perfectrecovery.fragment.ChartFragment
+import com.pr.perfectrecovery.fragment.CheckEventFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.TimeUtils
@@ -109,13 +112,32 @@ class SingleActivity : BaseActivity() {
 
     private lateinit var cycleFragment: CycleFragment;
     private fun initViewPager() {
+        var curItem = 0
+        val isCheck = mTrainingBean?.isCheck
         val fragments = mutableListOf<Fragment>()
+        val titleBtns = mutableListOf<CheckedTextView>()
+
+        if (isCheck == true) {
+            fragments.add(CheckEventFragment.newInstance())
+            binding.ctEvent.visibility = View.VISIBLE
+            val indexEvent = curItem ++
+            binding.ctEvent.setOnClickListener { binding.viewPager.currentItem = indexEvent }
+            titleBtns.add(binding.ctEvent)
+        }
+
         cycleFragment = CycleFragment.newInstance(mTrainingBean!!.isVoice, mTrainingBean!!.isBeat)
         fragments.add(cycleFragment)
-        fragments.add(ChartFragment.newInstance())
+        val indexChar = curItem ++
+        binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }
+        binding.ctChart.isChecked = indexChar == 0
+        titleBtns.add(binding.ctChart)
 
-        binding.ctChart.setOnClickListener { binding.viewPager.currentItem = 0 }
-        binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = 1 }
+        fragments.add(ChartFragment.newInstance())
+        val indexCure = curItem ++
+        binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = indexCure }
+        titleBtns.add(binding.ctCurve)
+
+
         binding.viewPager.offscreenPageLimit = fragments.size
         binding.viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -129,19 +151,12 @@ class SingleActivity : BaseActivity() {
         }
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-//                binding.tvPage.text = "${position + 1}/${fragments.size}"
-                binding.ctChart.isChecked = false
-                binding.ctCurve.isChecked = false
-                if (position == 0)
-                    binding.ctChart.isChecked = true
-                else
-                    binding.ctCurve.isChecked = true
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                titleBtns.forEach {
+                    it.isChecked = false
+                }
+                titleBtns[position].isChecked = true
             }
         })
     }
