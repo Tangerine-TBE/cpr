@@ -32,6 +32,7 @@ import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -101,7 +102,6 @@ class CycleFragment : Fragment() {
         val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
-            Log.i("CPRActivity", "${count++}")
             setViewDate(it)
             viewBinding.tvPress3.text = "距离值：${it.distance}"
             viewBinding.tvPress4.text = "气压值：${it.bpValue}"
@@ -110,6 +110,7 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
             viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
+            viewBinding.tvPress9.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
         })
 
 //        //监听按压事件回调-处理结果语音提示

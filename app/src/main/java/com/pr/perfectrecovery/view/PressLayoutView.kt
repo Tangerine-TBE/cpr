@@ -172,7 +172,7 @@ class PressLayoutView : LinearLayout {
     }
 
     private fun getNumber(value: Int): Int {
-        val number = DataVolatile.preDistance.toInt() - value
+        val number = abs(DataVolatile.preDistance.toInt() - value)
         //Log.e("getNumber", "$value   计算后的按压距离值：$number")
         if (number < 10) {
             return 0

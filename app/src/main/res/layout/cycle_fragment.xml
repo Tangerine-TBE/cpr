@@ -135,7 +135,14 @@
             android:textColor="@color/white"
             app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
             app:layout_constraintTop_toBottomOf="@+id/tv_press8" />
-
+    <TextView
+            android:id="@+id/tv_press10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_press8" />
     <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="100dp"
