@@ -1,420 +1,420 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color">
-
-    <androidx.core.widget.NestedScrollView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="@dimen/dp_20"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@color/theme_color">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:paddingTop="@dimen/dp_20"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardView1"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/dp_44"
-                    android:layout_marginStart="@dimen/dp_32"
-                    android:layout_marginTop="@dimen/dp_40"
-                    android:layout_marginEnd="@dimen/dp_10"
-                    app:cardBackgroundColor="#B322231D"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    app:layout_constraintEnd_toStartOf="@+id/cardView2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="spread_inside">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/tvLungCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/color_text_selected"
-                            android:textSize="20sp"
-                            app:layout_constraintEnd_toStartOf="@+id/tvLungTotal"
-                            app:layout_constraintTop_toTopOf="@+id/tvLungTotal" />
-
-                        <TextView
-                            android:id="@+id/tvLungTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:text="/0"
-                            android:textColor="#ffffffff"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-
-                <ImageView
-                    android:id="@+id/ivLung"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:layout_marginTop="@dimen/dp_20"
-                    android:src="@mipmap/icon_wm_chart_lung"
-                    app:layout_constraintStart_toStartOf="@+id/cardView1"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardView2"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/dp_44"
-                    android:layout_marginStart="@dimen/dp_10"
-                    android:layout_marginEnd="@dimen/dp_32"
-                    app:cardBackgroundColor="#B322231D"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/cardView1"
-                    app:layout_constraintTop_toTopOf="@+id/cardView1">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/tvHeartCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/color_text_selected"
-                            android:textSize="20sp"
-                            app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
-                            app:layout_constraintTop_toTopOf="@+id/tvHeartTotal" />
-
-                        <TextView
-                            android:id="@+id/tvHeartTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:text="/0"
-                            android:textColor="#ffffffff"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-
-                <ImageView
-                    android:id="@+id/ivHeart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:layout_marginTop="@dimen/dp_20"
-                    android:src="@mipmap/icon_wm_chart_heart"
-                    app:layout_constraintStart_toStartOf="@+id/cardView2"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintlayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_35"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView1">
+                    android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/textView6"
+                <androidx.cardview.widget.CardView
+                        android:id="@+id/cardView1"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/dp_44"
+                        android:layout_marginStart="@dimen/dp_32"
+                        android:layout_marginTop="@dimen/dp_40"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        app:cardBackgroundColor="#B322231D"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toStartOf="@+id/cardView2"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="spread_inside">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                        <TextView
+                                android:id="@+id/tvLungCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/color_text_selected"
+                                android:textSize="20sp"
+                                app:layout_constraintEnd_toStartOf="@+id/tvLungTotal"
+                                app:layout_constraintTop_toTopOf="@+id/tvLungTotal" />
+
+                        <TextView
+                                android:id="@+id/tvLungTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/dp_10"
+                                android:text="/0"
+                                android:textColor="#ffffffff"
+                                android:textSize="20sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                        android:id="@+id/ivLung"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:text="8vpm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_20"
+                        android:src="@mipmap/icon_wm_chart_lung"
+                        app:layout_constraintStart_toStartOf="@+id/cardView1"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <View
-                        android:id="@+id/view2"
+                <androidx.cardview.widget.CardView
+                        android:id="@+id/cardView2"
                         android:layout_width="0dp"
-                        android:layout_height="1dp"
+                        android:layout_height="@dimen/dp_44"
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView6"
+                        app:cardBackgroundColor="#B322231D"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView6"
-                        app:layout_constraintTop_toTopOf="@+id/textView6" />
+                        app:layout_constraintStart_toEndOf="@+id/cardView1"
+                        app:layout_constraintTop_toTopOf="@+id/cardView1">
 
-                    <TextView
-                        android:id="@+id/textView17"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                        <TextView
+                                android:id="@+id/tvHeartCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/color_text_selected"
+                                android:textSize="20sp"
+                                app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
+                                app:layout_constraintTop_toTopOf="@+id/tvHeartTotal" />
+
+                        <TextView
+                                android:id="@+id/tvHeartTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/dp_10"
+                                android:text="/0"
+                                android:textColor="#ffffffff"
+                                android:textSize="20sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                        android:id="@+id/ivHeart"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_28"
-                        android:text="6vpm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_20"
+                        android:src="@mipmap/icon_wm_chart_heart"
+                        app:layout_constraintStart_toStartOf="@+id/cardView2"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/constraintlayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_35"
+                        app:layout_constraintTop_toBottomOf="@+id/cardView1">
+
+                    <TextView
+                            android:id="@+id/textView6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:text="8vpm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView17"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView17"
-                        app:layout_constraintTop_toTopOf="@+id/textView17" />
+                            android:id="@+id/view2"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView6"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView6"
+                            app:layout_constraintTop_toTopOf="@+id/textView6" />
+
+                    <TextView
+                            android:id="@+id/textView17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:layout_marginTop="@dimen/dp_28"
+                            android:text="6vpm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+                    <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView17"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView17"
+                            app:layout_constraintTop_toTopOf="@+id/textView17" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="75dp"
-                    android:layout_marginTop="@dimen/dp_20"
-                    app:layout_constraintBottom_toTopOf="@+id/barChart"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/constraintlayout"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView1" />
+                        android:id="@+id/lineChart"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/dp_60"
+                        android:layout_marginTop="@dimen/dp_18"
+                        app:layout_constraintBottom_toTopOf="@+id/barChart"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/constraintlayout"
+                        app:layout_constraintTop_toBottomOf="@+id/cardView1" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintlayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
-                    app:layout_constraintStart_toStartOf="@+id/barChart"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
+                        android:id="@+id/constraintlayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_30"
+                        app:layout_constraintStart_toStartOf="@+id/barChart"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
 
                     <TextView
-                        android:id="@+id/textView10"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:text="600ml"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                            android:id="@+id/textView10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:text="600ml"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView10"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView10"
-                        app:layout_constraintTop_toTopOf="@+id/textView10" />
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView10"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView10"
+                            app:layout_constraintTop_toTopOf="@+id/textView10" />
 
                     <TextView
-                        android:id="@+id/textView16"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_28"
-                        android:text="400ml"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView10" />
+                            android:id="@+id/textView16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:layout_marginTop="@dimen/dp_28"
+                            android:text="400ml"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
                     <View
-                        android:id="@+id/viewBar"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView16"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView16"
-                        app:layout_constraintTop_toTopOf="@+id/textView16" />
+                            android:id="@+id/viewBar"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView16"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView16"
+                            app:layout_constraintTop_toTopOf="@+id/textView16" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.github.mikephil.charting.charts.BarChart
-                    android:id="@+id/barChart"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="70dp"
-                    android:layout_marginTop="@dimen/dp_10"
-                    app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
+                        android:id="@+id/barChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="65dp"
+                        android:layout_marginTop="@dimen/dp_10"
+                        app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintlayout3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
+                        android:id="@+id/constraintlayout3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_30"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
 
                     <TextView
-                        android:id="@+id/textView12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:text="0:00"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                            android:id="@+id/textView12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:text="0:00"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:id="@+id/view5"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView12"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView12"
-                        app:layout_constraintTop_toTopOf="@+id/textView12" />
+                            android:id="@+id/view5"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView12"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView12"
+                            app:layout_constraintTop_toTopOf="@+id/textView12" />
 
                     <TextView
-                        android:id="@+id/textView22"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_28"
-                        android:text="5cm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+                            android:id="@+id/textView22"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:layout_marginTop="@dimen/dp_28"
+                            android:text="5cm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
                     <View
-                        android:id="@+id/viewline"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView22"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView22"
-                        app:layout_constraintTop_toTopOf="@+id/textView22" />
+                            android:id="@+id/viewline"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView22"
+                            app:layout_constraintTop_toTopOf="@+id/textView22" />
 
                     <TextView
-                        android:id="@+id/textView14"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_28"
-                        android:text="6cm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView22" />
+                            android:id="@+id/textView14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:layout_marginTop="@dimen/dp_28"
+                            android:text="6cm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView22" />
 
                     <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView14"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView14"
-                        app:layout_constraintTop_toTopOf="@+id/textView14" />
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView14"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView14"
+                            app:layout_constraintTop_toTopOf="@+id/textView14" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart1"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="70dp"
-                    app:layout_constraintBottom_toTopOf="@+id/lineChart2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/constraintlayout3" />
+                        android:id="@+id/lineChart1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="65dp"
+                        app:layout_constraintBottom_toTopOf="@+id/lineChart2"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/constraintlayout3" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintlayout4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
+                        android:id="@+id/constraintlayout4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_30"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
 
                     <TextView
-                        android:id="@+id/textView9"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:text="120cpm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                            android:id="@+id/textView9"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:text="120cpm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     <View
-                        android:id="@+id/view3"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView9"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView9"
-                        app:layout_constraintTop_toTopOf="@+id/textView9" />
+                            android:id="@+id/view3"
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView9"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView9"
+                            app:layout_constraintTop_toTopOf="@+id/textView9" />
 
                     <TextView
-                        android:id="@+id/textView13"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_28"
-                        android:text="100cpm"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+                            android:id="@+id/textView13"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dp_32"
+                            android:layout_marginTop="@dimen/dp_28"
+                            android:text="100cpm"
+                            android:textColor="#ffffffff"
+                            android:textSize="13sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
                     <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_32"
-                        android:background="#1EFFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/textView13"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView13"
-                        app:layout_constraintTop_toTopOf="@+id/textView13" />
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginEnd="@dimen/dp_32"
+                            android:background="#1EFFFFFF"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView13"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView13"
+                            app:layout_constraintTop_toTopOf="@+id/textView13" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart2"
-                    android:layout_width="0dp"
-                    android:layout_height="84dp"
-                    android:layout_marginStart="@dimen/dp_80"
-                    android:layout_marginTop="@dimen/dp_10"
-                    app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
+                        android:id="@+id/lineChart2"
+                        android:layout_width="0dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="@dimen/dp_75"
+                        android:layout_marginTop="@dimen/dp_20"
+                        app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>

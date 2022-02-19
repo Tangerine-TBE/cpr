@@ -53,16 +53,23 @@ object DataVolatile {
 
     var L_valueSet = intArrayOf(1)
     var QY_valueSet = mutableListOf<Int>()
+    var QY_valueSet2 = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
 
-    fun max(array: List<Int>): Int {
-        var maximum = Int.MIN_VALUE
+    /**
+     * array 数据列表
+     * isClear 清除数据集合
+     */
+    fun max(array: List<Int>, isClear: Boolean): Int {
+        var maximum = 0
         for (i in array.indices) {
             if (maximum < array[i]) {
                 maximum = array[i]
             }
         }
-        QY_valueSet.clear()
+        if (isClear) {
+            QY_valueSet.clear()
+        }
         return maximum
     }
 
@@ -74,8 +81,7 @@ object DataVolatile {
         for (i in array.indices) {
             sum += i
         }
-
-        QY_valueSet.clear()
+        QY_valueSet2.clear()
         return sum
     }
 
@@ -123,7 +129,12 @@ object DataVolatile {
             } else {
                 LKS_Value = 0
             }
-            if (state and 16 == 16) {
+//            if (state and 16 == 16) {
+//                PSR_Value = 1
+//            } else {
+//                PSR_Value = 0
+//            }
+            if (state and 8 == 8) {
                 PSR_Value = 1
             } else {
                 PSR_Value = 0
@@ -230,8 +241,33 @@ object DataVolatile {
         dataDTO.ERR_QY_DEAD = ERR_QY_DEAD
         dataDTO.ERR_QY_HIGH = ERR_QY_HIGH
         dataDTO.ERR_QY_LOW = ERR_QY_LOW
-
         return dataDTO
+    }
+
+    fun dataClear() {
+        //电量值：  0-100%
+        VI_Value = 0
+        //距离值：  30-150
+        L_Value = 0
+        //气压值：  0-2000ml
+        QY_Value = 0
+        //蓝牙连接状态：   0-断开 1-连接
+        BLS_Value = 0
+        //按压频率：0-200
+        PF_Value = 0
+        //吹气频率：0-200
+        CF_Value = 0
+        //按压次数
+        PR_SUM = 0
+        //吹气次数
+        QY_SUM = 0
+        ERR_PR_HIGH = 0
+        ERR_PR_LOW = 0
+        ERR_PR_POSI = 0
+        ERR_QY_CLOSE = 0
+        ERR_QY_DEAD = 0
+        ERR_QY_HIGH = 0
+        ERR_QY_LOW = 0
     }
 
     fun setCF_Value() {
@@ -302,10 +338,10 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    if(PF_Value>180){
-                        PF_Value=180;
-                    }else if(PF_Value<60){
-                        PF_Value=60;
+                    if (PF_Value > 180) {
+                        PF_Value = 180;
+                    } else if (PF_Value < 60) {
+                        PF_Value = 60;
                     }
                 }
                 preTimePress = changTimePress
@@ -319,10 +355,10 @@ object DataVolatile {
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    if(PF_Value>180){
-                        PF_Value=180;
-                    }else if(PF_Value<60){
-                        PF_Value=60;
+                    if (PF_Value > 180) {
+                        PF_Value = 180;
+                    } else if (PF_Value < 60) {
+                        PF_Value = 60;
                     }
                 }
                 preTimePress = changTimePress
@@ -343,13 +379,19 @@ object DataVolatile {
     //按压错误-按压位置错误
     var ERR_PR_POSI = 0
 
+    /**
+     * 初始化按压区间值
+     */
+    val PR_LOW_VALUE = 45
+    val PR_HIGH_VALUE = 65
+
     private fun Err_PrTotal(l: Int) {
         if (PSR_Value == 0) {
             ERR_PR_POSI++
         } else {
-            if (abs(preDistance - l)< 45) {
+            if (abs(preDistance - l) < PR_LOW_VALUE) {
                 ERR_PR_LOW++
-            } else if (abs(preDistance - l)> 60) {
+            } else if (abs(preDistance - l) > PR_HIGH_VALUE) {
                 ERR_PR_HIGH++
             }
         }
@@ -393,9 +435,8 @@ object DataVolatile {
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
-
             if (top_flag == 1) {
-                ERR_QyTotal(max(QY_valueSet));//每次筛选最大吹气值，去做错误次数的判断
+                ERR_QyTotal(max(QY_valueSet, false))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
@@ -422,14 +463,17 @@ object DataVolatile {
             }
         }
         if (value > 0) {
+            QY_valueSet2.add(value)
             QY_valueSet.add(value)
         }
         return value
     }
+
+
     //判断按压是否停止
     private const val count = 20
     private fun pt(p: Int): Boolean {
-        if (p > 175) {
+        if (p > (preDistance - 5)) {
             if (pt_valueSet.size == count) pt_valueSet.removeFirst()
             pt_valueSet.add(p)
             if (pt_valueSet.size == count) {

@@ -62,6 +62,7 @@ class CPRActivity : BaseActivity() {
     private val mDeviceAdapter = DeviceBluetoothAdapter()
     private var bleList = mutableListOf<BleDevice>()
     private var connectList = arrayListOf<BleDevice>()
+    private var isInitValue = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +119,7 @@ class CPRActivity : BaseActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         if (event.code == BaseConstant.EVENT_CPR_START) {
+            isInitValue = false
             bindBluetooth()
         } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
             unBindBluetooth()
@@ -503,8 +505,12 @@ class CPRActivity : BaseActivity() {
                         false
                     )
                     val dataDTO = DataVolatile.parseString(formatHexString)
-                    DataVolatile.initPreDistance(formatHexString)
-                    runOnUiThread { Log.i("CPRActivity", "${bleDevice?.name}") }
+                    if (!isInitValue) {
+                        isInitValue = true
+                        DataVolatile.initPreDistance(formatHexString)
+                    }
+//                    runOnUiThread { Log.i("CPRActivity", "${bleDevice?.name}") }
+                    runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)
                 }
