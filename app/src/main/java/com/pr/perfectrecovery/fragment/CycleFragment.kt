@@ -110,7 +110,7 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
             viewBinding.tvPress8.text = "按压位置：${it.psrType}"
             viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
-            viewBinding.tvPress9.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
+            viewBinding.tvPress10.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
         })
 
 //        //监听按压事件回调-处理结果语音提示
