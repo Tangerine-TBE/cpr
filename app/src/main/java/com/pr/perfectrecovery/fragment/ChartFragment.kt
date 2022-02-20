@@ -81,12 +81,11 @@ class ChartFragment : Fragment() {
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
             if (qyValue != it.qySum) {
                 qyValue = it.qySum
-                val max = DataVolatile.max(DataVolatile.QY_valueSet2, false)
-                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), max)
+                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
+                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
             } else {
                 addBarEntry(0, 0)
             }
-            //吹气错误数统计
             //吹气错误数统计
             viewBinding.tvLungCount.text =
                 "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"

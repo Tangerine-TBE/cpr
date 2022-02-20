@@ -336,20 +336,20 @@ class CycleFragment : Fragment() {
             viewBinding.ivAim.visibility = View.INVISIBLE
             blowCount++
             if (qyValue != dataDTO.qySum) {
-                dataDTO.bpValue = DataVolatile.max(DataVolatile.QY_valueSet, true)
+                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
                 when {
-                    dataDTO.bpValue in 40..80 -> {//通气正常
+                    qyMax in 40..80 -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
-                    dataDTO.bpValue in 80..100 -> {//通气过大
+                    qyMax in 80..100 -> {//通气过大
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    dataDTO.bpValue < 40 -> {//通气不足
+                    qyMax < 40 -> {//通气不足
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    dataDTO.bpValue > 100 -> {//吹气进胃
+                    qyMax > 100 -> {//吹气进胃
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
