@@ -280,7 +280,9 @@ object DataVolatile {
     /*
 * 获取初始位置，每次连接成功后调用一次初始化方法
 * */
+
     var preDistance: Long = 180
+
     fun initPreDistance(data: String?) {
         // long value=180;
         if (data != null && data.length == 40) {
@@ -312,13 +314,83 @@ object DataVolatile {
             preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
         }
     }
+/*
+* 优化算法：增加和上一次最小值的判断
+*
+* */
+  /*  var validDistance:Long = preDistance;
+    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+       var value=0
+        //最高点消抖（10mm）
+        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
+                preDistance - L_d3
+            ) < 10
+        ) {
+            return preDistance.toInt()
+        }
+        if(validDistance>=L_d1){
+            if(L_d1>L_d2){
+                if(L_d2>=L_d3){
+                    value = L_d3
+                    low_flag = 0
+                        //  validDistance=value.toLong()
+                }else{
+                    low_flag = 1
+                    PR_SUM++
+                    Err_PrTotal(L_d2)
+                    val changTimePress = System.currentTimeMillis()
+                    if (PR_SUM > 1) {
+                        val time = changTimePress - preTimePress
+                        PF_Value = (60000 / time).toInt()
+                        if (PF_Value > 120) {
+                            PF_Value = 120;
+                        } else if (PF_Value < 80) {
+                            PF_Value = 80;
+                        }
+                    }
+                    preTimePress = changTimePress
+                    value = L_d2
+                }
+            }else if(L_d2<L_d3){
+                low_flag = 1
+                PR_SUM++
+                Err_PrTotal(L_d1)
+                val changTimePress = System.currentTimeMillis()
+                if (PR_SUM > 1) {
+                    val time = changTimePress - preTimePress
+                    PF_Value = (60000 / time).toInt()
+                    if (PF_Value > 180) {
+                        PF_Value = 180;
+                    } else if (PF_Value < 60) {
+                        PF_Value = 60;
+                    }
+                }
+                preTimePress = changTimePress
+                value = L_d1
+            }else{
+
+            }
+
+        }else{
+
+        }
+
+
+        return value
+
+
+    }*/
+
+
+
+
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-        //Log.e("TAG", "$L_d1  $L_d2  $L_d3")
+        Log.e("TAG", "$L_d1  $L_d2  $L_d3")
         if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
                 preDistance - L_d3
             ) < 10
@@ -327,11 +399,10 @@ object DataVolatile {
         }
         // int low_flag=0;
         if (L_d1 > L_d2) {
-            if (L_d2 > L_d3 && L_d2 - L_d3 > 5) {
+            if (L_d2 >= L_d3 ) {
                 value = L_d3
                 low_flag = 0
             } else {
-                if (L_d3 - L_d2 > 5) {
                    // value = L_d2
                     low_flag = 1
                     PR_SUM++
@@ -346,11 +417,10 @@ object DataVolatile {
                             PF_Value = 60;
                         }
                     }
-                    preTimePress = changTimePress
-                }
+                preTimePress = changTimePress
                 value = L_d2
             }
-        } else if (L_d2 < L_d3 && L_d3 - L_d2 > 5) {
+        } else if (L_d2 < L_d3 ) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
@@ -371,7 +441,8 @@ object DataVolatile {
         } else {
             value = L_d2
         }
-       // Log.e("TAG1", "$value")
+        Log.e("TAG1", "$value")
+       // validDistance=value;
         return value
     }
 
@@ -398,14 +469,14 @@ object DataVolatile {
             var value=abs(preDistance - l)
             if (value < PR_LOW_VALUE) {
                 ERR_PR_LOW++
-                Log.e("TAG1", "按压不足")
-                Log.e("TAG1", "$value")
+             //   Log.e("TAG1", "按压不足")
+            //    Log.e("TAG1", "$value")
             } else if (value > PR_HIGH_VALUE) {
                 ERR_PR_HIGH++
-                Log.e("TAG2", "按压过深")
-                Log.e("TAG2", "$value")
+            //    Log.e("TAG2", "按压过深")
+             //   Log.e("TAG2", "$value")
             }
-            Log.e("TAG3", "$value")
+           // Log.e("TAG3", "$value")
         }
     }
 
