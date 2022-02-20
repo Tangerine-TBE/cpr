@@ -70,7 +70,7 @@ class SingleActivity : BaseActivity() {
                 DataVolatile.dataClear()
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
-                cycleFragment.start()
+                cycleFragment?.start()
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -82,15 +82,17 @@ class SingleActivity : BaseActivity() {
                     null
                 )
             } else {
-                val mTrainingDTO = cycleFragment.stop()
+                val mTrainingDTO = cycleFragment?.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter.let { mHandler.removeCallbacks(it) }
-                mTrainingDTO.name = binding.tvName.text.toString().trim()
-                mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
-                mTrainingDTO.trainingTime = TimeUtils.formatDate(timeZero)
-                TrainResultActivity.start(this, mTrainingDTO)
+                mTrainingDTO?.name = binding.tvName.text.toString().trim()
+                mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+                if (mTrainingDTO != null) {
+                    TrainResultActivity.start(this, mTrainingDTO)
+                }
                 finish()
             }
         }
@@ -106,13 +108,13 @@ class SingleActivity : BaseActivity() {
             //循环次数
             binding.tvCycle.text = "${event.cycleCount}"
         } else if (event.code == BaseConstant.EVENT_CPR_DISCONNENT) {
-            cycleFragment.bluetoothDisconnected()
+            cycleFragment?.bluetoothDisconnected()
         } else if (event.code == BaseConstant.EVENT_CPR_TIMEING) {
             counter.let { mHandler.post(it) }
         }
     }
 
-    private lateinit var cycleFragment: CycleFragment;
+    private var cycleFragment: CycleFragment? = null
     private fun initViewPager() {
         var curItem = 0
         val isCheck = mTrainingBean?.isCheck
@@ -128,7 +130,7 @@ class SingleActivity : BaseActivity() {
         }
 
         cycleFragment = CycleFragment.newInstance(mTrainingBean!!.isVoice, mTrainingBean!!.isBeat)
-        fragments.add(cycleFragment)
+        fragments.add(cycleFragment!!)
         val indexChar = curItem++
         binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }
         binding.ctChart.isChecked = indexChar == 0
@@ -181,7 +183,7 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 mHandler.removeCallbacks(counter)
-                cycleFragment.stop()
+                cycleFragment?.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
             }
             if (!mTrainingBean?.isCheck!!) {

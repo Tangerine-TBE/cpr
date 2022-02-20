@@ -95,7 +95,6 @@ class CycleFragment : Fragment() {
         initView()
     }
 
-    private var count = 0
     private fun initView() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
@@ -113,7 +112,7 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress9.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
         })
 
-//        //监听按压事件回调-处理结果语音提示
+        //监听按压事件回调-处理结果语音提示
         viewBinding.pressLayoutView.setScrollerCallBack(object : PressLayoutView.ScrollerCallBack {
             override fun onScrollerState(state: Int) {
                 when (state) {
@@ -190,6 +189,7 @@ class CycleFragment : Fragment() {
                 } else {
                     startMP3()
                 }
+                mpType = -1
             }
             mMediaPlayer?.start()
         } else {
@@ -211,7 +211,7 @@ class CycleFragment : Fragment() {
         viewBinding.chartQy.visibility = View.VISIBLE
         isStart = true
         startMP3()
-        mHandler.post(counter)
+//        mHandler.post(counter)
     }
 
     fun stop(): TrainingDTO {
@@ -297,6 +297,7 @@ class CycleFragment : Fragment() {
 
     private var err_pr_low = 0
     private var err_pr_high = 0
+    private var err_pr_posi = 0
     private var isTimeOut = false
 
     private fun setViewDate(dataDTO: BaseDataDTO?) {
@@ -327,6 +328,18 @@ class CycleFragment : Fragment() {
                 mHandler.postDelayed(runnable, 0)
             }
 
+            //更新循环次数
+            if (pressCount != dataDTO.prSum && isTimeing) {
+                isTimeing = false
+                EventBus.getDefault()
+                    .post(
+                        MessageEventData(
+                            BaseConstant.EVENT_CPR_TIMEING,
+                            "",
+                            null
+                        )
+                    )
+            }
         }
     }
 
@@ -387,57 +400,57 @@ class CycleFragment : Fragment() {
 
     private fun pr(dataDTO: BaseDataDTO) {
         //按压位置 0-错误  1-正确
-        if (dataDTO.psrType == 1) {
-            viewBinding.ivPressAim.visibility = View.INVISIBLE
-            //按压频率
-            setRate(viewBinding.chart, dataDTO.pf)
-            if (dataDTO.distance > 0) {
-                viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
-                //暂停超时时间 - 判断是否小于初始值
-                if (dataDTO.distance < (DataVolatile.preDistance - 5)) {
-                    stopOutTime()
-                }
-
+//        if (dataDTO.psrType == 1) {
+        viewBinding.ivPressAim.visibility = View.INVISIBLE
+        //按压频率
+        setRate(viewBinding.chart, dataDTO.pf)
+        if (dataDTO.prSum != prValue) {
+            prValue = dataDTO.prSum
+            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
+            //暂停超时时间 - 判断是否小于初始值
+            stopOutTime()
+            //按压位置错误
+            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
+                err_pr_posi = dataDTO.ERR_PR_POSI
+                viewBinding.pressLayoutView.setHigh()
+                setPlayVoice(VOICE_MP3_AYWZCW)
+            } else {
                 //按压不足
                 if (err_pr_low != dataDTO.ERR_PR_LOW) {
                     Log.e("TAG123", "按压错误：${dataDTO.ERR_PR_LOW}")
                     err_pr_low = dataDTO.ERR_PR_LOW
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
-                }
-
-                //按压过大
-                if (err_pr_high != dataDTO.ERR_PR_HIGH) {
+                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
                     err_pr_high = dataDTO.ERR_PR_HIGH
                     viewBinding.pressLayoutView.setHigh()
                     setPlayVoice(VOICE_MP3_AYGD)
                 }
-                pressCount = dataDTO.prSum
             }
-        } else {
+
+
+
+
+            pressCount = dataDTO.prSum
+        }
+//        }
+
+        //按压位置错误显示错误图标
+        if (dataDTO.psrType == 0) {
             viewBinding.ivPressAim.visibility = View.VISIBLE
-//            mHandler3.removeCallbacksAndMessages(null)
-//            mHandler3.postAtTime(this::setPrAimVisibility, 2000)
+            mHandler3.removeCallbacksAndMessages(null)
+            mHandler3.postAtTime(Runnable {
+                viewBinding.ivPressAim.visibility = View.VISIBLE
+            }, 2000)
+            stopOutTime()
         }
-        if (pressCount != dataDTO.prSum && isTimeing) {
-            isTimeing = false
-            //更新循环次数
-            EventBus.getDefault()
-                .post(
-                    MessageEventData(
-                        BaseConstant.EVENT_CPR_TIMEING,
-                        "",
-                        null
-                    )
-                )
-        }
+
         //按压错误数统计
         viewBinding.tvPress.text =
             "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH)}"
         //按压总数
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
-
     }
 
     private fun stopOutTime() {
