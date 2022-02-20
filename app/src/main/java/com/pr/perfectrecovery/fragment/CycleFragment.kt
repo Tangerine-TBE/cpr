@@ -358,9 +358,6 @@ class CycleFragment : Fragment() {
                 //吹气变灰
                 mHandler1.removeCallbacks(blowRunnable)
                 mHandler1.postDelayed(blowRunnable, 2000)
-                //吹气频率清零
-                mHandler2.removeCallbacks(runnableCF)
-                mHandler2.postDelayed(runnableCF, 10000)
                 stopOutTime()
             }
         } else {
@@ -372,6 +369,12 @@ class CycleFragment : Fragment() {
             mHandler4.removeCallbacksAndMessages(null)
             mHandler4.postAtTime(this::setQyAimVisibility, 2000)
         }
+        if (dataDTO.bpValue <= 0) {
+            //吹气频率清零
+            mHandler2.removeCallbacks(runnableCF)
+            mHandler2.postDelayed(runnableCF, 10000)
+        }
+
         qyValue = dataDTO.qySum
         //吹气错误数统计
         viewBinding.tvLungError.text =
@@ -397,6 +400,7 @@ class CycleFragment : Fragment() {
 
                 //按压不足
                 if (err_pr_low != dataDTO.ERR_PR_LOW) {
+                    Log.e("TAG123", "按压错误：${dataDTO.ERR_PR_LOW}")
                     err_pr_low = dataDTO.ERR_PR_LOW
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
