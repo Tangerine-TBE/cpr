@@ -81,10 +81,10 @@ class ChartFragment : Fragment() {
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
             if (qyValue != it.qySum) {
                 qyValue = it.qySum
-                addBarEntry(
-                    DataVolatile.qyValue(DataVolatile.QY_valueSet),
-                    DataVolatile.max(DataVolatile.QY_valueSet, true)
-                )
+                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
+                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
+            } else {
+                addBarEntry(0, 0)
             }
             //吹气错误数统计
             viewBinding.tvLungCount.text =
@@ -122,7 +122,7 @@ class ChartFragment : Fragment() {
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
         xAxis.granularity = 1f
-//        xAxis.setLabelCount(50, true)
+//        xAxis.setLabelCount(30, true)
         xAxis.position = XAxisPosition.BOTTOM
 
         val leftAxis: YAxis = lineChart.axisLeft
@@ -196,11 +196,11 @@ class ChartFragment : Fragment() {
             val barData = BarData(dataSets)
             data = barData
             //初始化默认值
-            addBarEntry(0, 0)
-            addBarEntry(0, 0)
-            addBarEntry(0, 0)
-            addBarEntry(0, 0)
-            addBarEntry(0, 0)
+//            addBarEntry(0, 0)
+//            addBarEntry(0, 0)
+//            addBarEntry(0, 0)
+//            addBarEntry(0, 0)
+//            addBarEntry(0, 0)
         }
     }
 
@@ -236,10 +236,10 @@ class ChartFragment : Fragment() {
                 mBarDataSet!!.colors = colors
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(10f)
+                setVisibleXRangeMaximum(30f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 10)
-                setBorderWidth(0.3f)
+                moveViewToX(barData.entryCount.toFloat() - 29)
+//                setBorderWidth(0.3f)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
