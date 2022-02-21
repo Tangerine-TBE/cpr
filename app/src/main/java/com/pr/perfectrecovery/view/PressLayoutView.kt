@@ -123,8 +123,8 @@ class PressLayoutView : LinearLayout {
         ivArrowDown!!.visibility = VISIBLE
     }
 
-    fun setHigh() {
-        ivArrowUp!!.visibility = INVISIBLE
+    fun setUnBack() {
+        ivArrowUp!!.visibility = VISIBLE
         ivArrowDown!!.visibility = INVISIBLE
     }
 

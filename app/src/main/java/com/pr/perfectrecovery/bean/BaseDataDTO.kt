@@ -27,6 +27,8 @@ data class BaseDataDTO(
     var prSum: Int = 0,
     //吹起次数
     var qySum: Int = 0,
+    //按压错误-未回弹
+    var ERR_PR_UNBACK: Int = 0,
     //按压错误-按压不足
     var ERR_PR_LOW: Int = 0,
     //按压错误-按压过大
@@ -42,5 +44,6 @@ data class BaseDataDTO(
     //吹气错误-气道未打开错误
     var ERR_QY_CLOSE: Int = 0
 ) {
-
+    //是否开始
+    var isStart = false
 }

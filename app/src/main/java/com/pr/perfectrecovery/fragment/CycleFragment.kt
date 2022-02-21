@@ -101,15 +101,17 @@ class CycleFragment : Fragment() {
         val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
-            setViewDate(it)
-            viewBinding.tvPress3.text = "距离值：${it.distance}"
-            viewBinding.tvPress4.text = "气压值：${it.bpValue}"
-            viewBinding.tvPress5.text = "按压频率：${it.pf}"
-            viewBinding.tvPress6.text = "吹气频率：${it.cf}"
-            viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
-            viewBinding.tvPress8.text = "按压位置：${it.psrType}"
-            viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
-            viewBinding.tvPress10.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
+            if (it.isStart) {
+                setViewDate(it)
+                viewBinding.tvPress3.text = "距离值：${it.distance}"
+                viewBinding.tvPress4.text = "气压值：${it.bpValue}"
+                viewBinding.tvPress5.text = "按压频率：${it.pf}"
+                viewBinding.tvPress6.text = "吹气频率：${it.cf}"
+                viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
+                viewBinding.tvPress8.text = "按压位置：${it.psrType}"
+                viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
+                viewBinding.tvPress10.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
+            }
         })
     }
 
@@ -193,7 +195,6 @@ class CycleFragment : Fragment() {
         viewBinding.chartQy.visibility = View.VISIBLE
         isStart = true
         startMP3()
-//        mHandler.post(counter)
     }
 
     fun stop(): TrainingDTO {
@@ -280,6 +281,7 @@ class CycleFragment : Fragment() {
     private var err_pr_low = 0
     private var err_pr_high = 0
     private var err_pr_posi = 0
+    private var err_qr_unback = 0
     private var isTimeOut = false
 
     private fun setViewDate(dataDTO: BaseDataDTO?) {
@@ -349,7 +351,6 @@ class CycleFragment : Fragment() {
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
                 }
-                //DataVolatile.ERR_QyTotal(DataVolatile.max(DataVolatile.QY_valueSet))
                 //吹气变灰
                 mHandler1.removeCallbacks(blowRunnable)
                 mHandler1.postDelayed(blowRunnable, 2000)
@@ -395,6 +396,11 @@ class CycleFragment : Fragment() {
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
                 setPlayVoice(VOICE_MP3_AYWZCW)
+            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
+                //按压未回弹
+                err_qr_unback = dataDTO.ERR_PR_UNBACK
+                viewBinding.pressLayoutView.setUnBack()
+                setPlayVoice(VOICE_MP3_WHT)
             } else {
                 //按压不足
                 if (err_pr_low != dataDTO.ERR_PR_LOW) {
@@ -404,7 +410,6 @@ class CycleFragment : Fragment() {
                     setPlayVoice(VOICE_MP3_AYBZ)
                 } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
                     err_pr_high = dataDTO.ERR_PR_HIGH
-                    viewBinding.pressLayoutView.setHigh()
                     setPlayVoice(VOICE_MP3_AYGD)
                 }
             }
@@ -424,7 +429,7 @@ class CycleFragment : Fragment() {
 
         //按压错误数统计
         viewBinding.tvPress.text =
-            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH)}"
+            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
         //按压总数
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"

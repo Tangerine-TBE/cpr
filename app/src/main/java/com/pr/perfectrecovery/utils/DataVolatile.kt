@@ -236,6 +236,7 @@ object DataVolatile {
         dataDTO.workType = WS_Value
         dataDTO.cf = CF_Value
         dataDTO.pf = PF_Value
+        dataDTO.isStart = isStart
         dataDTO.ERR_PR_HIGH = ERR_PR_HIGH
         dataDTO.ERR_PR_LOW = ERR_PR_LOW
         dataDTO.ERR_PR_POSI = ERR_PR_POSI
@@ -243,10 +244,13 @@ object DataVolatile {
         dataDTO.ERR_QY_DEAD = ERR_QY_DEAD
         dataDTO.ERR_QY_HIGH = ERR_QY_HIGH
         dataDTO.ERR_QY_LOW = ERR_QY_LOW
+        dataDTO.ERR_PR_HIGH = ERR_PR_UNBACK
         return dataDTO
     }
 
+    var isStart = false
     fun dataClear() {
+        isStart = false
         //电量值：  0-100%
         VI_Value = 0
         //距离值：  30-150
@@ -263,6 +267,7 @@ object DataVolatile {
         PR_SUM = 0
         //吹气次数
         QY_SUM = 0
+        ERR_PR_UNBACK = 0
         ERR_PR_HIGH = 0
         ERR_PR_LOW = 0
         ERR_PR_POSI = 0

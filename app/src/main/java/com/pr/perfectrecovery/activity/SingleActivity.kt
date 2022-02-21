@@ -67,6 +67,7 @@ class SingleActivity : BaseActivity() {
             }
 
             if (isStart) {
+                DataVolatile.isStart = true
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment?.start()
@@ -81,8 +82,8 @@ class SingleActivity : BaseActivity() {
                     null
                 )
             } else {
+                DataVolatile.isStart = false
                 val mTrainingDTO = cycleFragment?.stop()
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter.let { mHandler.removeCallbacks(it) }
