@@ -252,26 +252,12 @@ class CycleFragment : Fragment() {
     private val mHandler3 = object : Handler(Looper.getMainLooper()) {}
     private val mHandler4 = object : Handler(Looper.getMainLooper()) {}
 
-    private var time: Long = 5000
-    private var isTime = false
-
     private inner class Counter : Runnable {
         override fun run() {
             viewBinding.ctTime.visibility = View.VISIBLE
-            mHandler.postDelayed(this, 1000)//一秒钟循环计时一次
-            if (time <= 0) {
-                //记录一次按压超时
-                timeOut += 1000
-                if (!isTime) {
-                    isTime = true
-                    viewBinding.ctTime.base = SystemClock.elapsedRealtime()
-                    viewBinding.ctTime.start()
-                }
-            } else {
-                isTime = false
-                viewBinding.ctTime.visibility = View.INVISIBLE
-            }
-            time -= 1000
+            //记录一次按压超时
+            viewBinding.ctTime.base = SystemClock.elapsedRealtime()
+            viewBinding.ctTime.start()
         }
     }
 
@@ -308,10 +294,9 @@ class CycleFragment : Fragment() {
             qy(dataDTO)
             if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0) {
                 isTimeOut = true
-                mHandler.removeCallbacks(runnable)
-                mHandler.postDelayed(runnable, 0)
+                mHandler.removeCallbacks(counter)
+                mHandler.postDelayed(counter, 5000)
             }
-
             //更新循环次数
             if (pressCount != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -358,10 +343,10 @@ class CycleFragment : Fragment() {
             }
         } else {
             if (dataDTO.bpValue > 10) {
+                stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
             }
             viewBinding.ivAim.visibility = View.VISIBLE
-            stopOutTime()
             mHandler4.removeCallbacksAndMessages(null)
             mHandler4.postAtTime(this::setQyAimVisibility, 2000)
         }
@@ -384,7 +369,6 @@ class CycleFragment : Fragment() {
     private fun pr(dataDTO: BaseDataDTO) {
         //按压位置 0-错误  1-正确
 //        if (dataDTO.psrType == 1) {
-        viewBinding.ivPressAim.visibility = View.INVISIBLE
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
         viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
@@ -416,15 +400,16 @@ class CycleFragment : Fragment() {
             pressCount = dataDTO.prSum
         }
 //        }
-
         //按压位置错误显示错误图标
         if (dataDTO.psrType == 0) {
             viewBinding.ivPressAim.visibility = View.VISIBLE
             mHandler3.removeCallbacksAndMessages(null)
             mHandler3.postAtTime(Runnable {
-                viewBinding.ivPressAim.visibility = View.VISIBLE
+                viewBinding.ivPressAim.visibility = View.INVISIBLE
             }, 2000)
             stopOutTime()
+        } else {
+            viewBinding.ivPressAim.visibility = View.INVISIBLE
         }
 
         //按压错误数统计
@@ -438,7 +423,8 @@ class CycleFragment : Fragment() {
     private fun stopOutTime() {
         //暂停超时时间
         isTimeOut = false
-        mHandler.removeCallbacks(runnable)
+        viewBinding.ctTime.visibility = View.INVISIBLE
+        mHandler.removeCallbacks(counter)
         viewBinding.ctTime.stop()
     }
 
@@ -450,16 +436,6 @@ class CycleFragment : Fragment() {
         val pf = p / 200f
         view.setCurrentStatus(pf)
         view.invalidate()
-    }
-
-    private var isPT = false
-
-    //按压中断 - 开启计时器 频率清零
-    private val runnable = Runnable {
-        isPT = false
-        mHandler.removeCallbacksAndMessages(null)
-        time = 5000
-        mHandler.post(counter)
     }
 
     /**

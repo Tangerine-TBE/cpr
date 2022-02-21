@@ -31,4 +31,35 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var blowMeterPercentage: Int = 0//吹气仪表百分比
     var blowPercentage: Int = 0//吹气百分比
     var blowAverageDepth: Int = 0//吹气平均深度
+
+    //检查环境
+    var check1 = false
+
+    //检查意识
+    var check2 = false
+
+    //检查呼吸
+    var check3 = false
+
+    //检查脉搏
+    var check4 = false
+
+    //检查体位
+    var check5 = false
+
+    //清理口腔
+    var check6 = false
+
+    //拨打120
+    var check7 = false
+
+    //寻求帮助
+    var check8 = false
+
+    //体外除颤
+    var check9 = false
+
+    //完成评估
+    var check10 = false
+
 }

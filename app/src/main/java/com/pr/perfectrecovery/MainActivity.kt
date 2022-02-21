@@ -89,7 +89,6 @@ class MainActivity : BaseActivity() {
             data.compressions = 50
             data.ventilation = 45
             data.deduction = 0.5f
-
             data.depth = 0
             data.depthEnd = 6
             data.depthFrequency = 100

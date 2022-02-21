@@ -75,12 +75,22 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
-                binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                    resources.getDrawable(R.mipmap.icon_wm_time),
-                    null,
-                    null,
-                    null
-                )
+                if (mTrainingBean?.isCheck!!) {
+                    binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
+                        resources.getDrawable(R.mipmap.icon_wm_countdown),
+                        null,
+                        null,
+                        null
+                    )
+                } else {
+                    binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
+                        resources.getDrawable(R.mipmap.icon_wm_time),
+                        null,
+                        null,
+                        null
+                    )
+                }
+                counter.let { mHandler.post(it) }
             } else {
                 DataVolatile.isStart = false
                 val mTrainingDTO = cycleFragment?.stop()
@@ -90,6 +100,22 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
                 mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+                //检查页面 结果
+                checkEventFragment?.getData().let {
+                    if (it != null) {
+                        mTrainingDTO?.check1 = it.check1
+                        mTrainingDTO?.check2 = it.check2
+                        mTrainingDTO?.check3 = it.check3
+                        mTrainingDTO?.check4 = it.check4
+                        mTrainingDTO?.check5 = it.check5
+                        mTrainingDTO?.check6 = it.check6
+                        mTrainingDTO?.check7 = it.check7
+                        mTrainingDTO?.check8 = it.check8
+                        mTrainingDTO?.check9 = it.check9
+                        mTrainingDTO?.check10 = it.check10
+                    }
+                }
+
                 if (mTrainingDTO != null) {
                     TrainResultActivity.start(this, mTrainingDTO)
                 }
@@ -119,6 +145,7 @@ class SingleActivity : BaseActivity() {
     }
 
     private var cycleFragment: CycleFragment? = null
+    private var checkEventFragment: CheckEventFragment? = CheckEventFragment.newInstance()
     private fun initViewPager() {
         var curItem = 0
         val isCheck = mTrainingBean?.isCheck
@@ -126,7 +153,7 @@ class SingleActivity : BaseActivity() {
         val titleBtns = mutableListOf<CheckedTextView>()
 
         if (isCheck == true) {
-            fragments.add(CheckEventFragment.newInstance())
+            fragments.add(checkEventFragment!!)
             binding.ctEvent.visibility = View.VISIBLE
             val indexEvent = curItem++
             binding.ctEvent.setOnClickListener { binding.viewPager.currentItem = indexEvent }
