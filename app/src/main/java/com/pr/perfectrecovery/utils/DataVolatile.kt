@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.utils
 
 import android.util.Log
 import com.pr.perfectrecovery.bean.BaseDataDTO
+import com.pr.perfectrecovery.utils.TestVolatile.Err_PrTotal
 import com.pr.perfectrecovery.utils.TestVolatile.top_flag
 import kotlin.math.abs
 
@@ -390,10 +391,8 @@ object DataVolatile {
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-        Log.e("TAG", "$L_d1  $L_d2  $L_d3")
-        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
-                preDistance - L_d3
-            ) < 10
+        Log.e("TAG5", "$L_d1  $L_d2  $L_d3")
+        if ( abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
             return preDistance.toInt()
         }
@@ -403,41 +402,50 @@ object DataVolatile {
                 value = L_d3
                 low_flag = 0
             } else {
-                   // value = L_d2
+                if( low_flag==0){//防止在上升到最高点出现抖动导致次数误增加
                     low_flag = 1
                     PR_SUM++
+                    Log.e("TAG5", "$PR_SUM")
                     Err_PrTotal(L_d2)
                     val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
                         val time = changTimePress - preTimePress
                         PF_Value = (60000 / time).toInt()
-                        if (PF_Value > 180) {
-                            PF_Value = 180;
-                        } else if (PF_Value < 60) {
-                            PF_Value = 60;
+                        if (PF_Value > 130) {
+                            PF_Value = 130;
+                        } else if (PF_Value < 80) {
+                            PF_Value = 80;
                         }
+                        Log.e("TAG4", "$PF_Value")
                     }
-                preTimePress = changTimePress
+                    preTimePress = changTimePress
+                }
+
                 value = L_d2
             }
-        } else if (L_d2 < L_d3 ) {
+        } else if(L_d2 < L_d3 ) {
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
-                Err_PrTotal(L_d3)
+                Log.e("TAG5", "$PR_SUM")
+                Err_PrTotal(L_d1)
                 val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress
                     PF_Value = (60000 / time).toInt()
-                    if (PF_Value > 180) {
-                        PF_Value = 180;
-                    } else if (PF_Value < 60) {
-                        PF_Value = 60;
+                    if (PF_Value > 130) {
+                        PF_Value = 130;
+                    } else if (PF_Value < 80) {
+                        PF_Value = 80;
                     }
+                    Log.e("TAG4", "$PF_Value")
                 }
                 preTimePress = changTimePress
+                return L_d1
+            }else{
+                value=L_d3
             }
-            value = L_d3
+
         } else {
             value = L_d2
         }
