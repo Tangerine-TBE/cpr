@@ -327,7 +327,7 @@ object DataVolatile {
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-        Log.e("TAG5", "$L_d1  $L_d2  $L_d3")
+        Log.e("TAG6", "$L_d1  $L_d2  $L_d3")
         if ( abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
             return preDistance.toInt()
@@ -351,14 +351,14 @@ object DataVolatile {
                     val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
                         val time = changTimePress - preTimePress+40
-                        Log.e("TAG4", "$L_d2")
+                        Log.e("TAG6", "$L_d2")
                         PF_Value = (60000 / time).toInt()
                         if (PF_Value > 130) {
                             PF_Value = 130;
                         } else if (PF_Value < 80) {
                             PF_Value = 80;
                         }
-                        Log.e("TAG4", "$PF_Value")
+                        Log.e("TAG6", "$PF_Value")
                     }
                     preTimePress = changTimePress
                 }
@@ -370,6 +370,7 @@ object DataVolatile {
                 PR_SUM++
                // Log.e("TAG5", "$PR_SUM")
                 Err_PrTotal(L_d1)
+               // Log.e("TAG6", "$L_d1")
                 val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress+70
@@ -379,7 +380,7 @@ object DataVolatile {
                     } else if (PF_Value < 80) {
                         PF_Value = 80;
                     }
-                    Log.e("TAG4", "$PF_Value")
+                    Log.e("TAG6", "$PF_Value")
                 }
                 preTimePress = changTimePress
                 return L_d1
