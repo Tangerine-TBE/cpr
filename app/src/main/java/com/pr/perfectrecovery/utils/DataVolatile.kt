@@ -315,77 +315,8 @@ object DataVolatile {
             preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
         }
     }
-/*
-* 优化算法：增加和上一次最小值的判断
-*
-* */
-  /*  var validDistance:Long = preDistance;
-    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
-       var value=0
-        //最高点消抖（10mm）
-        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
-                preDistance - L_d3
-            ) < 10
-        ) {
-            return preDistance.toInt()
-        }
-        if(validDistance>=L_d1){
-            if(L_d1>L_d2){
-                if(L_d2>=L_d3){
-                    value = L_d3
-                    low_flag = 0
-                        //  validDistance=value.toLong()
-                }else{
-                    low_flag = 1
-                    PR_SUM++
-                    Err_PrTotal(L_d2)
-                    val changTimePress = System.currentTimeMillis()
-                    if (PR_SUM > 1) {
-                        val time = changTimePress - preTimePress
-                        PF_Value = (60000 / time).toInt()
-                        if (PF_Value > 120) {
-                            PF_Value = 120;
-                        } else if (PF_Value < 80) {
-                            PF_Value = 80;
-                        }
-                    }
-                    preTimePress = changTimePress
-                    value = L_d2
-                }
-            }else if(L_d2<L_d3){
-                low_flag = 1
-                PR_SUM++
-                Err_PrTotal(L_d1)
-                val changTimePress = System.currentTimeMillis()
-                if (PR_SUM > 1) {
-                    val time = changTimePress - preTimePress
-                    PF_Value = (60000 / time).toInt()
-                    if (PF_Value > 180) {
-                        PF_Value = 180;
-                    } else if (PF_Value < 60) {
-                        PF_Value = 60;
-                    }
-                }
-                preTimePress = changTimePress
-                value = L_d1
-            }else{
 
-            }
-
-        }else{
-
-        }
-
-
-        return value
-
-
-    }*/
-
-
-
-
-
+    var UNBACK_FLAG = 0
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
@@ -401,15 +332,21 @@ object DataVolatile {
             if (L_d2 >= L_d3 ) {
                 value = L_d3
                 low_flag = 0
+                if(UNBACK_FLAG==1){
+                    ERR_PR_UNBACK++
+                    UNBACK_FLAG=0
+                }
             } else {
                 if( low_flag==0){//防止在上升到最高点出现抖动导致次数误增加
                     low_flag = 1
                     PR_SUM++
                   //  Log.e("TAG5", "$PR_SUM")
                     Err_PrTotal(L_d2)
+                    Log.e("TAG4", "$L_d2")
                     val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
                         val time = changTimePress - preTimePress+40
+                        Log.e("TAG4", "$L_d2")
                         PF_Value = (60000 / time).toInt()
                         if (PF_Value > 130) {
                             PF_Value = 130;
@@ -442,16 +379,29 @@ object DataVolatile {
                 preTimePress = changTimePress
                 return L_d1
             }else{
+                if(abs(preDistance-L_d3)>15){
+                    UNBACK_FLAG=1
+                }else{
+                    UNBACK_FLAG=0
+                }
                 value=L_d3
             }
 
         } else {
+            if(abs(preDistance-L_d3)>15){
+                UNBACK_FLAG=1
+            }else{
+                UNBACK_FLAG=0
+            }
             value = L_d2
         }
        // Log.e("TAG1", "$value")
        // validDistance=value;
         return value
     }
+
+    //按压错误-按压未回弹
+    var ERR_PR_UNBACK = 0
 
     //按压错误-按压不足
     var ERR_PR_LOW = 0
