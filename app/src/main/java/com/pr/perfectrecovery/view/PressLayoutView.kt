@@ -85,16 +85,14 @@ class PressLayoutView : LinearLayout {
     private var down = 0
     private var isDown = false
     private var isRate = false
-    fun smoothScrollTo(destY: Int, prSum: Int) {
+    fun smoothScrollTo(destY: Int) {
+        Log.e("smoothScrollTo_1", "$destY")
         //距离值：  30-150
         var destY = destY
         destY = getNumber(destY)
-        val topHeight = viewTop!!.height
         val height = height - (viewPress!!.height + 10)
         newY = abs(height.toFloat() / 10 * destY).toInt()
-        //        Log.d("smoothScrollTo", "destY : " + destY);
-//        Log.d("smoothScrollTo", "newY : " + newY);
-//        Log.d("smoothScrollTo", "height : " + height);
+
         viewPress!!.visibility = VISIBLE
         ivArrowUp!!.visibility = INVISIBLE
         ivArrowDown!!.visibility = INVISIBLE
@@ -116,43 +114,6 @@ class PressLayoutView : LinearLayout {
             viewPress!!.visibility = INVISIBLE
             ivArrowUp!!.visibility = INVISIBLE
             ivArrowDown!!.visibility = INVISIBLE
-        } else if (prSum != prCount && destY > 9) { //按压过大
-            isDown = true
-            prCount = prSum
-            Log.e("smoothScrollTo", "按压过大")
-            if (mScrollerCallBack != null) {
-                mScrollerCallBack!!.onScrollerState(TYPE_MAX)
-            }
-        } else if (!isDown) {
-            if (-newY - scrollY > 20) { //向上滚动
-//                if (down != 0 && down < 9) {
-//                    isDown = true;
-//                    ivArrowUp.setVisibility(View.INVISIBLE);
-//                    ivArrowDown.setVisibility(View.VISIBLE);
-//                    Log.e("smoothScrollTo", "按压不足");
-//                    if (mScrollerCallBack != null) {
-//                        mScrollerCallBack.onScrollerState(TYPE_MIN);
-//                    }
-//                }
-                //为滚动到顶部时向下按压提示 未回弹
-                Log.e("smoothScrollTo", "向上滚动：" + (-newY - scrollY))
-            } else { //向下滚动
-                if (destY > 0) {
-                    viewTop!!.isChecked = false
-                    Log.e("smoothScrollTo", "向下滚动：" + (-newY - scrollY))
-                    if (down > 0 && down > destY) {
-                        isRate = false
-                        Log.e("smoothScrollTo", "按压未回弹")
-                        ivArrowUp!!.visibility = VISIBLE
-                        ivArrowDown!!.visibility = INVISIBLE
-                        if (mScrollerCallBack != null) {
-                            mScrollerCallBack!!.onScrollerState(TYPE_UP)
-                        }
-                    }
-                }
-                isDown = false
-                down = destY
-            }
         }
         invalidate()
     }
@@ -163,7 +124,7 @@ class PressLayoutView : LinearLayout {
     }
 
     fun setHigh() {
-        ivArrowUp!!.visibility = VISIBLE
+        ivArrowUp!!.visibility = INVISIBLE
         ivArrowDown!!.visibility = INVISIBLE
     }
 
@@ -183,31 +144,31 @@ class PressLayoutView : LinearLayout {
             return 0
         }
         return when {
-            number < 4 -> {
+            number < 10 -> {
                 1
             }
-            number < 8 -> {
+            number < 15 -> {
                 2
             }
-            number < 12 -> {
+            number < 20 -> {
                 3
             }
-            number < 16 -> {
+            number < 25 -> {
                 4
             }
-            number < 20 -> {
+            number < 30 -> {
                 5
             }
-            number < 24 -> {
+            number < 35 -> {
                 6
             }
-            number < 26 -> {
+            number < 40 -> {
                 7
             }
-            number < 30 -> {
+            number < 45 -> {
                 8
             }
-            number <= 70 -> {
+            number <= 65 -> {
                 9
             }
             number > 65 -> {

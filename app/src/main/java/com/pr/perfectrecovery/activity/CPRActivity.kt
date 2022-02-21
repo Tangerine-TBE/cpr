@@ -504,13 +504,12 @@ class CPRActivity : BaseActivity() {
                         characteristic.value,
                         false
                     )
+                    runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     val dataDTO = DataVolatile.parseString(formatHexString)
                     if (!isInitValue) {
                         isInitValue = true
                         DataVolatile.initPreDistance(formatHexString)
                     }
-//                    runOnUiThread { Log.i("CPRActivity", "${bleDevice?.name}") }
-                    runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)
                 }

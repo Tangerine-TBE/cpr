@@ -111,24 +111,6 @@ class CycleFragment : Fragment() {
             viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
             viewBinding.tvPress10.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
         })
-
-        //监听按压事件回调-处理结果语音提示
-        viewBinding.pressLayoutView.setScrollerCallBack(object : PressLayoutView.ScrollerCallBack {
-            override fun onScrollerState(state: Int) {
-                when (state) {
-                    PressLayoutView.TYPE_UP -> {//未回弹
-                        setPlayVoice(VOICE_MP3_WHT)
-                    }
-                    PressLayoutView.TYPE_MIN -> {//按压不足
-                        //放在按压不足错误数据中处理
-//                    setPlayVoice(VOICE_MP3_AYBZ)
-                    }
-                    PressLayoutView.TYPE_MAX -> {//按压过大
-                        //setPlayVoice(VOICE_MP3_AYGD)
-                    }
-                }
-            }
-        })
     }
 
     private val VOICE_MP3_BGM: Int = 1//节奏音乐
@@ -404,15 +386,14 @@ class CycleFragment : Fragment() {
         viewBinding.ivPressAim.visibility = View.INVISIBLE
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
-            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO.prSum)
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()
             //按压位置错误
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
-                viewBinding.pressLayoutView.setHigh()
                 setPlayVoice(VOICE_MP3_AYWZCW)
             } else {
                 //按压不足
@@ -427,10 +408,6 @@ class CycleFragment : Fragment() {
                     setPlayVoice(VOICE_MP3_AYGD)
                 }
             }
-
-
-
-
             pressCount = dataDTO.prSum
         }
 //        }
@@ -500,14 +477,14 @@ class CycleFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        //数据清零
-        DataVolatile.dataClear()
         super.onDestroy()
         if (mMediaPlayer != null) {
             mMediaPlayer!!.stop()
             mMediaPlayer!!.release()
             mMediaPlayer = null
         }
+        //数据清零
+        DataVolatile.dataClear()
     }
 
     private var alphaAniShow: AlphaAnimation? = null

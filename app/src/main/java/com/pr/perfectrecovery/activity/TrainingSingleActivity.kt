@@ -10,6 +10,7 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
+import com.pr.perfectrecovery.utils.DataVolatile
 
 /**
  * 训练模式- 单人 - 多人

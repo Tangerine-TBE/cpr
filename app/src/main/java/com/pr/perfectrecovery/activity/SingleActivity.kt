@@ -67,7 +67,6 @@ class SingleActivity : BaseActivity() {
             }
 
             if (isStart) {
-                DataVolatile.dataClear()
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment?.start()
@@ -104,13 +103,17 @@ class SingleActivity : BaseActivity() {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
-        if (event.code == BaseConstant.EVENT_SINGLE_DATA_CYCLE) {
-            //循环次数
-            binding.tvCycle.text = "${event.cycleCount}"
-        } else if (event.code == BaseConstant.EVENT_CPR_DISCONNENT) {
-            cycleFragment?.bluetoothDisconnected()
-        } else if (event.code == BaseConstant.EVENT_CPR_TIMEING) {
-            counter.let { mHandler.post(it) }
+        when (event.code) {
+            BaseConstant.EVENT_SINGLE_DATA_CYCLE -> {
+                //循环次数
+                binding.tvCycle.text = "${event.cycleCount}"
+            }
+            BaseConstant.EVENT_CPR_DISCONNENT -> {
+                cycleFragment?.bluetoothDisconnected()
+            }
+            BaseConstant.EVENT_CPR_TIMEING -> {
+                counter.let { mHandler.post(it) }
+            }
         }
     }
 
@@ -141,7 +144,6 @@ class SingleActivity : BaseActivity() {
         binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = indexCure }
         titleBtns.add(binding.ctCurve)
 
-
         binding.viewPager.offscreenPageLimit = fragments.size
         binding.viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -166,10 +168,11 @@ class SingleActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        counter.let { mHandler.removeCallbacks(it) }
         super.onDestroy()
-        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
+        counter.let { mHandler.removeCallbacks(it) }
+//        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         EventBus.getDefault().unregister(this)
+
     }
 
     private var time: Long = 1000 * 60 * 2
