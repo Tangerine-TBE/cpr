@@ -757,6 +757,11 @@
                             app:layout_constraintEnd_toEndOf="@+id/tvBlow"
                             app:layout_constraintStart_toStartOf="@+id/tvBlow" />
 
+                    <androidx.constraintlayout.widget.Group
+                            android:id="@+id/groups"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:constraint_referenced_ids="tvOutBout, " />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
