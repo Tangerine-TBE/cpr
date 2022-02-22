@@ -339,6 +339,7 @@ object DataVolatile {
                 low_flag = 0
                 if(UNBACK_FLAG==1){
                     ERR_PR_UNBACK++
+                    Log.e("TAG7", "未回弹")
                     UNBACK_FLAG=0
                 }
             } else {
@@ -380,24 +381,26 @@ object DataVolatile {
                     } else if (PF_Value < 80) {
                         PF_Value = 80;
                     }
-                    Log.e("TAG6", "$PF_Value")
+                   // Log.e("TAG6", "$PF_Value")
                 }
                 preTimePress = changTimePress
                 return L_d1
             }else{
-                if(abs(preDistance-L_d3)>15){
-                    UNBACK_FLAG=1
-                }else{
+                if(abs(preDistance-L_d3)<15){
                     UNBACK_FLAG=0
+                    Log.e("TAG7", "回到初始位置，复位未回弹")
+                }else{
+                    UNBACK_FLAG=1
                 }
                 value=L_d3
             }
 
         } else {
-            if(abs(preDistance-L_d3)>15){
-                UNBACK_FLAG=1
-            }else{
+            if(abs(preDistance-L_d2)<15){
                 UNBACK_FLAG=0
+                Log.e("TAG7", "回到初始位置，复位未回弹")
+            }else{
+                UNBACK_FLAG=1
             }
             value = L_d2
         }
@@ -422,7 +425,7 @@ object DataVolatile {
      * 初始化按压区间值
      */
     val PR_LOW_VALUE = 45
-    val PR_HIGH_VALUE = 65
+    val PR_HIGH_VALUE = 60
 
     private fun Err_PrTotal(l: Int) {
 
