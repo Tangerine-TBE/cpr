@@ -206,8 +206,9 @@ class CycleFragment : Fragment() {
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
             trainingDTO.pressLocation = ERR_PR_POSI
+            trainingDTO.pressRebound = ERR_PR_UNBACK
             //按压总错误数
-            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI
+            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI + ERR_PR_UNBACK
             trainingDTO.blowHigh = ERR_QY_HIGH
             trainingDTO.blowLow = ERR_QY_LOW
             trainingDTO.blowIntoStomach = ERR_QY_DEAD
@@ -292,7 +293,7 @@ class CycleFragment : Fragment() {
             pr(dataDTO)
             //吹气
             qy(dataDTO)
-            if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0) {
+            if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
                 mHandler.postDelayed(counter, 5000)
@@ -373,6 +374,7 @@ class CycleFragment : Fragment() {
         setRate(viewBinding.chart, dataDTO.pf)
         viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         if (dataDTO.prSum != prValue) {
+
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()

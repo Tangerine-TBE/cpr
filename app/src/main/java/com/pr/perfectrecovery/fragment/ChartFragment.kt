@@ -171,7 +171,7 @@ class ChartFragment : Fragment() {
                 setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
                 //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
                 granularity = 1f // only intervals of 1 day
-//                labelCount = 100
+                labelCount = 100
                 /*valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                       //TODO 自定义X轴label格式
@@ -195,12 +195,6 @@ class ChartFragment : Fragment() {
             dataSets.add(mBarDataSet!!)
             val barData = BarData(dataSets)
             data = barData
-            //初始化默认值
-//            addBarEntry(0, 0)
-//            addBarEntry(0, 0)
-//            addBarEntry(0, 0)
-//            addBarEntry(0, 0)
-//            addBarEntry(0, 0)
         }
     }
 

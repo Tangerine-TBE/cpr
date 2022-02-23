@@ -59,34 +59,34 @@ class CheckEventFragment : Fragment() {
             }
         }
 
-        viewBinding.checkBox1.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox1.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check1 = b
         }
-        viewBinding.checkBox2.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox2.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check2 = b
         }
-        viewBinding.checkBox3.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox3.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check3 = b
         }
-        viewBinding.checkBox4.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox4.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check4 = b
         }
-        viewBinding.checkBox5.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox5.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check5 = b
         }
-        viewBinding.checkBox6.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox6.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check6 = b
         }
-        viewBinding.checkBox7.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox7.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check7 = b
         }
-        viewBinding.checkBox8.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox8.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check8 = b
         }
-        viewBinding.checkBox9.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox9.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check9 = b
         }
-        viewBinding.checkBox10.setOnCheckedChangeListener { compoundButton, b ->
+        viewBinding.check.checkBox10.setOnCheckedChangeListener { compoundButton, b ->
             mTrainingDTO.check10 = b
         }
 

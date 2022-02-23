@@ -5,6 +5,7 @@ import java.io.Serializable
 
 data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var id: Int = 0
+    var isAssessment = false//是否为 false 训练  true 考核
     var trainingTime: String = ""//训练时长
     var cycleCount: Int = 0//循环次数
     var pressErrorCount: Int = 0//按压错误数

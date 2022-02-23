@@ -43,6 +43,13 @@ class TrainResultActivity : BaseActivity() {
 
     private fun initData() {
         val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
+        if (trainingDTO.isAssessment) {
+            //可和模式下
+            viewBinding.layoutCheck.root.visibility = View.VISIBLE
+            viewBinding.groupPr.visibility = View.VISIBLE
+            viewBinding.groupQy.visibility = View.VISIBLE
+//            viewBinding.layoutCheck.check.
+        }
         viewBinding.tvName.text = trainingDTO.name
         viewBinding.tvTrain.text = "训练"
         viewBinding.tvTime.text = trainingDTO.trainingTime
@@ -67,9 +74,7 @@ class TrainResultActivity : BaseActivity() {
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
         //按压百仪表分比
-        if (trainingDTO.pressTotal > 0) {
-            viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
-        }
+        viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
         //按压百分比
         viewBinding.tvPress.text = "${trainingDTO.pressTopPercentage}"
         viewBinding.tvPressEnd.text = "${trainingDTO.pressBottomPercentage}"
