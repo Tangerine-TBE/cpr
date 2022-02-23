@@ -59,4 +59,28 @@ object TimeUtils {
         }
         return ""
     }
+
+    fun date2TimeStamp(date: String?, format: String?): String? {
+        try {
+            val sdf = SimpleDateFormat(format)
+            return (sdf.parse(date).time / 1000).toString()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
+    /**
+     * 获取时间格式毫秒数
+     */
+    fun getTimeMill(time: String, format: String): Long? {
+        try {
+            val sdf = SimpleDateFormat(format)
+            val parse = sdf.parse(time)
+            return parse.time
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
 }

@@ -362,7 +362,7 @@ class CPRActivity : BaseActivity() {
             }
         }
 
-        var names = arrayOf("WMFS", "D87A")
+        val names = arrayOf("WMFS", "D87A")
         val mac: String = ""
         val isAutoConnect: Boolean = false
         val scanRuleConfig = BleScanRuleConfig.Builder()
@@ -376,12 +376,12 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun startScan() {
+//        viewBinding.tvModelNum.visibility = View.INVISIBLE
         BleManager.getInstance().scan(object : BleScanCallback() {
             override fun onScanStarted(success: Boolean) {
                 //已连接的蓝牙添加进来
                 val deviceList = BleManager.getInstance().allConnectedDevice
                 mDeviceAdapter.setList(deviceList)
-
             }
 
             override fun onLeScan(bleDevice: BleDevice) {
@@ -397,7 +397,6 @@ class CPRActivity : BaseActivity() {
                 mDeviceAdapter.data.let {
                     if (it.size == 0) {
                         viewBinding.tvModelNum.visibility = View.VISIBLE
-
                     }
                 }
                 stopRefresh()

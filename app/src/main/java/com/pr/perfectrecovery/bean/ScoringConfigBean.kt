@@ -7,8 +7,8 @@ import java.io.Serializable
  */
 
 data class ScoringConfigBean(
-    var depth: Float = 0f,//深度start
-    var depthEnd: Float = 0f,//深度end
+    var depth: Int = 0,//深度start
+    var depthEnd: Int = 0,//深度end
     var depthFrequency: Int = 0,//深度频率开始
     var depthFrequencyEnd: Int = 0,//深度频率结束
     var tidalVolume: Int = 0,//吹气（潮气）开始
@@ -26,11 +26,22 @@ data class ScoringConfigBean(
     var deduction: Float = 0f//中断分数
 ) : Serializable {
     //按压比列计算
-    var pr_High: Int = (depthEnd * 10).toInt()
-    var pr_Low: Int = if (depth > 0) (depth * 10).toInt() else 0
+    fun prHigh(): Int {
+        return (depthEnd * 10).toInt()
+    }
+
+    fun prLow(): Int {
+        return if (depth > 0) (depth * 10) else 0
+    }
 
     //吹气配置计算比列
-    var qy_high = tidalVolumeEnd / 100 * 8
-    var qy_low = tidalVolume / 100 * 8
+    fun qyHigh(): Int {
+        return tidalVolumeEnd / 100 * 8
+    }
+
+    fun qyLow(): Int {
+        return tidalVolume / 100 * 8
+    }
+
     var qy_max = 100
 }

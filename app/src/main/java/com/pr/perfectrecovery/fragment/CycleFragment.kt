@@ -91,8 +91,8 @@ class CycleFragment : Fragment() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
-        DataVolatile.PR_HIGH_VALUE = configBean.pr_High
-        DataVolatile.PR_LOW_VALUE = configBean.pr_Low
+        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
+        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
             if (it.isStart) {
@@ -267,19 +267,22 @@ class CycleFragment : Fragment() {
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
-            //计算循环次数
-            if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
-                cycleCount++
-                //更新循环次数
-                EventBus.getDefault()
-                    .post(
-                        MessageEventData(
-                            BaseConstant.EVENT_SINGLE_DATA_CYCLE,
-                            "$cycleCount",
-                            null
+            if (configBean.prCount > 0 || configBean.qyCount > 0) {
+                //计算循环次数
+                if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
+                    cycleCount++
+                    //更新循环次数
+                    EventBus.getDefault()
+                        .post(
+                            MessageEventData(
+                                BaseConstant.EVENT_SINGLE_DATA_CYCLE,
+                                "$cycleCount",
+                                null
+                            )
                         )
-                    )
+                }
             }
+
             //吹气频率
             setRate(viewBinding.chartQy, dataDTO.cf)
             //按压
@@ -316,14 +319,14 @@ class CycleFragment : Fragment() {
             if (qyValue != dataDTO.qySum) {
                 val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
                 when {
-                    qyMax in configBean.qy_low..configBean.qy_high -> {//通气正常
+                    qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
-                    qyMax in configBean.qy_high..100 -> {//通气过大
+                    qyMax in configBean.qyHigh()..100 -> {//通气过大
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    qyMax < configBean.qy_low -> {//通气不足
+                    qyMax < configBean.qyLow() -> {//通气不足
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }

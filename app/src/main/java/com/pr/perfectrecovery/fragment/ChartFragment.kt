@@ -107,6 +107,26 @@ class ChartFragment : Fragment() {
         setViewData()
     }
 
+    private fun setValue(value: Int): Int {
+        val depth = DataVolatile.preDistance - value
+        if (value > 0 && value > DataVolatile.preDistance - 5) {
+            return 0
+        } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_LOW_VALUE) {
+            return 5
+        } else if (depth > DataVolatile.PR_LOW_VALUE) {
+            return 6
+        } else if (depth < DataVolatile.PR_LOW_VALUE - 5) {
+            return 4
+        } else if (depth < DataVolatile.PR_LOW_VALUE - 10) {
+            return 3
+        } else if (depth < DataVolatile.PR_LOW_VALUE - 15) {
+            return 2
+        } else if (depth < DataVolatile.PR_LOW_VALUE - 20) {
+            return 1
+        }
+        return 0
+    }
+
     private fun setViewData() {
         viewBinding.tvDepth.text = "${configBean.depth}cm"
         viewBinding.tvDepthEnd.text = "${configBean.depthEnd}cm"
@@ -223,12 +243,12 @@ class ChartFragment : Fragment() {
                 data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
                 data.notifyDataChanged()
                 when {
-                    value2 in configBean.qy_low..configBean.qy_high -> {
+                    value2 in configBean.qyLow()..configBean.qyHigh() -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_37B48B)
                         )
                     }
-                    value2 < configBean.qy_low -> {
+                    value2 < configBean.qyLow() -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )

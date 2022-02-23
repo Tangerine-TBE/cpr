@@ -66,7 +66,7 @@ object LineChartUtils {
         leftAxis.mAxisMinimum = 0f
         rightAxis.mAxisMinimum = 0f
         // 最大值
-        leftAxis.mAxisMaximum = value.toFloat()
+        leftAxis.mAxisMaximum = -8f
 
         leftAxis.setDrawGridLines(false)
         val xAxis: XAxis = chart.xAxis

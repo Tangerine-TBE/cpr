@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.text.format.DateUtils
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -16,6 +17,7 @@ import com.pr.perfectrecovery.bean.ScoringConfigBean
 import com.pr.perfectrecovery.databinding.ActivityCprListBinding
 import com.pr.perfectrecovery.fragment.CPRScoreFragment
 import com.pr.perfectrecovery.fragment.CPRStandardFragment
+import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 
 /**
@@ -102,15 +104,19 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
-                dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
-            }
-            if (!TextUtils.isEmpty(viewBinding.etDepthEnd.text.toString().trim())) {
-                dataDTO?.depthEnd = viewBinding.etDepthEnd.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            if (p0.toString().toInt() in 11 downTo 0) {
+                viewBinding.tvMsg.text = "按压深度输入范围：整数1～10"
+            } else {
+                if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
+                    dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
+                }
+                if (!TextUtils.isEmpty(viewBinding.etDepthEnd.text.toString().trim())) {
+                    dataDTO?.depthEnd = viewBinding.etDepthEnd.text.toString().trim().toInt()
+                }
+                dataDTO.let {
+                    MMKV.defaultMMKV()
+                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                }
             }
         }
 
@@ -152,10 +158,21 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.interrupt = viewBinding.etInterrupt.text.toString().trim()
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            val str = viewBinding.etInterrupt.text.toString().trim()
+            var time: Long? = null
+            try {
+                time = TimeUtils.getTimeMill(str, "mm:ss")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            if (time == null) {
+                viewBinding.tvMsg.text = "时间格式错误，请按此格式00:00"
+            } else {
+                dataDTO?.interrupt = viewBinding.etInterrupt.text.toString().trim()
+                dataDTO.let {
+                    MMKV.defaultMMKV()
+                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                }
             }
         }
 
