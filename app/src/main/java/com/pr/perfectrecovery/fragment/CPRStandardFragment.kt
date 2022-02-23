@@ -64,6 +64,11 @@ class CPRStandardFragment : Fragment() {
         viewBinding.etTidalFrequency.addTextChangedListener(editTextTidalFrequency)
         viewBinding.etTidalFrequencyEnd.addTextChangedListener(editTextTidalFrequency)
 
+        //按压次数
+        viewBinding.etPr.addTextChangedListener(editTextCompression)
+        //吹气次数
+        viewBinding.etQy.addTextChangedListener(editTextCompression)
+
         setData()
     }
 
@@ -83,8 +88,8 @@ class CPRStandardFragment : Fragment() {
                 viewBinding.etTidalFrequencyEnd.setText("${it.tidalFrequencyEnd}")
                 viewBinding.etTime.setText("${it.operationTime}")
                 viewBinding.etCycles.setText("${it.cycles}")
-                viewBinding.etCompression.setText("${it.cprRatio}")
-                viewBinding.etCompression2.setText("${it.cprRatioEnd}")
+                viewBinding.etPr.setText("${it.prCount}")
+                viewBinding.etQy.setText("${it.qyCount}")
 
             }
         }
@@ -125,7 +130,8 @@ class CPRStandardFragment : Fragment() {
 
         override fun afterTextChanged(p0: Editable?) {
             if (!TextUtils.isEmpty(viewBinding.etDepthFrequency.text.toString().trim())) {
-                dataDTO?.depthFrequency = viewBinding.etDepthFrequency.text.toString().trim().toInt()
+                dataDTO?.depthFrequency =
+                    viewBinding.etDepthFrequency.text.toString().trim().toInt()
             }
             if (!TextUtils.isEmpty(viewBinding.etDepthFrequencyEnd.text.toString().trim())) {
                 dataDTO?.depthFrequencyEnd =
@@ -169,7 +175,8 @@ class CPRStandardFragment : Fragment() {
 
         override fun afterTextChanged(p0: Editable?) {
             if (!TextUtils.isEmpty(viewBinding.etTidalFrequency.text.toString().trim())) {
-                dataDTO?.tidalFrequency = viewBinding.etTidalFrequency.text.toString().trim().toInt()
+                dataDTO?.tidalFrequency =
+                    viewBinding.etTidalFrequency.text.toString().trim().toInt()
             }
             if (!TextUtils.isEmpty(viewBinding.etTidalFrequencyEnd.text.toString().trim())) {
                 dataDTO?.tidalFrequencyEnd =
@@ -199,6 +206,30 @@ class CPRStandardFragment : Fragment() {
             if (!TextUtils.isEmpty(viewBinding.etTidalVolumeEnd.text.toString().trim())) {
                 dataDTO?.tidalVolumeEnd =
                     viewBinding.etTidalVolumeEnd.text.toString().trim().toInt()
+            }
+            dataDTO.let {
+                MMKV.defaultMMKV()
+                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            }
+        }
+    }
+
+    private val editTextCompression = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            if (!TextUtils.isEmpty(viewBinding.etPr.text.toString().trim())) {
+                dataDTO?.prCount = viewBinding.etPr.text.toString().trim().toInt()
+            }
+            if (!TextUtils.isEmpty(viewBinding.etQy.text.toString().trim())) {
+                dataDTO?.qyCount =
+                    viewBinding.etQy.text.toString().trim().toInt()
             }
             dataDTO.let {
                 MMKV.defaultMMKV()

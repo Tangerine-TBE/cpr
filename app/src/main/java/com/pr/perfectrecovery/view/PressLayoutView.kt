@@ -165,13 +165,13 @@ class PressLayoutView : LinearLayout {
             number < 40 -> {
                 7
             }
-            number < 45 -> {
+            number < DataVolatile.PR_LOW_VALUE -> {
                 8
             }
-            number <= 65 -> {
+            number <= DataVolatile.PR_HIGH_VALUE -> {
                 9
             }
-            number > 65 -> {
+            number > DataVolatile.PR_HIGH_VALUE -> {
                 10
             }
             else -> {

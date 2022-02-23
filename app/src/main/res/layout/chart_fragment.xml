@@ -136,7 +136,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/cardView1">
 
                     <TextView
-                            android:id="@+id/textView6"
+                            android:id="@+id/tvTidalFrequencyEnd"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -153,13 +153,13 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView6"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequencyEnd"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView6"
-                            app:layout_constraintTop_toTopOf="@+id/textView6" />
+                            app:layout_constraintStart_toEndOf="@+id/tvTidalFrequencyEnd"
+                            app:layout_constraintTop_toTopOf="@+id/tvTidalFrequencyEnd" />
 
                     <TextView
-                            android:id="@+id/textView17"
+                            android:id="@+id/tvTidalFrequency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -168,7 +168,7 @@
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                            app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequencyEnd" />
 
                     <View
                             android:layout_width="0dp"
@@ -176,10 +176,10 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView17"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequency"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView17"
-                            app:layout_constraintTop_toTopOf="@+id/textView17" />
+                            app:layout_constraintStart_toEndOf="@+id/tvTidalFrequency"
+                            app:layout_constraintTop_toTopOf="@+id/tvTidalFrequency" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -203,7 +203,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
 
                     <TextView
-                            android:id="@+id/textView10"
+                            android:id="@+id/tvTidalVolumeEnd"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -219,13 +219,13 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView10"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolumeEnd"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView10"
-                            app:layout_constraintTop_toTopOf="@+id/textView10" />
+                            app:layout_constraintStart_toEndOf="@+id/tvTidalVolumeEnd"
+                            app:layout_constraintTop_toTopOf="@+id/tvTidalVolumeEnd" />
 
                     <TextView
-                            android:id="@+id/textView16"
+                            android:id="@+id/tvTidalVolume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -234,7 +234,7 @@
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+                            app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
 
                     <View
                             android:id="@+id/viewBar"
@@ -243,10 +243,10 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView16"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolume"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView16"
-                            app:layout_constraintTop_toTopOf="@+id/textView16" />
+                            app:layout_constraintStart_toEndOf="@+id/tvTidalVolume"
+                            app:layout_constraintTop_toTopOf="@+id/tvTidalVolume" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -270,13 +270,15 @@
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
 
                     <TextView
-                            android:id="@+id/textView12"
+                            android:id="@+id/tvDepth"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
-                            android:text="0:00"
+                            android:text="0   "
                             android:textColor="#ffffffff"
+                            android:ems="2"
                             android:textSize="13sp"
+                            android:gravity="center"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -284,13 +286,13 @@
                             android:id="@+id/view5"
                             android:layout_width="0dp"
                             android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_marginStart="@dimen/dp_4"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView12"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvDepth"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView12"
-                            app:layout_constraintTop_toTopOf="@+id/textView12" />
+                            app:layout_constraintStart_toEndOf="@+id/tvDepth"
+                            app:layout_constraintTop_toTopOf="@+id/tvDepth" />
 
                     <TextView
                             android:id="@+id/textView22"
@@ -302,7 +304,7 @@
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+                            app:layout_constraintTop_toBottomOf="@+id/tvDepth" />
 
                     <View
                             android:id="@+id/viewline"
@@ -317,7 +319,7 @@
                             app:layout_constraintTop_toTopOf="@+id/textView22" />
 
                     <TextView
-                            android:id="@+id/textView14"
+                            android:id="@+id/tvDepthEnd"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -334,10 +336,10 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView14"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthEnd"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView14"
-                            app:layout_constraintTop_toTopOf="@+id/textView14" />
+                            app:layout_constraintStart_toEndOf="@+id/tvDepthEnd"
+                            app:layout_constraintTop_toTopOf="@+id/tvDepthEnd" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -358,7 +360,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
 
                     <TextView
-                            android:id="@+id/textView9"
+                            android:id="@+id/tvDepthFrequencyEnd"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -375,13 +377,13 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView9"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequencyEnd"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView9"
-                            app:layout_constraintTop_toTopOf="@+id/textView9" />
+                            app:layout_constraintStart_toEndOf="@+id/tvDepthFrequencyEnd"
+                            app:layout_constraintTop_toTopOf="@+id/tvDepthFrequencyEnd" />
 
                     <TextView
-                            android:id="@+id/textView13"
+                            android:id="@+id/tvDepthFrequency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
@@ -390,7 +392,7 @@
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView9" />
+                            app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequencyEnd" />
 
                     <View
                             android:layout_width="0dp"
@@ -398,10 +400,10 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView13"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequency"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView13"
-                            app:layout_constraintTop_toTopOf="@+id/textView13" />
+                            app:layout_constraintStart_toEndOf="@+id/tvDepthFrequency"
+                            app:layout_constraintTop_toTopOf="@+id/tvDepthFrequency" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

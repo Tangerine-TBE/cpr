@@ -50,21 +50,13 @@ class CycleFragment : Fragment() {
     private var mBaseDataDTO: BaseDataDTO? = null
     private var isStart = false
     private var isTimeing = true
+    private var configBean = ScoringConfigBean()
 
     //中断计时累加
     private var timeOut: Long = 0
 
-    //错误按压数统计
-    private var errorPressCount: Int = 0
-
-    //错误吹起数统计
-    private var errorBlowCount: Int = 0
-
     //按压总数统计
     private var pressCount: Int = 0
-
-    //总吹起数统计
-    private var blowCount: Int = 0
 
     companion object {
         fun newInstance(isTS: Boolean, isYY: Boolean) = CycleFragment().apply {
@@ -98,7 +90,9 @@ class CycleFragment : Fragment() {
     private fun initView() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
+        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
+        DataVolatile.PR_HIGH_VALUE = configBean.pr_High
+        DataVolatile.PR_LOW_VALUE = configBean.pr_Low
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
             if (it.isStart) {
@@ -264,7 +258,6 @@ class CycleFragment : Fragment() {
 
     private var prValue = 0
     private var qyValue = 0
-
     private var err_pr_low = 0
     private var err_pr_high = 0
     private var err_pr_posi = 0
@@ -275,7 +268,7 @@ class CycleFragment : Fragment() {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
             //计算循环次数
-            if (dataDTO.prSum / 30 > cycleCount && dataDTO.qySum / 2 > cycleCount) {
+            if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
                 cycleCount++
                 //更新循环次数
                 EventBus.getDefault()
@@ -313,26 +306,28 @@ class CycleFragment : Fragment() {
         }
     }
 
+    /**
+     * 吹气状态
+     */
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
-            blowCount++
             if (qyValue != dataDTO.qySum) {
                 val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
                 when {
-                    qyMax in 40..80 -> {//通气正常
+                    qyMax in configBean.qy_low..configBean.qy_high -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
-                    qyMax in 80..100 -> {//通气过大
+                    qyMax in configBean.qy_high..100 -> {//通气过大
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    qyMax < 40 -> {//通气不足
+                    qyMax < configBean.qy_low -> {//通气不足
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax > 100 -> {//吹气进胃
+                    qyMax > configBean.qy_max -> {//吹气进胃
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
@@ -343,7 +338,7 @@ class CycleFragment : Fragment() {
                 stopOutTime()
             }
         } else {
-            if (dataDTO.bpValue > 10) {
+            if (dataDTO.bpValue > 5) {
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
             }
@@ -367,6 +362,9 @@ class CycleFragment : Fragment() {
         viewBinding.ivAim.visibility = View.INVISIBLE
     }
 
+    /**
+     * 按压处理逻辑
+     */
     private fun pr(dataDTO: BaseDataDTO) {
         //按压位置 0-错误  1-正确
 //        if (dataDTO.psrType == 1) {

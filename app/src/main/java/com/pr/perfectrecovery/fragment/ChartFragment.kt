@@ -65,7 +65,6 @@ class ChartFragment : Fragment() {
     private var qyValue = 0
 
     private fun initView() {
-
         //曲线图表
         val data: LineData = getData(0)
         val data1: LineData = getData(DataVolatile.preDistance.toInt())
@@ -105,6 +104,18 @@ class ChartFragment : Fragment() {
         viewBinding.constraintlayout.setOnClickListener {
             addEntry(data, viewBinding.lineChart, 0f)
         }
+        setViewData()
+    }
+
+    private fun setViewData() {
+        viewBinding.tvDepth.text = "${configBean.depth}cm"
+        viewBinding.tvDepthEnd.text = "${configBean.depthEnd}cm"
+        viewBinding.tvDepthFrequency.text = "${configBean.depthFrequency}cpm"
+        viewBinding.tvDepthFrequencyEnd.text = "${configBean.depthFrequencyEnd}cpm"
+        viewBinding.tvTidalFrequency.text = "${configBean.tidalFrequency}vpm"
+        viewBinding.tvTidalFrequencyEnd.text = "${configBean.tidalFrequencyEnd}vpm"
+        viewBinding.tvTidalVolume.text = "${configBean.tidalVolume}ml"
+        viewBinding.tvTidalVolumeEnd.text = "${configBean.tidalVolumeEnd}ml"
     }
 
     private fun initLineChart(lineChart: LineChart, lineData: LineData) {
@@ -165,6 +176,7 @@ class ChartFragment : Fragment() {
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
             setTouchEnabled(false)
+            scaleX = 1.5f
             //x轴设置
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
@@ -211,17 +223,17 @@ class ChartFragment : Fragment() {
                 data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
                 data.notifyDataChanged()
                 when {
-                    value2 in 40..80 -> {
+                    value2 in configBean.qy_low..configBean.qy_high -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_37B48B)
                         )
                     }
-                    value2 < 40 -> {
+                    value2 < configBean.qy_low -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )
                     }
-                    value2 > 80 -> {
+                    value2 > configBean.qy_max -> {
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_text_selected)
                         )
@@ -245,9 +257,9 @@ class ChartFragment : Fragment() {
     }
 
     private fun setData(data: BaseDataDTO) {
-        viewBinding.tvLungTotal.text = "/150"
+        viewBinding.tvLungTotal.text = "/${configBean.prCount * configBean.cycles}"
         viewBinding.tvLungCount.text = "${data.qySum}"
-        viewBinding.tvHeartTotal.text = "/10"
+        viewBinding.tvHeartTotal.text = "/${configBean.qyCount * configBean.cycles}"
         viewBinding.tvHeartCount.text = "${data.prSum}"
     }
 

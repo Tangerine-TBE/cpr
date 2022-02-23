@@ -28,7 +28,8 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val BLUETOOTH_PERMISSIONS = arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+    private val BLUETOOTH_PERMISSIONS =
+        arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,20 +40,27 @@ class MainActivity : BaseActivity() {
     }
 
     private fun checkPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_SCAN
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(BLUETOOTH_PERMISSIONS, 0)
             }
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode){
+        when (requestCode) {
             0 -> {
-                if (!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)){
-                    Toast.makeText(this,"请在设置中打开应用权限",Toast.LENGTH_SHORT).show()
+                if (!(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Toast.makeText(this, "请在设置中打开应用权限", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -100,8 +108,8 @@ class MainActivity : BaseActivity() {
             data.operationTime = "02:00"
             data.interrupt = "02:00"
             data.cycles = 5
-            data.cprRatio = 30
-            data.cprRatioEnd = 2
+            data.prCount = 30
+            data.qyCount = 2
             //保存配置信息
             MMKV.defaultMMKV().encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(data))
         }

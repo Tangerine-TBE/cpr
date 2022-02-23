@@ -425,8 +425,8 @@ object DataVolatile {
     /**
      * 初始化按压区间值
      */
-    val PR_LOW_VALUE = 45
-    val PR_HIGH_VALUE = 60
+    var PR_LOW_VALUE = 45
+    var PR_HIGH_VALUE = 60
 
     private fun Err_PrTotal(l: Int) {
 
