@@ -74,7 +74,9 @@ class TrainResultActivity : BaseActivity() {
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
         //按压百仪表分比
-        viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
+        if (trainingDTO.pressTotal > 0) {
+            viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
+        }
         //按压百分比
         viewBinding.tvPress.text = "${trainingDTO.pressTopPercentage}"
         viewBinding.tvPressEnd.text = "${trainingDTO.pressBottomPercentage}"
