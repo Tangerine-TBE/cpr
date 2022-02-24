@@ -53,6 +53,7 @@ class SingleActivity : BaseActivity() {
         binding.tvName.text = mTrainingBean?.name
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
+        time = (configBean.operationTime * 1000).toLong()
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
@@ -64,12 +65,10 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
-
 //            if (time <= 0) {
 //                ToastUtils.showShort("本次练习已结束")
 //                return@setOnClickListener
 //            }
-
             if (isStart) {
                 DataVolatile.isStart = true
                 EventBus.getDefault()
@@ -80,7 +79,6 @@ class SingleActivity : BaseActivity() {
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 if (mTrainingBean?.isCheck!!) {
-                    time = (configBean.operationTime * 1000).toLong()
                     binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                         resources.getDrawable(R.mipmap.icon_wm_countdown),
                         null,
