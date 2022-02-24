@@ -47,7 +47,7 @@ class ConfigActivity : BaseActivity() {
         viewBinding.etDepthFrequencyEnd.addTextChangedListener(editTextDepthFrequency)
 
         //按压中断
-        viewBinding.etInterrupt.addTextChangedListener(editTextInterrupt)
+        viewBinding.etInterruptTime.addTextChangedListener(editTextInterrupt)
 
         //潮气量
         viewBinding.etTidalVolume.addTextChangedListener(editTextTidalVolume)
@@ -76,7 +76,7 @@ class ConfigActivity : BaseActivity() {
                 viewBinding.etDepthEnd.setText("${it.depthEnd}")
                 viewBinding.etDepthFrequency.setText("${it.depthFrequency}")
                 viewBinding.etDepthFrequencyEnd.setText("${it.depthFrequencyEnd}")
-                viewBinding.etInterrupt.setText("${it.interrupt}")
+                viewBinding.etInterruptTime.setText("${it.interruptTime}")
                 viewBinding.etTidalVolume.setText("${it.tidalVolume}")
                 viewBinding.etTidalVolumeEnd.setText("${it.tidalVolumeEnd}")
                 viewBinding.etTidalFrequency.setText("${it.tidalFrequency}")
@@ -85,7 +85,7 @@ class ConfigActivity : BaseActivity() {
                 viewBinding.etCycles.setText("${it.cycles}")
                 viewBinding.etPr.setText("${it.prCount}")
                 viewBinding.etQy.setText("${it.qyCount}")
-                viewBinding.etDeduction.setText("${it.deduction}")
+                viewBinding.etDeduction.setText("${it.deductionTime}")
                 viewBinding.etProcess.setText("${it.process}")
                 viewBinding.etCompressions.setText("${it.compressions}")
                 viewBinding.etVentilation.setText("${it.ventilation}")
@@ -158,17 +158,10 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            val str = viewBinding.etInterrupt.text.toString().trim()
-            var time: Long? = null
-            try {
-                time = TimeUtils.getTimeMill(str, "mm:ss")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            if (time == null) {
-                viewBinding.tvMsg.text = "时间格式错误，请按此格式00:00"
-            } else {
-                dataDTO?.interrupt = viewBinding.etInterrupt.text.toString().trim()
+            val str = viewBinding.etInterruptTime.text.toString().trim().toInt()
+
+            if (str > 0) {
+                dataDTO?.interruptTime = viewBinding.etInterruptTime.text.toString().trim().toInt()
                 dataDTO.let {
                     MMKV.defaultMMKV()
                         .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
@@ -238,12 +231,15 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etPr.text.toString().trim())) {
-                dataDTO?.prCount = viewBinding.etPr.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            val value = viewBinding.etPr.text.toString().trim()
+            if (TextUtils.isEmpty(value)) {
+                viewBinding.tvMsg.text = "请填写按压次数"
+            } else {
+                dataDTO?.prCount = value.toInt()
+                dataDTO.let {
+                    MMKV.defaultMMKV()
+                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                }
             }
         }
 
@@ -259,13 +255,15 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etQy.text.toString().trim())) {
-                dataDTO?.qyCount =
-                    viewBinding.etQy.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            val value = viewBinding.etQy.text.toString().trim()
+            if (TextUtils.isEmpty(value)) {
+                viewBinding.tvMsg.text = "请填写吹气次数"
+            } else {
+                dataDTO?.qyCount = value.toInt()
+                dataDTO.let {
+                    MMKV.defaultMMKV()
+                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                }
             }
         }
 
@@ -283,7 +281,8 @@ class ConfigActivity : BaseActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            dataDTO?.deduction = viewBinding.etDeduction.text.toString().trim().toFloat()
+            dataDTO?.deductionTime =
+                viewBinding.etDeduction.text.toString().trim().toFloat().toInt()
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))

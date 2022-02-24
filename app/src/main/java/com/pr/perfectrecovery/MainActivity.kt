@@ -96,7 +96,7 @@ class MainActivity : BaseActivity() {
             data.process = 5
             data.compressions = 50
             data.ventilation = 45
-            data.deduction = 0.5f
+            data.deductionTime = 1
             data.depth = 0
             data.depthEnd = 6
             data.depthFrequency = 100
@@ -105,8 +105,8 @@ class MainActivity : BaseActivity() {
             data.tidalVolumeEnd = 600
             data.tidalFrequency = 6
             data.tidalFrequencyEnd = 8
-            data.operationTime = "02:00"
-            data.interrupt = "02:00"
+            data.operationTime = 120
+            data.interruptTime = 30
             data.cycles = 5
             data.prCount = 30
             data.qyCount = 2

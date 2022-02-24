@@ -72,7 +72,7 @@ class CPRActivity : BaseActivity() {
         initView()
         //初始化蓝牙管理器
         initBluetooth()
-        ttl()
+//        ttl()
     }
 
     private fun initView() {
@@ -84,7 +84,6 @@ class CPRActivity : BaseActivity() {
         }
 
         viewBinding.btnOpen.setOnClickListener {
-            //ttl()
             openTTL()
         }
 

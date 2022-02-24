@@ -16,6 +16,7 @@ import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
@@ -71,7 +72,7 @@ class ChartFragment : Fragment() {
         val data2: LineData = getData(0)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
-        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)
+        LineChartUtils.setLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
         StatusLiveData.data.observe(requireActivity()) {
             setData(it)
@@ -104,17 +105,22 @@ class ChartFragment : Fragment() {
         viewBinding.constraintlayout.setOnClickListener {
             addEntry(data, viewBinding.lineChart, 0f)
         }
+
+        viewBinding.constraintlayout3.setOnClickListener {
+            val random = (1..100).random()
+            addEntry(data, viewBinding.lineChart1, setValue(random).toFloat())
+        }
         setViewData()
     }
 
     private fun setValue(value: Int): Int {
         val depth = DataVolatile.preDistance - value
-        if (value > 0 && value > DataVolatile.preDistance - 5) {
+        if (depth > 0 && depth > DataVolatile.preDistance - 5) {
             return 0
-        } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_LOW_VALUE) {
+        } else if (depth > DataVolatile.PR_HIGH_VALUE) {
+            return 7
+        } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_HIGH_VALUE) {
             return 5
-        } else if (depth > DataVolatile.PR_LOW_VALUE) {
-            return 6
         } else if (depth < DataVolatile.PR_LOW_VALUE - 5) {
             return 4
         } else if (depth < DataVolatile.PR_LOW_VALUE - 10) {
@@ -298,8 +304,19 @@ class ChartFragment : Fragment() {
         lineDataSet.setDrawValues(true)
         lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+
+        val sets = ArrayList<ILineDataSet>()
+        sets.add(lineDataSet)
+
+        val d = LineDataSet(values, "")
+        d.highLightColor = Color.argb(0, 0, 0, 0)
+        d.setCircleColor(Color.argb(0, 0, 0, 0))
+        d.color = Color.argb(0, 0, 0, 0)
+        d.addEntry(Entry(0f, 10f))
+
+        sets.add(d)
         // create a data object with the data sets
-        return LineData(lineDataSet)
+        return LineData(sets)
     }
 
     /**

@@ -122,10 +122,10 @@
                             android:id="@+id/tv3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_30"
-                            android:layout_marginTop="@dimen/dp_30"
+                            android:layout_marginStart="28dp"
+                            android:layout_marginTop="28dp"
                             android:ems="7"
-                            android:text="按压中断（ms）"
+                            android:text="按压中断（s）"
                             android:textColor="@color/white"
                             android:textSize="@dimen/text_16"
                             app:layout_constraintStart_toStartOf="parent"
@@ -248,7 +248,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:text="    不能超过"
+                            android:text="    允许中断"
                             android:textColor="@color/white"
                             android:textSize="@dimen/text_14"
                             app:layout_constraintBottom_toBottomOf="@+id/textview3"
@@ -299,7 +299,7 @@
                             app:layout_constraintTop_toTopOf="@+id/tvd2" />
 
                     <EditText
-                            android:id="@+id/etInterrupt"
+                            android:id="@+id/etInterruptTime"
                             style="@style/EditTextStyle"
                             app:layout_constraintBottom_toBottomOf="@+id/tvd3"
                             app:layout_constraintStart_toStartOf="@+id/etDepthFrequencyEnd"
@@ -309,9 +309,8 @@
                             android:id="@+id/etTidalVolumeEnd"
                             style="@style/EditTextStyle"
                             app:layout_constraintBottom_toBottomOf="@+id/tvd4"
-                            app:layout_constraintStart_toStartOf="@+id/etInterrupt"
                             app:layout_constraintTop_toTopOf="@+id/tvd4"
-                            app:layout_constraintVertical_bias="0.555" />
+                            app:layout_constraintEnd_toEndOf="@+id/etInterruptTime" />
 
                     <EditText
                             android:id="@+id/etTidalFrequencyEnd"
@@ -367,7 +366,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_30"
                             android:ems="7"
-                            android:text="操作时长（m:s）"
+                            android:text="操作时长（s）"
                             android:textColor="@color/white"
                             android:textSize="@dimen/text_16"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -484,6 +483,7 @@
                             android:layout_marginEnd="@dimen/dp_10"
                             android:gravity="center"
                             android:textColor="@color/white"
+                            android:text=":"
                             android:textSize="@dimen/text_18"
                             app:layout_constraintBottom_toBottomOf="@+id/etQy"
                             app:layout_constraintEnd_toStartOf="@+id/etQy"

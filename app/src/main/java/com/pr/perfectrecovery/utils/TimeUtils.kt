@@ -1,5 +1,6 @@
 package com.pr.perfectrecovery.utils
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -60,27 +61,16 @@ object TimeUtils {
         return ""
     }
 
-    fun date2TimeStamp(date: String?, format: String?): String? {
-        try {
-            val sdf = SimpleDateFormat(format)
-            return (sdf.parse(date).time / 1000).toString()
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-        return ""
+    /**
+     * 将时分秒转为毫秒数
+     */
+    fun formatTurnSecond(time: String): Long {
+        val index1 = time.indexOf(":")
+        val mi = time.substring(0, 2).toInt()
+        val ss = time.substring(3, 5).toInt()
+        //Log.e(TAG, "formatTurnSecond: 时间== " + hh * 60 * 60 + mi * 60 + ss)
+        return ((mi * 60 + ss) * 1000).toLong()
     }
 
-    /**
-     * 获取时间格式毫秒数
-     */
-    fun getTimeMill(time: String, format: String): Long? {
-        try {
-            val sdf = SimpleDateFormat(format)
-            val parse = sdf.parse(time)
-            return parse.time
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
+
 }

@@ -9,12 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
+import com.pr.perfectrecovery.bean.ScoringConfigBean
 import com.pr.perfectrecovery.databinding.ActivitySingleBinding
 import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
@@ -22,6 +24,7 @@ import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.utils.TimeUtils
+import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -48,7 +51,8 @@ class SingleActivity : BaseActivity() {
     private fun initView() {
         binding.bottom.ivBack.setOnClickListener { finish() }
         binding.tvName.text = mTrainingBean?.name
-
+        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
+        val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
@@ -76,6 +80,7 @@ class SingleActivity : BaseActivity() {
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 if (mTrainingBean?.isCheck!!) {
+                    time = (configBean.operationTime * 1000).toLong()
                     binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                         resources.getDrawable(R.mipmap.icon_wm_countdown),
                         null,
@@ -204,7 +209,7 @@ class SingleActivity : BaseActivity() {
 
     }
 
-    private var time: Long = 1000 * 60 * 2
+    private var time: Long = 0
     private var timeZero: Long = 0
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
 

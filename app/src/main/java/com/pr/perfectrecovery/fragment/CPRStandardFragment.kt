@@ -81,7 +81,7 @@ class CPRStandardFragment : Fragment() {
                 viewBinding.etDepthEnd.setText("${it.depthEnd}")
                 viewBinding.etDepthFrequency.setText("${it.depthFrequency}")
                 viewBinding.etDepthFrequencyEnd.setText("${it.depthFrequencyEnd}")
-                viewBinding.etInterrupt.setText("${it.interrupt}")
+                viewBinding.etInterrupt.setText("${it.interruptTime}")
                 viewBinding.etTidalVolume.setText("${it.tidalVolume}")
                 viewBinding.etTidalVolumeEnd.setText("${it.tidalVolumeEnd}")
                 viewBinding.etTidalFrequency.setText("${it.tidalFrequency}")
@@ -155,7 +155,7 @@ class CPRStandardFragment : Fragment() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            dataDTO?.interrupt = viewBinding.etInterrupt.text.toString().trim()
+            dataDTO?.interruptTime = viewBinding.etInterrupt.text.toString().trim().toInt()
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))

@@ -15,19 +15,19 @@ data class ScoringConfigBean(
     var tidalVolumeEnd: Int = 0,//吹气（潮气）结束
     var tidalFrequency: Int = 0,//吹气（潮气）频率开始
     var tidalFrequencyEnd: Int = 0,//吹气（潮气）频率结束
-    var interrupt: String = "",//中断
-    var operationTime: String = "",//操作时长
+    var interruptTime: Int = 0,//中断
+    var operationTime: Int = 0,//操作时长
     var cycles: Int = 0,//循环次数
     var qyCount: Int = 0,//吹气次数
     var prCount: Int = 0,//按压次数
     var process: Int = 0,//流程分数
     var compressions: Int = 0,//按压分数
     var ventilation: Int = 0,//吹气分数
-    var deduction: Float = 0f//中断分数
+    var deductionTime: Int = 0//中断分数
 ) : Serializable {
     //按压比列计算
     fun prHigh(): Int {
-        return (depthEnd * 10).toInt()
+        return depthEnd * 10
     }
 
     fun prLow(): Int {
@@ -44,4 +44,8 @@ data class ScoringConfigBean(
     }
 
     var qy_max = 100
+
+    fun getTime(value: Int): Long {
+        return (value * 1000).toLong()
+    }
 }

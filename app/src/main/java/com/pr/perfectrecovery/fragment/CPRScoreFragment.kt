@@ -61,7 +61,7 @@ class CPRScoreFragment : Fragment() {
         dataDTO = GsonUtils.fromJson(decodeString, ScoringConfigBean::class.java)
         dataDTO.let {
             if (it != null) {
-                viewBinding.etDeduction.setText("${it.deduction}")
+                viewBinding.etDeduction.setText("${it.deductionTime}")
                 viewBinding.etProcess.setText("${it.process}")
                 viewBinding.etCompressions.setText("${it.compressions}")
                 viewBinding.etVentilation.setText("${it.ventilation}")
@@ -80,7 +80,7 @@ class CPRScoreFragment : Fragment() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            dataDTO?.deduction = viewBinding.etDeduction.text.toString().trim().toFloat()
+            dataDTO?.deductionTime = viewBinding.etDeduction.text.toString().trim().toInt()
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
