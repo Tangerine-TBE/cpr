@@ -16,7 +16,7 @@ import com.pr.perfectrecovery.activity.ConfigActivity
 import com.pr.perfectrecovery.activity.StatisticalActivity
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.ActivityMainBinding
 import com.tencent.mmkv.MMKV
 import kotlin.system.exitProcess
@@ -92,12 +92,12 @@ class MainActivity : BaseActivity() {
     private fun initConfigData() {
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         if (TextUtils.isEmpty(decodeString)) {
-            val data = ScoringConfigBean()
+            val data = ConfigBean()
             data.process = 5
             data.compressions = 50
             data.ventilation = 45
             data.deductionTime = 1
-            data.depth = 0
+            data.depth = 4
             data.depthEnd = 6
             data.depthFrequency = 100
             data.depthFrequencyEnd = 120

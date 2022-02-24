@@ -21,7 +21,7 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.ChartFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
@@ -37,7 +37,7 @@ import java.util.*
  */
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
-    private lateinit var configBean: ScoringConfigBean
+    private lateinit var configBean: ConfigBean
 
     companion object {
         fun newInstance() = ChartFragment()
@@ -58,7 +58,7 @@ class ChartFragment : Fragment() {
         EventBus.getDefault().register(this)
         viewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
+        configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
         initView()
     }
 
@@ -67,9 +67,9 @@ class ChartFragment : Fragment() {
 
     private fun initView() {
         //曲线图表
-        val data: LineData = getData(0)
-        val data1: LineData = getData(DataVolatile.preDistance.toInt())
-        val data2: LineData = getData(0)
+        val data: LineData = getData(0f)
+        val data1: LineData = getData(DataVolatile.preDistance.toFloat())
+        val data2: LineData = getData(0f)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(viewBinding.lineChart1, data1)
@@ -289,14 +289,14 @@ class ChartFragment : Fragment() {
         viewBinding.tvHeartCount.text = "${data.prSum}"
     }
 
-    private fun getData(value: Int): LineData {
+    private fun getData(value: Float): LineData {
         val values = ArrayList<Entry>()
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        lineDataSet.lineWidth = 1.75f
+        lineDataSet.lineWidth = 1.5f
         lineDataSet.circleRadius = 5f
-        lineDataSet.circleHoleRadius = 2.5f
+        lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
         lineDataSet.color = Color.parseColor("#3DB38E")
         lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
@@ -306,15 +306,24 @@ class ChartFragment : Fragment() {
         lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
 
         val sets = ArrayList<ILineDataSet>()
-        sets.add(lineDataSet)
-
         val d = LineDataSet(values, "")
+        d.lineWidth = 0f
+        d.circleRadius = 5f
+        d.circleHoleRadius = 0f
+        d.valueTextColor = Color.WHITE
+        d.color = Color.parseColor("#3DB38E")
+        d.setCircleColor(Color.parseColor("#3DB38E"))
+        d.highLightColor = Color.parseColor("#3DB38E")
+        d.setDrawValues(false)
+        d.axisDependency = YAxis.AxisDependency.LEFT
+        d.mode = LineDataSet.Mode.CUBIC_BEZIER
         d.highLightColor = Color.argb(0, 0, 0, 0)
         d.setCircleColor(Color.argb(0, 0, 0, 0))
         d.color = Color.argb(0, 0, 0, 0)
-        d.addEntry(Entry(0f, 10f))
+        d.addEntry(Entry(0f, value))
 
         sets.add(d)
+        sets.add(lineDataSet)
         // create a data object with the data sets
         return LineData(sets)
     }
@@ -327,12 +336,12 @@ class ChartFragment : Fragment() {
      */
     private var x = 20
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
-        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
+        val entryCount = (lineData.getDataSetByIndex(1) as LineDataSet).entryCount
         val entry = Entry(
             entryCount.toFloat(), yValues
         )
         // 创建一个点
-        lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
+        lineData.addEntry(entry, 1) // 将entry添加到指定索引处的折线中
         lineChart.data = lineData
         //通知数据已经改变
         lineData.notifyDataChanged()

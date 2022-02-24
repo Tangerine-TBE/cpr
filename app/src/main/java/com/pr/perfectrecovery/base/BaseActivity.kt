@@ -7,7 +7,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.tencent.mmkv.MMKV
 
 open class BaseActivity : AppCompatActivity() {

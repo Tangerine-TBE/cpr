@@ -6,7 +6,7 @@ import java.io.Serializable
  * 训练、考核  基本配置属性
  */
 
-data class ScoringConfigBean(
+data class ConfigBean(
     var depth: Int = 0,//深度start
     var depthEnd: Int = 0,//深度end
     var depthFrequency: Int = 0,//深度频率开始

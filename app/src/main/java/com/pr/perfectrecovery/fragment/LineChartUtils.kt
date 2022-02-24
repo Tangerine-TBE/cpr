@@ -88,7 +88,6 @@ object LineChartUtils {
         (lineData.getDataSetByIndex(0) as LineDataSet).circleHoleColor = Color.TRANSPARENT
         (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)
         chart.setDrawGridBackground(false)
-
         // no description text
         chart.description.isEnabled = false
 

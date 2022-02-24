@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.CprStandardFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CPRStandardViewModel
 import com.tencent.mmkv.MMKV
@@ -23,7 +23,7 @@ import com.tencent.mmkv.MMKV
  */
 class CPRStandardFragment : Fragment() {
     private lateinit var viewBinding: CprStandardFragmentBinding
-    private var dataDTO: ScoringConfigBean? = null
+    private var dataDTO: ConfigBean? = null
 
     companion object {
         fun newInstance() = CPRStandardFragment()
@@ -74,7 +74,7 @@ class CPRStandardFragment : Fragment() {
 
     private fun setData() {
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        dataDTO = GsonUtils.fromJson(decodeString, ScoringConfigBean::class.java)
+        dataDTO = GsonUtils.fromJson(decodeString, ConfigBean::class.java)
         dataDTO.let {
             if (it != null) {
                 viewBinding.etDepth.setText("${it.depth}")

@@ -19,7 +19,7 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
@@ -50,7 +50,7 @@ class CycleFragment : Fragment() {
     private var mBaseDataDTO: BaseDataDTO? = null
     private var isStart = false
     private var isTimeing = true
-    private var configBean = ScoringConfigBean()
+    private var configBean = ConfigBean()
 
     //中断计时累加
     private var timeOut: Long = 0
@@ -90,7 +90,7 @@ class CycleFragment : Fragment() {
     private fun initView() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
+        configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
         DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
         DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列

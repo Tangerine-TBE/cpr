@@ -13,7 +13,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.ActivityCprListBinding
 import com.pr.perfectrecovery.fragment.CPRScoreFragment
 import com.pr.perfectrecovery.fragment.CPRStandardFragment
@@ -26,7 +26,7 @@ import com.tencent.mmkv.MMKV
 class ConfigActivity : BaseActivity() {
 
     private lateinit var viewBinding: ActivityCprListBinding
-    private var dataDTO: ScoringConfigBean? = null
+    private var dataDTO: ConfigBean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +69,7 @@ class ConfigActivity : BaseActivity() {
 
     private fun setData() {
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        dataDTO = GsonUtils.fromJson(decodeString, ScoringConfigBean::class.java)
+        dataDTO = GsonUtils.fromJson(decodeString, ConfigBean::class.java)
         dataDTO.let {
             if (it != null) {
                 viewBinding.etDepth.setText("${it.depth}")

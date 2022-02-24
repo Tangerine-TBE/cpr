@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.CprScoreFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CPRScoreSettingViewModel
 import com.tencent.mmkv.MMKV
@@ -25,7 +25,7 @@ class CPRScoreFragment : Fragment() {
 
     private var isInit = false
     private lateinit var viewBinding: CprScoreFragmentBinding
-    private var dataDTO: ScoringConfigBean? = null
+    private var dataDTO: ConfigBean? = null
 
     companion object {
         fun newInstance() = CPRScoreFragment()
@@ -58,7 +58,7 @@ class CPRScoreFragment : Fragment() {
 
     private fun setData() {
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        dataDTO = GsonUtils.fromJson(decodeString, ScoringConfigBean::class.java)
+        dataDTO = GsonUtils.fromJson(decodeString, ConfigBean::class.java)
         dataDTO.let {
             if (it != null) {
                 viewBinding.etDeduction.setText("${it.deductionTime}")

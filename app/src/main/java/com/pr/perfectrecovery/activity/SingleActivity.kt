@@ -16,7 +16,7 @@ import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
-import com.pr.perfectrecovery.bean.ScoringConfigBean
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.ActivitySingleBinding
 import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
@@ -52,7 +52,7 @@ class SingleActivity : BaseActivity() {
         binding.bottom.ivBack.setOnClickListener { finish() }
         binding.tvName.text = mTrainingBean?.name
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)
+        val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
@@ -65,10 +65,10 @@ class SingleActivity : BaseActivity() {
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
 
-            if (time <= 0) {
-                ToastUtils.showShort("本次练习已结束")
-                return@setOnClickListener
-            }
+//            if (time <= 0) {
+//                ToastUtils.showShort("本次练习已结束")
+//                return@setOnClickListener
+//            }
 
             if (isStart) {
                 DataVolatile.isStart = true
