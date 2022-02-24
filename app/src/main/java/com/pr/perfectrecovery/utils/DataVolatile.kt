@@ -329,7 +329,7 @@ object DataVolatile {
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
         Log.e("TAG6", "$L_d1  $L_d2  $L_d3")
-        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
+        if (abs(preDistance - L_d1) < 10 || abs(preDistance - L_d2) < 10 || abs(preDistance - L_d3) < 10
         ) {
             return preDistance.toInt()
         }
