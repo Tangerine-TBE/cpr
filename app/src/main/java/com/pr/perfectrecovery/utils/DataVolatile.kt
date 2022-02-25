@@ -322,6 +322,7 @@ object DataVolatile {
     }
 
     var UNBACK_FLAG = 0
+    var ERR_FLAG=0;
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
@@ -340,15 +341,20 @@ object DataVolatile {
                 low_flag = 0
                 if (UNBACK_FLAG == 1) {
                     ERR_PR_UNBACK++
+                    UNBACK_FLAG=0
                     Log.e("TAG7", "未回弹")
-                    UNBACK_FLAG = 0
+                    ERR_FLAG=1;
                 }
             } else {
                 if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                     low_flag = 1
                     PR_SUM++
                     //  Log.e("TAG5", "$PR_SUM")
-                    Err_PrTotal(L_d2)
+                    if(ERR_FLAG == 0){
+                        Err_PrTotal(L_d2)
+                    }else{
+                        ERR_FLAG = 0;
+                    }
                     Log.e("TAG4", "$L_d2")
                     val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
@@ -371,7 +377,11 @@ object DataVolatile {
                 low_flag = 1
                 PR_SUM++
                 // Log.e("TAG5", "$PR_SUM")
-                Err_PrTotal(L_d1)
+                if(ERR_FLAG == 0){
+                    Err_PrTotal(L_d1)
+                }else{
+                    ERR_FLAG = 0;
+                }
                 // Log.e("TAG6", "$L_d1")
                 val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
