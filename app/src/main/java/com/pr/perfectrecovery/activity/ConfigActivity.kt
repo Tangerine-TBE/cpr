@@ -104,9 +104,11 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (p0.toString().toInt() in 11 downTo 0) {
+            val value = p0.toString().trim()
+            if (TextUtils.isEmpty(value) || value.toInt() > 11 || value.toInt() < 0) {
                 viewBinding.tvMsg.text = "按压深度输入范围：整数1～10"
             } else {
+                viewBinding.tvMsg.text = ""
                 if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
                     dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
                 }
@@ -158,13 +160,19 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            val str = viewBinding.etInterruptTime.text.toString().trim().toInt()
-
-            if (str > 0) {
-                dataDTO?.interruptTime = viewBinding.etInterruptTime.text.toString().trim().toInt()
-                dataDTO.let {
-                    MMKV.defaultMMKV()
-                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            val str = viewBinding.etInterruptTime.text.toString().trim()
+            if (TextUtils.isEmpty(str)) {
+                viewBinding.tvMsg.text = "按压超时时间设置"
+            } else {
+                if (str.toInt() > 0) {
+                    viewBinding.tvMsg.text = ""
+                    dataDTO?.interruptTime = str.toInt()
+                    dataDTO.let {
+                        MMKV.defaultMMKV()
+                            .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                    }
+                } else {
+                    viewBinding.tvMsg.text = "按压超时时间设置"
                 }
             }
         }
@@ -281,11 +289,14 @@ class ConfigActivity : BaseActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            dataDTO?.deductionTime =
-                viewBinding.etDeduction.text.toString().trim().toFloat().toInt()
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            val value = viewBinding.etDeduction.text.toString().trim()
+            if (!TextUtils.isEmpty(value)) {
+                dataDTO?.deductionTime =
+                    viewBinding.etDeduction.text.toString().trim().toInt()
+                dataDTO.let {
+                    MMKV.defaultMMKV()
+                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+                }
             }
         }
     }
@@ -330,6 +341,7 @@ class ConfigActivity : BaseActivity() {
         if (number > 100) {
             viewBinding.tvDesc.text = "三项加起来总分 ＜ 100分"
         } else {
+            viewBinding.tvDesc.text = ""
             dataDTO?.process = process
             dataDTO?.compressions = compressions
             dataDTO?.ventilation = ventilation

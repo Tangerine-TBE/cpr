@@ -52,6 +52,7 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.system.exitProcess
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -100,7 +101,7 @@ class CPRActivity : BaseActivity() {
 
         viewBinding.progressCircular.setOnClickListener {
             if (!isRefresh) {
-                viewBinding.tvModelNum.visibility = View.INVISIBLE
+                viewBinding.tvMsg.visibility = View.INVISIBLE
                 startRefresh()
                 checkPermissions()
                 isRefresh = true
@@ -143,7 +144,7 @@ class CPRActivity : BaseActivity() {
                 val bleDevice = mDeviceAdapter.getItem(position)
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
                     if (count >= 6) {//处理提示语设备连接过多提示
-                        viewBinding.tvModelNum.text = "当前版本最多同时支持6台模型"
+                        viewBinding.tvMsg.text = "当前版本最多同时支持6台模型"
                         hintHandler.postDelayed(this::setTextNull, 2000)
                     }
                     BleManager.getInstance().cancelScan()
@@ -161,7 +162,7 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun setTextNull() {
-        viewBinding.tvModelNum.text = ""
+        viewBinding.tvMsg.text = ""
     }
 
     override fun onResume() {
@@ -185,6 +186,7 @@ class CPRActivity : BaseActivity() {
     private fun checkPermissions() {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (!bluetoothAdapter.isEnabled) {
+
             Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()
             return
         }
@@ -268,9 +270,9 @@ class CPRActivity : BaseActivity() {
                     mDeviceAdapter.addData(position, bleDevice)
                     isItemClick = true
                     if (exception.code == BleException.ERROR_CODE_TIMEOUT) {
-                        viewBinding.tvModelNum.text = "连接超时，请重新连接"
+                        viewBinding.tvMsg.text = "连接超时，请重新连接"
                     } else {
-                        viewBinding.tvModelNum.text = "连接失败，请重新连接"
+                        viewBinding.tvMsg.text = "连接失败，请重新连接"
                     }
                 }
 
@@ -395,7 +397,7 @@ class CPRActivity : BaseActivity() {
             override fun onScanFinished(scanResultList: List<BleDevice>) {
                 mDeviceAdapter.data.let {
                     if (it.size == 0) {
-                        viewBinding.tvModelNum.visibility = View.VISIBLE
+                        viewBinding.tvMsg.visibility = View.VISIBLE
                     }
                 }
                 stopRefresh()
@@ -564,7 +566,11 @@ class CPRActivity : BaseActivity() {
                     .setMessage("您的手机不支持USB HOST，请更换其他手机再试！")
                     .setPositiveButton(
                         "确认"
-                    ) { arg0, arg1 -> System.exit(0) }.create()
+                    ) { arg0, arg1 ->
+                        {
+                            //exitProcess(0)
+                        }
+                    }.create()
             dialog.setCanceledOnTouchOutside(false)
             dialog.show()
         }

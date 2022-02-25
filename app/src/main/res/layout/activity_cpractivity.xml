@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <TextView
-        android:id="@+id/tvModelNum"
+        android:id="@+id/tvMsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_10"
@@ -48,7 +48,7 @@
         android:layout_marginTop="@dimen/dp_10"
         android:background="@drawable/border_dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvModelNum" />
+        app:layout_constraintTop_toBottomOf="@+id/tvMsg" />
 
     <TextView
         android:id="@+id/tvDesc"

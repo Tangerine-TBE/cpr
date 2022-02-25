@@ -166,6 +166,10 @@ object DataVolatile {
                     )
                 )
             )
+            //三次按压深度
+            dataDTO.L_D1 = L_d1
+            dataDTO.L_D2 = L_d2
+            dataDTO.L_D3 = L_d3
             L_Value = selectValue_P(L_d1, L_d2, L_d3)
             //清空频率
             pt(L_Value)

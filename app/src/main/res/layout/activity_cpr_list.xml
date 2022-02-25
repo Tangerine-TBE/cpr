@@ -661,10 +661,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="@dimen/dp_40"
-                            android:text="三项加起来总分 ＜ 100分"
                             android:textColor="@color/color_text_selected"
                             android:textSize="14sp"
-                            android:visibility="invisible"
+                            android:visibility="visible"
                             app:layout_constraintBottom_toBottomOf="@+id/text"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/text" />
@@ -917,7 +916,8 @@
                                 android:layout_marginEnd="@dimen/dp_4"
                                 app:layout_constraintBottom_toBottomOf="@+id/textView8"
                                 app:layout_constraintEnd_toStartOf="@+id/textView7"
-                                app:layout_constraintTop_toTopOf="@+id/textView8" />
+                                app:layout_constraintTop_toTopOf="@+id/textView8"
+                                app:layout_constraintVertical_bias="0.0" />
 
                         <TextView
                                 android:id="@+id/textView7"

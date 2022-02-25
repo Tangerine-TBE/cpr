@@ -147,9 +147,6 @@ class ChartFragment : Fragment() {
     private fun initLineChart(lineChart: LineChart, lineData: LineData) {
         // apply styling
         // holder.chart.setValueTypeface(mTf);
-
-        // apply styling
-        // holder.chart.setValueTypeface(mTf);
         lineChart.description.isEnabled = false
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
@@ -170,7 +167,6 @@ class ChartFragment : Fragment() {
         rightAxis.setLabelCount(5, false)
         rightAxis.setDrawGridLines(false)
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)
 
         xAxis.isEnabled = false
         leftAxis.isEnabled = false
@@ -182,8 +178,6 @@ class ChartFragment : Fragment() {
 
         // set data
         lineChart.data = lineData
-        // do not forget to refresh the chart
-        // holder.chart.invalidate();
 
         // do not forget to refresh the chart
         // holder.chart.invalidate();
@@ -221,8 +215,6 @@ class ChartFragment : Fragment() {
             axisRight.isEnabled = false
 
             // if more than 60 entries are displayed in the chart, no values will be
-            // drawny
-//            setMaxVisibleValueCount(6)
             //保证Y轴从0开始，不然会上移一点
             axisLeft.axisMinimum = 0f
             axisRight.axisMinimum = 0f
@@ -271,7 +263,6 @@ class ChartFragment : Fragment() {
                 setVisibleXRangeMaximum(30f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
                 moveViewToX(barData.entryCount.toFloat() - 29)
-//                setBorderWidth(0.3f)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
@@ -294,27 +285,29 @@ class ChartFragment : Fragment() {
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        lineDataSet.lineWidth = 1.5f
-        lineDataSet.circleRadius = 5f
+        lineDataSet.lineWidth = 1.3f
+        lineDataSet.circleRadius = 0f
         lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
         lineDataSet.color = Color.parseColor("#3DB38E")
         lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
         lineDataSet.highLightColor = Color.parseColor("#3DB38E")
         lineDataSet.setDrawValues(true)
+        lineDataSet.setDrawCircles(false)
         lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
 
         val sets = ArrayList<ILineDataSet>()
         val d = LineDataSet(values, "")
         d.lineWidth = 0f
-        d.circleRadius = 5f
+        d.circleRadius = 0f
         d.circleHoleRadius = 0f
-        d.valueTextColor = Color.WHITE
-        d.color = Color.parseColor("#3DB38E")
-        d.setCircleColor(Color.parseColor("#3DB38E"))
-        d.highLightColor = Color.parseColor("#3DB38E")
+        d.valueTextColor = Color.TRANSPARENT
+        d.color = Color.TRANSPARENT
+        d.setCircleColor(Color.TRANSPARENT)
+        d.highLightColor = Color.TRANSPARENT
         d.setDrawValues(false)
+        d.setDrawCircles(false)
         d.axisDependency = YAxis.AxisDependency.LEFT
         d.mode = LineDataSet.Mode.CUBIC_BEZIER
         d.highLightColor = Color.argb(0, 0, 0, 0)

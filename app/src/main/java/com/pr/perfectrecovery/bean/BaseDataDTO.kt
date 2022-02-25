@@ -46,4 +46,8 @@ data class BaseDataDTO(
 ) {
     //是否开始
     var isStart = false
+    var L_D1 : Int = 0
+    var L_D2 : Int= 0
+    var L_D3 : Int= 0
+
 }

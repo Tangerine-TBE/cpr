@@ -246,6 +246,8 @@ class CycleFragment : Fragment() {
     private val mHandler2 = object : Handler(Looper.getMainLooper()) {}
     private val mHandler3 = object : Handler(Looper.getMainLooper()) {}
     private val mHandler4 = object : Handler(Looper.getMainLooper()) {}
+    private val mHandler5 = object : Handler(Looper.getMainLooper()) {}
+    private val mHandler6 = object : Handler(Looper.getMainLooper()) {}
 
     private inner class Counter : Runnable {
         override fun run() {
@@ -373,7 +375,18 @@ class CycleFragment : Fragment() {
 //        if (dataDTO.psrType == 1) {
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
-        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+//        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        //执行三次按压深度
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D1)
+        mHandler5.removeCallbacksAndMessages(null)
+        mHandler5.postAtTime(Runnable {
+            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D2)
+            mHandler6.removeCallbacksAndMessages(null)
+            mHandler6.postAtTime(Runnable {
+                viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D3)
+            }, 33)
+        }, 33)
+
         if (dataDTO.prSum != prValue) {
 
             prValue = dataDTO.prSum
