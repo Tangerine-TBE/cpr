@@ -77,7 +77,7 @@ class ChartFragment : Fragment() {
         StatusLiveData.data.observe(requireActivity()) {
             setData(it)
             addEntry(data, viewBinding.lineChart, it.cf.toFloat())
-            addEntry(data1, viewBinding.lineChart1, it.L_D1.toFloat())
+            addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
             if (qyValue != it.qySum) {
                 qyValue = it.qySum

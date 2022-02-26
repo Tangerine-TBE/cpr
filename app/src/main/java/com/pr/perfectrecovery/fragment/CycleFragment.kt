@@ -375,9 +375,9 @@ class CycleFragment : Fragment() {
 //        if (dataDTO.psrType == 1) {
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
-//        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         //执行三次按压深度
-        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D1)
+//        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D1)
 //        mHandler5.removeCallbacksAndMessages(null)
 //        mHandler5.postAtTime(Runnable {
 //            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D2)
