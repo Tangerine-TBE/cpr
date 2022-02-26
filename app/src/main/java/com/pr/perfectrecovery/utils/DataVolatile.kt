@@ -321,20 +321,24 @@ object DataVolatile {
                     )
                 )
             )
-            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
+            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
+            preDistance=L_d1.toLong();
         }
     }
 
     var UNBACK_FLAG = 0
     var ERR_FLAG=0;
+    var PR_DOTTIMSE_NUMBER=0;
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-        Log.e("TAG6", "$L_d1  $L_d2  $L_d3")
-        if (abs(preDistance - L_d1) < 10 || abs(preDistance - L_d2) < 10 || abs(preDistance - L_d3) < 10
+       // var sumflag= PR_SUM;
+        PR_DOTTIMSE_NUMBER+=3
+        Log.e("TAG7", "$L_d1  $L_d2  $L_d3")
+        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
             return preDistance.toInt()
         }
@@ -359,8 +363,13 @@ object DataVolatile {
                     }else{
                         ERR_FLAG = 0;
                     }
-                    Log.e("TAG4", "$L_d2")
-                    val changTimePress = System.currentTimeMillis()
+                    PR_DOTTIMSE_NUMBER-=1
+                    if(PR_SUM > 1){
+                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30)).toInt()
+                        PR_DOTTIMSE_NUMBER=0;
+                    }
+                   // Log.e("TAG4", "$L_d2")
+                    /*val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
                         val time = changTimePress - preTimePress + 40
                         Log.e("TAG6", "$L_d2")
@@ -370,9 +379,9 @@ object DataVolatile {
                         } else if (PF_Value < 80) {
                             PF_Value = 80;
                         }
-                        Log.e("TAG6", "$PF_Value")
+                     //   Log.e("TAG6", "$PF_Value")
                     }
-                    preTimePress = changTimePress
+                    preTimePress = changTimePress*/
                 }
                 value = L_d2
             }
@@ -386,8 +395,12 @@ object DataVolatile {
                 }else{
                     ERR_FLAG = 0;
                 }
+                if(PR_SUM > 1){
+                    PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30)).toInt()
+                    PR_DOTTIMSE_NUMBER=0;
+                }
                 // Log.e("TAG6", "$L_d1")
-                val changTimePress = System.currentTimeMillis()
+                /*val changTimePress = System.currentTimeMillis()
                 if (PR_SUM > 1) {
                     val time = changTimePress - preTimePress + 70
                     PF_Value = (60000 / time).toInt()
@@ -398,12 +411,12 @@ object DataVolatile {
                     }
                     // Log.e("TAG6", "$PF_Value")
                 }
-                preTimePress = changTimePress
-                return L_d1
+                preTimePress = changTimePress*/
+               value= L_d1
             } else {
                 if (abs(preDistance - L_d3) < 15) {
                     UNBACK_FLAG = 0
-                    Log.e("TAG7", "回到初始位置，复位未回弹")
+                    Log.e("TAG7", "回到初始位置，复位未回弹$L_d3")
                 } else {
                     UNBACK_FLAG = 1
                 }
@@ -413,7 +426,7 @@ object DataVolatile {
         } else {
             if (abs(preDistance - L_d2) < 15) {
                 UNBACK_FLAG = 0
-                Log.e("TAG7", "回到初始位置，复位未回弹")
+                Log.e("TAG7", "回到初始位置，复位未回弹$L_d2")
             } else {
                 UNBACK_FLAG = 1
             }

@@ -144,7 +144,7 @@ class PressLayoutView : LinearLayout {
             return 0
         }
         return when {
-            number in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_LOW_VALUE -> {
+            number < DataVolatile.PR_LOW_VALUE -> {
                 8
             }
             number <= DataVolatile.PR_HIGH_VALUE -> {
@@ -153,25 +153,25 @@ class PressLayoutView : LinearLayout {
             number > DataVolatile.PR_HIGH_VALUE -> {
                 10
             }
-            number < 10 -> {
+            number < DataVolatile.PR_LOW_VALUE - 5 -> {
                 1
             }
-            number < 15 -> {
+            number < DataVolatile.PR_LOW_VALUE - 10 -> {
                 2
             }
-            number < 20 -> {
+            number < DataVolatile.PR_LOW_VALUE - 15 -> {
                 3
             }
-            number < 25 -> {
+            number < DataVolatile.PR_LOW_VALUE - 20 -> {
                 4
             }
-            number < 30 -> {
+            number < DataVolatile.PR_LOW_VALUE - 25 -> {
                 5
             }
-            number < 35 -> {
+            number < DataVolatile.PR_LOW_VALUE - 30 -> {
                 6
             }
-            number < 40 -> {
+            number < DataVolatile.PR_LOW_VALUE - 35 -> {
                 7
             }
             else -> {
