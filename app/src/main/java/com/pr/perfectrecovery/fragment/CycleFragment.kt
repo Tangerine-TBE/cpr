@@ -378,14 +378,14 @@ class CycleFragment : Fragment() {
 //        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         //执行三次按压深度
         viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D1)
-        mHandler5.removeCallbacksAndMessages(null)
-        mHandler5.postAtTime(Runnable {
-            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D2)
-            mHandler6.removeCallbacksAndMessages(null)
-            mHandler6.postAtTime(Runnable {
-                viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D3)
-            }, 33)
-        }, 33)
+//        mHandler5.removeCallbacksAndMessages(null)
+//        mHandler5.postAtTime(Runnable {
+//            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D2)
+//            mHandler6.removeCallbacksAndMessages(null)
+//            mHandler6.postAtTime(Runnable {
+//                viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D3)
+//            }, 33)
+//        }, 33)
 
         if (dataDTO.prSum != prValue) {
 
