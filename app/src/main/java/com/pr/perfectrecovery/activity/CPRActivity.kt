@@ -95,7 +95,8 @@ class CPRActivity : BaseActivity() {
 
         viewBinding.bottom.ivStart.setOnClickListener {
             val intent = Intent(this, TrainingSingleActivity::class.java)
-            intent.putParcelableArrayListExtra("blueTooth", connectList)
+            connectList.addAll(bleList)
+            intent.putParcelableArrayListExtra(BaseConstant.CONNECT_BLE_DEVICES, connectList)
             startActivity(intent)
         }
 
@@ -510,6 +511,7 @@ class CPRActivity : BaseActivity() {
                         isInitValue = true
                         DataVolatile.initPreDistance(formatHexString)
                     }
+                    dataDTO.mac = bleDevice?.device?.address.toString()
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)
                 }

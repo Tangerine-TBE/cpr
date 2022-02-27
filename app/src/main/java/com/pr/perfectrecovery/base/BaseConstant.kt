@@ -1,6 +1,10 @@
 package com.pr.perfectrecovery.base
 
 object BaseConstant {
+    //学员信息
+    const val TRAINING_BEAN = "TRAINING_BEAN"
+    //连接的蓝牙设备数据
+    const val CONNECT_BLE_DEVICES = "CONNECT_BLE_DEVICES"
     //配置
     val MMKV_WM_CONFIGURATION: String = "mmkv_wm_configuration"
 

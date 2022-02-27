@@ -16,6 +16,12 @@ class TrainingBean() : Serializable {
     //true 考核模式 false 练习模式
     var isCheck: Boolean = false
 
+    //是否单模型
+    var isSingle: Boolean = true
+
+    //考核人使用设备的mac地址
+    var mac:String = ""
+
     //多人模式
     var list = mutableListOf<TrainingBean>()
 }

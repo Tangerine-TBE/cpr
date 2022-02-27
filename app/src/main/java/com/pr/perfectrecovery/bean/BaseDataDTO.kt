@@ -1,6 +1,8 @@
 package com.pr.perfectrecovery.bean
 
 data class BaseDataDTO(
+    //mac地址
+    var mac:String = "",
     //电量值：  0-100%
     var electricity: Int = 0,
     //距离值：  30-150
