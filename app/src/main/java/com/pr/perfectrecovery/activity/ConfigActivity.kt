@@ -22,6 +22,16 @@ import com.tencent.mmkv.MMKV
 
 /**
  * 基础参数配置界面
+1，按压深度输入范围：1-10cm
+2，按压频率输入范围：10-200cpm
+3，潮气量输入范围：  100-2000ml
+4，潮气频率输入范围：1-60vpm
+5，操作时长输入范围：00:10-10:00（m:s）
+6，循环次数输入范围：1-10次
+7，按压通气比例输入范围：1-50
+8，流程分数输入范围：0-100
+9，按压分数输入范围：0-100
+10，通气分数输入范围：0-100
  */
 class ConfigActivity : BaseActivity() {
 
@@ -65,6 +75,11 @@ class ConfigActivity : BaseActivity() {
         viewBinding.etProcess.addTextChangedListener(editTextProcess)
         viewBinding.etCompressions.addTextChangedListener(editTextProcess)
         viewBinding.etVentilation.addTextChangedListener(editTextProcess)
+
+        //循环次数
+        viewBinding.etCycles.addTextChangedListener(editTextCycle)
+        //操作时长
+        viewBinding.etTime.addTextChangedListener(editTextTime)
     }
 
     private fun setData() {
@@ -108,17 +123,13 @@ class ConfigActivity : BaseActivity() {
             if (TextUtils.isEmpty(value) || value.toInt() > 11 || value.toInt() < 0) {
                 viewBinding.tvMsg.text = "按压深度输入范围：整数1～10"
             } else {
-                viewBinding.tvMsg.text = ""
                 if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
                     dataDTO?.depth = viewBinding.etDepth.text.toString().trim().toInt()
                 }
                 if (!TextUtils.isEmpty(viewBinding.etDepthEnd.text.toString().trim())) {
                     dataDTO?.depthEnd = viewBinding.etDepthEnd.text.toString().trim().toInt()
                 }
-                dataDTO.let {
-                    MMKV.defaultMMKV()
-                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-                }
+                save()
             }
         }
 
@@ -134,18 +145,17 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etDepthFrequency.text.toString().trim())) {
-                dataDTO?.depthFrequency =
-                    viewBinding.etDepthFrequency.text.toString().trim().toInt()
+            val value = p0.toString().trim()
+            val start = viewBinding.etDepthFrequency.text.toString().trim()
+            val end = viewBinding.etDepthFrequencyEnd.text.toString().trim()
+            if (!TextUtils.isEmpty(value) && !TextUtils.isEmpty(start) && !TextUtils.isEmpty(end) && value.toInt() in 10..200) {
+                dataDTO?.depthFrequency = start.toInt()
+                dataDTO?.depthFrequencyEnd = end.toInt()
+                save()
+            } else {
+                viewBinding.tvMsg.text = "按压频率输入范围：10-200cpm"
             }
-            if (!TextUtils.isEmpty(viewBinding.etDepthFrequencyEnd.text.toString().trim())) {
-                dataDTO?.depthFrequencyEnd =
-                    viewBinding.etDepthFrequencyEnd.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-            }
+
         }
 
     }
@@ -161,19 +171,11 @@ class ConfigActivity : BaseActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             val str = viewBinding.etInterruptTime.text.toString().trim()
-            if (TextUtils.isEmpty(str)) {
-                viewBinding.tvMsg.text = "按压超时时间设置"
+            if (!TextUtils.isEmpty(str) && str.toInt() > 0) {
+                dataDTO?.interruptTime = str.toInt()
+                save()
             } else {
-                if (str.toInt() > 0) {
-                    viewBinding.tvMsg.text = ""
-                    dataDTO?.interruptTime = str.toInt()
-                    dataDTO.let {
-                        MMKV.defaultMMKV()
-                            .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-                    }
-                } else {
-                    viewBinding.tvMsg.text = "按压超时时间设置"
-                }
+                viewBinding.tvMsg.text = "按压超时时间设置"
             }
         }
 
@@ -189,17 +191,16 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etTidalFrequency.text.toString().trim())) {
-                dataDTO?.tidalFrequency =
-                    viewBinding.etTidalFrequency.text.toString().trim().toInt()
-            }
-            if (!TextUtils.isEmpty(viewBinding.etTidalFrequencyEnd.text.toString().trim())) {
-                dataDTO?.tidalFrequencyEnd =
-                    viewBinding.etTidalFrequencyEnd.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            //4，潮气频率输入范围：1-60vpm
+            val value = p0.toString().trim()
+            val start = viewBinding.etTidalFrequency.text.toString().trim()
+            val end = viewBinding.etTidalFrequencyEnd.text.toString().trim()
+            if (!TextUtils.isEmpty(value) && !TextUtils.isEmpty(start) && !TextUtils.isEmpty(end) && value.toInt() in 1..60) {
+                dataDTO?.tidalFrequency = start.toInt()
+                dataDTO?.tidalFrequencyEnd = end.toInt()
+                save()
+            } else {
+                viewBinding.tvMsg.text = "潮气频率输入范围：1-60vpm"
             }
         }
 
@@ -215,18 +216,22 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            if (!TextUtils.isEmpty(viewBinding.etTidalVolume.text.toString().trim())) {
-                dataDTO?.tidalVolume = viewBinding.etTidalVolume.text.toString().trim().toInt()
-            }
-            if (!TextUtils.isEmpty(viewBinding.etTidalVolumeEnd.text.toString().trim())) {
-                dataDTO?.tidalVolumeEnd =
-                    viewBinding.etTidalVolumeEnd.text.toString().trim().toInt()
-            }
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
+            //潮气量 100-2000ml
+            val value = p0.toString().trim()
+            val valueStart = viewBinding.etTidalVolume.text.toString().trim()
+            val valueEnd = viewBinding.etTidalVolumeEnd.text.toString().trim()
+            if (!TextUtils.isEmpty(value) && !TextUtils.isEmpty(valueStart) && !TextUtils.isEmpty(
+                    valueEnd
+                ) && value.toInt() in 100..2000
+            ) {
+                dataDTO?.tidalVolume = valueStart.toInt()
+                dataDTO?.tidalVolumeEnd = valueEnd.toInt()
+                save()
+            } else {
+                viewBinding.tvMsg.text = "潮气量输入范围：100-2000ml"
             }
         }
+
     }
 
     private val editTextPr = object : TextWatcher {
@@ -239,15 +244,13 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            val value = viewBinding.etPr.text.toString().trim()
-            if (TextUtils.isEmpty(value)) {
-                viewBinding.tvMsg.text = "请填写按压次数"
-            } else {
+            //7，按压通气比例输入范围：1-50
+            val value = p0.toString().trim()
+            if (!TextUtils.isEmpty(value) && value.toInt() in 1..50) {
                 dataDTO?.prCount = value.toInt()
-                dataDTO.let {
-                    MMKV.defaultMMKV()
-                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-                }
+                save()
+            } else {
+                viewBinding.tvMsg.text = "按压通气比例输入范围：1-50"
             }
         }
 
@@ -263,20 +266,58 @@ class ConfigActivity : BaseActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            val value = viewBinding.etQy.text.toString().trim()
-            if (TextUtils.isEmpty(value)) {
-                viewBinding.tvMsg.text = "请填写吹气次数"
-            } else {
+            //7，按压通气比例输入范围：1-50
+            val value = p0.toString().trim()
+            if (!TextUtils.isEmpty(value) && value.toInt() in 1..50) {
                 dataDTO?.qyCount = value.toInt()
-                dataDTO.let {
-                    MMKV.defaultMMKV()
-                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-                }
+                save()
+            } else {
+                viewBinding.tvMsg.text = "按压通气比例输入范围：1-50"
             }
         }
-
     }
 
+    private val editTextCycle = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            //中断扣分
+            val value = p0.toString().trim()
+            if (!TextUtils.isEmpty(value) && value.toInt() in 1..10) {
+                dataDTO?.cycles = value.toInt()
+                save()
+            } else {
+                viewBinding.tvMsg.text = "循环次数输入范围：1-10次"
+            }
+        }
+    }
+
+    private val editTextTime = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            //中断扣分
+            val value = p0.toString().trim()
+            if (!TextUtils.isEmpty(value) && value.toInt() in 10..600) {
+                dataDTO?.cycles = value.toInt()
+                save()
+            } else {
+                viewBinding.tvMsg.text = "操作时长输入范围：10-600（s）"
+            }
+        }
+    }
 
     private val editTextDeduction = object : TextWatcher {
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -289,14 +330,13 @@ class ConfigActivity : BaseActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            val value = viewBinding.etDeduction.text.toString().trim()
-            if (!TextUtils.isEmpty(value)) {
+            val value = p0.toString().trim()
+            if (!TextUtils.isEmpty(value) && value.toInt() >= 10) {
                 dataDTO?.deductionTime =
                     viewBinding.etDeduction.text.toString().trim().toInt()
-                dataDTO.let {
-                    MMKV.defaultMMKV()
-                        .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-                }
+                save()
+            } else {
+                viewBinding.tvDesc.text = "按压中断时间设定大于10s"
             }
         }
     }
@@ -345,10 +385,16 @@ class ConfigActivity : BaseActivity() {
             dataDTO?.process = process
             dataDTO?.compressions = compressions
             dataDTO?.ventilation = ventilation
-            dataDTO.let {
-                MMKV.defaultMMKV()
-                    .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
-            }
+            save()
+        }
+    }
+
+    private fun save() {
+        viewBinding.tvMsg.text = ""
+        viewBinding.tvDesc.text = ""
+        dataDTO.let {
+            MMKV.defaultMMKV()
+                .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
         }
     }
 

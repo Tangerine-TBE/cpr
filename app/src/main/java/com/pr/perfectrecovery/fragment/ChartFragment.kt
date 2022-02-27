@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
+import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -99,7 +100,7 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            //addBarEntry(Random().nextInt(800))
+            addBarEntry(Random().nextInt(800), 30)
         }
 
         viewBinding.constraintlayout.setOnClickListener {
@@ -151,7 +152,7 @@ class ChartFragment : Fragment() {
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
         lineChart.setDrawGridBackground(false)
-        lineChart.setNoDataText("")
+        lineChart.setNoDataText("no data")
         val xAxis: XAxis = lineChart.xAxis
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
@@ -196,7 +197,7 @@ class ChartFragment : Fragment() {
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
             setTouchEnabled(false)
-            scaleX = 1.5f
+//            scaleX = 1.5f
             //x轴设置
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
@@ -210,9 +211,13 @@ class ChartFragment : Fragment() {
                     }
                 }*/
             }
+            xAxis.setLabelCount(30, false)
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
+            setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
+            isScaleXEnabled = true                             //支持x轴缩放
+            isScaleYEnabled = false
 
             // if more than 60 entries are displayed in the chart, no values will be
             //保证Y轴从0开始，不然会上移一点
@@ -225,6 +230,7 @@ class ChartFragment : Fragment() {
             dataSets.add(mBarDataSet!!)
             val barData = BarData(dataSets)
             data = barData
+//            data.barWidth = 0.3f
         }
     }
 
@@ -256,6 +262,12 @@ class ChartFragment : Fragment() {
                             ContextCompat.getColor(requireContext(), R.color.color_text_selected)
                         )
                     }
+                }
+                //给一个默认值
+                if (colors.isEmpty()) {
+                    colors.add(
+                        ContextCompat.getColor(requireContext(), R.color.color_37B48B)
+                    )
                 }
                 mBarDataSet!!.colors = colors
                 notifyDataSetChanged()

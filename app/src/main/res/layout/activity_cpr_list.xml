@@ -195,7 +195,7 @@
                             style="@style/EditTextStyle"
                             app:layout_constraintBottom_toBottomOf="@+id/textview1"
                             app:layout_constraintStart_toEndOf="@+id/textview1"
-                            app:layout_constraintTop_toTopOf="@+id/textview1" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                     <EditText
                             android:id="@+id/etDepthFrequency"
@@ -386,7 +386,7 @@
 
                     <EditText
                             android:id="@+id/etTime"
-                            style="@style/EditTextStyle2"
+                            style="@style/EditTextStyle"
                             android:layout_marginEnd="@dimen/dp_30"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
