@@ -321,8 +321,8 @@ object DataVolatile {
                     )
                 )
             )
-            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
-            preDistance=L_d1.toLong();
+            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
+           // preDistance=L_d1.toLong();
         }
     }
 
@@ -365,7 +365,7 @@ object DataVolatile {
                     }
                     PR_DOTTIMSE_NUMBER-=1
                     if(PR_SUM > 1){
-                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30)).toInt()
+                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30+60)).toInt()
                         PR_DOTTIMSE_NUMBER=0;
                     }
                    // Log.e("TAG4", "$L_d2")
@@ -396,7 +396,7 @@ object DataVolatile {
                     ERR_FLAG = 0;
                 }
                 if(PR_SUM > 1){
-                    PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30)).toInt()
+                    PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30+60)).toInt()
                     PR_DOTTIMSE_NUMBER=0;
                 }
                 // Log.e("TAG6", "$L_d1")
