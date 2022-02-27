@@ -100,10 +100,14 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter.let { mHandler.removeCallbacks(it) }
-                mTrainingDTO?.isAssessment = mTrainingBean!!.isCheck
+                mTrainingDTO?.isCheck = mTrainingBean!!.isCheck
                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
                 mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+                mTrainingDTO?.pressScore = configBean.pressScore
+                mTrainingDTO?.blowScore = configBean.blowScore
+                mTrainingDTO?.processScore = configBean.processScore
+                mTrainingDTO?.deduction = configBean.deductionScore
                 //检查页面 结果
                 checkEventFragment?.getData().let {
                     if (it != null) {

@@ -49,7 +49,7 @@ class ChartFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         viewBinding = ChartFragmentBinding.inflate(layoutInflater)
         return viewBinding.root
     }
@@ -297,7 +297,7 @@ class ChartFragment : Fragment() {
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        lineDataSet.lineWidth = 1.3f
+        lineDataSet.lineWidth = 1.2f
         lineDataSet.circleRadius = 0f
         lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
@@ -339,7 +339,6 @@ class ChartFragment : Fragment() {
      *
      * @param yValues y值
      */
-    private var x = 20
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
         val entryCount = (lineData.getDataSetByIndex(1) as LineDataSet).entryCount
         val entry = Entry(

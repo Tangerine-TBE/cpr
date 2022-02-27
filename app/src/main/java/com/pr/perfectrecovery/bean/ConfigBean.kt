@@ -20,10 +20,10 @@ data class ConfigBean(
     var cycles: Int = 0,//循环次数
     var qyCount: Int = 0,//吹气次数
     var prCount: Int = 0,//按压次数
-    var process: Int = 0,//流程分数
-    var compressions: Int = 0,//按压分数
-    var ventilation: Int = 0,//吹气分数
-    var deductionTime: Int = 0//中断分数
+    var processScore: Int = 0,//流程分数
+    var pressScore: Int = 0,//按压分数
+    var blowScore: Int = 0,//吹气分数
+    var deductionScore: Int = 0//中断分数
 ) : Serializable {
     //按压比列计算
     fun prHigh(): Int {

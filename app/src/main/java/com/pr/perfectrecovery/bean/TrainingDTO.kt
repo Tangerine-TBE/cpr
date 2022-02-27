@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var id: Int = 0
-    var isAssessment = false//是否为 false 训练  true 考核
+    var isCheck = false//是否为 false 训练  true 考核
     var trainingTime: String = ""//训练时长
     var cycleCount: Int = 0//循环次数
     var pressErrorCount: Int = 0//按压错误数
@@ -17,10 +17,6 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pressAverage: Int = 0//按压平均多少次每分数
     var pressOutTime: String = ""//按压超时
     var pressFrequency: Int = 0//按压频率
-    var pressTopPercentage: Int = 0//按压顶部百分比
-    var pressBottomPercentage: Int = 0//按压底部百分比
-    var pressAverageDepth: Int = 0//按压平均深度
-    var pressCenterPercentage: Int = 0//按压百分比
 
     var blowErrorCount: Int = 0//吹气错误数
     var blowTotal: Int = 0//吹气总数
@@ -29,9 +25,13 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var blowHigh: Int = 0//吹气过大错误数
     var blowIntoStomach: Int = 0//吹气进胃错误数
     var blowAverage: Int = 0//吹气平均多少次每分数
-    var blowMeterPercentage: Int = 0//吹气仪表百分比
-    var blowPercentage: Int = 0//吹气百分比
-    var blowAverageDepth: Int = 0//吹气平均深度
+
+    var prScale: Int = 0 //按压次数比例
+    var qyScale: Int = 0 //吹气次数比例
+    var processScore: Int = 0//流程分数
+    var pressScore: Int = 0//按压分数
+    var deduction: Int = 0//扣分
+    var blowScore: Int = 0//吹气、通气 分数
 
     //检查环境
     var check1 = false
@@ -62,5 +62,69 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     //完成评估
     var check10 = false
+
+    /**
+     * 按压频率合格率
+     */
+    fun getPressRate(): Int {
+        return if (pressFrequency > 0 && pressTotal > 0) {
+            pressFrequency / pressTotal
+        } else {
+            0
+        }
+    }
+
+    /**
+     * 按压回弹合格率
+     */
+    fun getReboundRate(): Int {
+        //总数=正确按压次数+位置错误按压次数+未回弹按压次数
+        return if ((pressTotal - pressErrorCount + pressLocation + pressHigh) > 0 && pressTotal > 0) {
+            (pressTotal - pressErrorCount + pressLocation + pressHigh) / pressTotal
+        } else {
+            0
+        }
+    }
+
+    /**
+     * 按压深度合格率
+     */
+    fun getDepthRate(): Int {
+        //总数=正确按压次数+位置错误按压次数+未回弹按压次数+深度错误的
+        return if ((pressTotal - pressErrorCount + pressLocation + pressHigh + pressRebound) > 0 && pressTotal > 0) {
+            (pressTotal - pressErrorCount + pressLocation + pressHigh + pressRebound) / pressTotal
+        } else {
+            0
+        }
+    }
+
+    /**
+     * 按压时间
+     */
+    fun getPressTime(): Int {
+        return 0
+    }
+
+    /**
+     * 吹气量合格率
+     */
+    fun getBlowAmount(): Int {
+        return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) {
+            (blowTotal - blowErrorCount) / blowTotal
+        } else {
+            0
+        }
+    }
+
+    /**
+     * 吹气频率合格率
+     */
+    fun getBlowRate(): Int {
+        return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) {
+            (blowTotal - blowErrorCount) / blowTotal
+        } else {
+            0
+        }
+    }
 
 }

@@ -88,6 +88,12 @@
                             app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <androidx.constraintlayout.widget.Group
+                        android:id="@+id/gruops"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:constraint_referenced_ids="constraintLayout" />
+
                 <View
                         android:id="@+id/view"
                         android:layout_width="5dp"

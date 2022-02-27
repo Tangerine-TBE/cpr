@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
@@ -43,16 +44,39 @@ class TrainResultActivity : BaseActivity() {
 
     private fun initData() {
         val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
-        if (trainingDTO.isAssessment) {
-            //可和模式下
+        //判断模式- false 训练  true 考核
+        if (trainingDTO.isCheck) {
             viewBinding.layoutCheck.root.visibility = View.VISIBLE
             viewBinding.groupPr.visibility = View.VISIBLE
             viewBinding.groupQy.visibility = View.VISIBLE
-//            viewBinding.layoutCheck.check.
+            viewBinding.gruops.visibility = View.GONE
+            viewBinding.layoutCheck.tvName.text = "${trainingDTO.name}"
+            viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prScale}:${trainingDTO.qyScale}"
+            viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"//倒计时
+            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.pressScore}"
+            viewBinding.layoutCheck.tvDeduction.text = "${trainingDTO.deduction}"
+            viewBinding.layoutCheck.tvBlowScale.text = "${trainingDTO.blowScore}"
+
+            //按压得分
+            viewBinding.layoutCheck.tvPressScore.text = ""
+            //中断扣分
+            viewBinding.layoutCheck.tvInterruptScore.text = ""
+            //通气得分
+            viewBinding.layoutCheck.tvVentilationScore.text = ""
+            //流程分数
+            processCheck(trainingDTO)
+            viewBinding.layoutCheck.tvProcessScore2.text = ""
+
+            //总得分
+            //分数星星配置
+            viewBinding.layoutCheck.ratingBar.progress = 0
+            viewBinding.layoutCheck.tvScore.text = ""
+        } else {
+            viewBinding.gruops.visibility = View.VISIBLE
+            viewBinding.tvTrain.text = "训练"
+            viewBinding.tvName.text = trainingDTO.name
+            viewBinding.tvTime.text = trainingDTO.trainingTime
         }
-        viewBinding.tvName.text = trainingDTO.name
-        viewBinding.tvTrain.text = "训练"
-        viewBinding.tvTime.text = trainingDTO.trainingTime
 
         //循环次数
         viewBinding.tvCycleCount.text = "${trainingDTO.cycleCount}"
@@ -74,16 +98,14 @@ class TrainResultActivity : BaseActivity() {
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
         //按压百仪表分比
-        if (trainingDTO.pressTotal > 0) {
-            viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
-        }
+        viewBinding.tvClock1.text = "${trainingDTO.getPressRate()}%"
         //按压百分比
-        viewBinding.tvPress.text = "${trainingDTO.pressTopPercentage}"
-        viewBinding.tvPressEnd.text = "${trainingDTO.pressBottomPercentage}"
+        viewBinding.tvPress.text = "${trainingDTO.getReboundRate()}%"
+        viewBinding.tvPressEnd.text = "${trainingDTO.getDepthRate()}%"
         //按压平均深度
-        viewBinding.tvPressBottom.text = "${trainingDTO.pressAverageDepth}"
+        viewBinding.tvPressBottom.text = ""
         //整体按压百分比
-        viewBinding.tvPressCenter.text = "${trainingDTO.pressCenterPercentage}"
+        viewBinding.tvPressCenter.text = ""
 
         //吹气错误数
         viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount}"
@@ -99,11 +121,71 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach}"
         //平均吹气每分钟次数
         viewBinding.tvBlowAverageCount.text = "${trainingDTO.blowAverage}"
-        //吹气百仪表分比
-        viewBinding.tvClock2.text = "${trainingDTO.blowMeterPercentage}"
+        //吹气频率百分比
+        viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}"
         //吹气百分比
-        viewBinding.tvBlow.text = "${trainingDTO.blowPercentage}"
+        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}"
         //吹气平均值
-        viewBinding.tvBlowEnd.text = "${trainingDTO.blowAverageDepth}"
+        viewBinding.tvBlowEnd.text = ""
     }
+
+    /**
+     * 流程分数
+     */
+    private fun processCheck(trainingDTO: TrainingDTO): Int {
+        viewBinding.layoutCheck.check.checkBox1.isChecked = trainingDTO.check1
+        viewBinding.layoutCheck.check.checkBox2.isChecked = trainingDTO.check2
+        viewBinding.layoutCheck.check.checkBox3.isChecked = trainingDTO.check3
+        viewBinding.layoutCheck.check.checkBox4.isChecked = trainingDTO.check4
+        viewBinding.layoutCheck.check.checkBox5.isChecked = trainingDTO.check5
+        viewBinding.layoutCheck.check.checkBox6.isChecked = trainingDTO.check6
+        viewBinding.layoutCheck.check.checkBox7.isChecked = trainingDTO.check7
+        viewBinding.layoutCheck.check.checkBox8.isChecked = trainingDTO.check8
+        viewBinding.layoutCheck.check.checkBox9.isChecked = trainingDTO.check9
+        viewBinding.layoutCheck.check.checkBox10.isChecked = trainingDTO.check10
+
+        viewBinding.layoutCheck.check.checkBox1.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox2.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox3.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox4.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox5.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox6.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox7.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox8.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox9.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        viewBinding.layoutCheck.check.checkBox10.setOnCheckedChangeListener(
+            onCheckedChangeListener
+        )
+        if (trainingDTO.pressScore > 0) {
+            return trainingDTO.pressScore / 10 * listCheck.size
+        }
+        return 0
+    }
+
+    private val listCheck = mutableListOf<Int>()
+    private val onCheckedChangeListener =
+        CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                listCheck.add(buttonView.id)
+            }
+        }
+
 }
