@@ -80,7 +80,7 @@ class CPRScoreFragment : Fragment() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            dataDTO?.deductionScore = viewBinding.etDeduction.text.toString().trim().toInt()
+            dataDTO?.deductionScore = viewBinding.etDeduction.text.toString().trim().toFloat()
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))

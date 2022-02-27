@@ -51,7 +51,7 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.groupQy.visibility = View.VISIBLE
             viewBinding.gruops.visibility = View.GONE
             viewBinding.layoutCheck.tvName.text = "${trainingDTO.name}"
-            viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prScale}:${trainingDTO.qyScale}"
+            viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prCount}:${trainingDTO.qyCount}"
             //倒计时
             viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"
             //流程分数
@@ -106,7 +106,7 @@ class TrainResultActivity : BaseActivity() {
         //按压百仪表分比
         viewBinding.tvClock1.text = "${trainingDTO.getPressRate()}%"
         //按压百分比
-        viewBinding.tvPress.text = "${trainingDTO.getReboundRate()}%"
+        viewBinding.tvPressPercentage.text = "${trainingDTO.getReboundRate()}%"
         viewBinding.tvPressEnd.text = "${trainingDTO.getDepthRate()}%"
         //按压平均深度
         viewBinding.tvPressBottom.text = ""
@@ -149,6 +149,18 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.layoutCheck.check.checkBox8.isChecked = trainingDTO.check8
         viewBinding.layoutCheck.check.checkBox9.isChecked = trainingDTO.check9
         viewBinding.layoutCheck.check.checkBox10.isChecked = trainingDTO.check10
+
+        //该页面禁止点击事件
+        viewBinding.layoutCheck.check.checkBox1.isClickable = false
+        viewBinding.layoutCheck.check.checkBox2.isClickable = false
+        viewBinding.layoutCheck.check.checkBox3.isClickable = false
+        viewBinding.layoutCheck.check.checkBox4.isClickable = false
+        viewBinding.layoutCheck.check.checkBox5.isClickable = false
+        viewBinding.layoutCheck.check.checkBox6.isClickable = false
+        viewBinding.layoutCheck.check.checkBox7.isClickable = false
+        viewBinding.layoutCheck.check.checkBox8.isClickable = false
+        viewBinding.layoutCheck.check.checkBox9.isClickable = false
+        viewBinding.layoutCheck.check.checkBox10.isClickable = false
 
         viewBinding.layoutCheck.check.checkBox1.setOnCheckedChangeListener(
             onCheckedChangeListener

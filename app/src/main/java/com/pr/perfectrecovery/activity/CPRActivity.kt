@@ -179,7 +179,6 @@ class CPRActivity : BaseActivity() {
             .enableLog(true)
             .setReConnectCount(1, 5000)
             .setConnectOverTime(10000).operateTimeout = 5000
-
     }
 
     private val REQUEST_CODE_OPEN_GPS = 1
@@ -247,12 +246,14 @@ class CPRActivity : BaseActivity() {
     private fun showConnectedDevice() {
         val deviceList = BleManager.getInstance().allConnectedDevice
         bleList = deviceList
+        if(bleList != null && bleList.size > 0){
+            viewBinding.tvMsg.text = ""
+        }
         mDeviceAdapter.setList(deviceList)
     }
 
     private var isItemClick = true
     private var count = 0
-    private var position = -1
     private fun connect(bleDevice: BleDevice, position: Int) {
         BleManager.getInstance()
             .setConnectOverTime(5000)
@@ -383,6 +384,7 @@ class CPRActivity : BaseActivity() {
             override fun onScanStarted(success: Boolean) {
                 //已连接的蓝牙添加进来
                 val deviceList = BleManager.getInstance().allConnectedDevice
+                mDeviceAdapter.data.clear()
                 mDeviceAdapter.setList(deviceList)
             }
 
@@ -516,15 +518,6 @@ class CPRActivity : BaseActivity() {
                     StatusLiveData.data.postValue(dataDTO)
                 }
             })
-    }
-
-    private fun addText(textView: TextView, content: String) {
-        textView.append(content)
-        textView.append("\n")
-        val offset = textView.lineCount * textView.lineHeight
-        if (offset > textView.height) {
-            textView.scrollTo(0, offset - textView.height)
-        }
     }
 
     override fun onDestroy() {

@@ -96,7 +96,7 @@ class MainActivity : BaseActivity() {
             data.processScore = 5
             data.pressScore = 50
             data.blowScore = 45
-            data.deductionScore = 1
+            data.deductionScore = 0.5f
             data.depth = 4
             data.depthEnd = 6
             data.depthFrequency = 100

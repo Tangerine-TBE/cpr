@@ -26,11 +26,11 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var blowIntoStomach: Int = 0//吹气进胃错误数
     var blowAverage: Int = 0//吹气平均多少次每分数
 
-    var prScale: Int = 0 //按压次数比例
-    var qyScale: Int = 0 //吹气次数比例
+    var prCount: Int = 0 //按压次数比例
+    var qyCount: Int = 0 //吹气次数比例
     var processScore: Int = 0//流程分数
     var pressScore: Int = 0//按压分数
-    var deduction: Int = 0//扣分
+    var deduction: Float = 0f//扣分
     var blowScore: Int = 0//吹气、通气 分数
 
     //检查环境

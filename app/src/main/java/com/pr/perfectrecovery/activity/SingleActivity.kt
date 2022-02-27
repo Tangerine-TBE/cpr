@@ -65,10 +65,6 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
-//            if (time <= 0) {
-//                ToastUtils.showShort("本次练习已结束")
-//                return@setOnClickListener
-//            }
             if (isStart) {
                 DataVolatile.isStart = true
                 EventBus.getDefault()
@@ -104,6 +100,9 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
                 mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+
+                mTrainingDTO?.prCount = configBean.prCount
+                mTrainingDTO?.qyCount = configBean.qyCount
                 mTrainingDTO?.pressScore = configBean.pressScore
                 mTrainingDTO?.blowScore = configBean.blowScore
                 mTrainingDTO?.processScore = configBean.processScore

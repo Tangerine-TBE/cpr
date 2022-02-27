@@ -331,9 +331,9 @@ class ConfigActivity : BaseActivity() {
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
             val value = p0.toString().trim()
-            if (!TextUtils.isEmpty(value) && value.toInt() >= 10) {
+            if (!TextUtils.isEmpty(value) && value.toFloat() > 0) {
                 dataDTO?.deductionScore =
-                    viewBinding.etDeduction.text.toString().trim().toInt()
+                    viewBinding.etDeduction.text.toString().trim().toFloat()
                 save()
             } else {
                 viewBinding.tvDesc.text = "按压中断时间设定大于10s"

@@ -23,7 +23,7 @@ data class ConfigBean(
     var processScore: Int = 0,//流程分数
     var pressScore: Int = 0,//按压分数
     var blowScore: Int = 0,//吹气分数
-    var deductionScore: Int = 0//中断分数
+    var deductionScore: Float = 0f//中断分数
 ) : Serializable {
     //按压比列计算
     fun prHigh(): Int {

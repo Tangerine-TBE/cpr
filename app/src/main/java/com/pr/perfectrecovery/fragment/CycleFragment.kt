@@ -224,6 +224,17 @@ class CycleFragment : Fragment() {
 
     fun bluetoothDisconnected() {
         setPlayVoice(VOICE_MP3_DIS)
+        val dialog: androidx.appcompat.app.AlertDialog =
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("提示")
+                .setMessage("当前蓝牙已断开！")
+                .setPositiveButton(
+                    "确认"
+                ) { arg0, arg1 ->
+                        activity?.finish()
+                }.create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
     }
 
     /**
@@ -377,18 +388,7 @@ class CycleFragment : Fragment() {
         setRate(viewBinding.chart, dataDTO.pf)
         viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         //执行三次按压深度
-//        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D1)
-//        mHandler5.removeCallbacksAndMessages(null)
-//        mHandler5.postAtTime(Runnable {
-//            viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D2)
-//            mHandler6.removeCallbacksAndMessages(null)
-//            mHandler6.postAtTime(Runnable {
-//                viewBinding.pressLayoutView.smoothScrollTo(dataDTO.L_D3)
-//            }, 33)
-//        }, 33)
-
         if (dataDTO.prSum != prValue) {
-
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()

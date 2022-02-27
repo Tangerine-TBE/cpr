@@ -3,12 +3,10 @@ package com.pr.perfectrecovery.activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.ToastUtils
 import com.clj.fastble.data.BleDevice
 import com.pr.perfectrecovery.R
@@ -16,7 +14,6 @@ import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
-import com.pr.perfectrecovery.utils.DataVolatile
 
 /**
  * 训练模式- 单人 - 多人
@@ -51,13 +48,13 @@ class TrainingSingleActivity : BaseActivity() {
 //        }
         /* =================*/
 
-        if (blueToothList.size > 1) {
-            isSingle = false
-            initMany(blueToothList.size)
-        } else {
+//        if (blueToothList.size > 1) {
+//            isSingle = false
+//            initMany(blueToothList.size)
+//        } else {
             isSingle = true
             initSingle()
-        }
+//        }
     }
 
     /**
@@ -162,7 +159,7 @@ class TrainingSingleActivity : BaseActivity() {
                     return@setOnClickListener
                 }
 
-                var bean = TrainingBean()
+                val bean = TrainingBean()
                 bean.name = name.text.toString()
                 bean.isCheck = mTrainingBean.isCheck
                 // 根据 BleDevice 的count跟学员顺序对应绑定
