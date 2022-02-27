@@ -52,11 +52,18 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.gruops.visibility = View.GONE
             viewBinding.layoutCheck.tvName.text = "${trainingDTO.name}"
             viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prScale}:${trainingDTO.qyScale}"
-            viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"//倒计时
-            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.pressScore}"
+            //倒计时
+            viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"
+            //流程分数
+            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}"
+            //按压分数
+            viewBinding.layoutCheck.tvPress.text = "${trainingDTO.pressScore}"
+            //扣分
             viewBinding.layoutCheck.tvDeduction.text = "${trainingDTO.deduction}"
-            viewBinding.layoutCheck.tvBlowScale.text = "${trainingDTO.blowScore}"
+            //吹气分数
+            viewBinding.layoutCheck.tvBlowNumber.text = "${trainingDTO.blowScore}"
 
+            /*-----------------------------总结得分项----------------------------------*/
             //按压得分
             viewBinding.layoutCheck.tvPressScore.text = ""
             //中断扣分
@@ -64,8 +71,7 @@ class TrainResultActivity : BaseActivity() {
             //通气得分
             viewBinding.layoutCheck.tvVentilationScore.text = ""
             //流程分数
-            processCheck(trainingDTO)
-            viewBinding.layoutCheck.tvProcessScore2.text = ""
+            viewBinding.layoutCheck.tvProcessScore2.text = "" + processCheck(trainingDTO)
 
             //总得分
             //分数星星配置
@@ -174,8 +180,8 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.layoutCheck.check.checkBox10.setOnCheckedChangeListener(
             onCheckedChangeListener
         )
-        if (trainingDTO.pressScore > 0) {
-            return trainingDTO.pressScore / 10 * listCheck.size
+        if (trainingDTO.processScore > 0) {
+            return trainingDTO.processScore / 10 * listCheck.size
         }
         return 0
     }

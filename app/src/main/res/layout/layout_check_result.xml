@@ -185,7 +185,7 @@
                     android:textSize="13sp" />
 
             <TextView
-                    android:id="@+id/tvBlowScale"
+                    android:id="@+id/tvBlowNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#ffffff"

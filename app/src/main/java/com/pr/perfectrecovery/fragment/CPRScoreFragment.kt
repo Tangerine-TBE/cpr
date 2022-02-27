@@ -61,10 +61,10 @@ class CPRScoreFragment : Fragment() {
         dataDTO = GsonUtils.fromJson(decodeString, ConfigBean::class.java)
         dataDTO.let {
             if (it != null) {
-                viewBinding.etDeduction.setText("${it.deductionTime}")
-                viewBinding.etProcess.setText("${it.process}")
-                viewBinding.etCompressions.setText("${it.compressions}")
-                viewBinding.etVentilation.setText("${it.ventilation}")
+                viewBinding.etDeduction.setText("${it.deductionScore}")
+                viewBinding.etProcess.setText("${it.processScore}")
+                viewBinding.etCompressions.setText("${it.pressScore}")
+                viewBinding.etVentilation.setText("${it.blowScore}")
             }
         }
     }
@@ -80,7 +80,7 @@ class CPRScoreFragment : Fragment() {
 
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
-            dataDTO?.deductionTime = viewBinding.etDeduction.text.toString().trim().toInt()
+            dataDTO?.deductionScore = viewBinding.etDeduction.text.toString().trim().toInt()
             dataDTO.let {
                 MMKV.defaultMMKV()
                     .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
@@ -124,9 +124,9 @@ class CPRScoreFragment : Fragment() {
                 if (number > 100) {
                     viewBinding.tvDesc.text = "三项加起来总分 ＜ 100分"
                 } else {
-                    dataDTO?.process = process
-                    dataDTO?.compressions = compressions
-                    dataDTO?.ventilation = ventilation
+                    dataDTO?.processScore = process
+                    dataDTO?.pressScore = compressions
+                    dataDTO?.blowScore = ventilation
                     dataDTO.let {
                         MMKV.defaultMMKV()
                             .encode(BaseConstant.MMKV_WM_CONFIGURATION, GsonUtils.toJson(dataDTO))
