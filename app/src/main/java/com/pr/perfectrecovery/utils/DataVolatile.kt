@@ -4,6 +4,7 @@ import android.util.Log
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.utils.TestVolatile.Err_PrTotal
 import com.pr.perfectrecovery.utils.TestVolatile.top_flag
+import com.tencent.bugly.proguard.i
 import kotlin.math.abs
 
 object DataVolatile {
@@ -53,7 +54,7 @@ object DataVolatile {
 
     var Qliang = 0
 
-    var L_valueSet = intArrayOf(1)
+    var L_valueSet = mutableListOf<Int>()
     var QY_valueSet = mutableListOf<Int>()
     var QY_valueSet2 = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
@@ -89,9 +90,9 @@ object DataVolatile {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val data = "fe06040a0b01052d5303030405010723090ab261" //1、先将接收到的数据转调用工具类的方法换成字符串
+       // val data = "fe06040a0b01052d5303030405010723090ab261" //1、先将接收到的数据转调用工具类的方法换成字符串
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        parseString(data)
+      //  parseString(data)
     }
 
     /**
@@ -203,7 +204,8 @@ object DataVolatile {
             QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
 
             //频率
-            //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+           // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+           // Log.e("TAG9", "按压频率：$pfvalue")
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -327,23 +329,32 @@ object DataVolatile {
     }
 
     var UNBACK_FLAG = 0
-    var ERR_FLAG=0;
-    var PR_DOTTIMSE_NUMBER=0;
+    var ERR_FLAG=0
+    var PR_DOTTIMSE_NUMBER=0
+    var PR_RUN_FLAG=0
+    var MIN_FLAG=0;
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
-       // var sumflag= PR_SUM;
-        PR_DOTTIMSE_NUMBER+=3
-        Log.e("TAG7", "$L_d1  $L_d2  $L_d3")
+        var index =0
+        Log.e("TAG8", "$L_d1  $L_d2  $L_d3")
+        if( PR_RUN_FLAG==1){
+            L_valueSet.add(index,L_d1)
+            L_valueSet.add(index+1,L_d2)
+            L_valueSet.add(index+2,L_d3)
+            index+=3
+        }
         if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
+            low_flag = 0
             return preDistance.toInt()
         }
         // int low_flag=0;
-        if (L_d1 > L_d2) {
+        if (L_d1 >= L_d2) {
+          //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
                 value = L_d3
                 low_flag = 0
@@ -363,77 +374,121 @@ object DataVolatile {
                     }else{
                         ERR_FLAG = 0;
                     }
-                    PR_DOTTIMSE_NUMBER-=1
+                    PR_RUN_FLAG=1;
+                  //  Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                     if(PR_SUM > 1){
-                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30+60)).toInt()
-                        PR_DOTTIMSE_NUMBER=0;
+                       if(L_valueSet.size>30) {
+                           PF_Value=0;
+                           L_valueSet.clear()
+                       }else{
+                           if(MIN_FLAG==1){
+                               PR_DOTTIMSE_NUMBER= L_valueSet.size
+                           }else if(MIN_FLAG==2){
+                               PR_DOTTIMSE_NUMBER= L_valueSet.size+2
+                           }
+                           for(item in L_valueSet) {
+                               Log.e("TAG8", "距离数 ${item}")
+                           }
+                           Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
+                           PF_Value=(60000/(PR_DOTTIMSE_NUMBER*40)).toInt()
+                           PR_DOTTIMSE_NUMBER=0;
+                           index=0
+                           L_valueSet.clear()
+                       }
+
                     }
                    // Log.e("TAG4", "$L_d2")
                     /*val changTimePress = System.currentTimeMillis()
                     if (PR_SUM > 1) {
-                        val time = changTimePress - preTimePress + 40
-                        Log.e("TAG6", "$L_d2")
-                        PF_Value = (60000 / time).toInt()
-                        if (PF_Value > 130) {
-                            PF_Value = 130;
-                        } else if (PF_Value < 80) {
-                            PF_Value = 80;
+                        val time = changTimePress - preTimePress+40
+                        PF_Value = (PF_Value.toInt()+(60000 / time).toInt())/2
+                        if (PF_Value > 150) {
+                            PF_Value = 150;
+                        } else if (PF_Value < 60) {
+                            PF_Value = 60;
                         }
-                     //   Log.e("TAG6", "$PF_Value")
+                      Log.e("TAG6", "PF值：$PF_Value")
                     }
                     preTimePress = changTimePress*/
                 }
+                MIN_FLAG=1
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
+           // PR_DOTTIMSE_NUMBER+=3
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
+
                 // Log.e("TAG5", "$PR_SUM")
                 if(ERR_FLAG == 0){
                     Err_PrTotal(L_d1)
                 }else{
                     ERR_FLAG = 0;
                 }
+                PR_RUN_FLAG=1;
+                //Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                 if(PR_SUM > 1){
-                    PF_Value=(60000/(PR_DOTTIMSE_NUMBER*30+60)).toInt()
-                    PR_DOTTIMSE_NUMBER=0;
-                }
-                // Log.e("TAG6", "$L_d1")
-                /*val changTimePress = System.currentTimeMillis()
-                if (PR_SUM > 1) {
-                    val time = changTimePress - preTimePress + 70
-                    PF_Value = (60000 / time).toInt()
-                    if (PF_Value > 130) {
-                        PF_Value = 130;
-                    } else if (PF_Value < 80) {
-                        PF_Value = 80;
+                    if(L_valueSet.size>30) {
+                        PF_Value=0;
+                        L_valueSet.clear()
+                    }else{
+                        if(MIN_FLAG==1){
+                            PR_DOTTIMSE_NUMBER= L_valueSet.size-2
+                        }else if(MIN_FLAG==2){
+                            PR_DOTTIMSE_NUMBER= L_valueSet.size
+                        }
+                        for(item in L_valueSet) {
+                            Log.e("TAG8", "距离数 ${item}")
+                        }
+                        Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
+                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*40)).toInt()
+                        PR_DOTTIMSE_NUMBER=0;
+                        index=0
+                        L_valueSet.clear()
                     }
-                    // Log.e("TAG6", "$PF_Value")
+                }
+                MIN_FLAG=2
+                // Log.e("TAG6", "$L_d1")
+               /* val changTimePress = System.currentTimeMillis()
+                if (PR_SUM > 1) {
+                    PR_RUN_FLAG=1;
+                    val time = changTimePress - preTimePress+70
+                    PF_Value = (PF_Value.toInt()+(60000 / time).toInt())/2
+                    if (PF_Value > 150) {
+                        PF_Value = 150;
+                    } else if (PF_Value < 60) {
+                        PF_Value = 60;
+                    }
+                     Log.e("TAG6", "PF值：$PF_Value")
                 }
                 preTimePress = changTimePress*/
-               value= L_d1
+                value= L_d1
             } else {
+               // PR_DOTTIMSE_NUMBER+=3
                 if (abs(preDistance - L_d3) < 15) {
                     UNBACK_FLAG = 0
+                    low_flag=0
                     Log.e("TAG7", "回到初始位置，复位未回弹$L_d3")
                 } else {
                     UNBACK_FLAG = 1
                 }
+
                 value = L_d3
             }
 
         } else {
+           // PR_DOTTIMSE_NUMBER+=3
             if (abs(preDistance - L_d2) < 15) {
                 UNBACK_FLAG = 0
                 Log.e("TAG7", "回到初始位置，复位未回弹$L_d2")
+                low_flag=0
             } else {
                 UNBACK_FLAG = 1
             }
             value = L_d2
         }
-        // Log.e("TAG1", "$value")
-        // validDistance=value;
+
         return value
     }
 
