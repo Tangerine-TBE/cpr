@@ -15,7 +15,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pressHigh: Int = 0//按压过大错误数
     var pressRebound: Int = 0//按压未回弹错误数
     var pressAverage: Int = 0//按压平均多少次每分数
-    var pressOutTime: String = ""//按压超时
+    var pressOutTime: Long = 0//按压超时
     var pressFrequency: Int = 0//按压频率
 
     var blowErrorCount: Int = 0//吹气错误数
@@ -32,6 +32,13 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pressScore: Int = 0//按压分数
     var deduction: Float = 0f//扣分
     var blowScore: Int = 0//吹气、通气 分数
+
+    var prManyCount: Int = 0//按压多次
+    var prLessCount: Int = 0//按压少次
+    var qyManyCount: Int = 0//吹气多次
+    var qyLessCount: Int = 0//吹气少次
+
+    var score: Float = 0f//成绩分数
 
     //检查环境
     var check1 = false
@@ -62,6 +69,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     //完成评估
     var check10 = false
+
+    var isCheckBox = false
 
     /**
      * 按压频率合格率
@@ -126,5 +135,39 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
             0
         }
     }
+
+    /**
+     * 按压分数
+     */
+    fun getPrScore(): Float {
+        return if (pressTotal > 0 && prCount > 0) {
+            (pressTotal / prCount).toFloat()
+        } else {
+            0f
+        }
+    }
+
+    /**
+     * 通气分数
+     */
+    fun getQyScore(): Float {
+        return if (blowTotal > 0 && qyCount > 0) {
+            (blowTotal / qyCount).toFloat()
+        } else {
+            0f
+        }
+    }
+
+    /**
+     * 中断扣分 超时扣分
+     */
+    fun getTimeOutScore(): Float {
+        return if (pressOutTime > 0 && deduction > 0) {
+            (pressOutTime / 1000 * deduction)
+        } else {
+            0f
+        }
+    }
+
 
 }

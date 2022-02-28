@@ -44,6 +44,7 @@ class TrainResultActivity : BaseActivity() {
 
     private fun initData() {
         val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
+        trainingDTO.save()
         //判断模式- false 训练  true 考核
         if (trainingDTO.isCheck) {
             viewBinding.layoutCheck.root.visibility = View.VISIBLE
@@ -55,28 +56,38 @@ class TrainResultActivity : BaseActivity() {
             //倒计时
             viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"
             //流程分数
-            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}"
+            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}分"
             //按压分数
-            viewBinding.layoutCheck.tvPress.text = "${trainingDTO.pressScore}"
+            viewBinding.layoutCheck.tvPress.text = "${trainingDTO.pressScore}分"
             //扣分
-            viewBinding.layoutCheck.tvDeduction.text = "${trainingDTO.deduction}"
+            viewBinding.layoutCheck.tvDeduction.text = "${trainingDTO.deduction}分"
             //吹气分数
-            viewBinding.layoutCheck.tvBlowNumber.text = "${trainingDTO.blowScore}"
+            viewBinding.layoutCheck.tvBlowNumber.text = "${trainingDTO.blowScore}分"
 
             /*-----------------------------总结得分项----------------------------------*/
             //按压得分
-            viewBinding.layoutCheck.tvPressScore.text = ""
+            viewBinding.layoutCheck.tvPressScore.text = "${trainingDTO.getPrScore()}"
             //中断扣分
-            viewBinding.layoutCheck.tvInterruptScore.text = ""
+            viewBinding.layoutCheck.tvInterruptScore.text = "${trainingDTO.getTimeOutScore()}"
             //通气得分
-            viewBinding.layoutCheck.tvVentilationScore.text = ""
+            viewBinding.layoutCheck.tvVentilationScore.text = "${trainingDTO.getQyScore()}"
             //流程分数
-            viewBinding.layoutCheck.tvProcessScore2.text = "" + processCheck(trainingDTO)
+            viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
 
-            //总得分
+
             //分数星星配置
-            viewBinding.layoutCheck.ratingBar.progress = 0
-            viewBinding.layoutCheck.tvScore.text = ""
+            viewBinding.layoutCheck.ratingBar.progress = trainingDTO.score.toInt()
+            //总得分
+            viewBinding.layoutCheck.tvScore.text = "${trainingDTO.score}"
+
+            //按压超次
+            viewBinding.tvOutBoutCount.text = "${trainingDTO.prManyCount}次"
+            //按压少次
+            viewBinding.tvSmallBoutCount.text = "${trainingDTO.prLessCount}次"
+            //吹气多次
+            viewBinding.tvBlowBoutCount.text = "${trainingDTO.qyManyCount}次"
+            //吹气少次
+            viewBinding.tvBlowSmallCount.text = "${trainingDTO.qyLessCount}次"
         } else {
             viewBinding.gruops.visibility = View.VISIBLE
             viewBinding.tvTrain.text = "训练"

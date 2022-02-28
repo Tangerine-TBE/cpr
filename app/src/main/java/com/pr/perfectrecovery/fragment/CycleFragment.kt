@@ -196,7 +196,7 @@ class CycleFragment : Fragment() {
         isStart = false
         val trainingDTO = TrainingDTO()
         mBaseDataDTO?.apply {
-            trainingDTO.pressOutTime = TimeUtils.timeParse(timeOut).toString()
+            trainingDTO.pressOutTime = timeOut
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
             trainingDTO.pressLocation = ERR_PR_POSI
@@ -231,7 +231,7 @@ class CycleFragment : Fragment() {
                 .setPositiveButton(
                     "确认"
                 ) { arg0, arg1 ->
-                        activity?.finish()
+                    activity?.finish()
                 }.create()
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
