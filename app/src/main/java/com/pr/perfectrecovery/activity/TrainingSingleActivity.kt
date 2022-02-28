@@ -41,20 +41,15 @@ class TrainingSingleActivity : BaseActivity() {
 //            it.count = 2
 //            blueToothList.add(it)
 //        }
-//        bleDevice = blueToothList[0]
-//        bleDevice?.let {
-//            it.count = 3
-//            blueToothList.add(it)
-//        }
         /* =================*/
 
-//        if (blueToothList.size > 1) {
-//            isSingle = false
-//            initMany(blueToothList.size)
-//        } else {
+        if (blueToothList.size > 1) {
+            isSingle = false
+            initMany(blueToothList.size)
+        } else {
             isSingle = true
             initSingle()
-//        }
+        }
     }
 
     /**
@@ -159,7 +154,7 @@ class TrainingSingleActivity : BaseActivity() {
                     return@setOnClickListener
                 }
 
-                val bean = TrainingBean()
+                var bean = TrainingBean()
                 bean.name = name.text.toString()
                 bean.isCheck = mTrainingBean.isCheck
                 // 根据 BleDevice 的count跟学员顺序对应绑定
