@@ -6,13 +6,13 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('E:\\workspace\\perfect-recovery\\pr.jks')
+            storeFile file('F:\\andriod\\perfect-recovery\\pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'
         }
         release {
-            storeFile file('E:\\workspace\\perfect-recovery\\pr.jks')
+            storeFile file('F:\\andriod\\perfect-recovery\\pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'
@@ -98,6 +98,7 @@ dependencies {
     implementation project(':FastBleLib')
     //图表
     implementation project(':MPChartLib')
+//    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     //串口JAR
     implementation files('libs/CH34xUARTDriver.jar')
     //侧滑删除
@@ -106,6 +107,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.3.1'
     //郭霖-litepal本地数据库
     implementation 'org.litepal.guolindev:core:3.2.3'
+
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.2.0
     implementation 'com.tencent.bugly:crashreport:latest.release'
 
