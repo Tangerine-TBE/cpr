@@ -1,0 +1,415 @@
+Index: app/src/main/java/com/pr/perfectrecovery/utils/DataVolatile.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.utils\r\n\r\nimport android.util.Log\r\nimport com.pr.perfectrecovery.bean.BaseDataDTO\r\nimport com.pr.perfectrecovery.utils.TestVolatile.Err_PrTotal\r\nimport com.pr.perfectrecovery.utils.TestVolatile.top_flag\r\nimport kotlin.math.abs\r\n\r\nobject DataVolatile {\r\n    //电量值：  0-100%\r\n    var VI_Value = 0\r\n\r\n    //距离值：  30-150\r\n    var L_Value = 0\r\n\r\n    //气压值：  0-2000ml\r\n    var QY_Value = 0\r\n\r\n    //蓝牙连接状态：   0-断开 1-连接\r\n    var BLS_Value = 0\r\n\r\n    //USB连接状态: 0-断开 1-连接\r\n    var ULS_Value = 0\r\n\r\n    //通道打开状态 0-关闭 1-打开\r\n    var TOS_Value = 0\r\n\r\n    //连接方式  0-蓝牙 1-连接USB\r\n    var LKS_Value = 0\r\n\r\n    //按压位置正确  0-错误  1-正确\r\n    var PSR_Value = 0\r\n\r\n    //工作方式：00——休眠   01——工作    02——待机\r\n    var WS_Value = 0\r\n\r\n    //按压频率：0-200\r\n    var PF_Value = 0\r\n\r\n    //吹气频率：0-200\r\n    var CF_Value = 0\r\n\r\n    //按压次数\r\n    var PR_SUM = 0\r\n\r\n    //吹气次数\r\n    var QY_SUM = 0\r\n\r\n    //按压上升或下降标志位\r\n    var low_flag = 0\r\n\r\n    val dataDTO = BaseDataDTO()\r\n\r\n    var Qliang = 0\r\n\r\n    var L_valueSet = intArrayOf(1)\r\n    var QY_valueSet = mutableListOf<Int>()\r\n    var QY_valueSet2 = mutableListOf<Int>()\r\n    var pt_valueSet = mutableListOf<Int>()\r\n\r\n    /**\r\n     * array 数据列表\r\n     * isClear 清除数据集合\r\n     */\r\n    fun max(array: List<Int>, isClear: Boolean): Int {\r\n        var maximum = 0\r\n        for (i in array.indices) {\r\n            if (maximum < array[i]) {\r\n                maximum = array[i]\r\n            }\r\n        }\r\n        if (isClear) {\r\n            QY_valueSet.clear()\r\n        }\r\n        return maximum\r\n    }\r\n\r\n    /**\r\n     * 获取吹气值和\r\n     */\r\n    fun qyValue(array: List<Int>): Int {\r\n        var sum = 0\r\n        for (i in array.indices) {\r\n            sum += i\r\n        }\r\n        QY_valueSet2.clear()\r\n        return sum\r\n    }\r\n\r\n    @JvmStatic\r\n    fun main(args: Array<String>) {\r\n        val data = \"fe06040a0b01052d5303030405010723090ab261\" //1、先将接收到的数据转调用工具类的方法换成字符串\r\n        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));\r\n        parseString(data)\r\n    }\r\n\r\n    /**\r\n     * 解析蓝发送的数据\r\n     *\r\n     * @param data\r\n     */\r\n    fun parseString(data: String?): BaseDataDTO {\r\n        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));\r\n        if (data != null && data.length == 40) {\r\n            //模型状态需先判断\r\n            val state = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        28,\r\n                        30\r\n                    )\r\n                )\r\n            )\r\n            if (state and 1 == 1) {\r\n                BLS_Value = 1\r\n            } else {\r\n                BLS_Value = 0\r\n            }\r\n            if (state and 2 == 2) {\r\n                ULS_Value = 1\r\n            } else {\r\n                ULS_Value = 0\r\n            }\r\n            if (state and 4 == 4) {\r\n                TOS_Value = 1\r\n            } else {\r\n                TOS_Value = 0\r\n            }\r\n            if (state and 8 == 8) {\r\n                LKS_Value = 1\r\n            } else {\r\n                LKS_Value = 0\r\n            }\r\n//            if (state and 16 == 16) {\r\n//                PSR_Value = 1\r\n//            } else {\r\n//                PSR_Value = 0\r\n//            }\r\n            if (state and 8 == 8) {\r\n                PSR_Value = 1\r\n            } else {\r\n                PSR_Value = 0\r\n            }\r\n            //按压距离\r\n            val L_d1 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        12,\r\n                        14\r\n                    )\r\n                )\r\n            )\r\n            val L_d2 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        14,\r\n                        16\r\n                    )\r\n                )\r\n            )\r\n            val L_d3 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        16,\r\n                        18\r\n                    )\r\n                )\r\n            )\r\n            L_Value = selectValue_P(L_d1, L_d2, L_d3)\r\n            //清空频率\r\n            pt(L_Value)\r\n            //吹气数据\r\n            val QY_d1 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        18,\r\n                        20\r\n                    )\r\n                )\r\n            )\r\n            val QY_d2 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        20,\r\n                        22\r\n                    )\r\n                )\r\n            )\r\n            val QY_d3 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        22,\r\n                        24\r\n                    )\r\n                )\r\n            )\r\n\r\n            //不做气压值的算法处理\r\n            QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)\r\n\r\n            //频率\r\n            //PF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes(\"00\" + data.substring(24, 26)));\r\n            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes(\"00\" + data.substring(26, 28)));\r\n            VI_Value = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        30,\r\n                        32\r\n                    )\r\n                )\r\n            )\r\n        }\r\n        val stringBuffer = StringBuffer()\r\n        stringBuffer.append(\"电量值：\").append(VI_Value)\r\n        stringBuffer.append(\"距离值：\").append(L_Value)\r\n        stringBuffer.append(\"气压值：\").append(QY_Value)\r\n        stringBuffer.append(\"蓝牙连接值：\").append(BLS_Value)\r\n        stringBuffer.append(\"USB连接值：\").append(ULS_Value)\r\n        stringBuffer.append(\"通道打开状态值：\").append(TOS_Value)\r\n        stringBuffer.append(\"连接方式值：\").append(LKS_Value)\r\n        stringBuffer.append(\"按压位置正确值：\").append(PSR_Value)\r\n        stringBuffer.append(\"工作方式值：\").append(WS_Value)\r\n        stringBuffer.append(\"按压频率值：\").append(PF_Value)\r\n        stringBuffer.append(\"吹气频率值：\").append(CF_Value)\r\n\r\n        dataDTO.prSum = PR_SUM\r\n        dataDTO.qySum = QY_SUM\r\n        dataDTO.electricity = VI_Value\r\n        dataDTO.distance = L_Value\r\n        dataDTO.bpValue = QY_Value\r\n        dataDTO.blsType = BLS_Value\r\n        dataDTO.usbConnectType = ULS_Value\r\n        dataDTO.aisleType = TOS_Value\r\n        dataDTO.connectType = LKS_Value\r\n        dataDTO.psrType = PSR_Value\r\n        dataDTO.workType = WS_Value\r\n        dataDTO.cf = CF_Value\r\n        dataDTO.pf = PF_Value\r\n        dataDTO.ERR_PR_HIGH = ERR_PR_HIGH\r\n        dataDTO.ERR_PR_LOW = ERR_PR_LOW\r\n        dataDTO.ERR_PR_POSI = ERR_PR_POSI\r\n        dataDTO.ERR_QY_CLOSE = ERR_QY_CLOSE\r\n        dataDTO.ERR_QY_DEAD = ERR_QY_DEAD\r\n        dataDTO.ERR_QY_HIGH = ERR_QY_HIGH\r\n        dataDTO.ERR_QY_LOW = ERR_QY_LOW\r\n        return dataDTO\r\n    }\r\n\r\n    fun dataClear() {\r\n        //电量值：  0-100%\r\n        VI_Value = 0\r\n        //距离值：  30-150\r\n        L_Value = 0\r\n        //气压值：  0-2000ml\r\n        QY_Value = 0\r\n        //蓝牙连接状态：   0-断开 1-连接\r\n        BLS_Value = 0\r\n        //按压频率：0-200\r\n        PF_Value = 0\r\n        //吹气频率：0-200\r\n        CF_Value = 0\r\n        //按压次数\r\n        PR_SUM = 0\r\n        //吹气次数\r\n        QY_SUM = 0\r\n        ERR_PR_HIGH = 0\r\n        ERR_PR_LOW = 0\r\n        ERR_PR_POSI = 0\r\n        ERR_QY_CLOSE = 0\r\n        ERR_QY_DEAD = 0\r\n        ERR_QY_HIGH = 0\r\n        ERR_QY_LOW = 0\r\n    }\r\n\r\n    fun setCF_Value() {\r\n        CF_Value = 0\r\n    }\r\n\r\n    var preTimePress: Long = 0\r\n\r\n    /*\r\n* 获取初始位置，每次连接成功后调用一次初始化方法\r\n* */\r\n\r\n    var preDistance: Long = 180\r\n\r\n    fun initPreDistance(data: String?) {\r\n        // long value=180;\r\n        if (data != null && data.length == 40) {\r\n            //按压距离\r\n            val L_d1 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        12,\r\n                        14\r\n                    )\r\n                )\r\n            )\r\n            val L_d2 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        14,\r\n                        16\r\n                    )\r\n                )\r\n            )\r\n            val L_d3 = DataFormatUtils.byteArrayToInt(\r\n                DataFormatUtils.hexStr2Bytes(\r\n                    \"00\" + data.substring(\r\n                        16,\r\n                        18\r\n                    )\r\n                )\r\n            )\r\n            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()\r\n        }\r\n    }\r\n/*\r\n* 优化算法：增加和上一次最小值的判断\r\n*\r\n* */\r\n  /*  var validDistance:Long = preDistance;\r\n    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {\r\n       var value=0\r\n        //最高点消抖（10mm）\r\n        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(\r\n                preDistance - L_d3\r\n            ) < 10\r\n        ) {\r\n            return preDistance.toInt()\r\n        }\r\n        if(validDistance>=L_d1){\r\n            if(L_d1>L_d2){\r\n                if(L_d2>=L_d3){\r\n                    value = L_d3\r\n                    low_flag = 0\r\n                        //  validDistance=value.toLong()\r\n                }else{\r\n                    low_flag = 1\r\n                    PR_SUM++\r\n                    Err_PrTotal(L_d2)\r\n                    val changTimePress = System.currentTimeMillis()\r\n                    if (PR_SUM > 1) {\r\n                        val time = changTimePress - preTimePress\r\n                        PF_Value = (60000 / time).toInt()\r\n                        if (PF_Value > 120) {\r\n                            PF_Value = 120;\r\n                        } else if (PF_Value < 80) {\r\n                            PF_Value = 80;\r\n                        }\r\n                    }\r\n                    preTimePress = changTimePress\r\n                    value = L_d2\r\n                }\r\n            }else if(L_d2<L_d3){\r\n                low_flag = 1\r\n                PR_SUM++\r\n                Err_PrTotal(L_d1)\r\n                val changTimePress = System.currentTimeMillis()\r\n                if (PR_SUM > 1) {\r\n                    val time = changTimePress - preTimePress\r\n                    PF_Value = (60000 / time).toInt()\r\n                    if (PF_Value > 180) {\r\n                        PF_Value = 180;\r\n                    } else if (PF_Value < 60) {\r\n                        PF_Value = 60;\r\n                    }\r\n                }\r\n                preTimePress = changTimePress\r\n                value = L_d1\r\n            }else{\r\n\r\n            }\r\n\r\n        }else{\r\n\r\n        }\r\n\r\n\r\n        return value\r\n\r\n\r\n    }*/\r\n\r\n\r\n\r\n\r\n\r\n    /*\r\n    * 根据按压三次相邻的距离值找到有效值。\r\n    * */\r\n    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {\r\n        var value = 0\r\n        Log.e(\"TAG5\", \"$L_d1  $L_d2  $L_d3\")\r\n        if ( abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10\r\n        ) {\r\n            return preDistance.toInt()\r\n        }\r\n        // int low_flag=0;\r\n        if (L_d1 > L_d2) {\r\n            if (L_d2 >= L_d3 ) {\r\n                value = L_d3\r\n                low_flag = 0\r\n            } else {\r\n                if( low_flag==0){//防止在上升到最高点出现抖动导致次数误增加\r\n                    low_flag = 1\r\n                    PR_SUM++\r\n                  //  Log.e(\"TAG5\", \"$PR_SUM\")\r\n                    Err_PrTotal(L_d2)\r\n                    val changTimePress = System.currentTimeMillis()\r\n                    if (PR_SUM > 1) {\r\n                        val time = changTimePress - preTimePress+40\r\n                        PF_Value = (60000 / time).toInt()\r\n                        if (PF_Value > 130) {\r\n                            PF_Value = 130;\r\n                        } else if (PF_Value < 80) {\r\n                            PF_Value = 80;\r\n                        }\r\n                        Log.e(\"TAG4\", \"$PF_Value\")\r\n                    }\r\n                    preTimePress = changTimePress\r\n                }\r\n                value = L_d2\r\n            }\r\n        } else if(L_d2 < L_d3 ) {\r\n            if (low_flag == 0) {\r\n                low_flag = 1\r\n                PR_SUM++\r\n               // Log.e(\"TAG5\", \"$PR_SUM\")\r\n                Err_PrTotal(L_d1)\r\n                val changTimePress = System.currentTimeMillis()\r\n                if (PR_SUM > 1) {\r\n                    val time = changTimePress - preTimePress+70\r\n                    PF_Value = (60000 / time).toInt()\r\n                    if (PF_Value > 130) {\r\n                        PF_Value = 130;\r\n                    } else if (PF_Value < 80) {\r\n                        PF_Value = 80;\r\n                    }\r\n                    Log.e(\"TAG4\", \"$PF_Value\")\r\n                }\r\n                preTimePress = changTimePress\r\n                return L_d1\r\n            }else{\r\n                value=L_d3\r\n            }\r\n\r\n        } else {\r\n            value = L_d2\r\n        }\r\n       // Log.e(\"TAG1\", \"$value\")\r\n       // validDistance=value;\r\n        return value\r\n    }\r\n\r\n    //按压错误-按压不足\r\n    var ERR_PR_LOW = 0\r\n\r\n    //按压错误-按压过大\r\n    var ERR_PR_HIGH = 0\r\n\r\n    //按压错误-按压位置错误\r\n    var ERR_PR_POSI = 0\r\n\r\n    /**\r\n     * 初始化按压区间值\r\n     */\r\n    val PR_LOW_VALUE = 45\r\n    val PR_HIGH_VALUE = 65\r\n\r\n    private fun Err_PrTotal(l: Int) {\r\n\r\n        if (PSR_Value == 0) {\r\n            ERR_PR_POSI++\r\n        } else {\r\n            var value=abs(preDistance - l)\r\n            if (value < PR_LOW_VALUE) {\r\n                ERR_PR_LOW++\r\n             //   Log.e(\"TAG1\", \"按压不足\")\r\n            //    Log.e(\"TAG1\", \"$value\")\r\n            } else if (value > PR_HIGH_VALUE) {\r\n                ERR_PR_HIGH++\r\n            //    Log.e(\"TAG2\", \"按压过深\")\r\n             //   Log.e(\"TAG2\", \"$value\")\r\n            }\r\n           // Log.e(\"TAG3\", \"$value\")\r\n        }\r\n    }\r\n\r\n    //吹气错误-气压不足\r\n    var ERR_QY_LOW = 0\r\n\r\n    //吹气错误-气压过大\r\n    var ERR_QY_HIGH = 0\r\n\r\n    //吹气错误-气压进胃\r\n    var ERR_QY_DEAD = 0\r\n\r\n    //吹气错误-气道未打开错误\r\n    var ERR_QY_CLOSE = 0\r\n\r\n    fun ERR_QyTotal(value: Int) {\r\n        if (TOS_Value == 0) {\r\n            ERR_QY_CLOSE++\r\n        } else {\r\n            if (value in 1..39) {\r\n                ERR_QY_LOW++\r\n            } else if (value in 81..120) {\r\n                ERR_QY_HIGH++\r\n            } else if (value > 120) {\r\n                ERR_QY_DEAD++\r\n            }\r\n        }\r\n    }\r\n\r\n    var preTimeQY: Long = 0\r\n\r\n    /*\r\n * 根据吹气三次相邻的气压值找到有效值。\r\n * */\r\n    fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {\r\n        var value = 0\r\n        if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {\r\n            top_flag = 1\r\n            Qliang = (QY_d1 + QY_d2 + QY_d3) * 30\r\n        }\r\n        if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {\r\n            if (top_flag == 1) {\r\n                ERR_QyTotal(max(QY_valueSet, false))//每次筛选最大吹气值，去做错误次数的判断\r\n                val changTimePress = System.currentTimeMillis()\r\n                ++QY_SUM\r\n                top_flag = 0\r\n                Qliang = 0\r\n                if (QY_SUM > 1) {\r\n                    val time = changTimePress - preTimeQY\r\n                    CF_Value = (60000 / time).toInt()\r\n                }\r\n                preTimeQY = changTimePress\r\n            }\r\n        }\r\n        value = if (QY_d1 <= QY_d2) {\r\n            if (QY_d2 <= QY_d3) {\r\n                QY_d3\r\n            } else {\r\n                //  top_flag=1;\r\n                QY_d2\r\n            }\r\n        } else {\r\n            if (QY_d2 >= QY_d3) {\r\n                QY_d3\r\n            } else {\r\n                QY_d2\r\n            }\r\n        }\r\n        if (value > 0) {\r\n            QY_valueSet2.add(value)\r\n            QY_valueSet.add(value)\r\n        }\r\n        return value\r\n    }\r\n\r\n\r\n    //判断按压是否停止\r\n    private const val count = 20\r\n    private fun pt(p: Int): Boolean {\r\n        if (p > (preDistance - 5)) {\r\n            if (pt_valueSet.size == count) pt_valueSet.removeFirst()\r\n            pt_valueSet.add(p)\r\n            if (pt_valueSet.size == count) {\r\n                pt_valueSet.clear()\r\n                PF_Value = 0\r\n                return true\r\n            }\r\n        } else {\r\n            pt_valueSet.clear()\r\n        }\r\n        return false\r\n    }\r\n\r\n    fun getData(): BaseDataDTO? {\r\n        return dataDTO\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/utils/DataVolatile.kt b/app/src/main/java/com/pr/perfectrecovery/utils/DataVolatile.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/utils/DataVolatile.kt	
++++ b/app/src/main/java/com/pr/perfectrecovery/utils/DataVolatile.kt	
+@@ -236,6 +236,7 @@
+         dataDTO.workType = WS_Value
+         dataDTO.cf = CF_Value
+         dataDTO.pf = PF_Value
++        dataDTO.isStart = isStart
+         dataDTO.ERR_PR_HIGH = ERR_PR_HIGH
+         dataDTO.ERR_PR_LOW = ERR_PR_LOW
+         dataDTO.ERR_PR_POSI = ERR_PR_POSI
+@@ -246,7 +247,11 @@
+         return dataDTO
+     }
+ 
++    //是否点击开始
++    var isStart = false
++
+     fun dataClear() {
++        isStart = false
+         //电量值：  0-100%
+         VI_Value = 0
+         //距离值：  30-150
+@@ -319,97 +324,94 @@
+ * 优化算法：增加和上一次最小值的判断
+ *
+ * */
+-  /*  var validDistance:Long = preDistance;
+-    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+-       var value=0
+-        //最高点消抖（10mm）
+-        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
+-                preDistance - L_d3
+-            ) < 10
+-        ) {
+-            return preDistance.toInt()
+-        }
+-        if(validDistance>=L_d1){
+-            if(L_d1>L_d2){
+-                if(L_d2>=L_d3){
+-                    value = L_d3
+-                    low_flag = 0
+-                        //  validDistance=value.toLong()
+-                }else{
+-                    low_flag = 1
+-                    PR_SUM++
+-                    Err_PrTotal(L_d2)
+-                    val changTimePress = System.currentTimeMillis()
+-                    if (PR_SUM > 1) {
+-                        val time = changTimePress - preTimePress
+-                        PF_Value = (60000 / time).toInt()
+-                        if (PF_Value > 120) {
+-                            PF_Value = 120;
+-                        } else if (PF_Value < 80) {
+-                            PF_Value = 80;
+-                        }
+-                    }
+-                    preTimePress = changTimePress
+-                    value = L_d2
+-                }
+-            }else if(L_d2<L_d3){
+-                low_flag = 1
+-                PR_SUM++
+-                Err_PrTotal(L_d1)
+-                val changTimePress = System.currentTimeMillis()
+-                if (PR_SUM > 1) {
+-                    val time = changTimePress - preTimePress
+-                    PF_Value = (60000 / time).toInt()
+-                    if (PF_Value > 180) {
+-                        PF_Value = 180;
+-                    } else if (PF_Value < 60) {
+-                        PF_Value = 60;
+-                    }
+-                }
+-                preTimePress = changTimePress
+-                value = L_d1
+-            }else{
++    /*  var validDistance:Long = preDistance;
++      fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
++         var value=0
++          //最高点消抖（10mm）
++          if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(
++                  preDistance - L_d3
++              ) < 10
++          ) {
++              return preDistance.toInt()
++          }
++          if(validDistance>=L_d1){
++              if(L_d1>L_d2){
++                  if(L_d2>=L_d3){
++                      value = L_d3
++                      low_flag = 0
++                          //  validDistance=value.toLong()
++                  }else{
++                      low_flag = 1
++                      PR_SUM++
++                      Err_PrTotal(L_d2)
++                      val changTimePress = System.currentTimeMillis()
++                      if (PR_SUM > 1) {
++                          val time = changTimePress - preTimePress
++                          PF_Value = (60000 / time).toInt()
++                          if (PF_Value > 120) {
++                              PF_Value = 120;
++                          } else if (PF_Value < 80) {
++                              PF_Value = 80;
++                          }
++                      }
++                      preTimePress = changTimePress
++                      value = L_d2
++                  }
++              }else if(L_d2<L_d3){
++                  low_flag = 1
++                  PR_SUM++
++                  Err_PrTotal(L_d1)
++                  val changTimePress = System.currentTimeMillis()
++                  if (PR_SUM > 1) {
++                      val time = changTimePress - preTimePress
++                      PF_Value = (60000 / time).toInt()
++                      if (PF_Value > 180) {
++                          PF_Value = 180;
++                      } else if (PF_Value < 60) {
++                          PF_Value = 60;
++                      }
++                  }
++                  preTimePress = changTimePress
++                  value = L_d1
++              }else{
+ 
+-            }
++              }
+ 
+-        }else{
++          }else{
+ 
+-        }
++          }
+ 
+ 
+-        return value
++          return value
+ 
+ 
+-    }*/
++      }*/
+ 
+ 
+-
+-
+-
+     /*
+     * 根据按压三次相邻的距离值找到有效值。
+     * */
+     fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+         var value = 0
+         Log.e("TAG5", "$L_d1  $L_d2  $L_d3")
+-        if ( abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
++        if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
+         ) {
+             return preDistance.toInt()
+         }
+         // int low_flag=0;
+         if (L_d1 > L_d2) {
+-            if (L_d2 >= L_d3 ) {
++            if (L_d2 >= L_d3) {
+                 value = L_d3
+                 low_flag = 0
+             } else {
+-                if( low_flag==0){//防止在上升到最高点出现抖动导致次数误增加
++                if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
+                     low_flag = 1
+                     PR_SUM++
+-                  //  Log.e("TAG5", "$PR_SUM")
++                    //  Log.e("TAG5", "$PR_SUM")
+                     Err_PrTotal(L_d2)
+                     val changTimePress = System.currentTimeMillis()
+                     if (PR_SUM > 1) {
+-                        val time = changTimePress - preTimePress+40
++                        val time = changTimePress - preTimePress + 40
+                         PF_Value = (60000 / time).toInt()
+                         if (PF_Value > 130) {
+                             PF_Value = 130;
+@@ -422,15 +424,15 @@
+                 }
+                 value = L_d2
+             }
+-        } else if(L_d2 < L_d3 ) {
++        } else if (L_d2 < L_d3) {
+             if (low_flag == 0) {
+                 low_flag = 1
+                 PR_SUM++
+-               // Log.e("TAG5", "$PR_SUM")
++                // Log.e("TAG5", "$PR_SUM")
+                 Err_PrTotal(L_d1)
+                 val changTimePress = System.currentTimeMillis()
+                 if (PR_SUM > 1) {
+-                    val time = changTimePress - preTimePress+70
++                    val time = changTimePress - preTimePress + 70
+                     PF_Value = (60000 / time).toInt()
+                     if (PF_Value > 130) {
+                         PF_Value = 130;
+@@ -441,15 +443,15 @@
+                 }
+                 preTimePress = changTimePress
+                 return L_d1
+-            }else{
+-                value=L_d3
++            } else {
++                value = L_d3
+             }
+ 
+         } else {
+             value = L_d2
+         }
+-       // Log.e("TAG1", "$value")
+-       // validDistance=value;
++        // Log.e("TAG1", "$value")
++        // validDistance=value;
+         return value
+     }
+ 
+@@ -465,25 +467,24 @@
+     /**
+      * 初始化按压区间值
+      */
+-    val PR_LOW_VALUE = 45
+-    val PR_HIGH_VALUE = 65
++    var PR_LOW_VALUE = 45
++    var PR_HIGH_VALUE = 65
+ 
+     private fun Err_PrTotal(l: Int) {
+-
+         if (PSR_Value == 0) {
+             ERR_PR_POSI++
+         } else {
+-            var value=abs(preDistance - l)
++            val value = abs(preDistance - l)
+             if (value < PR_LOW_VALUE) {
+                 ERR_PR_LOW++
+-             //   Log.e("TAG1", "按压不足")
+-            //    Log.e("TAG1", "$value")
++                //   Log.e("TAG1", "按压不足")
++                //    Log.e("TAG1", "$value")
+             } else if (value > PR_HIGH_VALUE) {
+                 ERR_PR_HIGH++
+-            //    Log.e("TAG2", "按压过深")
+-             //   Log.e("TAG2", "$value")
++                //    Log.e("TAG2", "按压过深")
++                //   Log.e("TAG2", "$value")
+             }
+-           // Log.e("TAG3", "$value")
++            // Log.e("TAG3", "$value")
+         }
+     }
+ 
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    id 'com.android.application'\r\n    id 'kotlin-android'\r\n}\r\n\r\nandroid {\r\n    signingConfigs {\r\n        debug {\r\n            storeFile file('C:\\\\Users\\\\Administrator\\\\Desktop\\\\perfect-recovery\\\\pr.jks')\r\n            storePassword 'pr123456'\r\n            keyAlias 'pr'\r\n            keyPassword 'pr123456'\r\n        }\r\n        release {\r\n            storeFile file('C:\\\\Users\\\\Administrator\\\\Desktop\\\\perfect-recovery\\\\pr.jks')\r\n            storePassword 'pr123456'\r\n            keyAlias 'pr'\r\n            keyPassword 'pr123456'\r\n        }\r\n    }\r\n    compileSdk 31\r\n\r\n    defaultConfig {\r\n        applicationId \"com.pr.perfectrecovery\"\r\n        minSdk 21\r\n        targetSdk 31\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n\r\n    // 自定义打包名称\r\n    android.applicationVariants.all { variant ->\r\n        variant.outputs.all {\r\n            outputFileName = \"PR_APK_${buildType.name}_V${versionName}_${generateTime()}.apk\"\r\n        }\r\n    }\r\n\r\n    compileOptions {\r\n        sourceCompatibility JavaVersion.VERSION_1_8\r\n        targetCompatibility JavaVersion.VERSION_1_8\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = '1.8'\r\n    }\r\n\r\n    buildFeatures {\r\n        viewBinding true\r\n    }\r\n}\r\n//构建时间\r\nstatic def generateTime() {\r\n    return new Date().format(\"yyyy_MM_dd_HH_mm\")\r\n}\r\n\r\ndependencies {\r\n\r\n    implementation 'androidx.core:core-ktx:1.3.2'\r\n    implementation 'androidx.appcompat:appcompat:1.2.0'\r\n    implementation 'com.google.android.material:material:1.3.0'\r\n    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'\r\n    implementation 'androidx.fragment:fragment-ktx:1.3.2'\r\n    testImplementation 'junit:junit:4.+'\r\n    androidTestImplementation 'androidx.test.ext:junit:1.1.2'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'\r\n    //图表库\r\n//    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'\r\n//    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.1'\r\n//    implementation 'com.github.AAChartModel:AAChartCore-Kotlin:-SNAPSHOT'\r\n    //autoSize 适配框架\r\n    implementation 'me.jessyan:autosize:1.2.1'\r\n\r\n    implementation 'org.xclcharts:lib:2.4'\r\n    //tabLayout\r\n    implementation 'com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2@aar'\r\n    //万能适配器\r\n    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'\r\n    // 腾讯bugly--sdk\r\n    implementation 'com.tencent.bugly:crashreport:4.0.0'\r\n    //Utils\r\n    implementation 'com.blankj:utilcode:1.30.7'\r\n    //MMKV\r\n    implementation 'com.tencent:mmkv-static:1.2.12'\r\n    //GSON\r\n    implementation 'com.google.code.gson:gson:2.8.9'\r\n    //蓝牙框架\r\n    implementation project(':FastBleLib')\r\n    //图表\r\n    implementation project(':MPChartLib')\r\n//    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'\r\n    //串口JAR\r\n    implementation files('libs/CH34xUARTDriver.jar')\r\n    //侧滑删除\r\n    implementation 'com.yanzhenjie.recyclerview:x:1.3.2'\r\n    //EventBus\r\n    implementation 'org.greenrobot:eventbus:3.3.1'\r\n    //郭霖-litepal本地数据库\r\n    implementation 'org.litepal.guolindev:core:3.2.3'\r\n\r\n    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.2.0\r\n    implementation 'com.tencent.bugly:crashreport:latest.release'\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	
++++ b/app/build.gradle	
+@@ -6,13 +6,13 @@
+ android {
+     signingConfigs {
+         debug {
+-            storeFile file('C:\\Users\\Administrator\\Desktop\\perfect-recovery\\pr.jks')
++            storeFile file('E:\\workSpace\\perfect-recovery\\pr.jks')
+             storePassword 'pr123456'
+             keyAlias 'pr'
+             keyPassword 'pr123456'
+         }
+         release {
+-            storeFile file('C:\\Users\\Administrator\\Desktop\\perfect-recovery\\pr.jks')
++            storeFile file('E:\\workspace\\perfect-recovery\\pr.jks')
+             storePassword 'pr123456'
+             keyAlias 'pr'
+             keyPassword 'pr123456'
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.fragment\r\n\r\nimport android.graphics.Color\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport androidx.core.content.ContextCompat\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.lifecycle.ViewModelProvider\r\nimport com.blankj.utilcode.util.GsonUtils\r\nimport com.github.mikephil.charting.charts.LineChart\r\nimport com.github.mikephil.charting.components.XAxis\r\nimport com.github.mikephil.charting.components.XAxis.XAxisPosition\r\nimport com.github.mikephil.charting.components.YAxis\r\nimport com.github.mikephil.charting.data.*\r\nimport com.github.mikephil.charting.interfaces.datasets.IBarDataSet\r\nimport com.pr.perfectrecovery.R\r\nimport com.pr.perfectrecovery.base.BaseConstant\r\nimport com.pr.perfectrecovery.bean.BaseDataDTO\r\nimport com.pr.perfectrecovery.bean.MessageEventData\r\nimport com.pr.perfectrecovery.bean.ScoringConfigBean\r\nimport com.pr.perfectrecovery.databinding.ChartFragmentBinding\r\nimport com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel\r\nimport com.pr.perfectrecovery.livedata.StatusLiveData\r\nimport com.pr.perfectrecovery.utils.DataVolatile\r\nimport com.tencent.mmkv.MMKV\r\nimport org.greenrobot.eventbus.EventBus\r\nimport org.greenrobot.eventbus.Subscribe\r\nimport org.greenrobot.eventbus.ThreadMode\r\nimport java.util.*\r\n\r\n/**\r\n * 曲线\r\n */\r\nclass ChartFragment : Fragment() {\r\n    private lateinit var viewBinding: ChartFragmentBinding\r\n    private lateinit var configBean: ScoringConfigBean\r\n\r\n    companion object {\r\n        fun newInstance() = ChartFragment()\r\n    }\r\n\r\n    private lateinit var viewModel: ChartViewModel\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View? {\r\n        viewBinding = ChartFragmentBinding.inflate(layoutInflater)\r\n        return viewBinding.root\r\n    }\r\n\r\n    override fun onActivityCreated(savedInstanceState: Bundle?) {\r\n        super.onActivityCreated(savedInstanceState)\r\n        EventBus.getDefault().register(this)\r\n        viewModel = ViewModelProvider(this).get(ChartViewModel::class.java)\r\n        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)\r\n        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)\r\n        initView()\r\n    }\r\n\r\n    //吹气量统计\r\n    private var qyValue = 0\r\n\r\n    private fun initView() {\r\n\r\n        //曲线图表\r\n        val data: LineData = getData(0)\r\n        val data1: LineData = getData(DataVolatile.preDistance.toInt())\r\n        val data2: LineData = getData(0)\r\n        // add some transparency to the color with \"& 0x90FFFFFF\"\r\n        initLineChart(viewBinding.lineChart, data)\r\n        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)\r\n        initLineChart(viewBinding.lineChart2, data2)\r\n        StatusLiveData.data.observe(requireActivity()) {\r\n            setData(it)\r\n            addEntry(data, viewBinding.lineChart, it.cf.toFloat())\r\n            addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())\r\n            addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())\r\n            if (qyValue != it.qySum) {\r\n                qyValue = it.qySum\r\n                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)\r\n                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)\r\n            } else {\r\n                addBarEntry(0, 0)\r\n            }\r\n            //吹气错误数统计\r\n            viewBinding.tvLungCount.text =\r\n                \"${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}\"\r\n            //按压错误数统计\r\n            viewBinding.tvHeartCount.text =\r\n                \"${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}\"\r\n            //按压总数\r\n            viewBinding.tvLungTotal.text = \"/${it.qySum}\"\r\n            viewBinding.tvHeartTotal.text = \"/${it.prSum}\"\r\n        }\r\n\r\n        initBarChart()\r\n        viewBinding.constraintlayout2.setOnClickListener {\r\n            //addBarEntry(Random().nextInt(800))\r\n        }\r\n\r\n        viewBinding.constraintlayout.setOnClickListener {\r\n            addEntry(data, viewBinding.lineChart, 0f)\r\n        }\r\n    }\r\n\r\n    private fun initLineChart(lineChart: LineChart, lineData: LineData) {\r\n        // apply styling\r\n        // holder.chart.setValueTypeface(mTf);\r\n\r\n        // apply styling\r\n        // holder.chart.setValueTypeface(mTf);\r\n        lineChart.description.isEnabled = false\r\n        lineChart.setTouchEnabled(false)\r\n        lineChart.setPinchZoom(false)\r\n        lineChart.setDrawGridBackground(false)\r\n        lineChart.setNoDataText(\"\")\r\n        val xAxis: XAxis = lineChart.xAxis\r\n        xAxis.setDrawGridLines(false)\r\n        xAxis.setDrawAxisLine(false)\r\n        xAxis.granularity = 1f\r\n//        xAxis.setLabelCount(30, true)\r\n        xAxis.position = XAxisPosition.BOTTOM\r\n\r\n        val leftAxis: YAxis = lineChart.axisLeft\r\n        leftAxis.setLabelCount(5, false)\r\n        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)\r\n\r\n        val rightAxis: YAxis = lineChart.axisRight\r\n        rightAxis.setLabelCount(5, false)\r\n        rightAxis.setDrawGridLines(false)\r\n        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)\r\n        (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)\r\n\r\n        xAxis.isEnabled = false\r\n        leftAxis.isEnabled = false\r\n        rightAxis.isEnabled = false\r\n        xAxis.textColor = Color.WHITE\r\n\r\n        val l = lineChart.legend\r\n        l.isEnabled = false\r\n\r\n        // set data\r\n        lineChart.data = lineData\r\n        // do not forget to refresh the chart\r\n        // holder.chart.invalidate();\r\n\r\n        // do not forget to refresh the chart\r\n        // holder.chart.invalidate();\r\n        lineChart.animateX(750)\r\n    }\r\n\r\n    var mBarDataSet: BarDataSet? = null\r\n    private fun initBarChart() {\r\n        viewBinding.barChart.apply {\r\n            setDrawBorders(false) //显示边界\r\n            setDrawBarShadow(false) //设置每个直方图阴影为false\r\n            setDrawValueAboveBar(true) //这里设置为true每一个直方图的值就会显示在直方图的顶部\r\n            description.isEnabled = false //设置描述文字不显示，默认显示\r\n            setDrawGridBackground(false) //设置不显示网格\r\n            //setBackgroundColor(Color.parseColor(\"#F3F3F3\")) //设置图表的背景颜色\r\n            legend.isEnabled = false //设置不显示比例图\r\n            setScaleEnabled(true) //设置是否可以缩放\r\n            setTouchEnabled(false)\r\n            //x轴设置\r\n            xAxis.apply {\r\n                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面\r\n                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）\r\n                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴\r\n                granularity = 1f // only intervals of 1 day\r\n//                labelCount = 100\r\n                /*valueFormatter = object : ValueFormatter() {\r\n                    override fun getFormattedValue(value: Float): String {\r\n                      //TODO 自定义X轴label格式\r\n                    }\r\n                }*/\r\n            }\r\n            xAxis.isEnabled = false\r\n            axisLeft.isEnabled = false\r\n            axisRight.isEnabled = false\r\n\r\n            // if more than 60 entries are displayed in the chart, no values will be\r\n            // drawny\r\n//            setMaxVisibleValueCount(6)\r\n            //保证Y轴从0开始，不然会上移一点\r\n            axisLeft.axisMinimum = 0f\r\n            axisRight.axisMinimum = 0f\r\n            mBarDataSet = BarDataSet(values, \"Data Set\")\r\n            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)\r\n            mBarDataSet!!.setDrawValues(false)\r\n            val dataSets = ArrayList<IBarDataSet>()\r\n            dataSets.add(mBarDataSet!!)\r\n            val barData = BarData(dataSets)\r\n            data = barData\r\n            //初始化默认值\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n        }\r\n    }\r\n\r\n    private val values = ArrayList<BarEntry>()\r\n    private val colors = ArrayList<Int>()\r\n\r\n    //这里要进行图像绘制，所以要切回UI线程，否则会报错\r\n    private fun addBarEntry(value: Int, value2: Int) {\r\n        Log.e(\"addBarEntry\", \"$value\")\r\n        viewBinding.barChart.apply {\r\n            if (barData != null) {\r\n//                barData.addEntry(BarEntry(value.toFloat(), 0f), 0)\r\n                val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount\r\n                data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)\r\n                data.notifyDataChanged()\r\n                when {\r\n                    value2 in 40..80 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_37B48B)\r\n                        )\r\n                    }\r\n                    value2 < 40 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_FDC457)\r\n                        )\r\n                    }\r\n                    value2 > 80 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_text_selected)\r\n                        )\r\n                    }\r\n                }\r\n                mBarDataSet!!.colors = colors\r\n                notifyDataSetChanged()\r\n                //设置在图表中显示的最大X轴数量\r\n                setVisibleXRangeMaximum(30f)\r\n                //这里用29是因为30的话，最后一条柱子只显示了一半\r\n                moveViewToX(barData.entryCount.toFloat() - 29)\r\n//                setBorderWidth(0.3f)\r\n                //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)\r\n//                val mMatrix = Matrix()\r\n//                mMatrix.postScale(1.5f, 1f)\r\n//                viewPortHandler.refresh(mMatrix, this, false)\r\n//                animateY(1000)\r\n            }\r\n        }\r\n        viewBinding.barChart.invalidate()\r\n    }\r\n\r\n    private fun setData(data: BaseDataDTO) {\r\n        viewBinding.tvLungTotal.text = \"/150\"\r\n        viewBinding.tvLungCount.text = \"${data.qySum}\"\r\n        viewBinding.tvHeartTotal.text = \"/10\"\r\n        viewBinding.tvHeartCount.text = \"${data.prSum}\"\r\n    }\r\n\r\n    private fun getData(value: Int): LineData {\r\n        val values = ArrayList<Entry>()\r\n//        values.add(Entry(0f, value.toFloat()))\r\n        // create a dataset and give it a type\r\n        val lineDataSet = LineDataSet(values, \"DataSet 1\")\r\n        lineDataSet.lineWidth = 1.75f\r\n        lineDataSet.circleRadius = 5f\r\n        lineDataSet.circleHoleRadius = 2.5f\r\n        lineDataSet.valueTextColor = Color.WHITE\r\n        lineDataSet.color = Color.parseColor(\"#3DB38E\")\r\n        lineDataSet.setCircleColor(Color.parseColor(\"#3DB38E\"))\r\n        lineDataSet.highLightColor = Color.parseColor(\"#3DB38E\")\r\n        lineDataSet.setDrawValues(true)\r\n        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT\r\n        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER\r\n        // create a data object with the data sets\r\n        return LineData(lineDataSet)\r\n    }\r\n\r\n    /**\r\n     * 动态添加数据\r\n     * 在一个LineChart中存放的折线，其实是以索引从0开始编号的\r\n     *\r\n     * @param yValues y值\r\n     */\r\n    private var x = 20\r\n    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {\r\n        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount\r\n        val entry = Entry(\r\n            entryCount.toFloat(), yValues\r\n        )\r\n        // 创建一个点\r\n        lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中\r\n        lineChart.data = lineData\r\n        //通知数据已经改变\r\n        lineData.notifyDataChanged()\r\n        lineChart.notifyDataSetChanged()\r\n        //通知数据已经改变\r\n        lineData.notifyDataChanged()\r\n        lineChart.notifyDataSetChanged()\r\n        //把yValues移到指定索引的位置\r\n        lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)\r\n        lineChart.setVisibleXRangeMaximum(30f)\r\n//        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/\r\n        lineChart.moveViewToX((lineData.entryCount - 29).toFloat())\r\n        lineChart.invalidate()\r\n    }\r\n\r\n    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)\r\n    public fun onEvent(event: MessageEventData) {\r\n        if (event.code == BaseConstant.EVENT_SINGLE_CHART_START) {\r\n            //启动刷新界面数据\r\n            viewBinding.ivLung.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_lung_red))\r\n            viewBinding.ivHeart.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_heart_red))\r\n        }\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        EventBus.getDefault().unregister(this)\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt	
++++ b/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt	
+@@ -47,7 +47,7 @@
+     override fun onCreateView(
+         inflater: LayoutInflater, container: ViewGroup?,
+         savedInstanceState: Bundle?
+-    ): View? {
++    ): View {
+         viewBinding = ChartFragmentBinding.inflate(layoutInflater)
+         return viewBinding.root
+     }
+@@ -65,7 +65,6 @@
+     private var qyValue = 0
+ 
+     private fun initView() {
+-
+         //曲线图表
+         val data: LineData = getData(0)
+         val data1: LineData = getData(DataVolatile.preDistance.toInt())
+@@ -75,26 +74,28 @@
+         LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)
+         initLineChart(viewBinding.lineChart2, data2)
+         StatusLiveData.data.observe(requireActivity()) {
+-            setData(it)
+-            addEntry(data, viewBinding.lineChart, it.cf.toFloat())
+-            addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
+-            addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
+-            if (qyValue != it.qySum) {
+-                qyValue = it.qySum
+-                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
+-                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
+-            } else {
+-                addBarEntry(0, 0)
+-            }
+-            //吹气错误数统计
+-            viewBinding.tvLungCount.text =
+-                "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
+-            //按压错误数统计
+-            viewBinding.tvHeartCount.text =
+-                "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
+-            //按压总数
+-            viewBinding.tvLungTotal.text = "/${it.qySum}"
+-            viewBinding.tvHeartTotal.text = "/${it.prSum}"
++            if (it.isStart) {
++                setData(it)
++                addEntry(data, viewBinding.lineChart, it.cf.toFloat())
++                addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
++                addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
++                if (qyValue != it.qySum) {
++                    qyValue = it.qySum
++                    val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
++                    addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
++                } else {
++                    addBarEntry(0, 0)
++                }
++                //吹气错误数统计
++                viewBinding.tvLungCount.text =
++                    "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
++                //按压错误数统计
++                viewBinding.tvHeartCount.text =
++                    "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
++                //按压总数
++                viewBinding.tvLungTotal.text = "/${it.qySum}"
++                viewBinding.tvHeartTotal.text = "/${it.prSum}"
++            }
+         }
+ 
+         initBarChart()
+@@ -195,12 +196,6 @@
+             dataSets.add(mBarDataSet!!)
+             val barData = BarData(dataSets)
+             data = barData
+-            //初始化默认值
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+         }
+     }
+ 
+Index: app/src/main/java/com/pr/perfectrecovery/bean/BaseDataDTO.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.bean\r\n\r\ndata class BaseDataDTO(\r\n    //电量值：  0-100%\r\n    var electricity: Int = 0,\r\n    //距离值：  30-150\r\n    var distance: Int = 0,\r\n    //气压值：  0-2000ml\r\n    var bpValue: Int = 0,\r\n    //蓝牙连接状态：   0-断开 1-连接\r\n    var blsType: Int = 0,\r\n    //USB连接状态: 0-断开 1-连接\r\n    var usbConnectType: Int = 0,\r\n    //通道打开状态 0-关闭 1-打开\r\n    var aisleType: Int = 0,\r\n    //连接方式  0-蓝牙 1-连接USB\r\n    var connectType: Int = -1,\r\n    //按压位置正确  0-错误  1-正确\r\n    var psrType: Int = -1,\r\n    //工作方式：0——休眠   1——工作    2——待机\r\n    var workType: Int = -1,\r\n    //按压频率：0-200\r\n    var pf: Int = 0,\r\n    //吹气频率：0-200\r\n    var cf: Int = 0,\r\n    //按压次数\r\n    var prSum: Int = 0,\r\n    //吹起次数\r\n    var qySum: Int = 0,\r\n    //按压错误-按压不足\r\n    var ERR_PR_LOW: Int = 0,\r\n    //按压错误-按压过大\r\n    var ERR_PR_HIGH: Int = 0,\r\n    //按压错误-按压位置错误\r\n    var ERR_PR_POSI: Int = 0,\r\n    //吹气错误-气压不足\r\n    var ERR_QY_LOW: Int = 0,\r\n    //吹气错误-气压过大\r\n    var ERR_QY_HIGH: Int = 0,\r\n    //吹气错误-气压进胃\r\n    var ERR_QY_DEAD: Int = 0,\r\n    //吹气错误-气道未打开错误\r\n    var ERR_QY_CLOSE: Int = 0\r\n) {\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/bean/BaseDataDTO.kt b/app/src/main/java/com/pr/perfectrecovery/bean/BaseDataDTO.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/bean/BaseDataDTO.kt	
++++ b/app/src/main/java/com/pr/perfectrecovery/bean/BaseDataDTO.kt	
+@@ -42,5 +42,5 @@
+     //吹气错误-气道未打开错误
+     var ERR_QY_CLOSE: Int = 0
+ ) {
+-
++    var isStart = false //false 未开始 true 开始
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/pr/perfectrecovery/activity/CPRActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.activity\r\n\r\nimport android.Manifest\r\nimport android.app.AlertDialog\r\nimport android.bluetooth.BluetoothAdapter\r\nimport android.bluetooth.BluetoothGatt\r\nimport android.content.Intent\r\nimport android.content.pm.PackageManager\r\nimport android.location.LocationManager\r\nimport android.os.*\r\nimport android.provider.Settings\r\nimport android.text.TextUtils\r\nimport android.text.method.ScrollingMovementMethod\r\nimport android.util.Log\r\nimport android.view.View\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.core.app.ActivityCompat\r\nimport androidx.core.content.ContextCompat\r\nimport androidx.lifecycle.Observer\r\nimport androidx.recyclerview.widget.LinearLayoutManager\r\nimport com.blankj.utilcode.util.ToastUtils\r\nimport com.chad.library.adapter.base.BaseQuickAdapter\r\nimport com.chad.library.adapter.base.listener.OnItemClickListener\r\nimport com.chad.library.adapter.base.viewholder.BaseViewHolder\r\nimport com.clj.fastble.BleManager\r\nimport com.clj.fastble.callback.BleGattCallback\r\nimport com.clj.fastble.callback.BleNotifyCallback\r\nimport com.clj.fastble.callback.BleScanCallback\r\nimport com.clj.fastble.data.BleDevice\r\nimport com.clj.fastble.exception.BleException\r\nimport com.clj.fastble.scan.BleScanRuleConfig\r\nimport com.clj.fastble.utils.HexUtil\r\nimport com.pr.perfectrecovery.BaseApplication\r\nimport com.pr.perfectrecovery.R\r\nimport com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter\r\nimport com.pr.perfectrecovery.base.BaseActivity\r\nimport com.pr.perfectrecovery.base.BaseConstant\r\nimport com.pr.perfectrecovery.bean.BaseDataDTO\r\nimport com.pr.perfectrecovery.bean.MessageEventData\r\nimport com.pr.perfectrecovery.comm.ObserverManager\r\nimport com.pr.perfectrecovery.databinding.ActivityCpractivityBinding\r\nimport com.pr.perfectrecovery.databinding.ItemBluetoothBinding\r\nimport com.pr.perfectrecovery.livedata.StatusLiveData\r\nimport com.pr.perfectrecovery.utils.ConvertUtil\r\nimport com.pr.perfectrecovery.utils.DataVolatile\r\nimport com.pr.perfectrecovery.view.itemlayout.PagerConfig\r\nimport com.pr.perfectrecovery.view.itemlayout.PagerGridLayoutManager\r\nimport com.pr.perfectrecovery.view.itemlayout.PagerGridSnapHelper\r\nimport org.greenrobot.eventbus.EventBus\r\nimport org.greenrobot.eventbus.Subscribe\r\nimport org.greenrobot.eventbus.ThreadMode\r\nimport java.util.*\r\nimport kotlin.collections.ArrayList\r\n\r\n/**\r\n * CPR页面  蓝夜列表扫描链接\r\n */\r\nclass CPRActivity : BaseActivity() {\r\n    private lateinit var viewBinding: ActivityCpractivityBinding\r\n    private var isRefresh = false\r\n    private val mDeviceAdapter = DeviceBluetoothAdapter()\r\n    private var bleList = mutableListOf<BleDevice>()\r\n    private var connectList = arrayListOf<BleDevice>()\r\n    private var isInitValue = false\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        viewBinding = ActivityCpractivityBinding.inflate(layoutInflater)\r\n        setContentView(viewBinding.root)\r\n        EventBus.getDefault().register(this)\r\n        initView()\r\n        //初始化蓝牙管理器\r\n        initBluetooth()\r\n        ttl()\r\n    }\r\n\r\n    private fun initView() {\r\n        //查看是否有蓝牙权限\r\n        checkPermissions()\r\n        viewBinding.bottom.ivBack.setOnClickListener { finish() }\r\n        viewBinding.bottom.tvContinue.setOnClickListener {\r\n            startActivity(Intent(this, ConfigActivity::class.java))\r\n        }\r\n\r\n        viewBinding.btnOpen.setOnClickListener {\r\n            //ttl()\r\n            openTTL()\r\n        }\r\n\r\n        viewBinding.recyclerview.layoutManager = LinearLayoutManager(this)\r\n        // 是否抵用滚动事件监听\r\n        //layoutManager.setChangeSelectInScrolling(false)\r\n        viewBinding.recyclerview.adapter = bluetoothAdapter\r\n\r\n        viewBinding.bottom.ivStart.setOnClickListener {\r\n            val intent = Intent(this, TrainingSingleActivity::class.java)\r\n            intent.putParcelableArrayListExtra(\"blueTooth\", connectList)\r\n            startActivity(intent)\r\n        }\r\n\r\n        viewBinding.progressCircular.setOnClickListener {\r\n            if (!isRefresh) {\r\n                viewBinding.tvModelNum.visibility = View.INVISIBLE\r\n                startRefresh()\r\n                checkPermissions()\r\n                isRefresh = true\r\n            } else {\r\n                isRefresh = false\r\n                stopRefresh()\r\n                //取消扫描蓝牙设备\r\n                BleManager.getInstance().cancelScan()\r\n            }\r\n        }\r\n        viewBinding.recyclerview.adapter = mDeviceAdapter\r\n        mDeviceAdapter.setOnItemClickListener(itemClick)\r\n    }\r\n\r\n    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)\r\n    public fun onEvent(event: MessageEventData) {\r\n        if (event.code == BaseConstant.EVENT_CPR_START) {\r\n            isInitValue = false\r\n            bindBluetooth()\r\n        } else if (event.code == BaseConstant.EVENT_CPR_STOP) {\r\n            unBindBluetooth()\r\n        }\r\n    }\r\n\r\n    private fun bindBluetooth() {\r\n        bleList.forEach {\r\n            bind(it)\r\n        }\r\n    }\r\n\r\n    private fun unBindBluetooth() {\r\n        bleList.forEach {\r\n            unBind(it)\r\n        }\r\n    }\r\n\r\n    private val itemClick =\r\n        OnItemClickListener { adapter, view, position ->\r\n            if (isItemClick) {\r\n                val bleDevice = mDeviceAdapter.getItem(position)\r\n                if (!BleManager.getInstance().isConnected(bleDevice)) {\r\n                    if (count >= 6) {//处理提示语设备连接过多提示\r\n                        viewBinding.tvModelNum.text = \"当前版本最多同时支持6台模型\"\r\n                        hintHandler.postDelayed(this::setTextNull, 2000)\r\n                    }\r\n                    BleManager.getInstance().cancelScan()\r\n                    connect(bleDevice, position)\r\n                } else {\r\n                    BleManager.getInstance().disconnect(bleDevice)\r\n                }\r\n            }\r\n        }\r\n\r\n    private val hintHandler = object : Handler(Looper.getMainLooper()) {\r\n        override fun handleMessage(msg: Message) {\r\n            super.handleMessage(msg)\r\n        }\r\n    }\r\n\r\n    private fun setTextNull() {\r\n        viewBinding.tvModelNum.text = \"\"\r\n    }\r\n\r\n    override fun onResume() {\r\n        super.onResume()\r\n        showConnectedDevice()\r\n//        startRefresh()\r\n//        checkPermissions()\r\n    }\r\n\r\n    private fun initBluetooth() {\r\n        BleManager.getInstance().init(application)\r\n        BleManager.getInstance()\r\n            .enableLog(true)\r\n            .setReConnectCount(1, 5000)\r\n            .setConnectOverTime(10000).operateTimeout = 5000\r\n\r\n    }\r\n\r\n    private val REQUEST_CODE_OPEN_GPS = 1\r\n    private val REQUEST_CODE_PERMISSION_LOCATION = 2\r\n    private fun checkPermissions() {\r\n        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()\r\n        if (!bluetoothAdapter.isEnabled) {\r\n            Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()\r\n            return\r\n        }\r\n        val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)\r\n        val permissionDeniedList: MutableList<String> = ArrayList()\r\n        for (permission in permissions) {\r\n            val permissionCheck = ContextCompat.checkSelfPermission(this, permission)\r\n            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {\r\n                onPermissionGranted(permission)\r\n            } else {\r\n                permissionDeniedList.add(permission)\r\n            }\r\n        }\r\n        if (permissionDeniedList.isNotEmpty()) {\r\n            val deniedPermissions = permissionDeniedList.toTypedArray()\r\n            ActivityCompat.requestPermissions(\r\n                this,\r\n                deniedPermissions,\r\n                REQUEST_CODE_PERMISSION_LOCATION\r\n            )\r\n        }\r\n    }\r\n\r\n    private val bluetoothAdapter = object :\r\n        BaseQuickAdapter<BleDevice, BaseViewHolder>(R.layout.item_bluetooth) {\r\n        override fun convert(holder: BaseViewHolder, item: BleDevice) {\r\n            val bind = ItemBluetoothBinding.bind(holder.itemView)\r\n            bind.tvBluetoothName.text = item.name\r\n            bind.tvBluetoothStatus.text = \"未连接\"\r\n        }\r\n    }\r\n\r\n    private fun onPermissionGranted(permission: String) {\r\n        when (permission) {\r\n            Manifest.permission.ACCESS_FINE_LOCATION -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkGPSIsOpen()) {\r\n                AlertDialog.Builder(this)\r\n                    .setTitle(R.string.notifyTitle)\r\n                    .setMessage(R.string.gpsNotifyMsg)\r\n                    .setNegativeButton(\r\n                        R.string.cancel\r\n                    ) { dialog, which -> finish() }\r\n                    .setPositiveButton(\r\n                        R.string.setting\r\n                    ) { dialog, which ->\r\n                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)\r\n                        startActivityForResult(intent, REQUEST_CODE_OPEN_GPS)\r\n                    }\r\n                    .setCancelable(false)\r\n                    .show()\r\n            } else {\r\n                setScanRule()\r\n                startScan()\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun showConnectedDevice() {\r\n        val deviceList = BleManager.getInstance().allConnectedDevice\r\n        bleList = deviceList\r\n        mDeviceAdapter.setList(deviceList)\r\n    }\r\n\r\n    private var isItemClick = true\r\n    private var count = 0\r\n    private var position = -1\r\n    private fun connect(bleDevice: BleDevice, position: Int) {\r\n        BleManager.getInstance()\r\n            .setConnectOverTime(5000)\r\n            .setOperateTimeout(5000)\r\n            .connect(bleDevice, object : BleGattCallback() {\r\n                override fun onStartConnect() {\r\n                    isItemClick = false\r\n                    bleDevice.isLoading = true\r\n                    mDeviceAdapter.remove(bleDevice)\r\n                    mDeviceAdapter.addData(position, bleDevice)\r\n                }\r\n\r\n                override fun onConnectFail(bleDevice: BleDevice, exception: BleException) {\r\n                    bleDevice.isLoading = false\r\n                    mDeviceAdapter.remove(bleDevice)\r\n                    mDeviceAdapter.addData(position, bleDevice)\r\n                    isItemClick = true\r\n                    if (exception.code == BleException.ERROR_CODE_TIMEOUT) {\r\n                        viewBinding.tvModelNum.text = \"连接超时，请重新连接\"\r\n                    } else {\r\n                        viewBinding.tvModelNum.text = \"连接失败，请重新连接\"\r\n                    }\r\n                }\r\n\r\n                override fun onConnectSuccess(\r\n                    bleDevice: BleDevice,\r\n                    gatt: BluetoothGatt,\r\n                    status: Int\r\n                ) {\r\n                    count++\r\n                    //处理已连接的设备靠前\r\n                    mDeviceAdapter.remove(bleDevice)\r\n                    bleDevice.isLoading = false\r\n                    bleDevice.count = count\r\n                    if (mDeviceAdapter.data.size == 0) {\r\n                        mDeviceAdapter.addData(bleDevice)\r\n                    } else {\r\n                        mDeviceAdapter.addData(count - 1, bleDevice)\r\n                    }\r\n//                viewBinding.textView.text = \"$count\"\r\n                    bleList.add(bleDevice)\r\n                    viewBinding.tvConnections.text = \"设备连接数：${count}\"\r\n                    //bind(bleDevice)\r\n                    isItemClick = true\r\n                }\r\n\r\n                override fun onDisConnected(\r\n                    isActiveDisConnected: Boolean,\r\n                    bleDevice: BleDevice,\r\n                    gatt: BluetoothGatt,\r\n                    status: Int\r\n                ) {\r\n                    count--\r\n                    bleList.remove(bleDevice)\r\n                    if (isActiveDisConnected) {\r\n                        ToastUtils.showLong(bleDevice.name + getString(R.string.active_disconnected))\r\n                    } else {\r\n                        ToastUtils.showLong(bleDevice.name + getString(R.string.disconnected))\r\n                        ObserverManager.getInstance().notifyObserver(bleDevice)\r\n                    }\r\n                    viewBinding.tvConnections.text = \"设备连接数：${count}\"\r\n\r\n                    //断开蓝牙连接\r\n                    if (BleManager.getInstance().isConnected(bleDevice)) {\r\n                        BleManager.getInstance().disconnect(bleDevice)\r\n                    }\r\n\r\n                    if (count == 0) {\r\n                        EventBus.getDefault()\r\n                            .post(\r\n                                MessageEventData(\r\n                                    BaseConstant.EVENT_CPR_DISCONNENT,\r\n                                    \"\",\r\n                                    null\r\n                                )\r\n                            )\r\n                    }\r\n\r\n//                unBind(bleDevice)\r\n                    mDeviceAdapter.remove(bleDevice)\r\n                    bleDevice.isLoading = false\r\n                    bleDevice.count = 0\r\n                    mDeviceAdapter.addData(bleDevice)\r\n                    isItemClick = true\r\n                }\r\n            })\r\n    }\r\n\r\n    private fun setScanRule() {\r\n        val uuids: Array<String>?\r\n//        val str_uuid: String = et_uuid.getText().toString()\r\n        val str_uuid: String = \"\"\r\n        uuids = if (TextUtils.isEmpty(str_uuid)) {\r\n            null\r\n        } else {\r\n            str_uuid.split(\",\").toTypedArray()\r\n        }\r\n        var serviceUuids: Array<UUID?>? = null\r\n        if (uuids != null && uuids.isNotEmpty()) {\r\n            serviceUuids = arrayOfNulls(uuids.size)\r\n            for (i in uuids.indices) {\r\n                val name = uuids[i]\r\n                val components = name.split(\"-\").toTypedArray()\r\n                if (components.size != 5) {\r\n                    serviceUuids[i] = null\r\n                } else {\r\n                    serviceUuids[i] = UUID.fromString(uuids[i])\r\n                }\r\n            }\r\n        }\r\n\r\n        var names = arrayOf(\"WMFS\", \"D87A\")\r\n        val mac: String = \"\"\r\n        val isAutoConnect: Boolean = false\r\n        val scanRuleConfig = BleScanRuleConfig.Builder()\r\n            .setServiceUuids(serviceUuids) // 只扫描指定的服务的设备，可选\r\n            .setDeviceName(true, *names) // 只扫描指定广播名的设备，可选\r\n            .setDeviceMac(mac) // 只扫描指定mac的设备，可选\r\n            .setAutoConnect(isAutoConnect) // 连接时的autoConnect参数，可选，默认false\r\n            .setScanTimeOut(5000) // 扫描超时时间，可选，默认10秒\r\n            .build()\r\n        BleManager.getInstance().initScanRule(scanRuleConfig)\r\n    }\r\n\r\n    private fun startScan() {\r\n        BleManager.getInstance().scan(object : BleScanCallback() {\r\n            override fun onScanStarted(success: Boolean) {\r\n                //已连接的蓝牙添加进来\r\n                val deviceList = BleManager.getInstance().allConnectedDevice\r\n                mDeviceAdapter.setList(deviceList)\r\n\r\n            }\r\n\r\n            override fun onLeScan(bleDevice: BleDevice) {\r\n                super.onLeScan(bleDevice)\r\n            }\r\n\r\n            override fun onScanning(bleDevice: BleDevice) {\r\n                mDeviceAdapter.addData(bleDevice)\r\n                mDeviceAdapter.notifyDataSetChanged()\r\n            }\r\n\r\n            override fun onScanFinished(scanResultList: List<BleDevice>) {\r\n                mDeviceAdapter.data.let {\r\n                    if (it.size == 0) {\r\n                        viewBinding.tvModelNum.visibility = View.VISIBLE\r\n\r\n                    }\r\n                }\r\n                stopRefresh()\r\n                isRefresh = false\r\n            }\r\n        })\r\n    }\r\n\r\n    override fun onRequestPermissionsResult(\r\n        requestCode: Int,\r\n        permissions: Array<String?>,\r\n        grantResults: IntArray\r\n    ) {\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults)\r\n        when (requestCode) {\r\n            REQUEST_CODE_PERMISSION_LOCATION -> if (grantResults.size > 0) {\r\n                var i = 0\r\n                while (i < grantResults.size) {\r\n                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {\r\n                        permissions[i]?.let { onPermissionGranted(it) }\r\n                    }\r\n                    i++\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun checkGPSIsOpen(): Boolean {\r\n        val locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager\r\n            ?: return false\r\n        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)\r\n    }\r\n\r\n    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {\r\n        super.onActivityResult(requestCode, resultCode, data)\r\n        if (requestCode == REQUEST_CODE_OPEN_GPS) {\r\n            if (checkGPSIsOpen()) {\r\n                setScanRule()\r\n                startScan()\r\n            }\r\n        }\r\n    }\r\n\r\n    /**\r\n     * 开始刷新动画\r\n     */\r\n    private fun startRefresh() {\r\n        viewBinding.tvDesc.setText(R.string.searching_for_available_models)\r\n        viewBinding.progressCircular.indeterminateDrawable =\r\n            resources.getDrawable(R.drawable.progressbar_circle)\r\n        viewBinding.progressCircular.progressDrawable =\r\n            resources.getDrawable(R.drawable.progressbar_circle)\r\n    }\r\n\r\n    /**\r\n     * 停止刷新动画\r\n     */\r\n    private fun stopRefresh() {\r\n        viewBinding.tvDesc.setText(R.string.available_models)\r\n        viewBinding.progressCircular.indeterminateDrawable =\r\n            resources.getDrawable(R.drawable.icon_wm_refresh)\r\n        viewBinding.progressCircular.progressDrawable =\r\n            resources.getDrawable(R.drawable.icon_wm_refresh)\r\n    }\r\n\r\n    private fun unBind(bleDevice: BleDevice) {\r\n        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)\r\n        //蓝牙服务列表\r\n        val services = gatt.services\r\n        val bluetoothGattService = services[2]\r\n        val characteristic = bluetoothGattService.characteristics[1]\r\n        BleManager.getInstance().stopNotify(\r\n            bleDevice,\r\n            characteristic.service.uuid.toString(),\r\n            characteristic.uuid.toString()\r\n        )\r\n    }\r\n\r\n    private fun bind(bleDevice: BleDevice?) {\r\n        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)\r\n        //蓝牙服务列表\r\n        val services = gatt.services\r\n        val bluetoothGattService = services[2]\r\n        val characteristic = bluetoothGattService.characteristics[1]\r\n        BleManager.getInstance().notify(\r\n            bleDevice,\r\n            characteristic.service.uuid.toString(),\r\n            characteristic.uuid.toString(),\r\n            object : BleNotifyCallback() {\r\n                override fun onNotifySuccess() {\r\n                    runOnUiThread(Runnable {\r\n                        Log.i(\"CPRActivity\", \"notify success\")\r\n                    })\r\n                }\r\n\r\n                override fun onNotifyFailure(exception: BleException) {\r\n                    runOnUiThread(Runnable {\r\n                        Log.i(\"CPRActivity\", exception.toString())\r\n                    })\r\n                }\r\n\r\n                override fun onCharacteristicChanged(data: ByteArray) {\r\n                    val formatHexString = HexUtil.formatHexString(\r\n                        characteristic.value,\r\n                        false\r\n                    )\r\n                    runOnUiThread { Log.e(\"CPRActivity\", formatHexString) }\r\n                    val dataDTO = DataVolatile.parseString(formatHexString)\r\n                    if (!isInitValue) {\r\n                        isInitValue = true\r\n                        DataVolatile.initPreDistance(formatHexString)\r\n                    }\r\n                    //发送数据\r\n                    StatusLiveData.data.postValue(dataDTO)\r\n                }\r\n            })\r\n    }\r\n\r\n    private fun addText(textView: TextView, content: String) {\r\n        textView.append(content)\r\n        textView.append(\"\\n\")\r\n        val offset = textView.lineCount * textView.lineHeight\r\n        if (offset > textView.height) {\r\n            textView.scrollTo(0, offset - textView.height)\r\n        }\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        EventBus.getDefault().unregister(this)\r\n    }\r\n\r\n    private fun initTTL() {\r\n        if (BaseApplication.driver!!.isConnected) {\r\n            val retval: Int? = BaseApplication.driver?.ResumeUsbPermission()\r\n            if (retval == 0) {\r\n                if (BaseApplication.driver!!.SetConfig(\r\n                        115200, 8, 1, 0, 0\r\n                    )//配置串口波特率，函数说明可参照编程手册\r\n                ) {\r\n                    Toast.makeText(\r\n                        this, \"串口设置成功!\",\r\n                        Toast.LENGTH_SHORT\r\n                    ).show()\r\n                } else {\r\n                    Toast.makeText(\r\n                        this, \"串口设置失败!\",\r\n                        Toast.LENGTH_SHORT\r\n                    ).show()\r\n                }\r\n            } else if (retval == -2) {\r\n                Toast.makeText(\r\n                    this, \"获取权限失败!\",\r\n                    Toast.LENGTH_SHORT\r\n                ).show()\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun ttl() {\r\n        if (!BaseApplication.driver?.UsbFeatureSupported()!!) // 判断系统是否支持USB HOST\r\n        {\r\n            val dialog: androidx.appcompat.app.AlertDialog =\r\n                androidx.appcompat.app.AlertDialog.Builder(this)\r\n                    .setTitle(\"提示\")\r\n                    .setMessage(\"您的手机不支持USB HOST，请更换其他手机再试！\")\r\n                    .setPositiveButton(\r\n                        \"确认\"\r\n                    ) { arg0, arg1 -> System.exit(0) }.create()\r\n            dialog.setCanceledOnTouchOutside(false)\r\n            dialog.show()\r\n        }\r\n    }\r\n\r\n    private fun openTTL() {\r\n        if (!isOpen) {\r\n            when (BaseApplication.driver?.ResumeUsbList()) {\r\n                -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备\r\n                    Toast.makeText(\r\n                        this, \"打开设备失败!\",\r\n                        Toast.LENGTH_SHORT\r\n                    ).show()\r\n                    BaseApplication.driver?.CloseDevice()\r\n                }\r\n                0 -> {\r\n                    if (!BaseApplication.driver?.UartInit()!!) { //对串口设备进行初始化操作\r\n                        Toast.makeText(\r\n                            this, \"设备初始化失败!\",\r\n                            Toast.LENGTH_SHORT\r\n                        ).show()\r\n                        Toast.makeText(\r\n                            this, \"打开\" +\r\n                                    \"设备失败!\",\r\n                            Toast.LENGTH_SHORT\r\n                        ).show()\r\n                        return\r\n                    }\r\n                    Toast.makeText(\r\n                        this, \"打开设备成功!\",\r\n                        Toast.LENGTH_SHORT\r\n                    ).show()\r\n                    initTTL()\r\n                    isOpen = true\r\n                    ReadThread().start() //开启读线程读取串口接收的数据\r\n                }\r\n                else -> {\r\n                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)\r\n                    builder.setIcon(R.mipmap.icon_wm_logo)\r\n                    builder.setTitle(\"未授权限\")\r\n                    builder.setMessage(\"确认退出吗？\")\r\n                    builder.setPositiveButton(\r\n                        \"确定\"\r\n                    ) { dialog, which ->\r\n                        //System.exit(0)\r\n                        dialog.dismiss()\r\n                    }\r\n                    builder.setNegativeButton(\r\n                        \"返回\"\r\n                    ) { dialog, which ->\r\n                        dialog.dismiss()\r\n                    }\r\n                    builder.show()\r\n                }\r\n            }\r\n        } else {\r\n            //关闭USB TTL\r\n            isOpen = false\r\n            try {\r\n                Thread.sleep(200)\r\n            } catch (e: InterruptedException) {\r\n                e.printStackTrace()\r\n            }\r\n            BaseApplication.driver?.CloseDevice()\r\n//            totalrecv = 0\r\n        }\r\n    }\r\n\r\n    private var isOpen = false\r\n\r\n    inner class ReadThread : Thread() {\r\n        override fun run() {\r\n            val buffer = ByteArray(64)\r\n            while (true) {\r\n                val msg = Message.obtain()\r\n                if (!isOpen) {\r\n                    break\r\n                }\r\n                val length: Int = BaseApplication.driver!!.ReadData(buffer, 64)\r\n                if (length > 0) {\r\n                    runOnUiThread {\r\n                        Log.i(\"CPRActivity\", ConvertUtil.toHexString(buffer, length))\r\n                        val dataDTO =\r\n                            DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))\r\n                        //发布数据\r\n                        StatusLiveData.data.postValue(dataDTO)\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/activity/CPRActivity.kt b/app/src/main/java/com/pr/perfectrecovery/activity/CPRActivity.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/activity/CPRActivity.kt	
++++ b/app/src/main/java/com/pr/perfectrecovery/activity/CPRActivity.kt	
+@@ -506,8 +506,8 @@
+                     )
+                     runOnUiThread { Log.e("CPRActivity", formatHexString) }
+                     val dataDTO = DataVolatile.parseString(formatHexString)
+-                    if (!isInitValue) {
+-                        isInitValue = true
++                    if (isInitValue) {
++                        isInitValue = false
+                         DataVolatile.initPreDistance(formatHexString)
+                     }
+                     //发送数据

@@ -1,0 +1,1667 @@
+Index: app/src/main/java/com/pr/perfectrecovery/activity/SingleActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.activity\r\n\r\nimport android.os.Bundle\r\nimport android.os.Handler\r\nimport android.os.Looper\r\nimport android.view.View\r\nimport android.widget.CheckedTextView\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.lifecycle.Observer\r\nimport androidx.viewpager2.adapter.FragmentStateAdapter\r\nimport androidx.viewpager2.widget.ViewPager2\r\nimport com.blankj.utilcode.util.ToastUtils\r\nimport com.pr.perfectrecovery.R\r\nimport com.pr.perfectrecovery.TrainingBean\r\nimport com.pr.perfectrecovery.base.BaseActivity\r\nimport com.pr.perfectrecovery.base.BaseConstant\r\nimport com.pr.perfectrecovery.bean.MessageEventData\r\nimport com.pr.perfectrecovery.databinding.ActivitySingleBinding\r\nimport com.pr.perfectrecovery.fragment.ChartFragment\r\nimport com.pr.perfectrecovery.fragment.CheckEventFragment\r\nimport com.pr.perfectrecovery.fragment.CycleFragment\r\nimport com.pr.perfectrecovery.livedata.StatusLiveData\r\nimport com.pr.perfectrecovery.utils.DataVolatile\r\nimport com.pr.perfectrecovery.utils.TimeUtils\r\nimport org.greenrobot.eventbus.EventBus\r\nimport org.greenrobot.eventbus.Subscribe\r\nimport org.greenrobot.eventbus.ThreadMode\r\n\r\n/**\r\n * 单人模式\r\n */\r\nclass SingleActivity : BaseActivity() {\r\n    private lateinit var binding: ActivitySingleBinding\r\n    private var counter = Counter()\r\n    private var mTrainingBean: TrainingBean? = null\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        binding = ActivitySingleBinding.inflate(layoutInflater)\r\n        setContentView(binding.root)\r\n        EventBus.getDefault().register(this)\r\n        mTrainingBean = intent.getSerializableExtra(\"single\") as TrainingBean\r\n        initView()\r\n        initViewPager()\r\n    }\r\n\r\n    private var isStart = false\r\n    private fun initView() {\r\n        binding.bottom.ivBack.setOnClickListener { finish() }\r\n        binding.tvName.text = mTrainingBean?.name\r\n\r\n        if (mTrainingBean?.isCheck == true) {\r\n            binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(\r\n                resources.getDrawable(R.mipmap.icon_wm_countdown),\r\n                null,\r\n                null,\r\n                null\r\n            )\r\n        }\r\n        //定时器\r\n        binding.bottom.ivStart.setOnClickListener {\r\n            isStart = !isStart\r\n\r\n            if (time <= 0) {\r\n                ToastUtils.showShort(\"本次练习已结束\")\r\n                return@setOnClickListener\r\n            }\r\n\r\n            if (isStart) {\r\n                DataVolatile.isStart = true\r\n                EventBus.getDefault()\r\n                    .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, \"\", null))\r\n                cycleFragment?.start()\r\n                binding.bottom.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)\r\n                binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)\r\n                binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))\r\n                binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))\r\n                if (mTrainingBean?.isCheck!!) {\r\n                    binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(\r\n                        resources.getDrawable(R.mipmap.icon_wm_countdown),\r\n                        null,\r\n                        null,\r\n                        null\r\n                    )\r\n                } else {\r\n                    binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(\r\n                        resources.getDrawable(R.mipmap.icon_wm_time),\r\n                        null,\r\n                        null,\r\n                        null\r\n                    )\r\n                }\r\n                counter.let { mHandler.post(it) }\r\n            } else {\r\n                DataVolatile.isStart = false\r\n                val mTrainingDTO = cycleFragment?.stop()\r\n                binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)\r\n                binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)\r\n                counter.let { mHandler.removeCallbacks(it) }\r\n                mTrainingDTO?.name = binding.tvName.text.toString().trim()\r\n                mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()\r\n                mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)\r\n                //检查页面 结果\r\n                checkEventFragment?.getData().let {\r\n                    if (it != null) {\r\n                        mTrainingDTO?.check1 = it.check1\r\n                        mTrainingDTO?.check2 = it.check2\r\n                        mTrainingDTO?.check3 = it.check3\r\n                        mTrainingDTO?.check4 = it.check4\r\n                        mTrainingDTO?.check5 = it.check5\r\n                        mTrainingDTO?.check6 = it.check6\r\n                        mTrainingDTO?.check7 = it.check7\r\n                        mTrainingDTO?.check8 = it.check8\r\n                        mTrainingDTO?.check9 = it.check9\r\n                        mTrainingDTO?.check10 = it.check10\r\n                    }\r\n                }\r\n\r\n                if (mTrainingDTO != null) {\r\n                    TrainResultActivity.start(this, mTrainingDTO)\r\n                }\r\n                finish()\r\n            }\r\n        }\r\n\r\n        StatusLiveData.data.observe(this, Observer {\r\n            binding.tvBattery.power = it.electricity\r\n        })\r\n    }\r\n\r\n    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)\r\n    public fun onEvent(event: MessageEventData) {\r\n        when (event.code) {\r\n            BaseConstant.EVENT_SINGLE_DATA_CYCLE -> {\r\n                //循环次数\r\n                binding.tvCycle.text = \"${event.cycleCount}\"\r\n            }\r\n            BaseConstant.EVENT_CPR_DISCONNENT -> {\r\n                cycleFragment?.bluetoothDisconnected()\r\n            }\r\n            BaseConstant.EVENT_CPR_TIMEING -> {\r\n                counter.let { mHandler.post(it) }\r\n            }\r\n        }\r\n    }\r\n\r\n    private var cycleFragment: CycleFragment? = null\r\n    private var checkEventFragment: CheckEventFragment? = CheckEventFragment.newInstance()\r\n    private fun initViewPager() {\r\n        var curItem = 0\r\n        val isCheck = mTrainingBean?.isCheck\r\n        val fragments = mutableListOf<Fragment>()\r\n        val titleBtns = mutableListOf<CheckedTextView>()\r\n\r\n        if (isCheck == true) {\r\n            fragments.add(checkEventFragment!!)\r\n            binding.ctEvent.visibility = View.VISIBLE\r\n            val indexEvent = curItem++\r\n            binding.ctEvent.setOnClickListener { binding.viewPager.currentItem = indexEvent }\r\n            titleBtns.add(binding.ctEvent)\r\n        }\r\n\r\n        cycleFragment = CycleFragment.newInstance(mTrainingBean!!.isVoice, mTrainingBean!!.isBeat)\r\n        fragments.add(cycleFragment!!)\r\n        val indexChar = curItem++\r\n        binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }\r\n        binding.ctChart.isChecked = indexChar == 0\r\n        titleBtns.add(binding.ctChart)\r\n\r\n        fragments.add(ChartFragment.newInstance())\r\n        val indexCure = curItem++\r\n        binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = indexCure }\r\n        titleBtns.add(binding.ctCurve)\r\n\r\n        binding.viewPager.offscreenPageLimit = fragments.size\r\n        binding.viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL\r\n        binding.viewPager.adapter = object : FragmentStateAdapter(this) {\r\n            override fun getItemCount(): Int {\r\n                return fragments.size\r\n            }\r\n\r\n            override fun createFragment(position: Int): Fragment {\r\n                return fragments[position]\r\n            }\r\n        }\r\n\r\n        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {\r\n            override fun onPageSelected(position: Int) {\r\n                super.onPageSelected(position)\r\n                titleBtns.forEach {\r\n                    it.isChecked = false\r\n                }\r\n                titleBtns[position].isChecked = true\r\n            }\r\n        })\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        counter.let { mHandler.removeCallbacks(it) }\r\n//        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, \"\", null))\r\n        EventBus.getDefault().unregister(this)\r\n\r\n    }\r\n\r\n    private var time: Long = 1000 * 60 * 2\r\n    private var timeZero: Long = 0\r\n    private val mHandler = object : Handler(Looper.getMainLooper()) {}\r\n\r\n    private inner class Counter : Runnable {\r\n        override fun run() {\r\n            mHandler.postDelayed(this, 1000);//一秒钟循环计时一次\r\n            if (time <= 0) {\r\n                binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)\r\n                binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)\r\n                mHandler.removeCallbacks(counter)\r\n                cycleFragment?.stop()\r\n                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, \"\", null))\r\n            }\r\n            if (!mTrainingBean?.isCheck!!) {\r\n                timeZero += 1000\r\n                binding.tvTime.text = TimeUtils.timeParse(timeZero)\r\n            } else {\r\n                binding.tvTime.text = TimeUtils.timeParse(time)\r\n                time -= 1000\r\n            }\r\n\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/activity/SingleActivity.kt b/app/src/main/java/com/pr/perfectrecovery/activity/SingleActivity.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/activity/SingleActivity.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/activity/SingleActivity.kt	(date 1645539906160)
+@@ -97,6 +97,7 @@
+                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
+                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
+                 counter.let { mHandler.removeCallbacks(it) }
++                mTrainingDTO?.isAssessment = mTrainingBean!!.isCheck
+                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
+                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                 mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+Index: app/src/main/java/com/pr/perfectrecovery/activity/TrainResultActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.activity\r\n\r\nimport android.content.Context\r\nimport android.content.Intent\r\nimport android.os.Bundle\r\nimport android.view.View\r\nimport com.pr.perfectrecovery.base.BaseActivity\r\nimport com.pr.perfectrecovery.bean.TrainingDTO\r\nimport com.pr.perfectrecovery.databinding.ActivityTrainResultBinding\r\nimport com.pr.perfectrecovery.utils.TimeUtils\r\n\r\n/**\r\n * 训练结果-操作明细 成绩结果\r\n * Time 2022年2月8日22:14:36\r\n * author lrz\r\n */\r\nval DATADTO = \"dataDTO\"\r\n\r\nclass TrainResultActivity : BaseActivity() {\r\n    private lateinit var viewBinding: ActivityTrainResultBinding\r\n\r\n    companion object {\r\n        fun start(context: Context, trainingDTO: TrainingDTO) {\r\n            val intent = Intent(context, TrainResultActivity::class.java)\r\n            intent.putExtra(DATADTO, trainingDTO)\r\n            context.startActivity(intent)\r\n        }\r\n    }\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        viewBinding = ActivityTrainResultBinding.inflate(layoutInflater)\r\n        setContentView(viewBinding.root)\r\n        initView()\r\n        initData()\r\n    }\r\n\r\n    private fun initView() {\r\n        viewBinding.bottom.ivBack.setOnClickListener { finish() }\r\n        viewBinding.bottom.ivExport.setOnClickListener { }\r\n        viewBinding.bottom.ivExport.visibility = View.INVISIBLE\r\n    }\r\n\r\n    private fun initData() {\r\n        val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO\r\n        viewBinding.tvName.text = trainingDTO.name\r\n        viewBinding.tvTrain.text = \"训练\"\r\n        viewBinding.tvTime.text = trainingDTO.trainingTime\r\n\r\n        //循环次数\r\n        viewBinding.tvCycleCount.text = \"${trainingDTO.cycleCount}\"\r\n\r\n        //按压错误数\r\n        viewBinding.tvLungCount.text = \"${trainingDTO.pressErrorCount}\"\r\n        //按压总数\r\n        viewBinding.tvLungTotal.text = \"/${trainingDTO.pressTotal}\"\r\n        //按压位置错误\r\n        viewBinding.tvLocation.text = \"${trainingDTO.pressLocation}\"\r\n        //按压不足\r\n        viewBinding.tvInsufficient.text = \"${trainingDTO.pressLow}\"\r\n        //按压过大\r\n        viewBinding.tvPressBig.text = \"${trainingDTO.pressHigh}\"\r\n        //按压未回弹\r\n        viewBinding.tvRebound.text = \"${trainingDTO.pressRebound}\"\r\n        //按压超时统计时间\r\n        viewBinding.tvPressTime.text = \"${trainingDTO.pressOutTime}\"\r\n        //平均每分钟按压次数\r\n        viewBinding.tvAverageCount.text = \"${trainingDTO.pressAverage}\"\r\n        //按压百仪表分比\r\n        if (trainingDTO.pressTotal > 0) {\r\n            viewBinding.tvClock1.text = \"${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%\"\r\n        }\r\n        //按压百分比\r\n        viewBinding.tvPress.text = \"${trainingDTO.pressTopPercentage}\"\r\n        viewBinding.tvPressEnd.text = \"${trainingDTO.pressBottomPercentage}\"\r\n        //按压平均深度\r\n        viewBinding.tvPressBottom.text = \"${trainingDTO.pressAverageDepth}\"\r\n        //整体按压百分比\r\n        viewBinding.tvPressCenter.text = \"${trainingDTO.pressCenterPercentage}\"\r\n\r\n        //吹气错误数\r\n        viewBinding.tvHeartCount.text = \"${trainingDTO.blowErrorCount}\"\r\n        //吹气总数\r\n        viewBinding.tvHeartTotal.text = \"/${trainingDTO.blowTotal}\"\r\n        //吹气错误\r\n        viewBinding.tvAirway.text = \"${trainingDTO.blowClose}\"\r\n        //吹气不足\r\n        viewBinding.tvCInsufficient.text = \"${trainingDTO.blowLow}\"\r\n        //吹气过大\r\n        viewBinding.tvBLowBig.text = \"${trainingDTO.blowHigh}\"\r\n        //吹气进胃\r\n        viewBinding.tvIntoStomach.text = \"${trainingDTO.blowIntoStomach}\"\r\n        //平均吹气每分钟次数\r\n        viewBinding.tvBlowAverageCount.text = \"${trainingDTO.blowAverage}\"\r\n        //吹气百仪表分比\r\n        viewBinding.tvClock2.text = \"${trainingDTO.blowMeterPercentage}\"\r\n        //吹气百分比\r\n        viewBinding.tvBlow.text = \"${trainingDTO.blowPercentage}\"\r\n        //吹气平均值\r\n        viewBinding.tvBlowEnd.text = \"${trainingDTO.blowAverageDepth}\"\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/activity/TrainResultActivity.kt b/app/src/main/java/com/pr/perfectrecovery/activity/TrainResultActivity.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/activity/TrainResultActivity.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/activity/TrainResultActivity.kt	(date 1645540205327)
+@@ -43,6 +43,11 @@
+ 
+     private fun initData() {
+         val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
++        if (trainingDTO.isAssessment) {
++            viewBinding.layoutCheck.root.visibility = View.VISIBLE
++            viewBinding.groupPr.visibility = View.VISIBLE
++            viewBinding.groupQy.visibility = View.VISIBLE
++        }
+         viewBinding.tvName.text = trainingDTO.name
+         viewBinding.tvTrain.text = "训练"
+         viewBinding.tvTime.text = trainingDTO.trainingTime
+@@ -67,9 +72,7 @@
+         //平均每分钟按压次数
+         viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
+         //按压百仪表分比
+-        if (trainingDTO.pressTotal > 0) {
+-            viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
+-        }
++        viewBinding.tvClock1.text = "${(trainingDTO.pressFrequency / trainingDTO.pressTotal)}%"
+         //按压百分比
+         viewBinding.tvPress.text = "${trainingDTO.pressTopPercentage}"
+         viewBinding.tvPressEnd.text = "${trainingDTO.pressBottomPercentage}"
+Index: app/src/main/res/layout/activity_train_result.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n        xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n        xmlns:tools=\"http://schemas.android.com/tools\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:background=\"@color/theme_color\"\r\n        tools:context=\".activity.TrainResultActivity\">\r\n\r\n    <include\r\n            android:id=\"@+id/top\"\r\n            layout=\"@layout/layout_top\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"@dimen/dp_48\"\r\n            app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <androidx.core.widget.NestedScrollView\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"0dp\"\r\n            app:layout_constraintBottom_toTopOf=\"@+id/bottom\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/top\"\r\n            tools:layout_editor_absoluteX=\"16dp\"\r\n            app:layout_constraintVertical_bias=\"0.0\">\r\n\r\n        <androidx.appcompat.widget.LinearLayoutCompat\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"match_parent\"\r\n                android:orientation=\"vertical\">\r\n\r\n            <androidx.constraintlayout.widget.ConstraintLayout\r\n                    android:layout_width=\"match_parent\"\r\n                    android:layout_height=\"wrap_content\">\r\n\r\n                <androidx.constraintlayout.widget.ConstraintLayout\r\n                        android:id=\"@+id/constraintLayout\"\r\n                        android:layout_width=\"match_parent\"\r\n                        android:layout_height=\"60dp\"\r\n                        android:background=\"#22231D\"\r\n                        app:layout_constraintEnd_toEndOf=\"parent\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toTopOf=\"parent\">\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvName\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:layout_marginStart=\"@dimen/dp_20\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"16sp\"\r\n                            android:textStyle=\"bold\"\r\n                            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                            app:layout_constraintEnd_toStartOf=\"@+id/tvTrain\"\r\n                            app:layout_constraintHorizontal_chainStyle=\"spread_inside\"\r\n                            app:layout_constraintStart_toStartOf=\"parent\"\r\n                            app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvTrain\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:drawablePadding=\"4dp\"\r\n                            android:gravity=\"center\"\r\n                            android:text=\"训练\"\r\n                            android:textColor=\"@color/white\"\r\n                            android:textSize=\"16sp\"\r\n                            app:layout_constraintBottom_toBottomOf=\"@+id/tvName\"\r\n                            app:layout_constraintEnd_toStartOf=\"@+id/tvTime\"\r\n                            app:layout_constraintStart_toEndOf=\"@+id/tvName\"\r\n                            app:layout_constraintTop_toTopOf=\"@+id/tvName\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvTime\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:layout_marginEnd=\"@dimen/dp_32\"\r\n                            android:gravity=\"center\"\r\n                            android:text=\"2分30秒\"\r\n                            android:textColor=\"@color/white\"\r\n                            android:textSize=\"@dimen/text_12\"\r\n                            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                            app:layout_constraintEnd_toEndOf=\"parent\"\r\n                            app:layout_constraintStart_toEndOf=\"@+id/tvTrain\"\r\n                            app:layout_constraintTop_toTopOf=\"parent\" />\r\n                </androidx.constraintlayout.widget.ConstraintLayout>\r\n\r\n                <View\r\n                        android:id=\"@+id/view\"\r\n                        android:layout_width=\"5dp\"\r\n                        android:layout_height=\"16dp\"\r\n                        android:layout_marginStart=\"@dimen/dp_20\"\r\n                        android:layout_marginTop=\"@dimen/dp_16\"\r\n                        android:background=\"@drawable/border_dp\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/constraintLayout\" />\r\n\r\n                <TextView\r\n                        android:id=\"@+id/textView2\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginStart=\"@dimen/dp_6\"\r\n                        android:text=\"操作明细\"\r\n                        android:textColor=\"@color/white\"\r\n                        android:textSize=\"@dimen/text_16\"\r\n                        android:textStyle=\"bold\"\r\n                        app:layout_constraintBottom_toBottomOf=\"@+id/view\"\r\n                        app:layout_constraintStart_toEndOf=\"@+id/view\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/view\" />\r\n\r\n                <ImageView\r\n                        android:id=\"@+id/iv1\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginEnd=\"@dimen/dp_48\"\r\n                        android:src=\"@mipmap/icon_wm_chart_heart_red\"\r\n                        app:layout_constraintEnd_toStartOf=\"@+id/tvCycleCount\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/tvCycleCount\" />\r\n\r\n                <TextView\r\n                        android:id=\"@+id/tvCycleCount\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginTop=\"@dimen/dp_16\"\r\n                        android:background=\"@mipmap/icon_wm_start_level_cycle\"\r\n                        android:gravity=\"center\"\r\n                        android:text=\"0\"\r\n                        android:textColor=\"@color/color_37B48B\"\r\n                        android:textStyle=\"bold\"\r\n                        app:layout_constraintEnd_toEndOf=\"parent\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/textView2\" />\r\n\r\n                <ImageView\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginStart=\"@dimen/dp_48\"\r\n                        android:src=\"@mipmap/icon_wm_chart_lung_red\"\r\n                        app:layout_constraintStart_toEndOf=\"@+id/tvCycleCount\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/tvCycleCount\" />\r\n\r\n                <androidx.cardview.widget.CardView\r\n                        android:id=\"@+id/cardView1\"\r\n                        android:layout_width=\"0dp\"\r\n                        android:layout_height=\"@dimen/dp_44\"\r\n                        android:layout_marginStart=\"@dimen/dp_16\"\r\n                        android:layout_marginTop=\"@dimen/dp_12\"\r\n                        android:layout_marginEnd=\"@dimen/dp_8\"\r\n                        app:cardBackgroundColor=\"#B322231D\"\r\n                        app:cardCornerRadius=\"8dp\"\r\n                        app:cardElevation=\"0dp\"\r\n                        app:layout_constraintEnd_toStartOf=\"@+id/cardView2\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/iv1\"\r\n                        app:layout_constraintVertical_chainStyle=\"spread_inside\">\r\n\r\n                    <androidx.constraintlayout.widget.ConstraintLayout\r\n                            android:layout_width=\"match_parent\"\r\n                            android:layout_height=\"match_parent\">\r\n\r\n                        <androidx.appcompat.widget.LinearLayoutCompat\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\">\r\n\r\n                            <TextView\r\n                                    android:id=\"@+id/tvLungCount\"\r\n                                    android:layout_width=\"wrap_content\"\r\n                                    android:layout_height=\"wrap_content\"\r\n                                    android:text=\"0\"\r\n                                    android:textColor=\"@color/color_text_selected\"\r\n                                    android:textSize=\"24sp\"\r\n                                    app:layout_constraintEnd_toStartOf=\"@+id/tvLungTotal\"\r\n                                    app:layout_constraintTop_toTopOf=\"@+id/tvLungTotal\" />\r\n\r\n                            <TextView\r\n                                    android:id=\"@+id/tvLungTotal\"\r\n                                    android:layout_width=\"wrap_content\"\r\n                                    android:layout_height=\"wrap_content\"\r\n                                    android:text=\"/0\"\r\n                                    android:textColor=\"#ffffffff\"\r\n                                    android:textSize=\"24sp\"\r\n                                    app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                                    app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n                        </androidx.appcompat.widget.LinearLayoutCompat>\r\n                    </androidx.constraintlayout.widget.ConstraintLayout>\r\n                </androidx.cardview.widget.CardView>\r\n\r\n                <androidx.cardview.widget.CardView\r\n                        android:id=\"@+id/cardView2\"\r\n                        android:layout_width=\"0dp\"\r\n                        android:layout_height=\"@dimen/dp_44\"\r\n                        android:layout_marginStart=\"@dimen/dp_8\"\r\n                        android:layout_marginEnd=\"@dimen/dp_16\"\r\n                        app:cardBackgroundColor=\"#B322231D\"\r\n                        app:cardCornerRadius=\"8dp\"\r\n                        app:cardElevation=\"0dp\"\r\n                        app:layout_constraintEnd_toEndOf=\"parent\"\r\n                        app:layout_constraintStart_toEndOf=\"@+id/cardView1\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/cardView1\">\r\n\r\n                    <androidx.constraintlayout.widget.ConstraintLayout\r\n                            android:layout_width=\"match_parent\"\r\n                            android:layout_height=\"match_parent\">\r\n\r\n                        <androidx.appcompat.widget.LinearLayoutCompat\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\">\r\n\r\n                            <TextView\r\n                                    android:id=\"@+id/tvHeartCount\"\r\n                                    android:layout_width=\"wrap_content\"\r\n                                    android:layout_height=\"wrap_content\"\r\n                                    android:text=\"0\"\r\n                                    android:textColor=\"@color/color_text_selected\"\r\n                                    android:textSize=\"24sp\"\r\n                                    app:layout_constraintEnd_toStartOf=\"@+id/tvHeartTotal\"\r\n                                    app:layout_constraintTop_toTopOf=\"@+id/tvHeartTotal\" />\r\n\r\n                            <TextView\r\n                                    android:id=\"@+id/tvHeartTotal\"\r\n                                    android:layout_width=\"wrap_content\"\r\n                                    android:layout_height=\"wrap_content\"\r\n                                    android:text=\"/0\"\r\n                                    android:textColor=\"#ffffffff\"\r\n                                    android:textSize=\"24sp\"\r\n                                    app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                                    app:layout_constraintTop_toTopOf=\"parent\" />\r\n                        </androidx.appcompat.widget.LinearLayoutCompat>\r\n                    </androidx.constraintlayout.widget.ConstraintLayout>\r\n                </androidx.cardview.widget.CardView>\r\n\r\n                <androidx.cardview.widget.CardView\r\n                        android:id=\"@+id/cardView3\"\r\n                        android:layout_width=\"0dp\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginStart=\"@dimen/dp_16\"\r\n                        android:layout_marginTop=\"@dimen/dp_12\"\r\n                        android:layout_marginEnd=\"@dimen/dp_8\"\r\n                        app:cardBackgroundColor=\"#B322231D\"\r\n                        app:cardCornerRadius=\"8dp\"\r\n                        app:cardElevation=\"0dp\"\r\n                        app:layout_constraintEnd_toStartOf=\"@+id/cardView4\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/cardView1\"\r\n                        app:layout_constraintVertical_chainStyle=\"spread_inside\">\r\n\r\n                    <androidx.constraintlayout.widget.ConstraintLayout\r\n                            android:layout_width=\"match_parent\"\r\n                            android:layout_height=\"match_parent\"\r\n                            android:paddingBottom=\"@dimen/dp_12\">\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/textView18\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginStart=\"@dimen/dp_16\"\r\n                                android:layout_marginTop=\"@dimen/dp_16\"\r\n                                android:text=\"位置\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\"\r\n                                app:layout_constraintVertical_chainStyle=\"spread_inside\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv19\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginEnd=\"@dimen/dp_35\"\r\n                                android:text=\"不足\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"@+id/textView18\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvLocation\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"10次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/textView18\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/textView18\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvInsufficient\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"10次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv19\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv19\" />\r\n\r\n                        <View\r\n                                android:id=\"@+id/viewline1\"\r\n                                android:layout_width=\"match_parent\"\r\n                                android:layout_height=\"1dp\"\r\n                                android:background=\"#1EFFFFFF\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:layout_marginStart=\"@dimen/dp_12\"\r\n                                android:layout_marginEnd=\"@dimen/dp_12\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvInsufficient\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv21\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:text=\"过大\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvLocation\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewline1\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvPressBig\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"5次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv21\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv21\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv23\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"回弹\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvInsufficient\"\r\n                                app:layout_constraintTop_toTopOf=\"@+id/tv21\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvRebound\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginBottom=\"@dimen/dp_12\"\r\n                                android:text=\"5次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv23\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv23\" />\r\n\r\n                        <View\r\n                                android:id=\"@+id/viewline3\"\r\n                                android:layout_width=\"match_parent\"\r\n                                android:layout_height=\"1dp\"\r\n                                android:background=\"#1EFFFFFF\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:layout_marginStart=\"@dimen/dp_12\"\r\n                                android:layout_marginEnd=\"@dimen/dp_12\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvRebound\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvOutBout\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"超次\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewline3\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvPressBig\" />\r\n\r\n                        <TextView\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"0次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvOutBout\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvOutBout\"\r\n                                android:id=\"@+id/textView15\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvSmallBout\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"少次\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewline3\"\r\n                                app:layout_constraintEnd_toEndOf=\"@+id/tvRebound\" />\r\n\r\n                        <TextView\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"0次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvSmallBout\"\r\n                                app:layout_constraintEnd_toEndOf=\"@+id/tvSmallBout\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvSmallBout\" />\r\n                    </androidx.constraintlayout.widget.ConstraintLayout>\r\n\r\n                </androidx.cardview.widget.CardView>\r\n\r\n                <androidx.cardview.widget.CardView\r\n                        android:id=\"@+id/cardView4\"\r\n                        android:layout_width=\"0dp\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginStart=\"@dimen/dp_8\"\r\n                        android:layout_marginEnd=\"@dimen/dp_16\"\r\n                        app:cardBackgroundColor=\"#B322231D\"\r\n                        app:cardCornerRadius=\"8dp\"\r\n                        app:cardElevation=\"0dp\"\r\n                        app:layout_constraintEnd_toEndOf=\"parent\"\r\n                        app:layout_constraintStart_toEndOf=\"@+id/cardView3\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/cardView3\">\r\n\r\n                    <androidx.constraintlayout.widget.ConstraintLayout\r\n                            android:layout_width=\"match_parent\"\r\n                            android:layout_height=\"match_parent\"\r\n                            android:paddingBottom=\"@dimen/dp_12\">\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv1\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginStart=\"@dimen/dp_16\"\r\n                                android:layout_marginTop=\"@dimen/dp_16\"\r\n                                android:text=\"气道\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\"\r\n                                app:layout_constraintVertical_chainStyle=\"spread_inside\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv2\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginEnd=\"@dimen/dp_35\"\r\n                                android:text=\"不足\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"@+id/tv1\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvAirway\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"10次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv1\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv1\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvCInsufficient\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"10次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv2\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv2\" />\r\n\r\n                        <View\r\n                                android:id=\"@+id/viewLine2\"\r\n                                android:layout_width=\"match_parent\"\r\n                                android:layout_height=\"1dp\"\r\n                                android:background=\"#1EFFFFFF\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:layout_marginStart=\"@dimen/dp_12\"\r\n                                android:layout_marginEnd=\"@dimen/dp_12\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvCInsufficient\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv5\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:text=\"过大\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvAirway\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewLine2\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvBLowBig\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"5次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv5\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv5\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv7\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"进胃\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvCInsufficient\"\r\n                                app:layout_constraintTop_toTopOf=\"@+id/tv5\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvIntoStomach\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginBottom=\"@dimen/dp_12\"\r\n                                android:text=\"5次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tv7\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tv7\" />\r\n\r\n                        <View\r\n                                android:id=\"@+id/viewline4\"\r\n                                android:layout_width=\"match_parent\"\r\n                                android:layout_height=\"1dp\"\r\n                                android:background=\"#1EFFFFFF\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                android:layout_marginStart=\"@dimen/dp_12\"\r\n                                android:layout_marginEnd=\"@dimen/dp_12\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintEnd_toEndOf=\"parent\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvIntoStomach\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvBlowBout\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"超次\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewline4\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvBLowBig\" />\r\n\r\n                        <TextView\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"0次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvBlowBout\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvBlowBout\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvBlowSmallBout\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"少次\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"14sp\"\r\n                                android:layout_marginTop=\"@dimen/dp_6\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/viewline4\"\r\n                                app:layout_constraintEnd_toEndOf=\"@+id/tvIntoStomach\" />\r\n\r\n                        <TextView\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"0次\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"18sp\"\r\n                                app:layout_constraintTop_toBottomOf=\"@+id/tvBlowSmallBout\"\r\n                                app:layout_constraintEnd_toEndOf=\"@+id/tvBlowSmallBout\"\r\n                                app:layout_constraintStart_toStartOf=\"@+id/tvBlowSmallBout\" />\r\n                    </androidx.constraintlayout.widget.ConstraintLayout>\r\n                </androidx.cardview.widget.CardView>\r\n\r\n                <TextView\r\n                        android:id=\"@+id/tvAverageCount\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginStart=\"@dimen/dp_30\"\r\n                        android:layout_marginTop=\"@dimen/dp_20\"\r\n                        android:text=\"平均：115次/分\"\r\n                        android:textColor=\"#ffffffff\"\r\n                        android:textSize=\"16sp\"\r\n                        app:layout_constraintStart_toStartOf=\"parent\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/cardView3\" />\r\n\r\n                <TextView\r\n                        android:id=\"@+id/tvBlowAverageCount\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginEnd=\"@dimen/dp_30\"\r\n                        android:text=\"平均：6次/分\"\r\n                        android:textColor=\"#ffffffff\"\r\n                        android:textSize=\"16sp\"\r\n                        app:layout_constraintEnd_toEndOf=\"@+id/cardView4\"\r\n                        app:layout_constraintTop_toTopOf=\"@+id/tvAverageCount\" />\r\n\r\n                <androidx.constraintlayout.widget.ConstraintLayout\r\n                        android:layout_width=\"match_parent\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:layout_marginTop=\"@dimen/dp_16\"\r\n                        app:layout_constraintTop_toBottomOf=\"@+id/tvAverageCount\">\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvClock1\"\r\n                            android:layout_width=\"130dp\"\r\n                            android:layout_height=\"38dp\"\r\n                            android:layout_marginStart=\"@dimen/dp_24\"\r\n                            android:background=\"@mipmap/icon_wm_bp_2\"\r\n                            android:gravity=\"center_horizontal\"\r\n                            android:text=\"60%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintEnd_toStartOf=\"@+id/tvClock2\"\r\n                            app:layout_constraintHorizontal_chainStyle=\"spread_inside\"\r\n                            app:layout_constraintStart_toStartOf=\"parent\"\r\n                            app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvClock2\"\r\n                            android:layout_width=\"130dp\"\r\n                            android:layout_height=\"38dp\"\r\n                            android:layout_marginEnd=\"@dimen/dp_24\"\r\n                            android:background=\"@mipmap/icon_wm_bp_2\"\r\n                            android:gravity=\"center_horizontal\"\r\n                            android:text=\"70%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintEnd_toEndOf=\"parent\"\r\n                            app:layout_constraintStart_toEndOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n                    <androidx.constraintlayout.widget.ConstraintLayout\r\n                            android:id=\"@+id/constraintLayout3\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:layout_marginTop=\"@dimen/dp_30\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintTop_toTopOf=\"@+id/tvClock1\">\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tv10\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:text=\"t=\"\r\n                                android:textColor=\"#ffffffff\"\r\n                                android:textSize=\"13sp\"\r\n                                app:layout_constraintStart_toStartOf=\"parent\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n                        <TextView\r\n                                android:id=\"@+id/tvPressTime\"\r\n                                android:layout_width=\"wrap_content\"\r\n                                android:layout_height=\"wrap_content\"\r\n                                android:layout_marginStart=\"@dimen/dp_4\"\r\n                                android:textColor=\"@color/color_text_selected\"\r\n                                android:textSize=\"13sp\"\r\n                                app:layout_constraintStart_toEndOf=\"@+id/tv10\"\r\n                                app:layout_constraintTop_toTopOf=\"parent\" />\r\n                    </androidx.constraintlayout.widget.ConstraintLayout>\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvPress\"\r\n                            android:layout_width=\"80dp\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:layout_marginTop=\"@dimen/dp_16\"\r\n                            android:background=\"@color/color_37B48B\"\r\n                            android:gravity=\"center\"\r\n                            android:text=\"98%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintTop_toBottomOf=\"@+id/tvClock1\" />\r\n\r\n                    <View\r\n                            android:id=\"@+id/view4\"\r\n                            android:layout_width=\"@dimen/dp_44\"\r\n                            android:layout_height=\"@dimen/dp_50\"\r\n                            android:background=\"@color/color_text_normal\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvPress\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvPress\"\r\n                            app:layout_constraintTop_toBottomOf=\"@+id/tvPress\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvPressEnd\"\r\n                            android:layout_width=\"80dp\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:background=\"@color/color_37B48B\"\r\n                            android:gravity=\"center\"\r\n                            android:text=\"86%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvClock1\"\r\n                            app:layout_constraintTop_toBottomOf=\"@+id/view4\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvPressBottom\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:layout_marginTop=\"@dimen/dp_10\"\r\n                            android:text=\"平均：5cm\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"16sp\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvPressEnd\"\r\n                            app:layout_constraintTop_toBottomOf=\"@+id/tvPressEnd\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvPressEnd\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvPressCenter\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:drawableTop=\"@mipmap/icon_wm_score\"\r\n                            android:gravity=\"center\"\r\n                            android:text=\"60%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintBottom_toBottomOf=\"@+id/tvPressBottom\"\r\n                            app:layout_constraintEnd_toStartOf=\"@+id/tvClock2\"\r\n                            app:layout_constraintStart_toEndOf=\"@+id/tvClock1\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvBlow\"\r\n                            android:layout_width=\"88dp\"\r\n                            android:layout_height=\"77dp\"\r\n                            android:layout_marginTop=\"@dimen/dp_16\"\r\n                            android:background=\"@mipmap/icon_wm_lung_green\"\r\n                            android:gravity=\"center\"\r\n                            android:paddingBottom=\"@dimen/dp_26\"\r\n                            android:text=\"70%\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"13sp\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvClock2\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvClock2\"\r\n                            app:layout_constraintTop_toBottomOf=\"@+id/tvClock2\" />\r\n\r\n                    <TextView\r\n                            android:id=\"@+id/tvBlowEnd\"\r\n                            android:layout_width=\"wrap_content\"\r\n                            android:layout_height=\"wrap_content\"\r\n                            android:text=\"平均：400ml\"\r\n                            android:textColor=\"#ffffffff\"\r\n                            android:textSize=\"16sp\"\r\n                            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n                            app:layout_constraintEnd_toEndOf=\"@+id/tvBlow\"\r\n                            app:layout_constraintStart_toStartOf=\"@+id/tvBlow\" />\r\n\r\n                </androidx.constraintlayout.widget.ConstraintLayout>\r\n            </androidx.constraintlayout.widget.ConstraintLayout>\r\n        </androidx.appcompat.widget.LinearLayoutCompat>\r\n    </androidx.core.widget.NestedScrollView>\r\n\r\n    <include\r\n            android:id=\"@+id/bottom\"\r\n            layout=\"@layout/layout_bottom_exprot\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"@dimen/dp_60\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\" />\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_train_result.xml b/app/src/main/res/layout/activity_train_result.xml
+--- a/app/src/main/res/layout/activity_train_result.xml	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/res/layout/activity_train_result.xml	(date 1645540168621)
+@@ -4,8 +4,7 @@
+         xmlns:tools="http://schemas.android.com/tools"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+-        android:background="@color/theme_color"
+-        tools:context=".activity.TrainResultActivity">
++        android:background="@color/theme_color">
+ 
+     <include
+             android:id="@+id/top"
+@@ -19,14 +18,20 @@
+             android:layout_height="0dp"
+             app:layout_constraintBottom_toTopOf="@+id/bottom"
+             app:layout_constraintTop_toBottomOf="@+id/top"
+-            tools:layout_editor_absoluteX="16dp"
+-            app:layout_constraintVertical_bias="0.0">
++            tools:layout_editor_absoluteX="16dp">
+ 
+         <androidx.appcompat.widget.LinearLayoutCompat
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:orientation="vertical">
+ 
++            <include
++                    android:id="@+id/layoutCheck"
++                    layout="@layout/layout_check_result"
++                    android:visibility="gone"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content" />
++
+             <androidx.constraintlayout.widget.ConstraintLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content">
+@@ -385,7 +390,7 @@
+                                 android:textSize="18sp"
+                                 app:layout_constraintTop_toBottomOf="@+id/tvOutBout"
+                                 app:layout_constraintStart_toStartOf="@+id/tvOutBout"
+-                                android:id="@+id/textView15" />
++                                android:id="@+id/tvOutBoutCount" />
+ 
+                         <TextView
+                                 android:id="@+id/tvSmallBout"
+@@ -399,6 +404,7 @@
+                                 app:layout_constraintEnd_toEndOf="@+id/tvRebound" />
+ 
+                         <TextView
++                                android:id="@+id/tvSmallBoutCount"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="0次"
+@@ -406,7 +412,14 @@
+                                 android:textSize="18sp"
+                                 app:layout_constraintTop_toBottomOf="@+id/tvSmallBout"
+                                 app:layout_constraintEnd_toEndOf="@+id/tvSmallBout"
+-                                app:layout_constraintStart_toStartOf="@+id/tvSmallBout" />
++                                app:layout_constraintStart_toStartOf="@+id/tvRebound" />
++
++                        <androidx.constraintlayout.widget.Group
++                                android:id="@+id/groupPr"
++                                android:layout_width="wrap_content"
++                                android:layout_height="wrap_content"
++                                android:visibility="gone"
++                                app:constraint_referenced_ids="tvSmallBout, tvSmallBoutCount, tvOutBout, tvOutBoutCount, viewline3" />
+                     </androidx.constraintlayout.widget.ConstraintLayout>
+ 
+                 </androidx.cardview.widget.CardView>
+@@ -551,6 +564,7 @@
+                                 app:layout_constraintStart_toStartOf="@+id/tvBLowBig" />
+ 
+                         <TextView
++                                android:id="@+id/tvBlowBoutCount"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="0次"
+@@ -571,6 +585,7 @@
+                                 app:layout_constraintEnd_toEndOf="@+id/tvIntoStomach" />
+ 
+                         <TextView
++                                android:id="@+id/tvBlowSmallCount"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:text="0次"
+@@ -579,6 +594,13 @@
+                                 app:layout_constraintTop_toBottomOf="@+id/tvBlowSmallBout"
+                                 app:layout_constraintEnd_toEndOf="@+id/tvBlowSmallBout"
+                                 app:layout_constraintStart_toStartOf="@+id/tvBlowSmallBout" />
++
++                        <androidx.constraintlayout.widget.Group
++                                android:id="@+id/groupQy"
++                                android:layout_width="wrap_content"
++                                android:layout_height="wrap_content"
++                                android:visibility="gone"
++                                app:constraint_referenced_ids="tvBlowBout, tvBlowBoutCount, tvBlowSmallBout, viewline4, tvBlowSmallCount" />
+                     </androidx.constraintlayout.widget.ConstraintLayout>
+                 </androidx.cardview.widget.CardView>
+ 
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/CycleFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.fragment\r\n\r\nimport android.media.MediaPlayer\r\nimport android.os.Bundle\r\nimport android.os.Handler\r\nimport android.os.Looper\r\nimport android.os.SystemClock\r\nimport android.util.Log\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.view.animation.AlphaAnimation\r\nimport android.widget.Chronometer\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.lifecycle.Observer\r\nimport androidx.lifecycle.ViewModelProvider\r\nimport com.blankj.utilcode.util.GsonUtils\r\nimport com.pr.perfectrecovery.R\r\nimport com.pr.perfectrecovery.base.BaseConstant\r\nimport com.pr.perfectrecovery.bean.BaseDataDTO\r\nimport com.pr.perfectrecovery.bean.MessageEventData\r\nimport com.pr.perfectrecovery.bean.ScoringConfigBean\r\nimport com.pr.perfectrecovery.bean.TrainingDTO\r\nimport com.pr.perfectrecovery.databinding.CycleFragmentBinding\r\nimport com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel\r\nimport com.pr.perfectrecovery.livedata.StatusLiveData\r\nimport com.pr.perfectrecovery.utils.DataVolatile\r\nimport com.pr.perfectrecovery.utils.TimeUtils\r\nimport com.pr.perfectrecovery.view.DialChart07View\r\nimport com.pr.perfectrecovery.view.PressLayoutView\r\nimport com.tencent.mmkv.MMKV\r\nimport org.greenrobot.eventbus.EventBus\r\nimport java.text.SimpleDateFormat\r\nimport java.util.*\r\nimport kotlin.math.abs\r\n\r\nprivate const val ARG_PARAM1 = \"param1\"\r\nprivate const val ARG_PARAM2 = \"param2\"\r\n\r\n/**\r\n * CPR按压页\r\n */\r\nclass CycleFragment : Fragment() {\r\n    private lateinit var viewBinding: CycleFragmentBinding\r\n    private var counter = Counter()\r\n    private var mMediaPlayer: MediaPlayer? = null\r\n    private var isTS: Boolean = false\r\n    private var isYY: Boolean = false\r\n    private var cycleCount = 0\r\n    private var mBaseDataDTO: BaseDataDTO? = null\r\n    private var isStart = false\r\n    private var isTimeing = true\r\n\r\n    //中断计时累加\r\n    private var timeOut: Long = 0\r\n\r\n    //错误按压数统计\r\n    private var errorPressCount: Int = 0\r\n\r\n    //错误吹起数统计\r\n    private var errorBlowCount: Int = 0\r\n\r\n    //按压总数统计\r\n    private var pressCount: Int = 0\r\n\r\n    //总吹起数统计\r\n    private var blowCount: Int = 0\r\n\r\n    companion object {\r\n        fun newInstance(isTS: Boolean, isYY: Boolean) = CycleFragment().apply {\r\n            arguments = Bundle().apply {\r\n                putBoolean(ARG_PARAM1, isTS)\r\n                putBoolean(ARG_PARAM2, isYY)\r\n            }\r\n        }\r\n    }\r\n\r\n    private lateinit var viewModel: CycleViewModel\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View {\r\n        viewBinding = CycleFragmentBinding.inflate(layoutInflater)\r\n        return viewBinding.root\r\n    }\r\n\r\n    override fun onActivityCreated(savedInstanceState: Bundle?) {\r\n        super.onActivityCreated(savedInstanceState)\r\n        arguments?.let {\r\n            isTS = it.getBoolean(ARG_PARAM1)\r\n            isYY = it.getBoolean(ARG_PARAM2)\r\n        }\r\n        viewModel = ViewModelProvider(this).get(CycleViewModel::class.java)\r\n        initView()\r\n    }\r\n\r\n    private fun initView() {\r\n        alphaAnimation()\r\n        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)\r\n        val configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)\r\n        //按压通气比列\r\n        StatusLiveData.data.observe(requireActivity(), Observer {\r\n            if (it.isStart) {\r\n                setViewDate(it)\r\n                viewBinding.tvPress3.text = \"距离值：${it.distance}\"\r\n                viewBinding.tvPress4.text = \"气压值：${it.bpValue}\"\r\n                viewBinding.tvPress5.text = \"按压频率：${it.pf}\"\r\n                viewBinding.tvPress6.text = \"吹气频率：${it.cf}\"\r\n                viewBinding.tvPress7.text = \"气道状态：${it.aisleType}\"\r\n                viewBinding.tvPress8.text = \"按压位置：${it.psrType}\"\r\n                viewBinding.tvPress9.text = \"初始值：${DataVolatile.preDistance}\"\r\n                viewBinding.tvPress10.text = \"按压深度：${abs(DataVolatile.preDistance - it.distance)}\"\r\n            }\r\n        })\r\n    }\r\n\r\n    private val VOICE_MP3_BGM: Int = 1//节奏音乐\r\n    private val VOICE_MP3_AYBZ: Int = 2//按压不足\r\n    private val VOICE_MP3_AYGD: Int = 3//按压过大\r\n    private val VOICE_MP3_AYWZCW: Int = 4//按压位置错误\r\n    private val VOICE_MP3_CQBZ: Int = 5//吹气不足\r\n    private val VOICE_MP3_CQGD: Int = 6//吹气过大\r\n    private val VOICE_MP3_CQJW: Int = 7//吹气进胃\r\n    private val VOICE_MP3_WDKQD: Int = 8//未打开气道\r\n    private val VOICE_MP3_WHT: Int = 9//未回弹\r\n    private val VOICE_MP3_DIS: Int = 10//蓝牙断开连接\r\n\r\n    private var mpType = -1\r\n    private var isPlay = false\r\n\r\n    private fun setPlayVoice(type: Int) {\r\n        if (isTS && !isPlay) {\r\n            if (mMediaPlayer != null) {\r\n                mMediaPlayer?.reset()\r\n            }\r\n            isPlay = true\r\n            mpType = -1\r\n            when (type) {\r\n                VOICE_MP3_AYBZ -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_aybz)\r\n                }\r\n                VOICE_MP3_AYGD -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_aygd)\r\n                }\r\n                VOICE_MP3_AYWZCW -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_aywzcw)\r\n                }\r\n                VOICE_MP3_CQBZ -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_cqbz)\r\n                }\r\n                VOICE_MP3_CQGD -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_cqgd)\r\n                }\r\n                VOICE_MP3_CQJW -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_cqjw)\r\n                }\r\n                VOICE_MP3_WDKQD -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_wdkqd)\r\n                }\r\n                VOICE_MP3_WHT -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_wht)\r\n                }\r\n                VOICE_MP3_DIS -> {\r\n                    mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_blueooth)\r\n                }\r\n            }\r\n            //如果是其他MP3播完后播节奏\r\n            mMediaPlayer?.setOnCompletionListener {\r\n                isPlay = false\r\n                if (mpType > 0) {\r\n                    setPlayVoice(mpType)\r\n                } else {\r\n                    startMP3()\r\n                }\r\n                mpType = -1\r\n            }\r\n            mMediaPlayer?.start()\r\n        } else {\r\n            mpType = type\r\n        }\r\n    }\r\n\r\n    fun start() {\r\n        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, \"\", null))\r\n        viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)\r\n        viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)\r\n        viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)\r\n        viewBinding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)\r\n        viewBinding.ivPress.visibility = View.INVISIBLE\r\n        viewBinding.pressLayoutView.visibility = View.VISIBLE\r\n        viewBinding.dashBoard.visibility = View.INVISIBLE\r\n        viewBinding.dashBoard2.visibility = View.INVISIBLE\r\n        viewBinding.chart.visibility = View.VISIBLE\r\n        viewBinding.chartQy.visibility = View.VISIBLE\r\n        isStart = true\r\n        startMP3()\r\n    }\r\n\r\n    fun stop(): TrainingDTO {\r\n        //返回成绩结果类\r\n        isStart = false\r\n        val trainingDTO = TrainingDTO()\r\n        mBaseDataDTO?.apply {\r\n            trainingDTO.pressOutTime = TimeUtils.timeParse(timeOut).toString()\r\n            trainingDTO.pressHigh = ERR_PR_HIGH\r\n            trainingDTO.pressLow = ERR_PR_LOW\r\n            trainingDTO.pressLocation = ERR_PR_POSI\r\n            //按压总错误数\r\n            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI\r\n            trainingDTO.blowHigh = ERR_QY_HIGH\r\n            trainingDTO.blowLow = ERR_QY_LOW\r\n            trainingDTO.blowIntoStomach = ERR_QY_DEAD\r\n            trainingDTO.blowClose = ERR_QY_CLOSE\r\n            //吹气总错误数\r\n            trainingDTO.blowErrorCount = ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE\r\n            trainingDTO.pressTotal = prSum\r\n            trainingDTO.blowTotal = qySum\r\n        }\r\n        counter.let { mHandler.removeCallbacks(it) }\r\n        viewBinding.ctTime.stop()\r\n        if (mMediaPlayer != null) {\r\n            mMediaPlayer?.stop()\r\n            mMediaPlayer?.reset()\r\n            mMediaPlayer = null\r\n        }\r\n        return trainingDTO\r\n    }\r\n\r\n    fun bluetoothDisconnected() {\r\n        setPlayVoice(VOICE_MP3_DIS)\r\n    }\r\n\r\n    /**\r\n     * 播放节奏音乐\r\n     */\r\n    private fun startMP3() {\r\n        if (isYY && isStart) {//节奏音\r\n            mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_bg)\r\n            mMediaPlayer?.isLooping = true\r\n            mMediaPlayer?.seekTo(0)\r\n//            mMediaPlayer?.prepareAsync()\r\n            mMediaPlayer?.setOnPreparedListener { // 装载完毕回调\r\n                mMediaPlayer?.start()\r\n            }\r\n        }\r\n    }\r\n\r\n    private val mHandler = object : Handler(Looper.getMainLooper()) {}\r\n    private val mHandler1 = object : Handler(Looper.getMainLooper()) {}\r\n    private val mHandler2 = object : Handler(Looper.getMainLooper()) {}\r\n    private val mHandler3 = object : Handler(Looper.getMainLooper()) {}\r\n    private val mHandler4 = object : Handler(Looper.getMainLooper()) {}\r\n\r\n    private inner class Counter : Runnable {\r\n        override fun run() {\r\n            viewBinding.ctTime.visibility = View.VISIBLE\r\n            //记录一次按压超时\r\n            viewBinding.ctTime.base = SystemClock.elapsedRealtime()\r\n            viewBinding.ctTime.start()\r\n        }\r\n    }\r\n\r\n    private var prValue = 0\r\n    private var qyValue = 0\r\n\r\n    private var err_pr_low = 0\r\n    private var err_pr_high = 0\r\n    private var err_pr_posi = 0\r\n    private var err_qr_unback = 0\r\n    private var isTimeOut = false\r\n\r\n    private fun setViewDate(dataDTO: BaseDataDTO?) {\r\n        if (dataDTO != null) {\r\n            mBaseDataDTO = dataDTO\r\n            //计算循环次数\r\n            if (dataDTO.prSum / 30 > cycleCount && dataDTO.qySum / 2 > cycleCount) {\r\n                cycleCount++\r\n                //更新循环次数\r\n                EventBus.getDefault()\r\n                    .post(\r\n                        MessageEventData(\r\n                            BaseConstant.EVENT_SINGLE_DATA_CYCLE,\r\n                            \"$cycleCount\",\r\n                            null\r\n                        )\r\n                    )\r\n            }\r\n            //吹气频率\r\n            setRate(viewBinding.chartQy, dataDTO.cf)\r\n            //按压\r\n            pr(dataDTO)\r\n            //吹气\r\n            qy(dataDTO)\r\n            if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0) {\r\n                isTimeOut = true\r\n                mHandler.removeCallbacks(counter)\r\n                mHandler.postDelayed(counter, 5000)\r\n            }\r\n            //更新循环次数\r\n            if (pressCount != dataDTO.prSum && isTimeing) {\r\n                isTimeing = false\r\n                EventBus.getDefault()\r\n                    .post(\r\n                        MessageEventData(\r\n                            BaseConstant.EVENT_CPR_TIMEING,\r\n                            \"\",\r\n                            null\r\n                        )\r\n                    )\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun qy(dataDTO: BaseDataDTO) {\r\n        //通气道是否打开 0-关闭 1-打开\r\n        if (dataDTO.aisleType == 1) {\r\n            viewBinding.ivAim.visibility = View.INVISIBLE\r\n            blowCount++\r\n            if (qyValue != dataDTO.qySum) {\r\n                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)\r\n                when {\r\n                    qyMax in 40..80 -> {//通气正常\r\n                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)\r\n                    }\r\n                    qyMax in 80..100 -> {//通气过大\r\n                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)\r\n                        setPlayVoice(VOICE_MP3_CQGD)\r\n                    }\r\n                    qyMax < 40 -> {//通气不足\r\n                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)\r\n                        setPlayVoice(VOICE_MP3_CQBZ)\r\n                    }\r\n                    qyMax > 100 -> {//吹气进胃\r\n                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)\r\n                        setPlayVoice(VOICE_MP3_CQJW)\r\n                    }\r\n                }\r\n                //吹气变灰\r\n                mHandler1.removeCallbacks(blowRunnable)\r\n                mHandler1.postDelayed(blowRunnable, 2000)\r\n                stopOutTime()\r\n            }\r\n        } else {\r\n            if (dataDTO.bpValue > 10) {\r\n                stopOutTime()\r\n                setPlayVoice(VOICE_MP3_WDKQD)\r\n            }\r\n            viewBinding.ivAim.visibility = View.VISIBLE\r\n            mHandler4.removeCallbacksAndMessages(null)\r\n            mHandler4.postAtTime(this::setQyAimVisibility, 2000)\r\n        }\r\n        if (dataDTO.bpValue <= 0) {\r\n            //吹气频率清零\r\n            mHandler2.removeCallbacks(runnableCF)\r\n            mHandler2.postDelayed(runnableCF, 10000)\r\n        }\r\n\r\n        qyValue = dataDTO.qySum\r\n        //吹气错误数统计\r\n        viewBinding.tvLungError.text =\r\n            \"${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}\"\r\n    }\r\n\r\n    private fun setQyAimVisibility() {\r\n        viewBinding.ivAim.visibility = View.INVISIBLE\r\n    }\r\n\r\n    private fun pr(dataDTO: BaseDataDTO) {\r\n        //按压位置 0-错误  1-正确\r\n//        if (dataDTO.psrType == 1) {\r\n        //按压频率\r\n        setRate(viewBinding.chart, dataDTO.pf)\r\n        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)\r\n        if (dataDTO.prSum != prValue) {\r\n            prValue = dataDTO.prSum\r\n            //暂停超时时间 - 判断是否小于初始值\r\n            stopOutTime()\r\n            //按压位置错误\r\n            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {\r\n                err_pr_posi = dataDTO.ERR_PR_POSI\r\n                setPlayVoice(VOICE_MP3_AYWZCW)\r\n            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {\r\n                //按压未回弹\r\n                err_qr_unback = dataDTO.ERR_PR_UNBACK\r\n                viewBinding.pressLayoutView.setUnBack()\r\n                setPlayVoice(VOICE_MP3_WHT)\r\n            } else {\r\n                //按压不足\r\n                if (err_pr_low != dataDTO.ERR_PR_LOW) {\r\n                    Log.e(\"TAG123\", \"按压错误：${dataDTO.ERR_PR_LOW}\")\r\n                    err_pr_low = dataDTO.ERR_PR_LOW\r\n                    viewBinding.pressLayoutView.setDown()\r\n                    setPlayVoice(VOICE_MP3_AYBZ)\r\n                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大\r\n                    err_pr_high = dataDTO.ERR_PR_HIGH\r\n                    setPlayVoice(VOICE_MP3_AYGD)\r\n                }\r\n            }\r\n            pressCount = dataDTO.prSum\r\n        }\r\n//        }\r\n        //按压位置错误显示错误图标\r\n        if (dataDTO.psrType == 0) {\r\n            viewBinding.ivPressAim.visibility = View.VISIBLE\r\n            mHandler3.removeCallbacksAndMessages(null)\r\n            mHandler3.postAtTime(Runnable {\r\n                viewBinding.ivPressAim.visibility = View.INVISIBLE\r\n            }, 2000)\r\n            stopOutTime()\r\n        } else {\r\n            viewBinding.ivPressAim.visibility = View.INVISIBLE\r\n        }\r\n\r\n        //按压错误数统计\r\n        viewBinding.tvPress.text =\r\n            \"${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}\"\r\n        //按压总数\r\n        viewBinding.tvPressTotal.text = \"/${dataDTO.prSum}\"\r\n        viewBinding.tvLungTotal.text = \"/${dataDTO.qySum}\"\r\n    }\r\n\r\n    private fun stopOutTime() {\r\n        //暂停超时时间\r\n        isTimeOut = false\r\n        viewBinding.ctTime.visibility = View.INVISIBLE\r\n        mHandler.removeCallbacks(counter)\r\n        viewBinding.ctTime.stop()\r\n    }\r\n\r\n    //按压吹气频率\r\n    private fun setRate(view: DialChart07View, value: Int) {\r\n        val max = 200\r\n        val min = 0\r\n        val p = value % (max - min + 1) + min\r\n        val pf = p / 200f\r\n        view.setCurrentStatus(pf)\r\n        view.invalidate()\r\n    }\r\n\r\n    /**\r\n     * 吹气图恢复状态\r\n     */\r\n    private val blowRunnable = Runnable {\r\n        viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)\r\n        setRate(viewBinding.chartQy, 0)\r\n    }\r\n\r\n    //按压中断 - 开启计时器 频率清零\r\n    private val runnableCF = Runnable {\r\n        DataVolatile.setCF_Value()\r\n    }\r\n\r\n    override fun onResume() {\r\n        super.onResume()\r\n        setRate(viewBinding.chart, 0)\r\n        setRate(viewBinding.chartQy, 0)\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        if (mMediaPlayer != null) {\r\n            mMediaPlayer!!.stop()\r\n            mMediaPlayer!!.release()\r\n            mMediaPlayer = null\r\n        }\r\n        //数据清零\r\n        DataVolatile.dataClear()\r\n    }\r\n\r\n    private var alphaAniShow: AlphaAnimation? = null\r\n    private var alphaAniHide: AlphaAnimation? = null\r\n\r\n    //透明度动画\r\n    private fun alphaAnimation() {\r\n        //显示\r\n        alphaAniShow = AlphaAnimation(0f, 1f) //百分比透明度，从0%到100%显示\r\n        alphaAniShow?.duration = 100 //一秒\r\n\r\n        //隐藏\r\n        alphaAniHide = AlphaAnimation(1f, 0f)\r\n        alphaAniHide?.duration = 100\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/CycleFragment.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/CycleFragment.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/CycleFragment.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/fragment/CycleFragment.kt	(date 1645537002101)
+@@ -206,8 +206,9 @@
+             trainingDTO.pressHigh = ERR_PR_HIGH
+             trainingDTO.pressLow = ERR_PR_LOW
+             trainingDTO.pressLocation = ERR_PR_POSI
++            trainingDTO.pressRebound = ERR_PR_UNBACK
+             //按压总错误数
+-            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI
++            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI + ERR_PR_UNBACK
+             trainingDTO.blowHigh = ERR_QY_HIGH
+             trainingDTO.blowLow = ERR_QY_LOW
+             trainingDTO.blowIntoStomach = ERR_QY_DEAD
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultFragment.kt
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultFragment.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultFragment.kt
+deleted file mode 100644
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultFragment.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ /dev/null	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
+@@ -1,42 +0,0 @@
+-package com.pr.perfectrecovery.fragment
+-
+-import androidx.lifecycle.ViewModelProvider
+-import android.os.Bundle
+-import androidx.fragment.app.Fragment
+-import android.view.LayoutInflater
+-import android.view.View
+-import android.view.ViewGroup
+-import com.pr.perfectrecovery.databinding.CheckResultFragmentBinding
+-import com.pr.perfectrecovery.fragment.viewmodel.CheckResultViewModel
+-
+-/**
+- * 考核结果页
+- */
+-class CheckResultFragment : Fragment() {
+-
+-    companion object {
+-        fun newInstance() = CheckResultFragment()
+-    }
+-
+-    private lateinit var viewModel: CheckResultViewModel
+-    private lateinit var viewBinding: CheckResultFragmentBinding
+-
+-    override fun onCreateView(
+-        inflater: LayoutInflater, container: ViewGroup?,
+-        savedInstanceState: Bundle?
+-    ): View {
+-        viewBinding = CheckResultFragmentBinding.inflate(layoutInflater)
+-        return viewBinding.root
+-    }
+-
+-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+-        super.onActivityCreated(savedInstanceState)
+-        viewModel = ViewModelProvider(this).get(CheckResultViewModel::class.java)
+-        initView()
+-    }
+-
+-    private fun initView() {
+-
+-    }
+-
+-}
+\ No newline at end of file
+Index: app/src/main/res/layout/check_result_fragment.xml
+===================================================================
+diff --git a/app/src/main/res/layout/check_result_fragment.xml b/app/src/main/res/layout/check_result_fragment.xml
+deleted file mode 100644
+--- a/app/src/main/res/layout/check_result_fragment.xml	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ /dev/null	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
+@@ -1,482 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-        xmlns:app="http://schemas.android.com/apk/res-auto"
+-        xmlns:tools="http://schemas.android.com/tools"
+-        android:layout_width="match_parent"
+-        android:layout_height="match_parent"
+-        android:background="@color/theme_color">
+-
+-    <include
+-            android:id="@+id/top"
+-            layout="@layout/layout_top"
+-            android:layout_width="match_parent"
+-            android:layout_height="50dp"
+-            app:layout_constraintTop_toTopOf="parent" />
+-
+-    <androidx.core.widget.NestedScrollView
+-            android:layout_width="match_parent"
+-            android:layout_height="0dp"
+-            app:layout_constraintTop_toBottomOf="@+id/top"
+-            app:layout_constraintBottom_toBottomOf="parent">
+-
+-        <androidx.appcompat.widget.LinearLayoutCompat
+-                android:layout_width="match_parent"
+-                android:layout_height="match_parent">
+-
+-            <androidx.constraintlayout.widget.ConstraintLayout
+-                    android:layout_width="match_parent"
+-                    android:layout_height="match_parent">
+-
+-                <androidx.constraintlayout.widget.ConstraintLayout
+-                        android:id="@+id/constraintLayout"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="60dp"
+-                        android:background="#22231D"
+-                        app:layout_constraintTop_toTopOf="parent"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toStartOf="parent">
+-
+-                    <TextView
+-                            android:id="@+id/tvName"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginStart="@dimen/dp_38"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="16sp"
+-                            android:textStyle="bold"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvTrain"
+-                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+-                            app:layout_constraintStart_toStartOf="parent"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <TextView
+-                            android:id="@+id/tvTrain"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:drawablePadding="4dp"
+-                            android:gravity="center"
+-                            android:text="训练"
+-                            android:textColor="@color/white"
+-                            android:textSize="16sp"
+-                            android:textStyle="bold"
+-                            app:layout_constraintBottom_toBottomOf="@+id/tvName"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvTime"
+-                            app:layout_constraintStart_toEndOf="@+id/tvName"
+-                            app:layout_constraintTop_toTopOf="@+id/tvName" />
+-
+-                    <TextView
+-                            android:id="@+id/tvTime"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:gravity="center"
+-                            android:text="30:2"
+-                            android:textColor="@color/white"
+-                            android:textSize="@dimen/text_16"
+-                            android:textStyle="bold"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvCountdown"
+-                            app:layout_constraintStart_toEndOf="@+id/tvTrain"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <TextView
+-                            android:id="@+id/tvCountdown"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginEnd="@dimen/dp_12"
+-                            android:gravity="center"
+-                            android:text="0:30"
+-                            android:textColor="@color/white"
+-                            android:textSize="16sp"
+-                            android:textStyle="bold"
+-                            app:drawableStartCompat="@mipmap/icon_wm_countdown"
+-                            app:layout_constraintBottom_toBottomOf="@+id/tvTime"
+-                            app:layout_constraintEnd_toEndOf="parent"
+-                            app:layout_constraintStart_toEndOf="@+id/tvTime"
+-                            app:layout_constraintTop_toTopOf="@+id/tvTime" />
+-                </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                <TextView
+-                        android:id="@+id/tv1"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_16"
+-                        android:layout_marginTop="@dimen/dp_12"
+-                        android:drawablePadding="@dimen/dp_5"
+-                        android:text="CPR分数设定"
+-                        android:textColor="#ffffff"
+-                        android:textSize="14sp"
+-                        app:drawableStartCompat="@mipmap/icon_wm_fraction"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+-
+-                <androidx.constraintlayout.widget.ConstraintLayout
+-                        android:id="@+id/constraintLayout2"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginTop="@dimen/dp_10"
+-                        app:layout_constraintTop_toBottomOf="@+id/tv1">
+-
+-                    <androidx.appcompat.widget.LinearLayoutCompat
+-                            android:id="@+id/line1"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:orientation="horizontal"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toStartOf="@+id/line2"
+-                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+-                            app:layout_constraintStart_toStartOf="parent"
+-                            app:layout_constraintTop_toTopOf="parent">
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="流程："
+-                                android:textColor="#B3FFFFFF"
+-                                android:textSize="13sp" />
+-
+-                        <TextView
+-                                android:id="@+id/tvProcess"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="#ffffff"
+-                                android:textSize="13sp" />
+-                    </androidx.appcompat.widget.LinearLayoutCompat>
+-
+-                    <androidx.appcompat.widget.LinearLayoutCompat
+-                            android:id="@+id/line2"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:orientation="horizontal"
+-                            app:layout_constraintEnd_toStartOf="@+id/line1"
+-                            app:layout_constraintStart_toEndOf="@+id/line3"
+-                            app:layout_constraintTop_toTopOf="parent">
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="按压："
+-                                android:textColor="#B3FFFFFF"
+-                                android:textSize="13sp" />
+-
+-                        <TextView
+-                                android:id="@+id/tvPress"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="#ffffff"
+-                                android:textSize="13sp" />
+-                    </androidx.appcompat.widget.LinearLayoutCompat>
+-
+-                    <androidx.appcompat.widget.LinearLayoutCompat
+-                            android:id="@+id/line3"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:orientation="horizontal"
+-                            app:layout_constraintEnd_toStartOf="@+id/line4"
+-                            app:layout_constraintStart_toEndOf="@+id/line2"
+-                            app:layout_constraintTop_toTopOf="parent">
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="扣分："
+-                                android:textColor="#B3FFFFFF"
+-                                android:textSize="13sp" />
+-
+-                        <TextView
+-                                android:id="@+id/tvDeduction"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="#ffffff"
+-                                android:textSize="13sp" />
+-                    </androidx.appcompat.widget.LinearLayoutCompat>
+-
+-                    <androidx.appcompat.widget.LinearLayoutCompat
+-                            android:id="@+id/line4"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:orientation="horizontal"
+-                            app:layout_constraintEnd_toEndOf="parent"
+-                            app:layout_constraintStart_toEndOf="@+id/line3"
+-                            app:layout_constraintTop_toTopOf="parent">
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="通气："
+-                                android:textColor="#B3FFFFFF"
+-                                android:textSize="13sp" />
+-
+-                        <TextView
+-                                android:id="@+id/tvVentilation"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="#ffffff"
+-                                android:textSize="13sp" />
+-                    </androidx.appcompat.widget.LinearLayoutCompat>
+-
+-                </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                <androidx.constraintlayout.widget.ConstraintLayout
+-                        android:id="@+id/clPF"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content"
+-                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+-
+-                    <RatingBar
+-                            android:id="@+id/ratingBar"
+-                            style="@style/foodRatingBar"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginTop="@dimen/dp_20"
+-                            android:isIndicator="false"
+-                            android:numStars="5"
+-                            android:rating="0"
+-                            android:stepSize="0.5"
+-                            app:layout_constraintEnd_toEndOf="parent"
+-                            app:layout_constraintStart_toStartOf="parent"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <TextView
+-                            android:id="@+id/tvScore"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:text="0"
+-                            android:textColor="@color/color_37B48B"
+-                            android:textSize="36sp"
+-                            android:textStyle="bold"
+-                            app:layout_constraintEnd_toEndOf="@+id/ratingBar"
+-                            app:layout_constraintStart_toStartOf="@+id/ratingBar"
+-                            app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
+-
+-                    <TextView
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginStart="@dimen/dp_4"
+-                            android:layout_marginBottom="@dimen/dp_8"
+-                            android:text="分"
+-                            android:textColor="@color/color_text_normal"
+-                            android:textSize="18sp"
+-                            android:textStyle="bold"
+-                            app:layout_constraintBottom_toBottomOf="@+id/tvScore"
+-                            app:layout_constraintStart_toEndOf="@+id/tvScore" />
+-                </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView1"
+-                        android:layout_width="0dp"
+-                        android:layout_height="@dimen/dp_60"
+-                        android:layout_marginStart="@dimen/dp_16"
+-                        android:layout_marginTop="@dimen/dp_5"
+-                        android:layout_marginEnd="@dimen/dp_8"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="4dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toStartOf="@+id/cardView2"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/clPF"
+-                        app:layout_constraintVertical_chainStyle="spread_inside">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent">
+-
+-                        <TextView
+-                                android:id="@+id/tv3"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:text="按压得分"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="16sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent" />
+-
+-                        <TextView
+-                                android:id="@+id/tvPressScore"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="24sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintStart_toStartOf="@+id/tv3"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv3" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_6"
+-                                android:layout_marginBottom="@dimen/dp_5"
+-                                android:text="分"
+-                                android:textColor="#909090"
+-                                android:textSize="12sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintBottom_toBottomOf="@+id/tvPressScore"
+-                                app:layout_constraintStart_toEndOf="@+id/tvPressScore" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView2"
+-                        android:layout_width="0dp"
+-                        android:layout_height="@dimen/dp_60"
+-                        android:layout_marginStart="@dimen/dp_10"
+-                        android:layout_marginEnd="@dimen/dp_8"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="4dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toStartOf="@+id/cardView3"
+-                        app:layout_constraintStart_toEndOf="@+id/cardView1"
+-                        app:layout_constraintTop_toTopOf="@+id/cardView1">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent">
+-
+-                        <TextView
+-                                android:id="@+id/tv4"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:text="中断扣分"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="16sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent" />
+-
+-                        <TextView
+-                                android:id="@+id/tvInterruptScore"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="24sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintStart_toStartOf="@+id/tv4"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv4" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_6"
+-                                android:layout_marginBottom="@dimen/dp_5"
+-                                android:text="分"
+-                                android:textColor="#909090"
+-                                android:textSize="12sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintBottom_toBottomOf="@+id/tvInterruptScore"
+-                                app:layout_constraintStart_toEndOf="@+id/tvInterruptScore" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView3"
+-                        android:layout_width="0dp"
+-                        android:layout_height="@dimen/dp_60"
+-                        android:layout_marginStart="@dimen/dp_8"
+-                        android:layout_marginEnd="@dimen/dp_16"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="4dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toEndOf="@+id/cardView2"
+-                        app:layout_constraintTop_toTopOf="@+id/cardView2">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent">
+-
+-                        <TextView
+-                                android:id="@+id/tv5"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:text="通气得分"
+-                                android:textColor="@color/white"
+-                                android:textSize="16sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent" />
+-
+-                        <TextView
+-                                android:id="@+id/tvVentilationScore"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:textColor="@color/white"
+-                                android:textSize="24sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintStart_toStartOf="@+id/tv5"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv5" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_6"
+-                                android:layout_marginBottom="@dimen/dp_5"
+-                                android:text="分"
+-                                android:textColor="#909090"
+-                                android:textSize="12sp"
+-                                android:textStyle="bold"
+-                                app:layout_constraintBottom_toBottomOf="@+id/tvVentilationScore"
+-                                app:layout_constraintStart_toEndOf="@+id/tvVentilationScore" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <View
+-                        android:id="@+id/view"
+-                        android:layout_width="5dp"
+-                        android:layout_height="16dp"
+-                        android:layout_marginStart="@dimen/dp_16"
+-                        android:layout_marginTop="@dimen/dp_20"
+-                        android:background="@drawable/border_dp"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/cardView1" />
+-
+-                <TextView
+-                        android:id="@+id/tv6"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_6"
+-                        android:text="流程得分"
+-                        android:textColor="@color/white"
+-                        android:textSize="16sp"
+-                        app:layout_constraintBottom_toBottomOf="@+id/view"
+-                        app:layout_constraintStart_toEndOf="@+id/view"
+-                        app:layout_constraintTop_toTopOf="@+id/view" />
+-
+-                <TextView
+-                        android:id="@+id/tvProcessScore2"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_28"
+-                        android:text="4"
+-                        android:textColor="#ffffffff"
+-                        android:textSize="24sp"
+-                        android:textStyle="bold"
+-                        app:layout_constraintBottom_toBottomOf="@+id/tv6"
+-                        app:layout_constraintStart_toEndOf="@+id/tv6"
+-                        app:layout_constraintTop_toTopOf="@+id/tv6" />
+-
+-                <TextView
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_6"
+-                        android:layout_marginBottom="@dimen/dp_5"
+-                        android:text="分"
+-                        android:textColor="#909090"
+-                        android:textSize="12sp"
+-                        android:textStyle="bold"
+-                        app:layout_constraintBottom_toBottomOf="@+id/tvProcessScore2"
+-                        app:layout_constraintStart_toEndOf="@+id/tvProcessScore2" />
+-
+-                <include
+-                        android:id="@+id/check"
+-                        layout="@layout/layout_check_event"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content"
+-                        app:layout_constraintTop_toBottomOf="@+id/tv6" />
+-            </androidx.constraintlayout.widget.ConstraintLayout>
+-        </androidx.appcompat.widget.LinearLayoutCompat>
+-    </androidx.core.widget.NestedScrollView>
+-</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/check_result_two_fragment.xml
+===================================================================
+diff --git a/app/src/main/res/layout/check_result_two_fragment.xml b/app/src/main/res/layout/check_result_two_fragment.xml
+deleted file mode 100644
+--- a/app/src/main/res/layout/check_result_two_fragment.xml	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ /dev/null	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
+@@ -1,776 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-        xmlns:app="http://schemas.android.com/apk/res-auto"
+-        xmlns:tools="http://schemas.android.com/tools"
+-        android:layout_width="match_parent"
+-        android:layout_height="match_parent"
+-        android:background="@color/theme_color"
+-        tools:context=".activity.TrainResultActivity">
+-
+-    <include
+-            android:id="@+id/top"
+-            layout="@layout/layout_top"
+-            android:layout_width="match_parent"
+-            android:layout_height="@dimen/dp_48"
+-            app:layout_constraintTop_toTopOf="parent" />
+-
+-    <androidx.core.widget.NestedScrollView
+-            android:layout_width="match_parent"
+-            android:layout_height="0dp"
+-            app:layout_constraintBottom_toTopOf="@+id/bottom"
+-            app:layout_constraintTop_toBottomOf="@+id/top"
+-            tools:layout_editor_absoluteX="16dp"
+-            app:layout_constraintVertical_bias="0.0">
+-
+-        <androidx.appcompat.widget.LinearLayoutCompat
+-                android:layout_width="match_parent"
+-                android:layout_height="match_parent"
+-                android:orientation="vertical">
+-
+-            <androidx.constraintlayout.widget.ConstraintLayout
+-                    android:layout_width="match_parent"
+-                    android:layout_height="wrap_content">
+-
+-                <androidx.constraintlayout.widget.ConstraintLayout
+-                        android:id="@+id/constraintLayout"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="60dp"
+-                        android:background="#22231D"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toTopOf="parent">
+-
+-                    <TextView
+-                            android:id="@+id/tvName"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginStart="@dimen/dp_20"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="16sp"
+-                            android:textStyle="bold"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvTrain"
+-                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+-                            app:layout_constraintStart_toStartOf="parent"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <TextView
+-                            android:id="@+id/tvTrain"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:drawablePadding="4dp"
+-                            android:gravity="center"
+-                            android:text="训练"
+-                            android:textColor="@color/white"
+-                            android:textSize="16sp"
+-                            app:layout_constraintBottom_toBottomOf="@+id/tvName"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvTime"
+-                            app:layout_constraintStart_toEndOf="@+id/tvName"
+-                            app:layout_constraintTop_toTopOf="@+id/tvName" />
+-
+-                    <TextView
+-                            android:id="@+id/tvTime"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginEnd="@dimen/dp_32"
+-                            android:gravity="center"
+-                            android:text="2分30秒"
+-                            android:textColor="@color/white"
+-                            android:textSize="@dimen/text_12"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toEndOf="parent"
+-                            app:layout_constraintStart_toEndOf="@+id/tvTrain"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-                </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                <View
+-                        android:id="@+id/view"
+-                        android:layout_width="5dp"
+-                        android:layout_height="16dp"
+-                        android:layout_marginStart="@dimen/dp_20"
+-                        android:layout_marginTop="@dimen/dp_16"
+-                        android:background="@drawable/border_dp"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+-
+-                <TextView
+-                        android:id="@+id/textView2"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_6"
+-                        android:text="操作明细"
+-                        android:textColor="@color/white"
+-                        android:textSize="@dimen/text_16"
+-                        android:textStyle="bold"
+-                        app:layout_constraintBottom_toBottomOf="@+id/view"
+-                        app:layout_constraintStart_toEndOf="@+id/view"
+-                        app:layout_constraintTop_toTopOf="@+id/view" />
+-
+-                <ImageView
+-                        android:id="@+id/iv1"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginEnd="@dimen/dp_48"
+-                        android:src="@mipmap/icon_wm_chart_heart_red"
+-                        app:layout_constraintEnd_toStartOf="@+id/tvCycleCount"
+-                        app:layout_constraintTop_toTopOf="@+id/tvCycleCount" />
+-
+-                <TextView
+-                        android:id="@+id/tvCycleCount"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginTop="@dimen/dp_16"
+-                        android:background="@mipmap/icon_wm_start_level_cycle"
+-                        android:gravity="center"
+-                        android:text="0"
+-                        android:textColor="@color/color_37B48B"
+-                        android:textStyle="bold"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+-
+-                <ImageView
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_48"
+-                        android:src="@mipmap/icon_wm_chart_lung_red"
+-                        app:layout_constraintStart_toEndOf="@+id/tvCycleCount"
+-                        app:layout_constraintTop_toTopOf="@+id/tvCycleCount" />
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView1"
+-                        android:layout_width="0dp"
+-                        android:layout_height="@dimen/dp_44"
+-                        android:layout_marginStart="@dimen/dp_16"
+-                        android:layout_marginTop="@dimen/dp_12"
+-                        android:layout_marginEnd="@dimen/dp_8"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="8dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toStartOf="@+id/cardView2"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/iv1"
+-                        app:layout_constraintVertical_chainStyle="spread_inside">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent">
+-
+-                        <androidx.appcompat.widget.LinearLayoutCompat
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                app:layout_constraintBottom_toBottomOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent">
+-
+-                            <TextView
+-                                    android:id="@+id/tvLungCount"
+-                                    android:layout_width="wrap_content"
+-                                    android:layout_height="wrap_content"
+-                                    android:text="0"
+-                                    android:textColor="@color/color_text_selected"
+-                                    android:textSize="24sp"
+-                                    app:layout_constraintEnd_toStartOf="@+id/tvLungTotal"
+-                                    app:layout_constraintTop_toTopOf="@+id/tvLungTotal" />
+-
+-                            <TextView
+-                                    android:id="@+id/tvLungTotal"
+-                                    android:layout_width="wrap_content"
+-                                    android:layout_height="wrap_content"
+-                                    android:text="/0"
+-                                    android:textColor="#ffffffff"
+-                                    android:textSize="24sp"
+-                                    app:layout_constraintBottom_toBottomOf="parent"
+-                                    app:layout_constraintTop_toTopOf="parent" />
+-
+-                        </androidx.appcompat.widget.LinearLayoutCompat>
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView2"
+-                        android:layout_width="0dp"
+-                        android:layout_height="@dimen/dp_44"
+-                        android:layout_marginStart="@dimen/dp_8"
+-                        android:layout_marginEnd="@dimen/dp_16"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="8dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toEndOf="@+id/cardView1"
+-                        app:layout_constraintTop_toTopOf="@+id/cardView1">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent">
+-
+-                        <androidx.appcompat.widget.LinearLayoutCompat
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                app:layout_constraintBottom_toBottomOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent">
+-
+-                            <TextView
+-                                    android:id="@+id/tvHeartCount"
+-                                    android:layout_width="wrap_content"
+-                                    android:layout_height="wrap_content"
+-                                    android:text="0"
+-                                    android:textColor="@color/color_text_selected"
+-                                    android:textSize="24sp"
+-                                    app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
+-                                    app:layout_constraintTop_toTopOf="@+id/tvHeartTotal" />
+-
+-                            <TextView
+-                                    android:id="@+id/tvHeartTotal"
+-                                    android:layout_width="wrap_content"
+-                                    android:layout_height="wrap_content"
+-                                    android:text="/0"
+-                                    android:textColor="#ffffffff"
+-                                    android:textSize="24sp"
+-                                    app:layout_constraintBottom_toBottomOf="parent"
+-                                    app:layout_constraintTop_toTopOf="parent" />
+-                        </androidx.appcompat.widget.LinearLayoutCompat>
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView3"
+-                        android:layout_width="0dp"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_16"
+-                        android:layout_marginTop="@dimen/dp_12"
+-                        android:layout_marginEnd="@dimen/dp_8"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="8dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toStartOf="@+id/cardView4"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/cardView1"
+-                        app:layout_constraintVertical_chainStyle="spread_inside">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent"
+-                            android:paddingBottom="@dimen/dp_12">
+-
+-                        <TextView
+-                                android:id="@+id/textView18"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_16"
+-                                android:layout_marginTop="@dimen/dp_16"
+-                                android:text="位置"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent"
+-                                app:layout_constraintVertical_chainStyle="spread_inside" />
+-
+-                        <TextView
+-                                android:id="@+id/tv19"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginEnd="@dimen/dp_35"
+-                                android:text="不足"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toTopOf="@+id/textView18" />
+-
+-                        <TextView
+-                                android:id="@+id/tvLocation"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="10次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/textView18"
+-                                app:layout_constraintTop_toBottomOf="@+id/textView18" />
+-
+-                        <TextView
+-                                android:id="@+id/tvInsufficient"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="10次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv19"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv19" />
+-
+-                        <View
+-                                android:id="@+id/viewline1"
+-                                android:layout_width="match_parent"
+-                                android:layout_height="1dp"
+-                                android:background="#1EFFFFFF"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginEnd="@dimen/dp_12"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvInsufficient" />
+-
+-                        <TextView
+-                                android:id="@+id/tv21"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:text="过大"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tvLocation"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewline1" />
+-
+-                        <TextView
+-                                android:id="@+id/tvPressBig"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="5次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv21"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv21" />
+-
+-                        <TextView
+-                                android:id="@+id/tv23"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="回弹"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tvInsufficient"
+-                                app:layout_constraintTop_toTopOf="@+id/tv21" />
+-
+-                        <TextView
+-                                android:id="@+id/tvRebound"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginBottom="@dimen/dp_12"
+-                                android:text="5次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv23"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv23" />
+-
+-                        <View
+-                                android:id="@+id/viewline3"
+-                                android:layout_width="match_parent"
+-                                android:layout_height="1dp"
+-                                android:background="#1EFFFFFF"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginEnd="@dimen/dp_12"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvRebound" />
+-
+-                        <TextView
+-                                android:id="@+id/tvOutBout"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="超次"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewline3"
+-                                app:layout_constraintStart_toStartOf="@+id/tvPressBig" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="0次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvOutBout"
+-                                app:layout_constraintStart_toStartOf="@+id/tvOutBout"
+-                                android:id="@+id/textView15" />
+-
+-                        <TextView
+-                                android:id="@+id/tvSmallBout"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="少次"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewline3"
+-                                app:layout_constraintEnd_toEndOf="@+id/tvRebound" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="0次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvSmallBout"
+-                                app:layout_constraintEnd_toEndOf="@+id/tvSmallBout"
+-                                app:layout_constraintStart_toStartOf="@+id/tvSmallBout" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                </androidx.cardview.widget.CardView>
+-
+-                <androidx.cardview.widget.CardView
+-                        android:id="@+id/cardView4"
+-                        android:layout_width="0dp"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_8"
+-                        android:layout_marginEnd="@dimen/dp_16"
+-                        app:cardBackgroundColor="#B322231D"
+-                        app:cardCornerRadius="8dp"
+-                        app:cardElevation="0dp"
+-                        app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toEndOf="@+id/cardView3"
+-                        app:layout_constraintTop_toTopOf="@+id/cardView3">
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:layout_width="match_parent"
+-                            android:layout_height="match_parent"
+-                            android:paddingBottom="@dimen/dp_12">
+-
+-                        <TextView
+-                                android:id="@+id/tv1"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_16"
+-                                android:layout_marginTop="@dimen/dp_16"
+-                                android:text="气道"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent"
+-                                app:layout_constraintVertical_chainStyle="spread_inside" />
+-
+-                        <TextView
+-                                android:id="@+id/tv2"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginEnd="@dimen/dp_35"
+-                                android:text="不足"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toTopOf="@+id/tv1" />
+-
+-                        <TextView
+-                                android:id="@+id/tvAirway"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="10次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv1"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv1" />
+-
+-                        <TextView
+-                                android:id="@+id/tvCInsufficient"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="10次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv2"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv2" />
+-
+-                        <View
+-                                android:id="@+id/viewLine2"
+-                                android:layout_width="match_parent"
+-                                android:layout_height="1dp"
+-                                android:background="#1EFFFFFF"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginEnd="@dimen/dp_12"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvCInsufficient" />
+-
+-                        <TextView
+-                                android:id="@+id/tv5"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:text="过大"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tvAirway"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewLine2" />
+-
+-                        <TextView
+-                                android:id="@+id/tvBLowBig"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="5次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv5"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv5" />
+-
+-                        <TextView
+-                                android:id="@+id/tv7"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="进胃"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tvCInsufficient"
+-                                app:layout_constraintTop_toTopOf="@+id/tv5" />
+-
+-                        <TextView
+-                                android:id="@+id/tvIntoStomach"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginBottom="@dimen/dp_12"
+-                                android:text="5次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintStart_toStartOf="@+id/tv7"
+-                                app:layout_constraintTop_toBottomOf="@+id/tv7" />
+-
+-                        <View
+-                                android:id="@+id/viewline4"
+-                                android:layout_width="match_parent"
+-                                android:layout_height="1dp"
+-                                android:background="#1EFFFFFF"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                android:layout_marginStart="@dimen/dp_12"
+-                                android:layout_marginEnd="@dimen/dp_12"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintEnd_toEndOf="parent"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvIntoStomach" />
+-
+-                        <TextView
+-                                android:id="@+id/tvBlowBout"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="超次"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewline4"
+-                                app:layout_constraintStart_toStartOf="@+id/tvBLowBig" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="0次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvBlowBout"
+-                                app:layout_constraintStart_toStartOf="@+id/tvBlowBout" />
+-
+-                        <TextView
+-                                android:id="@+id/tvBlowSmallBout"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="少次"
+-                                android:textColor="#ffffffff"
+-                                android:textSize="14sp"
+-                                android:layout_marginTop="@dimen/dp_6"
+-                                app:layout_constraintTop_toBottomOf="@+id/viewline4"
+-                                app:layout_constraintEnd_toEndOf="@+id/tvIntoStomach" />
+-
+-                        <TextView
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="0次"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="18sp"
+-                                app:layout_constraintTop_toBottomOf="@+id/tvBlowSmallBout"
+-                                app:layout_constraintEnd_toEndOf="@+id/tvBlowSmallBout"
+-                                app:layout_constraintStart_toStartOf="@+id/tvBlowSmallBout" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-                </androidx.cardview.widget.CardView>
+-
+-                <TextView
+-                        android:id="@+id/tvAverageCount"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginStart="@dimen/dp_30"
+-                        android:layout_marginTop="@dimen/dp_20"
+-                        android:text="平均：115次/分"
+-                        android:textColor="#ffffffff"
+-                        android:textSize="16sp"
+-                        app:layout_constraintStart_toStartOf="parent"
+-                        app:layout_constraintTop_toBottomOf="@+id/cardView3" />
+-
+-                <TextView
+-                        android:id="@+id/tvBlowAverageCount"
+-                        android:layout_width="wrap_content"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginEnd="@dimen/dp_30"
+-                        android:text="平均：6次/分"
+-                        android:textColor="#ffffffff"
+-                        android:textSize="16sp"
+-                        app:layout_constraintEnd_toEndOf="@+id/cardView4"
+-                        app:layout_constraintTop_toTopOf="@+id/tvAverageCount" />
+-
+-                <androidx.constraintlayout.widget.ConstraintLayout
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content"
+-                        android:layout_marginTop="@dimen/dp_16"
+-                        app:layout_constraintTop_toBottomOf="@+id/tvAverageCount">
+-
+-                    <TextView
+-                            android:id="@+id/tvClock1"
+-                            android:layout_width="130dp"
+-                            android:layout_height="38dp"
+-                            android:layout_marginStart="@dimen/dp_24"
+-                            android:background="@mipmap/icon_wm_bp_2"
+-                            android:gravity="center_horizontal"
+-                            android:text="60%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvClock2"
+-                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+-                            app:layout_constraintStart_toStartOf="parent"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <TextView
+-                            android:id="@+id/tvClock2"
+-                            android:layout_width="130dp"
+-                            android:layout_height="38dp"
+-                            android:layout_marginEnd="@dimen/dp_24"
+-                            android:background="@mipmap/icon_wm_bp_2"
+-                            android:gravity="center_horizontal"
+-                            android:text="70%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintEnd_toEndOf="parent"
+-                            app:layout_constraintStart_toEndOf="@+id/tvClock1"
+-                            app:layout_constraintTop_toTopOf="parent" />
+-
+-                    <androidx.constraintlayout.widget.ConstraintLayout
+-                            android:id="@+id/constraintLayout3"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginTop="@dimen/dp_30"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvClock1"
+-                            app:layout_constraintStart_toStartOf="@+id/tvClock1"
+-                            app:layout_constraintTop_toTopOf="@+id/tvClock1">
+-
+-                        <TextView
+-                                android:id="@+id/tv10"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:text="t="
+-                                android:textColor="#ffffffff"
+-                                android:textSize="13sp"
+-                                app:layout_constraintStart_toStartOf="parent"
+-                                app:layout_constraintTop_toTopOf="parent" />
+-
+-                        <TextView
+-                                android:id="@+id/tvPressTime"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_marginStart="@dimen/dp_4"
+-                                android:textColor="@color/color_text_selected"
+-                                android:textSize="13sp"
+-                                app:layout_constraintStart_toEndOf="@+id/tv10"
+-                                app:layout_constraintTop_toTopOf="parent" />
+-                    </androidx.constraintlayout.widget.ConstraintLayout>
+-
+-                    <TextView
+-                            android:id="@+id/tvPress"
+-                            android:layout_width="80dp"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginTop="@dimen/dp_16"
+-                            android:background="@color/color_37B48B"
+-                            android:gravity="center"
+-                            android:text="98%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvClock1"
+-                            app:layout_constraintStart_toStartOf="@+id/tvClock1"
+-                            app:layout_constraintTop_toBottomOf="@+id/tvClock1" />
+-
+-                    <View
+-                            android:id="@+id/view4"
+-                            android:layout_width="@dimen/dp_44"
+-                            android:layout_height="@dimen/dp_50"
+-                            android:background="@color/color_text_normal"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvPress"
+-                            app:layout_constraintStart_toStartOf="@+id/tvPress"
+-                            app:layout_constraintTop_toBottomOf="@+id/tvPress" />
+-
+-                    <TextView
+-                            android:id="@+id/tvPressEnd"
+-                            android:layout_width="80dp"
+-                            android:layout_height="wrap_content"
+-                            android:background="@color/color_37B48B"
+-                            android:gravity="center"
+-                            android:text="86%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvClock1"
+-                            app:layout_constraintStart_toStartOf="@+id/tvClock1"
+-                            app:layout_constraintTop_toBottomOf="@+id/view4" />
+-
+-                    <TextView
+-                            android:id="@+id/tvPressBottom"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:layout_marginTop="@dimen/dp_10"
+-                            android:text="平均：5cm"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="16sp"
+-                            app:layout_constraintStart_toStartOf="@+id/tvPressEnd"
+-                            app:layout_constraintTop_toBottomOf="@+id/tvPressEnd"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvPressEnd" />
+-
+-                    <TextView
+-                            android:id="@+id/tvPressCenter"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:drawableTop="@mipmap/icon_wm_score"
+-                            android:gravity="center"
+-                            android:text="60%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintBottom_toBottomOf="@+id/tvPressBottom"
+-                            app:layout_constraintEnd_toStartOf="@+id/tvClock2"
+-                            app:layout_constraintStart_toEndOf="@+id/tvClock1" />
+-
+-                    <TextView
+-                            android:id="@+id/tvBlow"
+-                            android:layout_width="88dp"
+-                            android:layout_height="77dp"
+-                            android:layout_marginTop="@dimen/dp_16"
+-                            android:background="@mipmap/icon_wm_lung_green"
+-                            android:gravity="center"
+-                            android:paddingBottom="@dimen/dp_26"
+-                            android:text="70%"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="13sp"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvClock2"
+-                            app:layout_constraintStart_toStartOf="@+id/tvClock2"
+-                            app:layout_constraintTop_toBottomOf="@+id/tvClock2" />
+-
+-                    <TextView
+-                            android:id="@+id/tvBlowEnd"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            android:text="平均：400ml"
+-                            android:textColor="#ffffffff"
+-                            android:textSize="16sp"
+-                            app:layout_constraintBottom_toBottomOf="parent"
+-                            app:layout_constraintEnd_toEndOf="@+id/tvBlow"
+-                            app:layout_constraintStart_toStartOf="@+id/tvBlow" />
+-
+-                    <androidx.constraintlayout.widget.Group
+-                            android:id="@+id/groups"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="wrap_content"
+-                            app:constraint_referenced_ids="tvOutBout, " />
+-                </androidx.constraintlayout.widget.ConstraintLayout>
+-            </androidx.constraintlayout.widget.ConstraintLayout>
+-        </androidx.appcompat.widget.LinearLayoutCompat>
+-    </androidx.core.widget.NestedScrollView>
+-
+-    <include
+-            android:id="@+id/bottom"
+-            layout="@layout/layout_bottom_exprot"
+-            android:layout_width="match_parent"
+-            android:layout_height="@dimen/dp_60"
+-            app:layout_constraintBottom_toBottomOf="parent" />
+-</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoFragment.kt
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoFragment.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoFragment.kt
+deleted file mode 100644
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoFragment.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ /dev/null	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
+@@ -1,37 +0,0 @@
+-package com.pr.perfectrecovery.fragment
+-
+-import androidx.lifecycle.ViewModelProvider
+-import android.os.Bundle
+-import androidx.fragment.app.Fragment
+-import android.view.LayoutInflater
+-import android.view.View
+-import android.view.ViewGroup
+-import com.pr.perfectrecovery.R
+-import com.pr.perfectrecovery.databinding.CheckResultTwoFragmentBinding
+-
+-/**
+- * 训练结果页
+- */
+-class CheckResultTwoFragment : Fragment() {
+-
+-    companion object {
+-        fun newInstance() = CheckResultTwoFragment()
+-    }
+-
+-    private lateinit var viewModel: CheckResultTwoViewModel
+-    private lateinit var viewBinding: CheckResultTwoFragmentBinding
+-
+-    override fun onCreateView(
+-        inflater: LayoutInflater, container: ViewGroup?,
+-        savedInstanceState: Bundle?
+-    ): View {
+-        viewBinding = CheckResultTwoFragmentBinding.inflate(layoutInflater)
+-        return viewBinding.root
+-    }
+-
+-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+-        super.onActivityCreated(savedInstanceState)
+-        viewModel = ViewModelProvider(this).get(CheckResultTwoViewModel::class.java)
+-    }
+-
+-}
+\ No newline at end of file
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.fragment\r\n\r\nimport android.graphics.Color\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport androidx.core.content.ContextCompat\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.lifecycle.ViewModelProvider\r\nimport com.blankj.utilcode.util.GsonUtils\r\nimport com.github.mikephil.charting.charts.LineChart\r\nimport com.github.mikephil.charting.components.XAxis\r\nimport com.github.mikephil.charting.components.XAxis.XAxisPosition\r\nimport com.github.mikephil.charting.components.YAxis\r\nimport com.github.mikephil.charting.data.*\r\nimport com.github.mikephil.charting.interfaces.datasets.IBarDataSet\r\nimport com.pr.perfectrecovery.R\r\nimport com.pr.perfectrecovery.base.BaseConstant\r\nimport com.pr.perfectrecovery.bean.BaseDataDTO\r\nimport com.pr.perfectrecovery.bean.MessageEventData\r\nimport com.pr.perfectrecovery.bean.ScoringConfigBean\r\nimport com.pr.perfectrecovery.databinding.ChartFragmentBinding\r\nimport com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel\r\nimport com.pr.perfectrecovery.livedata.StatusLiveData\r\nimport com.pr.perfectrecovery.utils.DataVolatile\r\nimport com.tencent.mmkv.MMKV\r\nimport org.greenrobot.eventbus.EventBus\r\nimport org.greenrobot.eventbus.Subscribe\r\nimport org.greenrobot.eventbus.ThreadMode\r\nimport java.util.*\r\n\r\n/**\r\n * 曲线\r\n */\r\nclass ChartFragment : Fragment() {\r\n    private lateinit var viewBinding: ChartFragmentBinding\r\n    private lateinit var configBean: ScoringConfigBean\r\n\r\n    companion object {\r\n        fun newInstance() = ChartFragment()\r\n    }\r\n\r\n    private lateinit var viewModel: ChartViewModel\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?,\r\n        savedInstanceState: Bundle?\r\n    ): View? {\r\n        viewBinding = ChartFragmentBinding.inflate(layoutInflater)\r\n        return viewBinding.root\r\n    }\r\n\r\n    override fun onActivityCreated(savedInstanceState: Bundle?) {\r\n        super.onActivityCreated(savedInstanceState)\r\n        EventBus.getDefault().register(this)\r\n        viewModel = ViewModelProvider(this).get(ChartViewModel::class.java)\r\n        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)\r\n        configBean = GsonUtils.fromJson(jsonString, ScoringConfigBean::class.java)\r\n        initView()\r\n    }\r\n\r\n    //吹气量统计\r\n    private var qyValue = 0\r\n\r\n    private fun initView() {\r\n\r\n        //曲线图表\r\n        val data: LineData = getData(0)\r\n        val data1: LineData = getData(DataVolatile.preDistance.toInt())\r\n        val data2: LineData = getData(0)\r\n        // add some transparency to the color with \"& 0x90FFFFFF\"\r\n        initLineChart(viewBinding.lineChart, data)\r\n        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 180)\r\n        initLineChart(viewBinding.lineChart2, data2)\r\n        StatusLiveData.data.observe(requireActivity()) {\r\n            setData(it)\r\n            addEntry(data, viewBinding.lineChart, it.cf.toFloat())\r\n            addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())\r\n            addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())\r\n            if (qyValue != it.qySum) {\r\n                qyValue = it.qySum\r\n                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)\r\n                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)\r\n            } else {\r\n                addBarEntry(0, 0)\r\n            }\r\n            //吹气错误数统计\r\n            viewBinding.tvLungCount.text =\r\n                \"${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}\"\r\n            //按压错误数统计\r\n            viewBinding.tvHeartCount.text =\r\n                \"${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}\"\r\n            //按压总数\r\n            viewBinding.tvLungTotal.text = \"/${it.qySum}\"\r\n            viewBinding.tvHeartTotal.text = \"/${it.prSum}\"\r\n        }\r\n\r\n        initBarChart()\r\n        viewBinding.constraintlayout2.setOnClickListener {\r\n            //addBarEntry(Random().nextInt(800))\r\n        }\r\n\r\n        viewBinding.constraintlayout.setOnClickListener {\r\n            addEntry(data, viewBinding.lineChart, 0f)\r\n        }\r\n    }\r\n\r\n    private fun initLineChart(lineChart: LineChart, lineData: LineData) {\r\n        // apply styling\r\n        // holder.chart.setValueTypeface(mTf);\r\n\r\n        // apply styling\r\n        // holder.chart.setValueTypeface(mTf);\r\n        lineChart.description.isEnabled = false\r\n        lineChart.setTouchEnabled(false)\r\n        lineChart.setPinchZoom(false)\r\n        lineChart.setDrawGridBackground(false)\r\n        lineChart.setNoDataText(\"\")\r\n        val xAxis: XAxis = lineChart.xAxis\r\n        xAxis.setDrawGridLines(false)\r\n        xAxis.setDrawAxisLine(false)\r\n        xAxis.granularity = 1f\r\n//        xAxis.setLabelCount(30, true)\r\n        xAxis.position = XAxisPosition.BOTTOM\r\n\r\n        val leftAxis: YAxis = lineChart.axisLeft\r\n        leftAxis.setLabelCount(5, false)\r\n        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)\r\n\r\n        val rightAxis: YAxis = lineChart.axisRight\r\n        rightAxis.setLabelCount(5, false)\r\n        rightAxis.setDrawGridLines(false)\r\n        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)\r\n        (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)\r\n\r\n        xAxis.isEnabled = false\r\n        leftAxis.isEnabled = false\r\n        rightAxis.isEnabled = false\r\n        xAxis.textColor = Color.WHITE\r\n\r\n        val l = lineChart.legend\r\n        l.isEnabled = false\r\n\r\n        // set data\r\n        lineChart.data = lineData\r\n        // do not forget to refresh the chart\r\n        // holder.chart.invalidate();\r\n\r\n        // do not forget to refresh the chart\r\n        // holder.chart.invalidate();\r\n        lineChart.animateX(750)\r\n    }\r\n\r\n    var mBarDataSet: BarDataSet? = null\r\n    private fun initBarChart() {\r\n        viewBinding.barChart.apply {\r\n            setDrawBorders(false) //显示边界\r\n            setDrawBarShadow(false) //设置每个直方图阴影为false\r\n            setDrawValueAboveBar(true) //这里设置为true每一个直方图的值就会显示在直方图的顶部\r\n            description.isEnabled = false //设置描述文字不显示，默认显示\r\n            setDrawGridBackground(false) //设置不显示网格\r\n            //setBackgroundColor(Color.parseColor(\"#F3F3F3\")) //设置图表的背景颜色\r\n            legend.isEnabled = false //设置不显示比例图\r\n            setScaleEnabled(true) //设置是否可以缩放\r\n            setTouchEnabled(false)\r\n            //x轴设置\r\n            xAxis.apply {\r\n                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面\r\n                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）\r\n                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴\r\n                granularity = 1f // only intervals of 1 day\r\n//                labelCount = 100\r\n                /*valueFormatter = object : ValueFormatter() {\r\n                    override fun getFormattedValue(value: Float): String {\r\n                      //TODO 自定义X轴label格式\r\n                    }\r\n                }*/\r\n            }\r\n            xAxis.isEnabled = false\r\n            axisLeft.isEnabled = false\r\n            axisRight.isEnabled = false\r\n\r\n            // if more than 60 entries are displayed in the chart, no values will be\r\n            // drawny\r\n//            setMaxVisibleValueCount(6)\r\n            //保证Y轴从0开始，不然会上移一点\r\n            axisLeft.axisMinimum = 0f\r\n            axisRight.axisMinimum = 0f\r\n            mBarDataSet = BarDataSet(values, \"Data Set\")\r\n            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)\r\n            mBarDataSet!!.setDrawValues(false)\r\n            val dataSets = ArrayList<IBarDataSet>()\r\n            dataSets.add(mBarDataSet!!)\r\n            val barData = BarData(dataSets)\r\n            data = barData\r\n            //初始化默认值\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n//            addBarEntry(0, 0)\r\n        }\r\n    }\r\n\r\n    private val values = ArrayList<BarEntry>()\r\n    private val colors = ArrayList<Int>()\r\n\r\n    //这里要进行图像绘制，所以要切回UI线程，否则会报错\r\n    private fun addBarEntry(value: Int, value2: Int) {\r\n        Log.e(\"addBarEntry\", \"$value\")\r\n        viewBinding.barChart.apply {\r\n            if (barData != null) {\r\n//                barData.addEntry(BarEntry(value.toFloat(), 0f), 0)\r\n                val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount\r\n                data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)\r\n                data.notifyDataChanged()\r\n                when {\r\n                    value2 in 40..80 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_37B48B)\r\n                        )\r\n                    }\r\n                    value2 < 40 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_FDC457)\r\n                        )\r\n                    }\r\n                    value2 > 80 -> {\r\n                        colors.add(\r\n                            ContextCompat.getColor(requireContext(), R.color.color_text_selected)\r\n                        )\r\n                    }\r\n                }\r\n                mBarDataSet!!.colors = colors\r\n                notifyDataSetChanged()\r\n                //设置在图表中显示的最大X轴数量\r\n                setVisibleXRangeMaximum(30f)\r\n                //这里用29是因为30的话，最后一条柱子只显示了一半\r\n                moveViewToX(barData.entryCount.toFloat() - 29)\r\n//                setBorderWidth(0.3f)\r\n                //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)\r\n//                val mMatrix = Matrix()\r\n//                mMatrix.postScale(1.5f, 1f)\r\n//                viewPortHandler.refresh(mMatrix, this, false)\r\n//                animateY(1000)\r\n            }\r\n        }\r\n        viewBinding.barChart.invalidate()\r\n    }\r\n\r\n    private fun setData(data: BaseDataDTO) {\r\n        viewBinding.tvLungTotal.text = \"/150\"\r\n        viewBinding.tvLungCount.text = \"${data.qySum}\"\r\n        viewBinding.tvHeartTotal.text = \"/10\"\r\n        viewBinding.tvHeartCount.text = \"${data.prSum}\"\r\n    }\r\n\r\n    private fun getData(value: Int): LineData {\r\n        val values = ArrayList<Entry>()\r\n//        values.add(Entry(0f, value.toFloat()))\r\n        // create a dataset and give it a type\r\n        val lineDataSet = LineDataSet(values, \"DataSet 1\")\r\n        lineDataSet.lineWidth = 1.75f\r\n        lineDataSet.circleRadius = 5f\r\n        lineDataSet.circleHoleRadius = 2.5f\r\n        lineDataSet.valueTextColor = Color.WHITE\r\n        lineDataSet.color = Color.parseColor(\"#3DB38E\")\r\n        lineDataSet.setCircleColor(Color.parseColor(\"#3DB38E\"))\r\n        lineDataSet.highLightColor = Color.parseColor(\"#3DB38E\")\r\n        lineDataSet.setDrawValues(true)\r\n        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT\r\n        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER\r\n        // create a data object with the data sets\r\n        return LineData(lineDataSet)\r\n    }\r\n\r\n    /**\r\n     * 动态添加数据\r\n     * 在一个LineChart中存放的折线，其实是以索引从0开始编号的\r\n     *\r\n     * @param yValues y值\r\n     */\r\n    private var x = 20\r\n    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {\r\n        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount\r\n        val entry = Entry(\r\n            entryCount.toFloat(), yValues\r\n        )\r\n        // 创建一个点\r\n        lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中\r\n        lineChart.data = lineData\r\n        //通知数据已经改变\r\n        lineData.notifyDataChanged()\r\n        lineChart.notifyDataSetChanged()\r\n        //通知数据已经改变\r\n        lineData.notifyDataChanged()\r\n        lineChart.notifyDataSetChanged()\r\n        //把yValues移到指定索引的位置\r\n        lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)\r\n        lineChart.setVisibleXRangeMaximum(30f)\r\n//        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/\r\n        lineChart.moveViewToX((lineData.entryCount - 29).toFloat())\r\n        lineChart.invalidate()\r\n    }\r\n\r\n    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)\r\n    public fun onEvent(event: MessageEventData) {\r\n        if (event.code == BaseConstant.EVENT_SINGLE_CHART_START) {\r\n            //启动刷新界面数据\r\n            viewBinding.ivLung.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_lung_red))\r\n            viewBinding.ivHeart.setImageDrawable(resources.getDrawable(R.mipmap.icon_wm_chart_heart_red))\r\n        }\r\n    }\r\n\r\n    override fun onDestroy() {\r\n        super.onDestroy()\r\n        EventBus.getDefault().unregister(this)\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/fragment/ChartFragment.kt	(date 1645536606830)
+@@ -171,7 +171,7 @@
+                 setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
+                 //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
+                 granularity = 1f // only intervals of 1 day
+-//                labelCount = 100
++                labelCount = 100
+                 /*valueFormatter = object : ValueFormatter() {
+                     override fun getFormattedValue(value: Float): String {
+                       //TODO 自定义X轴label格式
+@@ -195,12 +195,6 @@
+             dataSets.add(mBarDataSet!!)
+             val barData = BarData(dataSets)
+             data = barData
+-            //初始化默认值
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+-//            addBarEntry(0, 0)
+         }
+     }
+ 
+Index: app/src/main/res/layout/activity_assessment.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_assessment.xml b/app/src/main/res/layout/layout_check_result.xml
+rename from app/src/main/res/layout/activity_assessment.xml
+rename to app/src/main/res/layout/layout_check_result.xml
+--- a/app/src/main/res/layout/activity_assessment.xml	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/res/layout/layout_check_result.xml	(date 1645539159648)
+@@ -4,15 +4,7 @@
+         xmlns:tools="http://schemas.android.com/tools"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+-        android:background="@color/theme_color"
+-        tools:context=".activity.AssessmentScoreActivity">
+-
+-    <include
+-            android:id="@+id/top"
+-            layout="@layout/layout_top"
+-            android:layout_width="match_parent"
+-            android:layout_height="50dp"
+-            app:layout_constraintTop_toTopOf="parent" />
++        android:background="@color/theme_color">
+ 
+     <androidx.constraintlayout.widget.ConstraintLayout
+             android:id="@+id/constraintLayout"
+@@ -21,7 +13,7 @@
+             android:background="#22231D"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toStartOf="parent"
+-            app:layout_constraintTop_toBottomOf="@+id/top">
++            app:layout_constraintTop_toTopOf="parent">
+ 
+         <TextView
+                 android:id="@+id/tvName"
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"DesignSurface\">\r\n    <option name=\"filePathToZoomLevelMap\">\r\n      <map>\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_assessment.xml\" value=\"0.36564102564102563\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_single.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_train_result.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/chart_fragment.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/check_result_fragment.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/check_result_two_fragment.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/event_fragment.xml\" value=\"0.36564102564102563\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/item_bluetooth.xml\" value=\"0.37135416666666665\" />\r\n        <entry key=\"..\\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_check_result.xml\" value=\"0.37135416666666665\" />\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"JavaScriptSettings\">\r\n    <option name=\"languageLevel\" value=\"ES6\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_11\" default=\"true\" project-jdk-name=\"11\" project-jdk-type=\"JavaSDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/.idea/misc.xml	(date 1645539392018)
+@@ -9,6 +9,7 @@
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/chart_fragment.xml" value="0.37135416666666665" />
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/check_result_fragment.xml" value="0.37135416666666665" />
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/check_result_two_fragment.xml" value="0.37135416666666665" />
++        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cpr_score_fragment.xml" value="0.36564102564102563" />
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment.xml" value="0.37135416666666665" />
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/event_fragment.xml" value="0.36564102564102563" />
+         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/item_bluetooth.xml" value="0.37135416666666665" />
+Index: app/src/main/java/com/pr/perfectrecovery/bean/TrainingDTO.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.pr.perfectrecovery.bean\r\n\r\nimport org.litepal.crud.LitePalSupport\r\nimport java.io.Serializable\r\n\r\ndata class TrainingDTO(var name: String = \"\") : Serializable, LitePalSupport() {\r\n    var id: Int = 0\r\n    var trainingTime: String = \"\"//训练时长\r\n    var cycleCount: Int = 0//循环次数\r\n    var pressErrorCount: Int = 0//按压错误数\r\n    var pressTotal: Int = 0//按压总数\r\n    var pressLocation: Int = 0//按压位置错误数\r\n    var pressLow: Int = 0//按压不足错误数\r\n    var pressHigh: Int = 0//按压过大错误数\r\n    var pressRebound: Int = 0//按压未回弹错误数\r\n    var pressAverage: Int = 0//按压平均多少次每分数\r\n    var pressOutTime: String = \"\"//按压超时\r\n    var pressFrequency: Int = 0//按压频率\r\n    var pressTopPercentage: Int = 0//按压顶部百分比\r\n    var pressBottomPercentage: Int = 0//按压底部百分比\r\n    var pressAverageDepth: Int = 0//按压平均深度\r\n    var pressCenterPercentage: Int = 0//按压百分比\r\n\r\n    var blowErrorCount: Int = 0//吹气错误数\r\n    var blowTotal: Int = 0//吹气总数\r\n    var blowClose: Int = 0//吹气气道错误数\r\n    var blowLow: Int = 0//吹气不足错误数\r\n    var blowHigh: Int = 0//吹气过大错误数\r\n    var blowIntoStomach: Int = 0//吹气进胃错误数\r\n    var blowAverage: Int = 0//吹气平均多少次每分数\r\n    var blowMeterPercentage: Int = 0//吹气仪表百分比\r\n    var blowPercentage: Int = 0//吹气百分比\r\n    var blowAverageDepth: Int = 0//吹气平均深度\r\n\r\n    //检查环境\r\n    var check1 = false\r\n\r\n    //检查意识\r\n    var check2 = false\r\n\r\n    //检查呼吸\r\n    var check3 = false\r\n\r\n    //检查脉搏\r\n    var check4 = false\r\n\r\n    //检查体位\r\n    var check5 = false\r\n\r\n    //清理口腔\r\n    var check6 = false\r\n\r\n    //拨打120\r\n    var check7 = false\r\n\r\n    //寻求帮助\r\n    var check8 = false\r\n\r\n    //体外除颤\r\n    var check9 = false\r\n\r\n    //完成评估\r\n    var check10 = false\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/bean/TrainingDTO.kt b/app/src/main/java/com/pr/perfectrecovery/bean/TrainingDTO.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/bean/TrainingDTO.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/bean/TrainingDTO.kt	(date 1645539827531)
+@@ -5,6 +5,7 @@
+ 
+ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
+     var id: Int = 0
++    var isAssessment = false//是否为 false 训练  true 考核
+     var trainingTime: String = ""//训练时长
+     var cycleCount: Int = 0//循环次数
+     var pressErrorCount: Int = 0//按压错误数
+Index: app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoViewModel.kt b/app/src/main/java/com/pr/perfectrecovery/fragment/viewmodel/CheckResultTwoViewModel.kt
+rename from app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoViewModel.kt
+rename to app/src/main/java/com/pr/perfectrecovery/fragment/viewmodel/CheckResultTwoViewModel.kt
+--- a/app/src/main/java/com/pr/perfectrecovery/fragment/CheckResultTwoViewModel.kt	(revision d3f617e69a439d95bd1be0a62a9918e888948ad3)
++++ b/app/src/main/java/com/pr/perfectrecovery/fragment/viewmodel/CheckResultTwoViewModel.kt	(date 1645536739713)
+@@ -1,4 +1,4 @@
+-package com.pr.perfectrecovery.fragment
++package com.pr.perfectrecovery.fragment.viewmodel
+ 
+ import androidx.lifecycle.ViewModel
+ 
