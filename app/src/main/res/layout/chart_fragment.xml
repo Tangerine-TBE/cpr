@@ -9,7 +9,6 @@
     <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/dp_20"
             app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -132,7 +131,7 @@
                         android:id="@+id/constraintlayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_35"
+                        android:layout_marginTop="@dimen/dp_40"
                         app:layout_constraintTop_toBottomOf="@+id/cardView1">
 
                     <TextView
@@ -198,7 +197,7 @@
                         android:id="@+id/constraintlayout2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_marginTop="@dimen/dp_40"
                         app:layout_constraintStart_toStartOf="@+id/barChart"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
 
@@ -265,7 +264,7 @@
                         android:id="@+id/constraintlayout3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_marginTop="@dimen/dp_40"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
 
@@ -356,7 +355,7 @@
                         android:id="@+id/constraintlayout4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_marginTop="@dimen/dp_40"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
 
                     <TextView

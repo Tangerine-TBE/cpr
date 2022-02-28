@@ -69,7 +69,7 @@ class ChartFragment : Fragment() {
     private fun initView() {
         //曲线图表
         val data: LineData = getData(0f)
-        val data1: LineData = getData(DataVolatile.preDistance.toFloat())
+        val data1: LineData = getData(0f)
         val data2: LineData = getData(0f)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
@@ -78,7 +78,7 @@ class ChartFragment : Fragment() {
         StatusLiveData.data.observe(requireActivity()) {
             setData(it)
             addEntry(data, viewBinding.lineChart, it.cf.toFloat())
-            addEntry(data1, viewBinding.lineChart1, it.distance.toFloat())
+            addEntry(data1, viewBinding.lineChart1, setValue(it.distance))
             addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
             if (qyValue != it.qySum) {
                 qyValue = it.qySum
@@ -114,28 +114,26 @@ class ChartFragment : Fragment() {
         setViewData()
     }
 
-    private fun setValue(value: Int): Int {
+    private fun setValue(value: Int): Float {
         val depth = DataVolatile.preDistance - value
-        if (depth > 0 && depth > DataVolatile.preDistance - 5) {
-            return 0
+        if (depth <= 0 || depth > DataVolatile.preDistance - 5) {
+            return 0f
         } else if (depth > DataVolatile.PR_HIGH_VALUE) {
-            return 7
+            return 6.4f
         } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_HIGH_VALUE) {
-            return 5
+            return 5f
         } else if (depth < DataVolatile.PR_LOW_VALUE - 5) {
-            return 4
+            return 3f
         } else if (depth < DataVolatile.PR_LOW_VALUE - 10) {
-            return 3
+            return 2f
         } else if (depth < DataVolatile.PR_LOW_VALUE - 15) {
-            return 2
-        } else if (depth < DataVolatile.PR_LOW_VALUE - 20) {
-            return 1
+            return 1f
         }
-        return 0
+        return 0f
     }
 
     private fun setViewData() {
-        viewBinding.tvDepth.text = "${configBean.depth}cm"
+        viewBinding.textView22.text = "${configBean.depth}cm"
         viewBinding.tvDepthEnd.text = "${configBean.depthEnd}cm"
         viewBinding.tvDepthFrequency.text = "${configBean.depthFrequency}cpm"
         viewBinding.tvDepthFrequencyEnd.text = "${configBean.depthFrequencyEnd}cpm"

@@ -52,6 +52,15 @@ class CycleFragment : Fragment() {
     private var isTimeing = true
     private var configBean = ConfigBean()
 
+    //按压少次
+    private var prLessCount : Int= 0
+    //按压多次
+    private var prManyCount : Int= 0
+    //吹气少次
+    private var qyLessCount : Int= 0
+    //吹气多次
+    private var qyManyCount : Int= 0
+
     //中断计时累加
     private var timeOut: Long = 0
 
@@ -277,12 +286,15 @@ class CycleFragment : Fragment() {
     private var err_qr_unback = 0
     private var isTimeOut = false
 
+    //当前是否为按压模式-吹气模式
+    private var isPress = false
+    //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
             if (configBean.prCount > 0 || configBean.qyCount > 0) {
                 //计算循环次数
-                if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
+                if ((dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount)) {
                     cycleCount++
                     //更新循环次数
                     EventBus.getDefault()

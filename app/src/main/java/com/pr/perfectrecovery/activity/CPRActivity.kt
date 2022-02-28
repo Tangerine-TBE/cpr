@@ -168,7 +168,7 @@ class CPRActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        showConnectedDevice()
+//        showConnectedDevice()
 //        startRefresh()
 //        checkPermissions()
     }
@@ -186,7 +186,6 @@ class CPRActivity : BaseActivity() {
     private fun checkPermissions() {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (!bluetoothAdapter.isEnabled) {
-
             Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()
             return
         }
@@ -246,7 +245,7 @@ class CPRActivity : BaseActivity() {
     private fun showConnectedDevice() {
         val deviceList = BleManager.getInstance().allConnectedDevice
         bleList = deviceList
-        if(bleList != null && bleList.size > 0){
+        if(bleList.size > 0){
             viewBinding.tvMsg.text = ""
         }
         mDeviceAdapter.setList(deviceList)
