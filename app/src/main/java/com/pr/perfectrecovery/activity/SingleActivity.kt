@@ -42,7 +42,7 @@ class SingleActivity : BaseActivity() {
         binding = ActivitySingleBinding.inflate(layoutInflater)
         setContentView(binding.root)
         EventBus.getDefault().register(this)
-        mTrainingBean = intent.getSerializableExtra("single") as TrainingBean
+        mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         initView()
         initViewPager()
     }
@@ -65,10 +65,6 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
-//            if (time <= 0) {
-//                ToastUtils.showShort("本次练习已结束")
-//                return@setOnClickListener
-//            }
             if (isStart) {
                 DataVolatile.isStart = true
                 EventBus.getDefault()
@@ -100,10 +96,17 @@ class SingleActivity : BaseActivity() {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter.let { mHandler.removeCallbacks(it) }
-                mTrainingDTO?.isAssessment = mTrainingBean!!.isCheck
+                mTrainingDTO?.isCheck = mTrainingBean!!.isCheck
                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
                 mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
+
+                mTrainingDTO?.prCount = configBean.prCount
+                mTrainingDTO?.qyCount = configBean.qyCount
+                mTrainingDTO?.pressScore = configBean.pressScore
+                mTrainingDTO?.blowScore = configBean.blowScore
+                mTrainingDTO?.processScore = configBean.processScore
+                mTrainingDTO?.deduction = configBean.deductionScore
                 //检查页面 结果
                 checkEventFragment?.getData().let {
                     if (it != null) {

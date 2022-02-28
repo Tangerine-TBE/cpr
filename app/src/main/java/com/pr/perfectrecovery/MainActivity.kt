@@ -93,10 +93,10 @@ class MainActivity : BaseActivity() {
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         if (TextUtils.isEmpty(decodeString)) {
             val data = ConfigBean()
-            data.process = 5
-            data.compressions = 50
-            data.ventilation = 45
-            data.deductionTime = 1
+            data.processScore = 5
+            data.pressScore = 50
+            data.blowScore = 45
+            data.deductionScore = 0.5f
             data.depth = 4
             data.depthEnd = 6
             data.depthFrequency = 100

@@ -914,6 +914,7 @@
                                 android:id="@+id/etDeduction"
                                 style="@style/EditTextStyle"
                                 android:layout_marginEnd="@dimen/dp_4"
+                                android:inputType="number|numberDecimal"
                                 app:layout_constraintBottom_toBottomOf="@+id/textView8"
                                 app:layout_constraintEnd_toStartOf="@+id/textView7"
                                 app:layout_constraintTop_toTopOf="@+id/textView8"

@@ -49,7 +49,7 @@ class ChartFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         viewBinding = ChartFragmentBinding.inflate(layoutInflater)
         return viewBinding.root
     }
@@ -204,14 +204,14 @@ class ChartFragment : Fragment() {
                 setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
                 //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
                 granularity = 1f // only intervals of 1 day
-                labelCount = 100
+                labelCount = 30
                 /*valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                       //TODO 自定义X轴label格式
                     }
                 }*/
             }
-            xAxis.setLabelCount(30, false)
+            xAxis.setLabelCount(12, false)
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
@@ -272,9 +272,9 @@ class ChartFragment : Fragment() {
                 mBarDataSet!!.colors = colors
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(30f)
+                setVisibleXRangeMaximum(12f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 29)
+                moveViewToX(barData.entryCount.toFloat() - 12)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
@@ -297,7 +297,7 @@ class ChartFragment : Fragment() {
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        lineDataSet.lineWidth = 1.3f
+        lineDataSet.lineWidth = 1.2f
         lineDataSet.circleRadius = 0f
         lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
@@ -339,7 +339,6 @@ class ChartFragment : Fragment() {
      *
      * @param yValues y值
      */
-    private var x = 20
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
         val entryCount = (lineData.getDataSetByIndex(1) as LineDataSet).entryCount
         val entry = Entry(

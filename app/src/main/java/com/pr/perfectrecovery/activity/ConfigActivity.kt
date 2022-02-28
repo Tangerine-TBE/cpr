@@ -100,10 +100,10 @@ class ConfigActivity : BaseActivity() {
                 viewBinding.etCycles.setText("${it.cycles}")
                 viewBinding.etPr.setText("${it.prCount}")
                 viewBinding.etQy.setText("${it.qyCount}")
-                viewBinding.etDeduction.setText("${it.deductionTime}")
-                viewBinding.etProcess.setText("${it.process}")
-                viewBinding.etCompressions.setText("${it.compressions}")
-                viewBinding.etVentilation.setText("${it.ventilation}")
+                viewBinding.etDeduction.setText("${it.deductionScore}")
+                viewBinding.etProcess.setText("${it.processScore}")
+                viewBinding.etCompressions.setText("${it.pressScore}")
+                viewBinding.etVentilation.setText("${it.blowScore}")
 
             }
         }
@@ -331,9 +331,9 @@ class ConfigActivity : BaseActivity() {
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
             val value = p0.toString().trim()
-            if (!TextUtils.isEmpty(value) && value.toInt() >= 10) {
-                dataDTO?.deductionTime =
-                    viewBinding.etDeduction.text.toString().trim().toInt()
+            if (!TextUtils.isEmpty(value) && value.toFloat() > 0) {
+                dataDTO?.deductionScore =
+                    viewBinding.etDeduction.text.toString().trim().toFloat()
                 save()
             } else {
                 viewBinding.tvDesc.text = "按压中断时间设定大于10s"
@@ -382,9 +382,9 @@ class ConfigActivity : BaseActivity() {
             viewBinding.tvDesc.text = "三项加起来总分 ＜ 100分"
         } else {
             viewBinding.tvDesc.text = ""
-            dataDTO?.process = process
-            dataDTO?.compressions = compressions
-            dataDTO?.ventilation = ventilation
+            dataDTO?.processScore = process
+            dataDTO?.pressScore = compressions
+            dataDTO?.blowScore = ventilation
             save()
         }
     }

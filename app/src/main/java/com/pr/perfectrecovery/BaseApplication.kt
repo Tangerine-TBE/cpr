@@ -18,7 +18,7 @@ class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         MMKV.initialize(this)
-        LitePal.initialize(this);
+        LitePal.initialize(this)
         //Multidex.install(this);
         CrashReport.initCrashReport(applicationContext, "0bd5e51ccc", false);
         driver = CH34xUARTDriver(

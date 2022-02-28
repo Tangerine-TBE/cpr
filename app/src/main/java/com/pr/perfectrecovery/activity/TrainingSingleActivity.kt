@@ -3,14 +3,17 @@ package com.pr.perfectrecovery.activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.clj.fastble.data.BleDevice
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
+import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
-import com.pr.perfectrecovery.utils.DataVolatile
 
 /**
  * 训练模式- 单人 - 多人
@@ -19,6 +22,8 @@ import com.pr.perfectrecovery.utils.DataVolatile
 class TrainingSingleActivity : BaseActivity() {
 
     private lateinit var binding: ActivityTrianBinding
+    private var isSingle = true
+    private var blueToothList = arrayListOf<BleDevice>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,20 +33,40 @@ class TrainingSingleActivity : BaseActivity() {
     }
 
     private fun initView() {
-        val blueToothList = intent.getParcelableArrayListExtra<BleDevice>("blueTooth")
-        if (blueToothList != null && blueToothList.size > 1) {
-            initMany()
-        } else {
+        blueToothList = intent.getParcelableArrayListExtra<BleDevice>(BaseConstant.CONNECT_BLE_DEVICES) as ArrayList<BleDevice>
+
+        /* Todo @chenhan 测试数据 需要删除 ========*/
+//        var bleDevice = blueToothList[0]
+//        bleDevice?.let {
+//            it.count = 2
+//            blueToothList.add(it)
+//        }
+//        bleDevice = blueToothList[0]
+//        bleDevice?.let {
+//            it.count = 3
+//            blueToothList.add(it)
+//        }
+        /* =================*/
+
+//        if (blueToothList.size > 1) {
+//            isSingle = false
+//            initMany(blueToothList.size)
+//        } else {
+            isSingle = true
             initSingle()
-        }
+//        }
     }
 
     /**
      * 单人模式
      */
     private fun initSingle() {
+        binding.single.root.visibility = View.VISIBLE
+        binding.more.root.visibility = View.GONE
+
         binding.bottom.ivBack.setOnClickListener { finish() }
         val mTrainingBean = TrainingBean()
+        mTrainingBean.isSingle = true
 
         binding.single.oprMod.setOnCheckedChangeListener { radioGroup, _ ->
             when (radioGroup.checkedRadioButtonId) {
@@ -79,7 +104,7 @@ class TrainingSingleActivity : BaseActivity() {
                 mTrainingBean.isBeat = binding.single.switchBeat.isChecked
                 mTrainingBean.isVoice = binding.single.switchVoice.isChecked
                 val intent = Intent(this, SingleActivity::class.java)
-                intent.putExtra("single", mTrainingBean)
+                intent.putExtra(BaseConstant.TRAINING_BEAN, mTrainingBean)
                 startActivity(intent)
             }
         }
@@ -88,33 +113,70 @@ class TrainingSingleActivity : BaseActivity() {
     /**
      * 多人模式
      */
-    private fun initMany() {
-        binding.more.cbCheck.setOnCheckedChangeListener { compoundButton, b ->
-            if (b)
-                binding.more.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
-            else
-                binding.more.cbCheck.setTextColor(resources.getColor(R.color.white))
-        }
+    private fun initMany(count: Int) {
+        binding.more.root.visibility = View.VISIBLE
+        binding.single.root.visibility = View.GONE
 
-        binding.more.cbTraining.setOnCheckedChangeListener { compoundButton, b ->
-            if (b)
-                binding.more.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
-            else
-                binding.more.cbTraining.setTextColor(resources.getColor(R.color.white))
-        }
+        val nameList = mutableListOf<EditText>()
+        binding.bottom.ivBack.setOnClickListener { finish() }
+        val mTrainingBean = TrainingBean()
+        mTrainingBean.isSingle = false
 
-        binding.more.mRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.more.mRecyclerView.adapter = null
+        binding.more.oprMod.setOnCheckedChangeListener { radioGroup, _ ->
+            when (radioGroup.checkedRadioButtonId) {
+                //考核模式
+                R.id.cbCheck -> {
+                    mTrainingBean.isCheck = true
+                    binding.more.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
+                    binding.more.cbTraining.setTextColor(resources.getColor(R.color.white))
+                }
+                //练习模式
+                R.id.cbTraining -> {
+                    mTrainingBean.isCheck = false
+                    binding.more.cbCheck.setTextColor(resources.getColor(R.color.white))
+                    binding.more.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
+                }
+            }
+        }
+        for (i in 1..count) {
+            val view = LayoutInflater.from(this@TrainingSingleActivity)
+                .inflate(R.layout.item_student_more, null, false)
+            view.findViewById<TextView>(R.id.tvStudent).text = "学员  $i  姓名:"
+            binding.more.mMultiStuContainer.addView(view)
+            nameList.add(view.findViewById(R.id.etName))
+        }
 
         binding.bottom.ivStart.setOnClickListener {
-            val name = binding.single.etName.text.toString()
-            if (TextUtils.isEmpty(name)) {
-                ToastUtils.showShort(R.string.please_input_name)
-            } else if (!binding.single.cbTraining.isChecked && !binding.single.cbCheck.isChecked) {
+            mTrainingBean.list.clear()
+            for (name in nameList) {
+                if (name.text.toString().isEmpty()) {
+                    ToastUtils.showShort(
+                        String.format(
+                            resources.getString(R.string.please_input_student_name),
+                            nameList.indexOf(name) + 1
+                        )
+                    )
+                    return@setOnClickListener
+                }
+
+                val bean = TrainingBean()
+                bean.name = name.text.toString()
+                bean.isCheck = mTrainingBean.isCheck
+                // 根据 BleDevice 的count跟学员顺序对应绑定
+                for (device in blueToothList) {
+                    // count从1开始， 学员下标从0开始
+                    if (device.count == nameList.indexOf(name) + 1)
+                        bean.mac = device.mac
+                }
+                //bean里面：设备mac 和 学员姓名 产生映射
+                mTrainingBean.list.add(bean)
+            }
+
+            if (!binding.single.cbTraining.isChecked && !binding.single.cbCheck.isChecked) {
                 ToastUtils.showShort(R.string.please_select_model)
             } else {
-                val intent = Intent(this, SingleActivity::class.java)
-//                intent.putExtra("single", mTrainingBean)
+                val intent = Intent(this, MultiActivity::class.java)
+                intent.putExtra(BaseConstant.TRAINING_BEAN, mTrainingBean)
                 startActivity(intent)
             }
         }

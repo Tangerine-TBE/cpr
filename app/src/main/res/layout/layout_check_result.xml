@@ -35,21 +35,20 @@
                 android:layout_height="wrap_content"
                 android:drawablePadding="4dp"
                 android:gravity="center"
-                android:text="训练"
+                android:text="考核"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/tvName"
-                app:layout_constraintEnd_toStartOf="@+id/tvTime"
+                app:layout_constraintEnd_toStartOf="@+id/tvScale"
                 app:layout_constraintStart_toEndOf="@+id/tvName"
                 app:layout_constraintTop_toTopOf="@+id/tvName" />
 
         <TextView
-                android:id="@+id/tvTime"
+                android:id="@+id/tvScale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="30:2"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_16"
                 android:textStyle="bold"
@@ -64,15 +63,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/dp_12"
                 android:gravity="center"
-                android:text="0:30"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:drawableStartCompat="@mipmap/icon_wm_countdown"
-                app:layout_constraintBottom_toBottomOf="@+id/tvTime"
+                app:layout_constraintBottom_toBottomOf="@+id/tvScale"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvTime"
-                app:layout_constraintTop_toTopOf="@+id/tvTime" />
+                app:layout_constraintStart_toEndOf="@+id/tvScale"
+                app:layout_constraintTop_toTopOf="@+id/tvScale" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -187,7 +185,7 @@
                     android:textSize="13sp" />
 
             <TextView
-                    android:id="@+id/tvVentilation"
+                    android:id="@+id/tvBlowNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#ffffff"
@@ -429,7 +427,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_28"
-            android:text="4"
             android:textColor="#ffffffff"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -454,7 +451,8 @@
             layout="@layout/layout_check_event"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tv6" />
+            app:layout_constraintTop_toBottomOf="@+id/tv6"
+            tools:layout_editor_absoluteX="0dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
