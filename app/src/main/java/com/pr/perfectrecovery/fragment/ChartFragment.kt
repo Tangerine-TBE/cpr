@@ -211,7 +211,7 @@ class ChartFragment : Fragment() {
                     }
                 }*/
             }
-            xAxis.setLabelCount(30, false)
+            xAxis.setLabelCount(12, false)
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
             axisRight.isEnabled = false
@@ -272,9 +272,9 @@ class ChartFragment : Fragment() {
                 mBarDataSet!!.colors = colors
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(30f)
+                setVisibleXRangeMaximum(12f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 29)
+                moveViewToX(barData.entryCount.toFloat() - 12)
                 //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
