@@ -253,4 +253,8 @@ class MultiActAdapter :
         view.setCurrentStatus(pf)
         view.invalidate()
     }
+
+    fun getCycleCount(mac:String): Int{
+        return cycleCountMap[mac] ?: 0
+    }
 }

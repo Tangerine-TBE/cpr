@@ -1,6 +1,9 @@
 package com.pr.perfectrecovery.base
 
 object BaseConstant {
+    //更新展示学员的时间间隔
+    const val INTERVAL_TIME = 5000
+
     //学员信息
     const val TRAINING_BEAN = "TRAINING_BEAN"
     //连接的蓝牙设备数据

@@ -38,7 +38,7 @@ class TrainingSingleActivity : BaseActivity() {
         /* Todo @chenhan 测试数据 需要删除 ========*/
 //        var bleDevice = blueToothList[0]
 //        bleDevice?.let {
-//            it.count = 2
+//            it.count = 1
 //            blueToothList.add(it)
 //        }
         /* =================*/
@@ -159,9 +159,11 @@ class TrainingSingleActivity : BaseActivity() {
                 bean.isCheck = mTrainingBean.isCheck
                 // 根据 BleDevice 的count跟学员顺序对应绑定
                 for (device in blueToothList) {
-                    // count从1开始， 学员下标从0开始
-                    if (device.count == nameList.indexOf(name) + 1)
+                    // count从0开始， 学员下标从0开始
+                    if (device.count == nameList.indexOf(name)) {
+                        bean.count = device.count
                         bean.mac = device.mac
+                    }
                 }
                 //bean里面：设备mac 和 学员姓名 产生映射
                 mTrainingBean.list.add(bean)

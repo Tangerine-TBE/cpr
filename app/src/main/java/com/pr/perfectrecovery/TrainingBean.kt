@@ -7,6 +7,9 @@ class TrainingBean() : Serializable {
     //考核人姓名
     var name: String = ""
 
+    //考核人使用的设备编号
+    var count:Int = 0
+
     //是否开启语音提示
     var isVoice: Boolean = false
 
@@ -24,4 +27,8 @@ class TrainingBean() : Serializable {
 
     //多人模式
     var list = mutableListOf<TrainingBean>()
+
+    override fun toString(): String {
+        return "TrainingBean(name='$name', count=$count, isVoice=$isVoice, isBeat=$isBeat, isCheck=$isCheck, isSingle=$isSingle, mac='$mac', list=$list)"
+    }
 }

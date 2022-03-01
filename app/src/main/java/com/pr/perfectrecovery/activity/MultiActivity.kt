@@ -6,17 +6,20 @@ import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.adapter.MultiActAdapter
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivityMultiBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.utils.TimeUtils
+import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -54,13 +57,17 @@ class MultiActivity : BaseActivity() {
         EventBus.getDefault().register(this)
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         dataSize = mTrainingBean?.list?.size!!
-        mTrainingBean?.list?.forEach {
-            Log.e(TAG, "onCreate: ${mTrainingBean.toString()}", )
+        mTrainingBean?.list?.forEach { item ->
+            Log.e(TAG, "onCreate: ${item.toString()}", )
         }
         initView()
         showData()
     }
     private fun initView() {
+        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
+        val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
+        time = (configBean.operationTime * 1000).toLong()
+
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.actMulRecycler.layoutManager = layoutManager
         binding.actMulRecycler.adapter = adapter
@@ -104,6 +111,7 @@ class MultiActivity : BaseActivity() {
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
+                binding.tvModel.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 counter.let { mHandler.post(it) }
             } else {
@@ -127,6 +135,9 @@ class MultiActivity : BaseActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         when (event.code) {
+            BaseConstant.EVENT_CPR_TIMEING -> {
+                counter.let { mHandler.post(it) }
+            }
         }
     }
 
@@ -151,6 +162,7 @@ class MultiActivity : BaseActivity() {
         dataList.add(data)
     }
 
+    var curStudentIndex = 0
     private inner class Counter : Runnable {
         override fun run() {
             mHandler.postDelayed(this, 1000);//一秒钟循环计时一次
@@ -158,12 +170,25 @@ class MultiActivity : BaseActivity() {
                 mHandler.removeCallbacks(counter)
             }
             if (!mTrainingBean?.isCheck!!) {
-                timeZero += 1000
+                updataCycleData(timeZero)
                 binding.tvTime.text = TimeUtils.timeParse(timeZero)
+                timeZero += 1000
             } else {
+                updataCycleData(time)
                 binding.tvTime.text = TimeUtils.timeParse(time)
                 time -= 1000
             }
+        }
+    }
+
+    fun updataCycleData(time:Long) {
+        if (time % BaseConstant.INTERVAL_TIME == 0L) {
+            curStudentIndex %= dataSize
+            mTrainingBean?.list?.get(curStudentIndex)?.let {
+                binding.tvModel.text = "${it.count + 1}"
+                binding.tvCycle.text = adapter.getCycleCount(it.mac).toString()
+            }
+            curStudentIndex ++
         }
     }
 
