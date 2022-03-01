@@ -16,6 +16,7 @@ import com.pr.perfectrecovery.utils.TimeUtils
  * author lrz
  */
 val DATADTO = "dataDTO"
+val PDF_FLAG = "pdf_flag"
 
 class TrainResultActivity : BaseActivity() {
     private lateinit var viewBinding: ActivityTrainResultBinding
@@ -26,6 +27,14 @@ class TrainResultActivity : BaseActivity() {
             intent.putExtra(DATADTO, trainingDTO)
             context.startActivity(intent)
         }
+
+        fun start(context: Context, trainingDTO: TrainingDTO, flagPDF: Boolean) {
+            val intent = Intent(context, TrainResultActivity::class.java)
+            intent.putExtra(DATADTO, trainingDTO)
+            intent.putExtra(PDF_FLAG, flagPDF)
+            context.startActivity(intent)
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

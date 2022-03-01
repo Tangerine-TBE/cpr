@@ -81,17 +81,21 @@ class StatisticalActivity : BaseActivity() {
         }
 
         mAdapter.setOnItemClickListener { adapter, view, position ->
-            val mCheckBox = view.findViewById<CheckBox>(R.id.cbCheck)
-            mCheckBox.isChecked = !mCheckBox.isChecked
             val item = mAdapter.getItem(position)
-            if (mCheckBox.isChecked) {
-                selectList.add(item)
-                item.isCheckBox = true
+            if (isDel) {
+                val mCheckBox = view.findViewById<CheckBox>(R.id.cbCheck)
+                mCheckBox.isChecked = !mCheckBox.isChecked
+                if (mCheckBox.isChecked) {
+                    selectList.add(item)
+                    item.isCheckBox = true
+                } else {
+                    item.isCheckBox = false
+                    selectList.remove(item)
+                }
+                mAdapter.data[position] = item
             } else {
-                item.isCheckBox = false
-                selectList.remove(item)
+                TrainResultActivity.start(this, item, true)
             }
-            mAdapter.data[position] = item
         }
 
         //删除选中数据
