@@ -95,6 +95,7 @@ class CPRActivity : BaseActivity() {
 
         viewBinding.bottom.ivStart.setOnClickListener {
             val intent = Intent(this, TrainingSingleActivity::class.java)
+            connectList.clear()
             connectList.addAll(bleList)
             intent.putParcelableArrayListExtra(BaseConstant.CONNECT_BLE_DEVICES, connectList)
             startActivity(intent)
