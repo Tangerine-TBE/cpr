@@ -168,7 +168,11 @@ class SingleActivity : BaseActivity() {
             titleBtns.add(binding.ctEvent)
         }
 
-        cycleFragment = CycleFragment.newInstance(mTrainingBean!!.isVoice, mTrainingBean!!.isBeat)
+        cycleFragment = CycleFragment.newInstance(
+            mTrainingBean!!.isVoice,
+            mTrainingBean!!.isBeat,
+            mTrainingBean!!.isCheck
+        )
         fragments.add(cycleFragment!!)
         val indexChar = curItem++
         binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }

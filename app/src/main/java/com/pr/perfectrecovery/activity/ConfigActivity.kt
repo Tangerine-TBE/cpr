@@ -4,20 +4,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.text.format.DateUtils
 import android.view.View
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.databinding.ActivityCprListBinding
-import com.pr.perfectrecovery.fragment.CPRScoreFragment
-import com.pr.perfectrecovery.fragment.CPRStandardFragment
-import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 
 /**

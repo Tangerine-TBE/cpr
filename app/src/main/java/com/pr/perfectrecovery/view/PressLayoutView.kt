@@ -81,10 +81,6 @@ class PressLayoutView : LinearLayout {
     }
 
     private var newY = 0
-    private var prCount = 0
-    private var down = 0
-    private var isDown = false
-    private var isRate = false
     fun smoothScrollTo(destY: Int) {
         Log.e("smoothScrollTo_1", "$destY")
         //距离值：  30-150
@@ -100,15 +96,11 @@ class PressLayoutView : LinearLayout {
         viewTop!!.isChecked = false
         viewBottom!!.isChecked = false
         if (destY == 0) {
-            down = 0
-            isDown = false
-            isRate = false
             viewTop!!.isChecked = true
         }
         val scrollY = linearLayout!!.scrollY
         scroller!!.startScroll(linearLayout!!.scrollX, scrollY, 0, -newY - scrollY)
         if (destY == 9) { //正确的按压
-            isDown = true
             viewBottom!!.isChecked = true
             Log.e("smoothScrollTo", "按压正确")
             viewPress!!.visibility = INVISIBLE

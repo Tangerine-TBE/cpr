@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
-import android.widget.Chronometer
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,24 +17,21 @@ import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
-import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.bean.ConfigBean
+import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.DataVolatile
-import com.pr.perfectrecovery.utils.TimeUtils
 import com.pr.perfectrecovery.view.DialChart07View
-import com.pr.perfectrecovery.view.PressLayoutView
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.math.abs
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM3 = "param3"
 
 /**
  * CPR按压页
@@ -46,6 +42,7 @@ class CycleFragment : Fragment() {
     private var mMediaPlayer: MediaPlayer? = null
     private var isTS: Boolean = false
     private var isYY: Boolean = false
+    private var isCheck: Boolean = false
     private var cycleCount = 0
     private var mBaseDataDTO: BaseDataDTO? = null
     private var isStart = false
@@ -53,25 +50,28 @@ class CycleFragment : Fragment() {
     private var configBean = ConfigBean()
 
     //按压少次
-    private var prLessCount : Int= 0
+    private var prLessCount: Int = 0
+
     //按压多次
-    private var prManyCount : Int= 0
+    private var prManyCount: Int = 0
+
     //吹气少次
-    private var qyLessCount : Int= 0
+    private var qyLessCount: Int = 0
+
     //吹气多次
-    private var qyManyCount : Int= 0
+    private var qyManyCount: Int = 0
 
     //中断计时累加
     private var timeOut: Long = 0
 
     //按压总数统计
-    private var pressCount: Int = 0
 
     companion object {
-        fun newInstance(isTS: Boolean, isYY: Boolean) = CycleFragment().apply {
+        fun newInstance(isTS: Boolean, isYY: Boolean, isCheck: Boolean) = CycleFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_PARAM1, isTS)
                 putBoolean(ARG_PARAM2, isYY)
+                putBoolean(ARG_PARAM3, isCheck)
             }
         }
     }
@@ -91,6 +91,7 @@ class CycleFragment : Fragment() {
         arguments?.let {
             isTS = it.getBoolean(ARG_PARAM1)
             isYY = it.getBoolean(ARG_PARAM2)
+            isCheck = it.getBoolean(ARG_PARAM3)
         }
         viewModel = ViewModelProvider(this).get(CycleViewModel::class.java)
         initView()
@@ -220,6 +221,11 @@ class CycleFragment : Fragment() {
             trainingDTO.blowErrorCount = ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE
             trainingDTO.pressTotal = prSum
             trainingDTO.blowTotal = qySum
+            //超次少次
+            trainingDTO.prManyCount = prManyCount
+            trainingDTO.prLessCount = prLessCount
+            trainingDTO.qyManyCount = qyManyCount
+            trainingDTO.qyLessCount = qyLessCount
         }
         counter.let { mHandler.removeCallbacks(it) }
         viewBinding.ctTime.stop()
@@ -286,28 +292,18 @@ class CycleFragment : Fragment() {
     private var err_qr_unback = 0
     private var isTimeOut = false
 
+    /**处理循环次数- 以及考核 超次 少次 数据统计**/
     //当前是否为按压模式-吹气模式
+    private var cyclePrCount = 0
+    private var cycleQyCount = 0
     private var isPress = false
+
     //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
-            if (configBean.prCount > 0 || configBean.qyCount > 0) {
-                //计算循环次数
-                if ((dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount)) {
-                    cycleCount++
-                    //更新循环次数
-                    EventBus.getDefault()
-                        .post(
-                            MessageEventData(
-                                BaseConstant.EVENT_SINGLE_DATA_CYCLE,
-                                "$cycleCount",
-                                null
-                            )
-                        )
-                }
-            }
-
+            //计算循环次数
+            cycle(dataDTO)
             //吹气频率
             setRate(viewBinding.chartQy, dataDTO.cf)
             //按压
@@ -320,7 +316,7 @@ class CycleFragment : Fragment() {
                 mHandler.postDelayed(counter, 5000)
             }
             //更新循环次数
-            if (pressCount != dataDTO.prSum && isTimeing) {
+            if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
                 EventBus.getDefault()
                     .post(
@@ -335,6 +331,109 @@ class CycleFragment : Fragment() {
     }
 
     /**
+     * 循环次数计算
+    吹气在整个流程的开头或中间：
+    检测到有按压，一个循环结束。这时候就能统计出这个循环的吹气次数，然后和设定的吹气次数比较，判断有没有超次少次
+
+    吹气在整个流程的结尾：
+    达到设定的次数结束整个流程，没有达到设定的次数，等待继续吹，如果一直没有吹，一直等到流程的时间用完，这个时候算出这个循环少次
+     */
+    private fun cycle(dataDTO: BaseDataDTO) {
+        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
+
+            if (isCheck) {
+                if (cyclePrCount > configBean.prCount) {
+                    //按压超次
+                    prManyCount += cyclePrCount - configBean.prCount
+                } else {
+                    //按压少次
+                    prLessCount += configBean.prCount - cyclePrCount
+                }
+                if (cycleQyCount > configBean.qyCount) {
+                    //吹气超次
+                    qyManyCount += cycleQyCount - configBean.qyCount
+                } else {
+                    //吹气少次
+                    qyLessCount += configBean.qyCount - cycleQyCount
+                }
+            }
+            cyclePrCount = 0
+            cycleQyCount = 0
+            cycleCount++
+            //更新循环次数
+            EventBus.getDefault()
+                .post(
+                    MessageEventData(
+                        BaseConstant.EVENT_SINGLE_DATA_CYCLE,
+                        "$cycleCount",
+                        null
+                    )
+                )
+
+        }
+    }
+
+    /**
+     * 按压处理逻辑
+     */
+    private fun pr(dataDTO: BaseDataDTO) {
+        //按压位置 0-错误  1-正确
+//        if (dataDTO.psrType == 1) {
+        //按压频率
+        setRate(viewBinding.chart, dataDTO.pf)
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        //执行三次按压深度
+        if (dataDTO.prSum != prValue) {
+            prValue = dataDTO.prSum
+            //暂停超时时间 - 判断是否小于初始值
+            stopOutTime()
+            isPress = true
+            cyclePrCount++
+            //按压位置错误
+            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
+                err_pr_posi = dataDTO.ERR_PR_POSI
+                setPlayVoice(VOICE_MP3_AYWZCW)
+            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
+                //按压未回弹
+                err_qr_unback = dataDTO.ERR_PR_UNBACK
+                viewBinding.pressLayoutView.setUnBack()
+                setPlayVoice(VOICE_MP3_WHT)
+            } else {
+                //按压不足
+                if (err_pr_low != dataDTO.ERR_PR_LOW) {
+                    Log.e("TAG123", "按压错误：${dataDTO.ERR_PR_LOW}")
+                    err_pr_low = dataDTO.ERR_PR_LOW
+                    viewBinding.pressLayoutView.setDown()
+                    setPlayVoice(VOICE_MP3_AYBZ)
+                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
+                    err_pr_high = dataDTO.ERR_PR_HIGH
+                    setPlayVoice(VOICE_MP3_AYGD)
+                }
+            }
+        }
+//        }
+        //按压位置错误显示错误图标
+        if (dataDTO.psrType == 0) {
+            viewBinding.ivPressAim.visibility = View.VISIBLE
+            mHandler3.removeCallbacksAndMessages(null)
+            mHandler3.postAtTime(Runnable {
+                viewBinding.ivPressAim.visibility = View.INVISIBLE
+            }, 2000)
+            stopOutTime()
+        } else {
+            viewBinding.ivPressAim.visibility = View.INVISIBLE
+        }
+
+        //按压错误数统计
+        viewBinding.tvPress.text =
+            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
+        //按压总数
+        viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
+        viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
+    }
+
+
+    /**
      * 吹气状态
      */
     private fun qy(dataDTO: BaseDataDTO) {
@@ -342,6 +441,8 @@ class CycleFragment : Fragment() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
+                cycleQyCount++
+                isPress = false
                 val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
@@ -390,64 +491,6 @@ class CycleFragment : Fragment() {
         viewBinding.ivAim.visibility = View.INVISIBLE
     }
 
-    /**
-     * 按压处理逻辑
-     */
-    private fun pr(dataDTO: BaseDataDTO) {
-        //按压位置 0-错误  1-正确
-//        if (dataDTO.psrType == 1) {
-        //按压频率
-        setRate(viewBinding.chart, dataDTO.pf)
-        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
-        //执行三次按压深度
-        if (dataDTO.prSum != prValue) {
-            prValue = dataDTO.prSum
-            //暂停超时时间 - 判断是否小于初始值
-            stopOutTime()
-            //按压位置错误
-            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
-                err_pr_posi = dataDTO.ERR_PR_POSI
-                setPlayVoice(VOICE_MP3_AYWZCW)
-            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
-                //按压未回弹
-                err_qr_unback = dataDTO.ERR_PR_UNBACK
-                viewBinding.pressLayoutView.setUnBack()
-                setPlayVoice(VOICE_MP3_WHT)
-            } else {
-                //按压不足
-                if (err_pr_low != dataDTO.ERR_PR_LOW) {
-                    Log.e("TAG123", "按压错误：${dataDTO.ERR_PR_LOW}")
-                    err_pr_low = dataDTO.ERR_PR_LOW
-                    viewBinding.pressLayoutView.setDown()
-                    setPlayVoice(VOICE_MP3_AYBZ)
-                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
-                    err_pr_high = dataDTO.ERR_PR_HIGH
-                    setPlayVoice(VOICE_MP3_AYGD)
-                }
-            }
-            pressCount = dataDTO.prSum
-        }
-//        }
-        //按压位置错误显示错误图标
-        if (dataDTO.psrType == 0) {
-            viewBinding.ivPressAim.visibility = View.VISIBLE
-            mHandler3.removeCallbacksAndMessages(null)
-            mHandler3.postAtTime(Runnable {
-                viewBinding.ivPressAim.visibility = View.INVISIBLE
-            }, 2000)
-            stopOutTime()
-        } else {
-            viewBinding.ivPressAim.visibility = View.INVISIBLE
-        }
-
-        //按压错误数统计
-        viewBinding.tvPress.text =
-            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
-        //按压总数
-        viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
-        viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
-    }
-
     private fun stopOutTime() {
         //暂停超时时间
         isTimeOut = false
@@ -492,6 +535,13 @@ class CycleFragment : Fragment() {
             mMediaPlayer!!.release()
             mMediaPlayer = null
         }
+        mHandler.removeCallbacksAndMessages(null)
+        mHandler1.removeCallbacksAndMessages(null)
+        mHandler2.removeCallbacksAndMessages(null)
+        mHandler3.removeCallbacksAndMessages(null)
+        mHandler4.removeCallbacksAndMessages(null)
+        mHandler5.removeCallbacksAndMessages(null)
+        mHandler6.removeCallbacksAndMessages(null)
         //数据清零
         DataVolatile.dataClear()
     }
