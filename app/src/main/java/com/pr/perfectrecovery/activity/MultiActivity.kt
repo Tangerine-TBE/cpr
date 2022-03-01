@@ -45,7 +45,7 @@ class MultiActivity : BaseActivity() {
         private const val INIT_VALUE = "fe0122000000ffffff000000000251000100d048"
     }
 
-    private val mac = arrayOf("00:1B:AB:6B:C4:4D", "00:1B:AB:6B:C4:6D", "00:1B:AB:6B:C4:5D", "00:1B:AB:6B:C4:3D", "00:1B:AB:6B:C4:2D", "00:1B:AB:6B:C4:1D")
+    private val testMacs = arrayOf("00:1B:AB:6B:C4:4D", "00:1B:AB:6B:C4:6D")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +54,9 @@ class MultiActivity : BaseActivity() {
         EventBus.getDefault().register(this)
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         dataSize = mTrainingBean?.list?.size!!
+        mTrainingBean?.list?.forEach {
+            Log.e(TAG, "onCreate: ${mTrainingBean.toString()}", )
+        }
         initView()
         showData()
     }
@@ -64,9 +67,13 @@ class MultiActivity : BaseActivity() {
 
         // 先初始化几个占位数据
         for (i in 0 until dataSize) {
-            var item = DataVolatile.parseString(INIT_VALUE)
-            item.mac = mac[i]
+            val bean = mTrainingBean?.list?.get(i)
+            var item = BaseDataDTO()
+            item.mac = bean?.mac.toString()
+            Log.e(TAG, "initView: mac: ${bean?.mac}", )
             item.isStart = false
+            item.distance = 255
+            item.bpValue = 0
             dataList.add(item)
         }
 
@@ -133,11 +140,13 @@ class MultiActivity : BaseActivity() {
     }
 
     private fun updateData(data:BaseDataDTO) {
-        var iterator = dataList.iterator()
-        while (iterator.hasNext()) {
-            if (iterator.next().mac == data.mac) {
-                iterator.remove()
-            }
+        var index = -1
+        dataList.forEach {
+            if (it.mac == data.mac)
+                index = dataList.indexOf(it)
+        }
+        if (index != -1) {
+            dataList.removeAt(index)
         }
         dataList.add(data)
     }

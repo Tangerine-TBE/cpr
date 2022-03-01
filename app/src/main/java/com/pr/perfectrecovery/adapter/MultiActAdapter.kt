@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.adapter
 
 import android.util.Log
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.blankj.utilcode.util.GsonUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -40,6 +41,7 @@ class MultiActAdapter :
     private var pressCountMap = mutableMapOf<String, Int>()
     private var isTimeingMap = mutableMapOf<String, Boolean>()
     private var qyValueMap = mutableMapOf<String, Int>()
+    private var currentShowViewMap = mutableMapOf<String, ConstraintLayout>()
 
     init {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
@@ -66,13 +68,24 @@ class MultiActAdapter :
         binding.layoutScore.visibility = View.GONE
         binding.layoutPress.visibility = View.GONE
         binding.layoutLung.visibility = View.GONE
-        if (data.distance < 255 || data.aisleType == 0) {
+
+        var curShowView = currentShowViewMap[data.mac]
+        if (curShowView == null) {
+            curShowView = binding.layoutPress
+        }
+        if (data.distance == 255 && data.bpValue == 0) {
+            curShowView.visibility = View.VISIBLE
+        } else if (data.distance < 255 || data.bpValue == 0) {
             binding.layoutPress.visibility = View.VISIBLE
-        } else if (data.bpValue > 0 && data.aisleType == 1) {
+            curShowView = binding.layoutPress
+        } else if (data.bpValue > 0) {
             binding.layoutLung.visibility = View.VISIBLE
+            curShowView = binding.layoutLung
         } else {
             binding.layoutScore.visibility = View.VISIBLE
+            curShowView = binding.layoutScore
         }
+        currentShowViewMap[data.mac] = curShowView
 
 
         // 未开始  显示灰色的图标
@@ -85,13 +98,25 @@ class MultiActAdapter :
             binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_1)
             binding.dashBoard2.visibility = View.VISIBLE
             binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_1)
-        } else {
-            //开始，但是暂无数据
-            binding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
-            binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
-            binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
-            binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
 
+            binding.pressLayoutView.visibility = View.INVISIBLE
+            binding.chart.visibility = View.INVISIBLE
+            binding.chartQy.visibility = View.INVISIBLE
+        } else {
+            if(data.distance == 255 && data.bpValue == 0) {
+                //开始，但是暂无数据
+                binding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
+                binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+                binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
+                binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
+            } else {
+                binding.ivPress.visibility = View.INVISIBLE
+                binding.pressLayoutView.visibility = View.VISIBLE
+                binding.dashBoard.visibility = View.INVISIBLE
+                binding.dashBoard2.visibility = View.INVISIBLE
+                binding.chart.visibility = View.VISIBLE
+                binding.chartQy.visibility = View.VISIBLE
+            }
         }
     }
 
