@@ -586,7 +586,7 @@ object DataVolatile {
                 Qliang = 0
                 if (QY_SUM > 1) {
                     val time = changTimePress - preTimeQY
-                    QY_VOLUME_SUM+=time.toInt()
+                    QY_TIME_SUM+=time.toInt()
                     CF_Value = (60000 / time).toInt()
                 }
                 preTimeQY = changTimePress
