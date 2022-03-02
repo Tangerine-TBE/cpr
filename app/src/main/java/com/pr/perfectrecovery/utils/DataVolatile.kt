@@ -402,6 +402,7 @@ object DataVolatile {
                            index=0
                            L_valueSet.clear()
                        }
+                        PR_DEPTH_SUM+= (preDistance-L_d2).toInt()
 
                     }
                    // Log.e("TAG4", "$L_d2")
@@ -419,7 +420,6 @@ object DataVolatile {
                     preTimePress = changTimePress*/
                 }
                 MIN_FLAG=1
-                PR_DEPTH_SUM+= (preDistance-L_d2).toInt()
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
@@ -456,6 +456,7 @@ object DataVolatile {
                         index=0
                         L_valueSet.clear()
                     }
+                    PR_DEPTH_SUM+= (preDistance-L_d1).toInt()
                 }
                 MIN_FLAG=2
                 // Log.e("TAG6", "$L_d1")
@@ -472,7 +473,7 @@ object DataVolatile {
                      Log.e("TAG6", "PF值：$PF_Value")
                 }
                 preTimePress = changTimePress*/
-                PR_DEPTH_SUM+= (preDistance-L_d1).toInt()
+
                 value= L_d1
             } else {
                // PR_DOTTIMSE_NUMBER+=3
@@ -483,7 +484,6 @@ object DataVolatile {
                 } else {
                     UNBACK_FLAG = 1
                 }
-
                 value = L_d3
             }
 
