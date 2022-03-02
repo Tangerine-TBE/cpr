@@ -338,6 +338,8 @@ object DataVolatile {
     var PR_TIME_SUM=0    // 按压时间总和（ms）
     var QY_VOLUME_SUM=0  //吹气量总和
     var QY_TIME_SUM=0     //吹气时间总和
+    var PR_SEQRIGHT_TOTAL=0; //按压频率正常的次数
+    var QY_SERRIGHT_TOTAL=0; //吹气频率正确的次数
 
 
     /*
@@ -398,6 +400,9 @@ object DataVolatile {
                            Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                            PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
                            PF_Value= (PF_Value+(60000/(PR_DOTTIMSE_NUMBER*40)).toInt())/2
+                           if(PF_Value in 100..120){
+                               PR_SEQRIGHT_TOTAL++
+                           }
                            PR_DOTTIMSE_NUMBER=0;
                            index=0
                            L_valueSet.clear()
@@ -452,6 +457,9 @@ object DataVolatile {
                         Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                         PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
                         PF_Value=(PF_Value+(60000/(PR_DOTTIMSE_NUMBER*40)).toInt())/2
+                        if(PF_Value in 100..120){
+                            PR_SEQRIGHT_TOTAL++
+                        }
                         PR_DOTTIMSE_NUMBER=0;
                         index=0
                         L_valueSet.clear()
@@ -588,6 +596,9 @@ object DataVolatile {
                     val time = changTimePress - preTimeQY
                     QY_TIME_SUM+=time.toInt()
                     CF_Value = (60000 / time).toInt()
+                    if(CF_Value in 6..8){
+                        QY_SERRIGHT_TOTAL++
+                    }
                 }
                 preTimeQY = changTimePress
             }
