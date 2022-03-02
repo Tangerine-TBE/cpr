@@ -334,6 +334,12 @@ object DataVolatile {
     var PR_RUN_FLAG=0
     var MIN_FLAG=0;
 
+    var PR_DEPTH_SUM=0  //按压深度总和(mm)
+    var PR_TIME_SUM=0    // 按压时间总和（ms）
+    var QY_VOLUME_SUM=0  //吹气量总和
+    var QY_TIME_SUM=0     //吹气时间总和
+
+
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
@@ -390,7 +396,8 @@ object DataVolatile {
                                Log.e("TAG8", "距离数 ${item}")
                            }
                            Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
-                           PF_Value=(60000/(PR_DOTTIMSE_NUMBER*40)).toInt()
+                           PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
+                           PF_Value= (PF_Value+(60000/(PR_DOTTIMSE_NUMBER*40)).toInt())/2
                            PR_DOTTIMSE_NUMBER=0;
                            index=0
                            L_valueSet.clear()
@@ -412,6 +419,7 @@ object DataVolatile {
                     preTimePress = changTimePress*/
                 }
                 MIN_FLAG=1
+                PR_DEPTH_SUM+= (preDistance-L_d2).toInt()
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
@@ -442,7 +450,8 @@ object DataVolatile {
                             Log.e("TAG8", "距离数 ${item}")
                         }
                         Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
-                        PF_Value=(60000/(PR_DOTTIMSE_NUMBER*40)).toInt()
+                        PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
+                        PF_Value=(PF_Value+(60000/(PR_DOTTIMSE_NUMBER*40)).toInt())/2
                         PR_DOTTIMSE_NUMBER=0;
                         index=0
                         L_valueSet.clear()
@@ -463,6 +472,7 @@ object DataVolatile {
                      Log.e("TAG6", "PF值：$PF_Value")
                 }
                 preTimePress = changTimePress*/
+                PR_DEPTH_SUM+= (preDistance-L_d1).toInt()
                 value= L_d1
             } else {
                // PR_DOTTIMSE_NUMBER+=3
@@ -565,6 +575,7 @@ object DataVolatile {
         if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
+            QY_VOLUME_SUM+=Qliang
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
             if (top_flag == 1) {
@@ -575,6 +586,7 @@ object DataVolatile {
                 Qliang = 0
                 if (QY_SUM > 1) {
                     val time = changTimePress - preTimeQY
+                    QY_VOLUME_SUM+=time.toInt()
                     CF_Value = (60000 / time).toInt()
                 }
                 preTimeQY = changTimePress
