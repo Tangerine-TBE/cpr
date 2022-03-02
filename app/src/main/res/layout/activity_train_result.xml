@@ -46,11 +46,11 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                            android:id="@+id/tvName"
+                            android:id="@+id/tvTrainName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_20"
-                            android:textColor="#ffffffff"
+                            android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -65,13 +65,14 @@
                             android:layout_height="wrap_content"
                             android:drawablePadding="4dp"
                             android:gravity="center"
-                            android:text="训练"
+                            android:textStyle="bold"
                             android:textColor="@color/white"
                             android:textSize="16sp"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvName"
+                            android:text="训练"
+                            app:layout_constraintBottom_toBottomOf="@+id/tvTrainName"
                             app:layout_constraintEnd_toStartOf="@+id/tvTime"
-                            app:layout_constraintStart_toEndOf="@+id/tvName"
-                            app:layout_constraintTop_toTopOf="@+id/tvName" />
+                            app:layout_constraintStart_toEndOf="@+id/tvTrainName"
+                            app:layout_constraintTop_toTopOf="@+id/tvTrainName" />
 
                     <TextView
                             android:id="@+id/tvTime"
@@ -79,9 +80,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="@dimen/dp_32"
                             android:gravity="center"
-                            android:text="2分30秒"
+                            android:textStyle="bold"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/text_12"
+                            android:textSize="@dimen/text_14"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/tvTrain"
@@ -735,7 +736,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dp_10"
-                            android:text="平均：0cm"
+                            android:text="平均：0mm"
                             android:textColor="#ffffffff"
                             android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="@+id/tvPressEnd"
@@ -746,13 +747,13 @@
                             android:id="@+id/tvPressCenter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableTop="@mipmap/icon_wm_score"
                             android:gravity="center"
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintBottom_toBottomOf="@+id/tvPressBottom"
                             app:layout_constraintEnd_toStartOf="@+id/tvClock2"
-                            app:layout_constraintStart_toEndOf="@+id/tvClock1" />
+                            app:layout_constraintStart_toEndOf="@+id/tvClock1"
+                            app:drawableTopCompat="@mipmap/icon_wm_score" />
 
                     <TextView
                             android:id="@+id/tvBlow"

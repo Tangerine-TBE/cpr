@@ -296,7 +296,6 @@ class CycleFragment : Fragment() {
     //当前是否为按压模式-吹气模式
     private var cyclePrCount = 0
     private var cycleQyCount = 0
-    private var isPress = false
 
     //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
@@ -339,8 +338,8 @@ class CycleFragment : Fragment() {
     达到设定的次数结束整个流程，没有达到设定的次数，等待继续吹，如果一直没有吹，一直等到流程的时间用完，这个时候算出这个循环少次
      */
     private fun cycle(dataDTO: BaseDataDTO) {
-        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
-
+//        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
+        if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
             if (isCheck) {
                 if (cyclePrCount > configBean.prCount) {
                     //按压超次
@@ -356,9 +355,9 @@ class CycleFragment : Fragment() {
                     //吹气少次
                     qyLessCount += configBean.qyCount - cycleQyCount
                 }
+                cyclePrCount = 0
+                cycleQyCount = 0
             }
-            cyclePrCount = 0
-            cycleQyCount = 0
             cycleCount++
             //更新循环次数
             EventBus.getDefault()
@@ -387,11 +386,15 @@ class CycleFragment : Fragment() {
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()
-            isPress = true
             cyclePrCount++
             //按压位置错误
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
+                viewBinding.ivPressAim.visibility = View.VISIBLE
+                mHandler3.removeCallbacksAndMessages(null)
+                mHandler3.postAtTime(Runnable {
+                    viewBinding.ivPressAim.visibility = View.INVISIBLE
+                }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
             } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
                 //按压未回弹
@@ -411,27 +414,12 @@ class CycleFragment : Fragment() {
                 }
             }
         }
-//        }
-        //按压位置错误显示错误图标
-        if (dataDTO.psrType == 0) {
-            viewBinding.ivPressAim.visibility = View.VISIBLE
-            mHandler3.removeCallbacksAndMessages(null)
-            mHandler3.postAtTime(Runnable {
-                viewBinding.ivPressAim.visibility = View.INVISIBLE
-            }, 2000)
-            stopOutTime()
-        } else {
-            viewBinding.ivPressAim.visibility = View.INVISIBLE
-        }
-
         //按压错误数统计
         viewBinding.tvPress.text =
             "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
         //按压总数
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
-        viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
     }
-
 
     /**
      * 吹气状态
@@ -441,8 +429,6 @@ class CycleFragment : Fragment() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                cycleQyCount++
-                isPress = false
                 val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
@@ -475,6 +461,10 @@ class CycleFragment : Fragment() {
             mHandler4.removeCallbacksAndMessages(null)
             mHandler4.postAtTime(this::setQyAimVisibility, 2000)
         }
+        //记录吹气超次少次
+        if (qyValue != dataDTO.qySum) {
+            cycleQyCount++
+        }
         if (dataDTO.bpValue <= 0) {
             //吹气频率清零
             mHandler2.removeCallbacks(runnableCF)
@@ -485,6 +475,7 @@ class CycleFragment : Fragment() {
         //吹气错误数统计
         viewBinding.tvLungError.text =
             "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
+        viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
     }
 
     private fun setQyAimVisibility() {

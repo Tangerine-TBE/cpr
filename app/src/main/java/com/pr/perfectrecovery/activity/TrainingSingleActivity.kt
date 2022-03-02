@@ -43,13 +43,13 @@ class TrainingSingleActivity : BaseActivity() {
 //        }
         /* =================*/
 
-        if (blueToothList.size > 1) {
-            isSingle = false
-            initMany(blueToothList.size)
-        } else {
+//        if (blueToothList.size > 1) {
+//            isSingle = false
+//            initMany(blueToothList.size)
+//        } else {
             isSingle = true
             initSingle()
-        }
+//        }
     }
 
     /**

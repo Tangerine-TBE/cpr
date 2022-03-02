@@ -2,7 +2,7 @@ package com.pr.perfectrecovery.bean
 
 data class BaseDataDTO(
     //mac地址
-    var mac:String = "",
+    var mac: String = "",
     //电量值：  0-100%
     var electricity: Int = 0,
     //距离值：  30-150
@@ -44,12 +44,15 @@ data class BaseDataDTO(
     //吹气错误-气压进胃
     var ERR_QY_DEAD: Int = 0,
     //吹气错误-气道未打开错误
-    var ERR_QY_CLOSE: Int = 0
+    var ERR_QY_CLOSE: Int = 0,
+    var PR_DEPTH_SUM: Int = 0,//按压深度总和(mm)
+    var PR_TIME_SUM: Int = 0,   // 按压时间总和（ms）
+    var QY_VOLUME_SUM: Int = 0,  //吹气量总和
+    var QY_TIME_SUM: Int = 0,  //吹气时间总和
+    var PR_SEQRIGHT_TOTAL: Int = 0, //按压频率正常的次数
+    var QY_SERRIGHT_TOTAL: Int = 0 //吹气频率正确的次数
 ) {
     //是否开始
     var isStart = false
-    var L_D1 : Int = 0
-    var L_D2 : Int= 0
-    var L_D3 : Int= 0
 
 }

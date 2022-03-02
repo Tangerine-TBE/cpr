@@ -54,7 +54,7 @@ class SingleActivity : BaseActivity() {
         binding.tvName.text = mTrainingBean?.name
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
-        time = (configBean.operationTime * 1000).toLong()
+        operateTime = (configBean.operationTime * 1000).toLong()
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
@@ -100,14 +100,20 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.isCheck = mTrainingBean!!.isCheck
                 mTrainingDTO?.name = binding.tvName.text.toString().trim()
                 mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
-                mTrainingDTO?.trainingTime = TimeUtils.formatDate(timeZero)
-
+                mTrainingDTO?.operateTime = if (operateTime2 > 0) operateTime2 else 0
+                mTrainingDTO?.timeTotal = (configBean.operationTime * 1000).toLong()
                 mTrainingDTO?.prCount = configBean.prCount
                 mTrainingDTO?.qyCount = configBean.qyCount
                 mTrainingDTO?.pressScore = configBean.pressScore
                 mTrainingDTO?.blowScore = configBean.blowScore
                 mTrainingDTO?.processScore = configBean.processScore
                 mTrainingDTO?.deduction = configBean.deductionScore
+                mTrainingDTO?.pr_depth_sum = DataVolatile.PR_DEPTH_SUM
+                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM
+                mTrainingDTO?.qy_volume_sum = DataVolatile.QY_VOLUME_SUM
+                mTrainingDTO?.qy_time_sum = DataVolatile.QY_TIME_SUM
+                mTrainingDTO?.pr_seqright_total = DataVolatile.PR_SEQRIGHT_TOTAL
+                mTrainingDTO?.qy_serright_total = DataVolatile.QY_SERRIGHT_TOTAL
                 //检查页面 结果
                 checkEventFragment?.getData().let {
                     if (it != null) {
@@ -212,31 +218,33 @@ class SingleActivity : BaseActivity() {
         counter.let { mHandler.removeCallbacks(it) }
 //        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         EventBus.getDefault().unregister(this)
-
     }
 
-    private var time: Long = 0
-    private var timeZero: Long = 0
+    //总操作时长
+    private var operateTime: Long = 0
+
+    //实际操作时长
+    private var operateTime2: Long = 0
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
 
     private inner class Counter : Runnable {
         override fun run() {
-            mHandler.postDelayed(this, 1000);//一秒钟循环计时一次
-            if (time <= 0) {
+            mHandler.postDelayed(this, 1000)//一秒钟循环计时一次
+            if (operateTime <= 0) {
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 mHandler.removeCallbacks(counter)
                 cycleFragment?.stop()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
             }
+            //训练模式 考核模式
+            operateTime2 += 1000
             if (!mTrainingBean?.isCheck!!) {
-                timeZero += 1000
-                binding.tvTime.text = TimeUtils.timeParse(timeZero)
+                binding.tvTime.text = TimeUtils.timeParse(operateTime2)
             } else {
-                binding.tvTime.text = TimeUtils.timeParse(time)
-                time -= 1000
+                operateTime -= 1000
+                binding.tvTime.text = TimeUtils.timeParse(operateTime)
             }
-
         }
     }
 }

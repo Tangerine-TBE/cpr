@@ -52,15 +52,10 @@ class StatisticalActivity : BaseActivity() {
         // 菜单点击监听。
         binding.recyclerview.setOnItemMenuClickListener(mItemMenuClickListener)
         binding.recyclerview.adapter = mAdapter
+        //mAdapter.setEmptyView(R.layout.empty_layout)
 
         //协程异步加载数据
         GlobalScope.launch(Dispatchers.IO) {
-//            for (item in 1..1000) {
-//                val listItem = TrainingDTO()
-//                listItem.id = item
-//                listItem.name = "WM_name${item}"
-//                listItem.save()
-//            }
             mDataList = LitePal.findAll(TrainingDTO::class.java) as ArrayList<TrainingDTO>
             withContext(Dispatchers.Main) {
                 mAdapter.setList(mDataList)
@@ -100,11 +95,14 @@ class StatisticalActivity : BaseActivity() {
 
         //删除选中数据
         binding.top.tvDel.setOnClickListener {
+            val ids = arrayOf("")
             if (selectList.size > 0) {
-                selectList.forEach { item ->
+                selectList.forEachIndexed { index, item ->
+                    ids[index] = "${item.id}"
                     mDataList.remove(item)
                     mAdapter.remove(item)
                 }
+                LitePal.deleteAll(TrainingDTO::class.java, *ids)
                 selectList.clear()
                 mAdapter.notifyDataSetChanged()
             }
@@ -133,6 +131,8 @@ class StatisticalActivity : BaseActivity() {
             val menuPosition = menuBridge.position // 菜单在RecyclerView的Item中的Position。
             if (direction == SwipeRecyclerView.RIGHT_DIRECTION) {
                 // 普通Item。
+                val trainingDTO = mAdapter.data[position]
+                LitePal.delete(TrainingDTO::class.java, trainingDTO.id)
                 mDataList.removeAt(position)
                 mAdapter.data.removeAt(position)
                 mAdapter.notifyItemRemoved(position)

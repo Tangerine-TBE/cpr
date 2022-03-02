@@ -3,6 +3,7 @@ package com.pr.perfectrecovery.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
 import com.pr.perfectrecovery.base.BaseActivity
@@ -63,7 +64,7 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.layoutCheck.tvName.text = "${trainingDTO.name}"
             viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prCount}:${trainingDTO.qyCount}"
             //倒计时
-            viewBinding.layoutCheck.tvCountdown.text = "${trainingDTO.trainingTime}"
+            viewBinding.layoutCheck.tvCountdown.text = TimeUtils.timeParse(trainingDTO.operateTime)
             //流程分数
             viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}分"
             //按压分数
@@ -83,7 +84,6 @@ class TrainResultActivity : BaseActivity() {
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
 
-
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.progress = trainingDTO.score.toInt()
             //总得分
@@ -99,9 +99,8 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.tvBlowSmallCount.text = "${trainingDTO.qyLessCount}次"
         } else {
             viewBinding.gruops.visibility = View.VISIBLE
-            viewBinding.tvTrain.text = "训练"
-            viewBinding.tvName.text = trainingDTO.name
-            viewBinding.tvTime.text = trainingDTO.trainingTime
+            viewBinding.tvTrainName.text = trainingDTO.name
+            viewBinding.tvTime.text = TimeUtils.formatDate(trainingDTO.operateTime)
         }
 
         //循环次数
@@ -122,17 +121,17 @@ class TrainResultActivity : BaseActivity() {
         //按压超时统计时间
         viewBinding.tvPressTime.text = "${trainingDTO.pressOutTime}"
         //平均每分钟按压次数
-        viewBinding.tvAverageCount.text = "${trainingDTO.pressAverage}"
-        //按压百仪表分比
+        viewBinding.tvAverageCount.text = "平均：${trainingDTO.getPressAverageTimes()}次/分"
+        //按压频率合格率
         viewBinding.tvClock1.text = "${trainingDTO.getPressRate()}%"
-        //按压百分比
+        //回弹合格率
         viewBinding.tvPressPercentage.text = "${trainingDTO.getReboundRate()}%"
+        //按压深度合格率
         viewBinding.tvPressEnd.text = "${trainingDTO.getDepthRate()}%"
         //按压平均深度
-        viewBinding.tvPressBottom.text = ""
+        viewBinding.tvPressBottom.text = "平均：${trainingDTO.getPressAverageDepth()}mm"
         //整体按压百分比
-        viewBinding.tvPressCenter.text = ""
-
+        viewBinding.tvPressCenter.text = "${trainingDTO.getPressTime()}%"
         //吹气错误数
         viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount}"
         //吹气总数
@@ -146,13 +145,13 @@ class TrainResultActivity : BaseActivity() {
         //吹气进胃
         viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach}"
         //平均吹气每分钟次数
-        viewBinding.tvBlowAverageCount.text = "${trainingDTO.blowAverage}"
+        viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
         //吹气频率百分比
-        viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}"
-        //吹气百分比
-        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}"
+        viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}%"
+        //通气合格率
+        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
         //吹气平均值
-        viewBinding.tvBlowEnd.text = ""
+        viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
     }
 
     /**
