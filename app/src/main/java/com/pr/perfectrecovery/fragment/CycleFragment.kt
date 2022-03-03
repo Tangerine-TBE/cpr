@@ -286,6 +286,9 @@ class CycleFragment : Fragment() {
 
     private var prValue = 0
     private var qyValue = 0
+
+    //通气频率
+    private var qyRate = 0
     private var err_pr_low = 0
     private var err_pr_high = 0
     private var err_pr_posi = 0
@@ -303,8 +306,6 @@ class CycleFragment : Fragment() {
             mBaseDataDTO = dataDTO
             //计算循环次数
             cycle(dataDTO)
-            //吹气频率
-            setRate(viewBinding.chartQy, dataDTO.cf)
             //按压
             pr(dataDTO)
             //吹气
@@ -396,6 +397,11 @@ class CycleFragment : Fragment() {
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
+                viewBinding.ivPressAim.visibility = View.VISIBLE
+                mHandler3.removeCallbacksAndMessages(null)
+                mHandler3.postAtTime(Runnable {
+                    viewBinding.ivPressAim.visibility = View.INVISIBLE
+                }, 2000)
             } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
                 //按压未回弹
                 err_qr_unback = dataDTO.ERR_PR_UNBACK
@@ -404,7 +410,6 @@ class CycleFragment : Fragment() {
             } else {
                 //按压不足
                 if (err_pr_low != dataDTO.ERR_PR_LOW) {
-                    Log.e("TAG123", "按压错误：${dataDTO.ERR_PR_LOW}")
                     err_pr_low = dataDTO.ERR_PR_LOW
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
@@ -456,22 +461,30 @@ class CycleFragment : Fragment() {
             if (dataDTO.bpValue > 5) {
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
+                viewBinding.ivAim.visibility = View.VISIBLE
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler4.postAtTime(this::setQyAimVisibility, 2000)
             }
-            viewBinding.ivAim.visibility = View.VISIBLE
-            mHandler4.removeCallbacksAndMessages(null)
-            mHandler4.postAtTime(this::setQyAimVisibility, 2000)
         }
         //记录吹气超次少次
         if (qyValue != dataDTO.qySum) {
             cycleQyCount++
         }
-        if (dataDTO.bpValue <= 0) {
+
+        if (dataDTO.bpValue <= 0 && qyRate > 0) {
             //吹气频率清零
+            qyRate = 0//用于清空数据
             mHandler2.removeCallbacks(runnableCF)
             mHandler2.postDelayed(runnableCF, 10000)
+        } else {
+            if (qyRate == 0 && dataDTO.bpValue > 0) {
+                qyRate = dataDTO.bpValue
+            }
         }
 
         qyValue = dataDTO.qySum
+        //吹气频率
+        setRate(viewBinding.chartQy, dataDTO.cf)
         //吹气错误数统计
         viewBinding.tvLungError.text =
             "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
