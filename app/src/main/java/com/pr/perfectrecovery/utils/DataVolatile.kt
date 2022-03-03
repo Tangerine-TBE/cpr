@@ -492,7 +492,7 @@ object DataVolatile {
                 value = L_d1
             } else {
                 // PR_DOTTIMSE_NUMBER+=3
-                if (abs(preDistance - L_d3) < 15) {
+                if (abs(preDistance - L_d3) < 12) {
                     UNBACK_FLAG = 0
                     low_flag = 0
                     Log.e("TAG7", "回到初始位置，复位未回弹$L_d3")
@@ -504,7 +504,7 @@ object DataVolatile {
 
         } else {
             // PR_DOTTIMSE_NUMBER+=3
-            if (abs(preDistance - L_d2) < 15) {
+            if (abs(preDistance - L_d2) < 12) {
                 UNBACK_FLAG = 0
                 Log.e("TAG7", "回到初始位置，复位未回弹$L_d2")
                 low_flag = 0
