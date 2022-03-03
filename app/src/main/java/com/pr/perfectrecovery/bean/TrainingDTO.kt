@@ -6,13 +6,15 @@ import java.io.Serializable
 data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var id: Long = 0
     var isCheck = false//是否为 false 训练  true 考核
+    var startTime: Long = 0//开始时间
+    var endTime: Long = 0//开始时间
 
     var pr_depth_sum = 0  //按压深度总和(mm)
     var pr_time_sum = 0    // 按压时间总和（ms）
     var qy_volume_sum = 0  //吹气量总和
     var qy_time_sum = 0     //吹气时间总和
-    var pr_seqright_total = 0; //按压频率正常的次数
-    var qy_serright_total = 0; //吹气频率正确的次数
+    var pr_seqright_total = 0 //按压频率正常的次数
+    var qy_serright_total = 0 //吹气频率正确的次数
 
     var timeTotal: Long = 0//总时长
     var operateTime: Long = 0//训练操作时间
@@ -84,7 +86,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getPressRate(): Int {
         return if (pressTotal > 0 && pr_seqright_total > 0) {
-            pr_seqright_total / pressTotal
+            (pr_seqright_total / pressTotal * 100)
         } else {
             0
         }
@@ -94,12 +96,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 按压回弹合格率
      * 回弹合格率=（总按压次数-未回弹次数）/总按压次数
      */
-    fun getReboundRate(): Int {
+    fun getReboundRate(): Float {
         //总数=正确按压次数+位置错误按压次数+未回弹按压次数
-        return if ((pressTotal - pressErrorCount + pressLocation + pressHigh) > 0 && pressTotal > 0) {
-            (pressTotal - pressRebound) / pressTotal
+        return if ((pressTotal - pressRebound) > 0 && pressTotal > 0) {
+            (((pressTotal - pressRebound) / pressTotal).toFloat() * 100)
         } else {
-            0
+            0f
         }
     }
 
@@ -109,8 +111,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getDepthRate(): Int {
         //总数=正确按压次数+位置错误按压次数+未回弹按压次数+深度错误的
-        return if ((pressTotal - pressErrorCount + pressLocation + pressHigh + pressRebound) > 0 && pressTotal > 0) {
-            (pressTotal - pressErrorCount) / pressTotal
+        return if ((pressTotal - pressErrorCount) > 0 && pressTotal > 0) {
+            ((pressTotal - pressErrorCount) / pressTotal * 100)
         } else {
             0
         }
@@ -146,7 +148,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getBlowAmount(): Int {
         return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) {
-            (blowTotal - blowErrorCount) / blowTotal
+            ((blowTotal - blowErrorCount) / blowTotal * 100)
         } else {
             0
         }
@@ -157,7 +159,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getBlowRate(): Int {
         return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) {
-            (blowTotal - blowErrorCount) / blowTotal
+            ((blowTotal - blowErrorCount) / blowTotal * 100)
         } else {
             0
         }
@@ -222,13 +224,13 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      * 按压时间百分比
-     * 按压总时间 / （按压时间 + 吹气时间）
+     * 按压时间/（结束操作的时间-开始操作模型的时间）
      */
-    fun getPressTime(): Float {
-        return if (timeTotal > 0 && pr_time_sum > 0)
-            (timeTotal / (pr_time_sum + qy_time_sum)).toFloat()
+    fun getPressTime(): Int {
+        return if (pr_time_sum > 0)
+            ((pr_time_sum / (endTime - startTime)).toInt() * 100)
         else
-            0f
+            0
     }
 
 }

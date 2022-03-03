@@ -246,7 +246,7 @@ class CPRActivity : BaseActivity() {
     private fun showConnectedDevice() {
         val deviceList = BleManager.getInstance().allConnectedDevice
         bleList = deviceList
-        if(bleList.size > 0){
+        if (bleList.size > 0) {
             viewBinding.tvMsg.text = ""
         }
         mDeviceAdapter.setList(deviceList)

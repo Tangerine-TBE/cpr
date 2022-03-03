@@ -186,6 +186,7 @@ class CycleFragment : Fragment() {
     }
 
     fun start() {
+        startTime = System.currentTimeMillis()
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
@@ -203,9 +204,12 @@ class CycleFragment : Fragment() {
 
     fun stop(): TrainingDTO {
         //返回成绩结果类
+        endTime = System.currentTimeMillis()
         isStart = false
         val trainingDTO = TrainingDTO()
         mBaseDataDTO?.apply {
+            trainingDTO.startTime = startTime
+            trainingDTO.endTime = endTime
             trainingDTO.pressOutTime = timeOut
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
@@ -299,6 +303,8 @@ class CycleFragment : Fragment() {
     //当前是否为按压模式-吹气模式
     private var cyclePrCount = 0
     private var cycleQyCount = 0
+    private var startTime: Long = 0
+    private var endTime: Long = 0
 
     //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
@@ -382,7 +388,7 @@ class CycleFragment : Fragment() {
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
         viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
-        //执行三次按压深度
+        //处理是否按压
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
@@ -397,11 +403,6 @@ class CycleFragment : Fragment() {
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
-                viewBinding.ivPressAim.visibility = View.VISIBLE
-                mHandler3.removeCallbacksAndMessages(null)
-                mHandler3.postAtTime(Runnable {
-                    viewBinding.ivPressAim.visibility = View.INVISIBLE
-                }, 2000)
             } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
                 //按压未回弹
                 err_qr_unback = dataDTO.ERR_PR_UNBACK
