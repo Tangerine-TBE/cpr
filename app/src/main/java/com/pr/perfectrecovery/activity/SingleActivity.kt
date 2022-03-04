@@ -109,7 +109,7 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.processScore = configBean.processScore
                 mTrainingDTO?.deduction = configBean.deductionScore
                 mTrainingDTO?.pr_depth_sum = DataVolatile.PR_DEPTH_SUM
-                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM
+                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM.toFloat()
                 mTrainingDTO?.qy_volume_sum = DataVolatile.QY_VOLUME_SUM
                 mTrainingDTO?.qy_time_sum = DataVolatile.QY_TIME_SUM
                 mTrainingDTO?.pr_seqright_total = DataVolatile.PR_SEQRIGHT_TOTAL

@@ -107,19 +107,19 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.tvCycleCount.text = "${trainingDTO.cycleCount}"
 
         //按压错误数
-        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
+        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount.toInt()}"
         //按压总数
-        viewBinding.tvLungTotal.text = "/${trainingDTO.pressTotal}"
+        viewBinding.tvLungTotal.text = "/${trainingDTO.pressTotal.toInt()}"
         //按压位置错误
-        viewBinding.tvLocation.text = "${trainingDTO.pressLocation}"
+        viewBinding.tvLocation.text = "${trainingDTO.pressLocation.toInt()}"
         //按压不足
-        viewBinding.tvInsufficient.text = "${trainingDTO.pressLow}"
+        viewBinding.tvInsufficient.text = "${trainingDTO.pressLow.toInt()}"
         //按压过大
-        viewBinding.tvPressBig.text = "${trainingDTO.pressHigh}"
+        viewBinding.tvPressBig.text = "${trainingDTO.pressHigh.toInt()}"
         //按压未回弹
-        viewBinding.tvRebound.text = "${trainingDTO.pressRebound}"
+        viewBinding.tvRebound.text = "${trainingDTO.pressRebound.toInt()}"
         //按压超时统计时间
-        viewBinding.tvPressTime.text = "${trainingDTO.pressOutTime}"
+        viewBinding.tvPressTime.text = "${TimeUtils.timeParse(trainingDTO.pressOutTime)}"
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "平均：${trainingDTO.getPressAverageTimes()}次/分"
         //按压频率合格率
@@ -133,17 +133,17 @@ class TrainResultActivity : BaseActivity() {
         //整体按压百分比
         viewBinding.tvPressCenter.text = "${trainingDTO.getPressTime()}%"
         //吹气错误数
-        viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount}"
+        viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount.toInt()}"
         //吹气总数
-        viewBinding.tvHeartTotal.text = "/${trainingDTO.blowTotal}"
+        viewBinding.tvHeartTotal.text = "/${trainingDTO.blowTotal.toInt()}"
         //吹气错误
-        viewBinding.tvAirway.text = "${trainingDTO.blowClose}"
+        viewBinding.tvAirway.text = "${trainingDTO.blowClose.toInt()}"
         //吹气不足
-        viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow}"
+        viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow.toInt()}"
         //吹气过大
-        viewBinding.tvBLowBig.text = "${trainingDTO.blowHigh}"
+        viewBinding.tvBLowBig.text = "${trainingDTO.blowHigh.toInt()}"
         //吹气进胃
-        viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach}"
+        viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach.toInt()}"
         //平均吹气每分钟次数
         viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
         //吹气频率百分比

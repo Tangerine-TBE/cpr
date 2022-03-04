@@ -214,16 +214,18 @@ class CycleFragment : Fragment() {
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
             trainingDTO.pressLocation = ERR_PR_POSI
-            trainingDTO.pressRebound = ERR_PR_UNBACK
+            trainingDTO.pressRebound = ERR_PR_UNBACK.toFloat()
             //按压总错误数
-            trainingDTO.pressErrorCount = ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI + ERR_PR_UNBACK
+            trainingDTO.pressErrorCount =
+                (ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI + ERR_PR_UNBACK).toFloat()
             trainingDTO.blowHigh = ERR_QY_HIGH
             trainingDTO.blowLow = ERR_QY_LOW
             trainingDTO.blowIntoStomach = ERR_QY_DEAD
             trainingDTO.blowClose = ERR_QY_CLOSE
             //吹气总错误数
-            trainingDTO.blowErrorCount = ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE
-            trainingDTO.pressTotal = prSum
+            trainingDTO.blowErrorCount =
+                (ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE).toFloat()
+            trainingDTO.pressTotal = prSum.toFloat()
             trainingDTO.blowTotal = qySum
             //超次少次
             trainingDTO.prManyCount = prManyCount
@@ -500,6 +502,7 @@ class CycleFragment : Fragment() {
         //暂停超时时间
         isTimeOut = false
         viewBinding.ctTime.visibility = View.INVISIBLE
+        timeOut += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
         mHandler.removeCallbacks(counter)
         viewBinding.ctTime.stop()
     }

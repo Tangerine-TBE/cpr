@@ -1,6 +1,5 @@
 package com.pr.perfectrecovery.utils
 
-import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
