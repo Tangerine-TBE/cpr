@@ -1,11 +1,10 @@
-package com.pr.perfectrecovery.fragment.viewmodel
+package com.pr.perfectrecovery.fragment
 
-import androidx.lifecycle.ViewModel
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.utils.DataVolatile
 
-class CycleViewModel : ViewModel() {
+object ProcessLogicUtil {
     private var prValue = 0
     private var err_pr_posi = 0
     private var err_qr_unback = 0
