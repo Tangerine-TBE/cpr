@@ -2,9 +2,7 @@ package com.pr.perfectrecovery.utils
 
 import android.util.Log
 import com.pr.perfectrecovery.bean.BaseDataDTO
-import com.pr.perfectrecovery.utils.TestVolatile.Err_PrTotal
-import com.pr.perfectrecovery.utils.TestVolatile.top_flag
-import com.tencent.bugly.proguard.i
+import com.pr.perfectrecovery.livedata.StatusLiveData
 import kotlin.math.abs
 
 object DataVolatile {
@@ -47,12 +45,18 @@ object DataVolatile {
     //吹气次数
     var QY_SUM = 0
 
+    //吹气上升或下降标志位
+    var top_flag = 0
+
     //按压上升或下降标志位
     var low_flag = 0
 
     val dataDTO = BaseDataDTO()
 
     var Qliang = 0
+
+    //是否开始数据传输
+    var isStart = false
 
     var L_valueSet = mutableListOf<Int>()
     var QY_valueSet = mutableListOf<Int>()
@@ -260,7 +264,6 @@ object DataVolatile {
         return dataDTO
     }
 
-    var isStart = false
     fun dataClear() {
         isStart = false
         //电量值：  0-100%

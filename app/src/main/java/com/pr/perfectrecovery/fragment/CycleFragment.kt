@@ -62,7 +62,7 @@ class CycleFragment : Fragment() {
     private var qyManyCount: Int = 0
 
     //中断计时累加
-    private var timeOut: Long = 0
+    private var timeOutTotal: Long = 0
 
     //按压总数统计
 
@@ -105,7 +105,7 @@ class CycleFragment : Fragment() {
         DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
-            if (it.isStart) {
+            if (it != null && it.isStart) {
                 setViewDate(it)
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
                 viewBinding.tvPress4.text = "气压值：${it.bpValue}"
@@ -210,7 +210,7 @@ class CycleFragment : Fragment() {
         mBaseDataDTO?.apply {
             trainingDTO.startTime = startTime
             trainingDTO.endTime = endTime
-            trainingDTO.pressOutTime = timeOut
+            trainingDTO.pressOutTime = timeOutTotal
             trainingDTO.pressHigh = ERR_PR_HIGH
             trainingDTO.pressLow = ERR_PR_LOW
             trainingDTO.pressLocation = ERR_PR_POSI
@@ -319,7 +319,7 @@ class CycleFragment : Fragment() {
             pr(dataDTO)
             //吹气
             qy(dataDTO)
-            //超时
+            //中断超时
             if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
@@ -504,8 +504,9 @@ class CycleFragment : Fragment() {
         //暂停超时时间
         isTimeOut = false
         viewBinding.ctTime.visibility = View.INVISIBLE
-        timeOut += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
+        timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
         mHandler.removeCallbacks(counter)
+        viewBinding.ctTime.base = SystemClock.elapsedRealtime()
         viewBinding.ctTime.stop()
     }
 
@@ -540,6 +541,7 @@ class CycleFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        StatusLiveData.data.value = null
         if (mMediaPlayer != null) {
             mMediaPlayer!!.stop()
             mMediaPlayer!!.release()

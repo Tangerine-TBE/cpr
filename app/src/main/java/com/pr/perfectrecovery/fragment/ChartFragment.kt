@@ -76,26 +76,28 @@ class ChartFragment : Fragment() {
         LineChartUtils.setLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
         StatusLiveData.data.observe(requireActivity()) {
-            setData(it)
-            addEntry(data, viewBinding.lineChart, it.cf.toFloat())
-            addEntry(data1, viewBinding.lineChart1, setValue(it.distance))
-            addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
-            if (qyValue != it.qySum) {
-                qyValue = it.qySum
-                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
-                addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
-            } else {
-                addBarEntry(0, 0)
+            if (it != null) {
+                setData(it)
+                addEntry(data, viewBinding.lineChart, it.cf.toFloat())
+                addEntry(data1, viewBinding.lineChart1, setValue(it.distance))
+                addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
+                if (qyValue != it.qySum) {
+                    qyValue = it.qySum
+                    val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
+                    addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
+                } else {
+                    addBarEntry(0, 0)
+                }
+                //吹气错误数统计
+                viewBinding.tvLungCount.text =
+                    "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
+                //按压错误数统计
+                viewBinding.tvHeartCount.text =
+                    "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
+                //按压总数
+                viewBinding.tvLungTotal.text = "/${it.qySum}"
+                viewBinding.tvHeartTotal.text = "/${it.prSum}"
             }
-            //吹气错误数统计
-            viewBinding.tvLungCount.text =
-                "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
-            //按压错误数统计
-            viewBinding.tvHeartCount.text =
-                "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
-            //按压总数
-            viewBinding.tvLungTotal.text = "/${it.qySum}"
-            viewBinding.tvHeartTotal.text = "/${it.prSum}"
         }
 
         initBarChart()
@@ -109,7 +111,7 @@ class ChartFragment : Fragment() {
 
         viewBinding.constraintlayout3.setOnClickListener {
             val random = (1..100).random()
-            addEntry(data, viewBinding.lineChart1, setValue(random).toFloat())
+            addEntry(data, viewBinding.lineChart1, setValue(random))
         }
         setViewData()
     }
@@ -118,8 +120,14 @@ class ChartFragment : Fragment() {
         val depth = DataVolatile.preDistance - value
         if (depth <= 0 || depth > DataVolatile.preDistance - 5) {
             return 0f
+        } else if (depth > DataVolatile.PR_HIGH_VALUE + 15) {
+            return 6.5f
+        } else if (depth > DataVolatile.PR_HIGH_VALUE + 10) {
+            return 6.3f
+        } else if (depth > DataVolatile.PR_HIGH_VALUE + 5) {
+            return 6.2f
         } else if (depth > DataVolatile.PR_HIGH_VALUE) {
-            return 6.4f
+            return 6.1f
         } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_HIGH_VALUE) {
             return 5f
         } else if (depth < DataVolatile.PR_LOW_VALUE - 5) {

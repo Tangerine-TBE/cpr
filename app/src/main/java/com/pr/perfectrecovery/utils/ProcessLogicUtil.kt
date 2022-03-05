@@ -1,9 +1,11 @@
-package com.pr.perfectrecovery.fragment
+package com.pr.perfectrecovery.utils
 
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
-import com.pr.perfectrecovery.utils.DataVolatile
 
+/**
+ * 操作页面逻辑处理回调
+ */
 object ProcessLogicUtil {
     private var prValue = 0
     private var err_pr_posi = 0
@@ -28,7 +30,7 @@ object ProcessLogicUtil {
      * 按压，吹气逻辑判断
      */
     fun processLogic(dataDTO: BaseDataDTO, configBean: ConfigBean, mDataCallback: DataCallback) {
-        this.mDataCallback = mDataCallback
+        ProcessLogicUtil.mDataCallback = mDataCallback
         //按压
         prLogic(dataDTO)
         //吹气
