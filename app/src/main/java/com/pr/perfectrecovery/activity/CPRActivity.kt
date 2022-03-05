@@ -500,6 +500,7 @@ class CPRActivity : BaseActivity() {
                         false
                     )
                     runOnUiThread { Log.e("CPRActivity", formatHexString) }
+                    Log.e("TAG9", "原始数据${formatHexString}")
                     val dataDTO = DataVolatile.parseString(formatHexString)
                     val mac = dataDTO.mac
                     val isInitValue = isInitValueMap[mac] ?: false

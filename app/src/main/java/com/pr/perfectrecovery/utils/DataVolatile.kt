@@ -102,9 +102,10 @@ object DataVolatile {
      * @param data
      */
     fun parseString(data: String?): BaseDataDTO {
+
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        if (data != null && data.length == 52) {
-            deviceMAC= data.substring(40, 52)
+        if (data != null && data.length == 40) {
+            deviceMAC= "001b${data.substring(24,28)+data.substring(32,36)}"
             //模型状态需先判断
             val state = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -310,7 +311,7 @@ object DataVolatile {
 
     @Synchronized fun initPreDistance(data: String?, macAddress:String) {
         // long value=180;
-        if (data != null && data.length == 52) {
+        if (data != null && data.length == 40) {
             //按压距离
             val L_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -336,8 +337,8 @@ object DataVolatile {
                     )
                 )
             )
-            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
-//            preDistance=150
+            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
+            preDistance=150
             // preDistance=L_d1.toLong();
             macAddress?.let {
                 preDistanceMap[macAddress] = preDistance
