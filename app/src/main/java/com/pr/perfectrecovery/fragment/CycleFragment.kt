@@ -318,6 +318,7 @@ class CycleFragment : Fragment() {
             pr(dataDTO)
             //吹气
             qy(dataDTO)
+            //超时
             if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
