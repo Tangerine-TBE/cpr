@@ -337,8 +337,8 @@ object DataVolatile {
                     )
                 )
             )
-            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
-            preDistance=150
+            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
+            //preDistance=150
             // preDistance=L_d1.toLong();
             macAddress?.let {
                 preDistanceMap[macAddress] = preDistance
@@ -425,7 +425,7 @@ object DataVolatile {
                             index = 0
                             L_valueSet.clear()
                         }
-                        PR_DEPTH_SUM += (preDistance - L_d2).toInt()
+                        PR_DEPTH_SUM += (preDistance - L_d2+5).toInt()
 
                     }
                     // Log.e("TAG4", "$L_d2")
@@ -482,7 +482,7 @@ object DataVolatile {
                         index = 0
                         L_valueSet.clear()
                     }
-                    PR_DEPTH_SUM += (preDistance - L_d1).toInt()
+                    PR_DEPTH_SUM += (preDistance - L_d1+5).toInt()
                 }
                 MIN_FLAG = 2
                 // Log.e("TAG6", "$L_d1")
