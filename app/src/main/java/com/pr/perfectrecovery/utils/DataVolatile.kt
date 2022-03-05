@@ -58,6 +58,7 @@ object DataVolatile {
     var QY_valueSet = mutableListOf<Int>()
     var QY_valueSet2 = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
+    var deviceMAC:String? = null
 
     /**
      * array 数据列表
@@ -102,7 +103,8 @@ object DataVolatile {
      */
     fun parseString(data: String?): BaseDataDTO {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        if (data != null && data.length == 40) {
+        if (data != null && data.length == 52) {
+            deviceMAC= data.substring(40, 52)
             //模型状态需先判断
             val state = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -331,7 +333,8 @@ object DataVolatile {
                     )
                 )
             )
-            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong()
+            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
+            preDistance=150
             // preDistance=L_d1.toLong();
         }
     }
@@ -365,6 +368,7 @@ object DataVolatile {
         if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
             low_flag = 0
+            UNBACK_FLAG = 0
             return preDistance.toInt()
         }
         // int low_flag=0;
@@ -492,24 +496,29 @@ object DataVolatile {
                 value = L_d1
             } else {
                 // PR_DOTTIMSE_NUMBER+=3
+                Log.e("TAG7", "初始位置$preDistance")
                 if (abs(preDistance - L_d3) < 12) {
                     UNBACK_FLAG = 0
                     low_flag = 0
-                    Log.e("TAG7", "回到初始位置，复位未回弹$L_d3")
+                    //Log.e("TAG7", "初始位置$preDistance")
+                    Log.e("TAG7", "回到初始位置，复位$L_d3")
                 } else {
                     UNBACK_FLAG = 1
+                    Log.e("TAG7", "未回弹$L_d3")
                 }
                 value = L_d3
             }
 
         } else {
             // PR_DOTTIMSE_NUMBER+=3
+            Log.e("TAG7", "初始位置$preDistance")
             if (abs(preDistance - L_d2) < 12) {
                 UNBACK_FLAG = 0
                 Log.e("TAG7", "回到初始位置，复位未回弹$L_d2")
                 low_flag = 0
             } else {
                 UNBACK_FLAG = 1
+                Log.e("TAG7", "未回弹$L_d2")
             }
             value = L_d2
         }
