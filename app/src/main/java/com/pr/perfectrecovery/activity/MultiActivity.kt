@@ -45,7 +45,6 @@ class MultiActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "MultiActivity"
-        private const val INIT_VALUE = "fe0122000000ffffff000000000251000100d048"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +54,8 @@ class MultiActivity : BaseActivity() {
         EventBus.getDefault().register(this)
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         dataSize = mTrainingBean?.list?.size!!
-        adapter = MultiActAdapter()
+        adapter = MultiActAdapter(this)
+        adapter?.isCheck(mTrainingBean?.isCheck ?: false)
         initView()
         showData()
     }
@@ -76,7 +76,7 @@ class MultiActivity : BaseActivity() {
             dataList.add(item)
         }
 
-        adapter?.setList(dataList)
+        adapter?.submitList(dataList)
 
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.actMulRecycler.layoutManager = layoutManager
@@ -95,11 +95,11 @@ class MultiActivity : BaseActivity() {
             isStart = !isStart
             if (isStart) {
                 DataVolatile.isStart = true
-                val iterator = dataList.iterator()
-                while (iterator.hasNext()) {
-                    iterator.next().isStart = true
-                }
-                adapter?.setList(dataList)
+//                val iterator = dataList.iterator()
+//                while (iterator.hasNext()) {
+//                    iterator.next().isStart = true
+//                }
+//                adapter?.submitList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
@@ -110,11 +110,11 @@ class MultiActivity : BaseActivity() {
                 counter.let { mHandler.post(it) }
             } else {
                 DataVolatile.isStart = true
-                val iterator = dataList.iterator()
-                while (iterator.hasNext()) {
-                    iterator.next().isStart = false
-                }
-                adapter?.setList(dataList)
+//                val iterator = dataList.iterator()
+//                while (iterator.hasNext()) {
+//                    iterator.next().isStart = false
+//                }
+//                adapter?.submitList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 DataVolatile.isStart = false
@@ -138,16 +138,21 @@ class MultiActivity : BaseActivity() {
         StatusLiveData.data.observe(this, Observer {
             Log.e(TAG, "mac: ${it.mac}; distance: ${it.distance}, bpValue :${it.bpValue}", )
             updateData(it)
+            adapter?.submitList(dataList)
+            adapter?.notifyDataSetChanged()
         })
     }
 
     private fun updateData(data:BaseDataDTO) {
-        Log.e("debugDistance", "distance source: ${data.distance} " )
+        var index = -1
         dataList.forEach {
             if (it.mac == data.mac) {
-                adapter?.setData(dataList.indexOf(it), data)
+                index = dataList.indexOf(it)
             }
         }
+        Log.e(TAG, "updateData: index is : ${index}, mac is: ${dataList[index].mac}", )
+        dataList.removeAt(index)
+        dataList.add(index, data)
     }
 
     var curStudentIndex = 0

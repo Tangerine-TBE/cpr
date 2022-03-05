@@ -494,7 +494,6 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
-                    Log.e("debugDistance", "onCharacteristicChanged(): ${bleDevice?.device?.address}" )
                     val formatHexString = HexUtil.formatHexString(
                         characteristic.value,
                         false
