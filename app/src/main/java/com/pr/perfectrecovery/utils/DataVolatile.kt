@@ -62,7 +62,7 @@ object DataVolatile {
     var QY_valueSet = mutableListOf<Int>()
     var QY_valueSet2 = mutableListOf<Int>()
     var pt_valueSet = mutableListOf<Int>()
-    var deviceMAC:String? = null
+    var deviceMAC: String? = null
 
     /**
      * array 数据列表
@@ -109,7 +109,7 @@ object DataVolatile {
 
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
         if (data != null && data.length == 40) {
-            deviceMAC= "001b${data.substring(24,28)+data.substring(32,36)}"
+            deviceMAC = "001b${data.substring(24, 28) + data.substring(32, 36)}"
             //模型状态需先判断
             val state = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -302,6 +302,10 @@ object DataVolatile {
         CF_Value = 0
     }
 
+    fun setPF_Value() {
+        PF_Value = 0
+    }
+
     var preTimePress: Long = 0
 
     /*
@@ -312,7 +316,8 @@ object DataVolatile {
 
     var preDistanceMap = mutableMapOf<String, Long>()
 
-    @Synchronized fun initPreDistance(data: String?, macAddress:String) {
+    @Synchronized
+    fun initPreDistance(data: String?, macAddress: String) {
         // long value=180;
         if (data != null && data.length == 40) {
             //按压距离
@@ -428,7 +433,7 @@ object DataVolatile {
                             index = 0
                             L_valueSet.clear()
                         }
-                        PR_DEPTH_SUM += (preDistance - L_d2+5).toInt()
+                        PR_DEPTH_SUM += (preDistance - L_d2 + 5).toInt()
 
                     }
                     // Log.e("TAG4", "$L_d2")
@@ -485,7 +490,7 @@ object DataVolatile {
                         index = 0
                         L_valueSet.clear()
                     }
-                    PR_DEPTH_SUM += (preDistance - L_d1+5).toInt()
+                    PR_DEPTH_SUM += (preDistance - L_d1 + 5).toInt()
                 }
                 MIN_FLAG = 2
                 // Log.e("TAG6", "$L_d1")

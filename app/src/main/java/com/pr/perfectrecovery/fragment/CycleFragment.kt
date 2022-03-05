@@ -489,7 +489,7 @@ class CycleFragment : Fragment() {
 
         qyValue = dataDTO.qySum
         //吹气频率
-        setRate(viewBinding.chartQy, dataDTO.cf)
+        setQyRate(viewBinding.chartQy, dataDTO.cf)
         //吹气错误数统计
         viewBinding.tvLungError.text =
             "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
@@ -502,15 +502,17 @@ class CycleFragment : Fragment() {
 
     private fun stopOutTime() {
         //暂停超时时间
-        isTimeOut = false
-        viewBinding.ctTime.visibility = View.INVISIBLE
-        timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
-        mHandler.removeCallbacks(counter)
-        viewBinding.ctTime.base = SystemClock.elapsedRealtime()
-        viewBinding.ctTime.stop()
+        if (isTimeOut) {
+            isTimeOut = false
+            viewBinding.ctTime.visibility = View.INVISIBLE
+            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
+            mHandler.removeCallbacks(counter)
+            viewBinding.ctTime.base = SystemClock.elapsedRealtime()
+            viewBinding.ctTime.stop()
+        }
     }
 
-    //按压吹气频率
+    //按压频率
     private fun setRate(view: DialChart07View, value: Int) {
         val max = 200
         val min = 0
@@ -520,12 +522,64 @@ class CycleFragment : Fragment() {
         view.invalidate()
     }
 
+    //按压频率
+    private fun setQyRate(view: DialChart07View, value: Int) {
+        val max = 16f
+        val min = 0
+        val p = value % (max - min + 1) + min
+        var pf = p / 200f
+
+        when {
+            value < 1 -> {
+                pf = 0.0f
+            }
+            value > 16 -> {
+                pf = 1.0f
+            }
+            value > 14 -> {
+                pf = 0.95f
+            }
+            value > 12 -> {
+                pf = 0.9f
+            }
+            value > 10 -> {
+                pf = 0.8f
+            }
+            value > 8 -> {
+                pf = 0.7f
+            }
+            value < 2 -> {
+                pf = 0.1f
+            }
+            value < 3 -> {
+                pf = 0.2f
+            }
+            value < 4 -> {
+                pf = 0.3f
+            }
+            value < 5 -> {
+                pf = 0.4f
+            }
+            value < 6 -> {
+                pf = 0.4f
+            }
+            value in 6..8 -> {
+                pf = 0.5f
+            }
+
+        }
+        Log.e("setQyRate", "Rate: ${pf}")
+        view.setCurrentStatus(pf)
+        view.invalidate()
+    }
+
     /**
      * 吹气图恢复状态
      */
     private val blowRunnable = Runnable {
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
-        setRate(viewBinding.chartQy, 0)
+        setQyRate(viewBinding.chartQy, 0)
+        DataVolatile.setCF_Value()
     }
 
     //按压中断 - 开启计时器 频率清零
@@ -536,7 +590,7 @@ class CycleFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         setRate(viewBinding.chart, 0)
-        setRate(viewBinding.chartQy, 0)
+        setQyRate(viewBinding.chartQy, 0)
     }
 
     override fun onDestroy() {

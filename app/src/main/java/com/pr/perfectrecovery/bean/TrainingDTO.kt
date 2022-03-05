@@ -13,7 +13,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pr_depth_sum = 0  //按压深度总和(mm)
     var pr_time_sum: Float = 0f   // 按压时间总和（ms）
     var qy_volume_sum = 0  //吹气量总和
-    var qy_time_sum = 0     //吹气时间总和
+    var qy_time_sum: Float = 0f     //吹气时间总和
     var pr_seqright_total = 0 //按压频率正常的次数
     var qy_serright_total = 0 //吹气频率正确的次数
 
@@ -112,7 +112,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 按压平均次数/分 = 按压总次数/按压总时间
      */
     fun getPressAverageTimes(): Int {
-        return if (pressTotal > 0 && pr_time_sum > 0) ((pressTotal / pr_time_sum) * 100).roundToInt() else 0
+        return if (pressTotal > 0 && pr_time_sum > 0) ((pressTotal / (pr_time_sum / 60))).roundToInt() else 0
     }
 
     /**
@@ -140,7 +140,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      *  平均通气每分钟次数
-     *  平均通气每分钟次数 = 通气总次数 / 通气总时间
+     *  平均通气每分钟次数 = 通气总量 / 通气总次数
      */
     fun getBlowAverageNumber(): Int {
         return if (blowTotal > 0 && qy_volume_sum > 0) qy_volume_sum / blowTotal else 0
@@ -148,10 +148,11 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      *  平均通气平均值
-     *  平均通气平均值 = 通气总量 / 通气总次数
+     *  总时间/总次数 = 单次时间
+     *  平均通气平均值 = 通气总次数 / 通气总时间
      */
     fun getBlowAverage(): Int {
-        return if (blowTotal > 0 && qy_serright_total > 0) blowTotal / qy_time_sum else 0
+        return if (blowTotal > 0 && qy_time_sum > 0) (60000 / (qy_time_sum / blowTotal)).roundToInt() else 0
     }
 
     /**

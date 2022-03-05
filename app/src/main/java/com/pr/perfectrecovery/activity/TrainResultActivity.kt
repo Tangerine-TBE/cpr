@@ -111,11 +111,11 @@ class TrainResultActivity : BaseActivity() {
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.pressTotal.toInt()}"
         //按压位置错误
-        viewBinding.tvLocation.text = "${trainingDTO.pressLocation.toInt()}"
+        viewBinding.tvLocation.text = "${trainingDTO.pressLocation}"
         //按压不足
-        viewBinding.tvInsufficient.text = "${trainingDTO.pressLow.toInt()}"
+        viewBinding.tvInsufficient.text = "${trainingDTO.pressLow}"
         //按压过大
-        viewBinding.tvPressBig.text = "${trainingDTO.pressHigh.toInt()}"
+        viewBinding.tvPressBig.text = "${trainingDTO.pressHigh}"
         //按压未回弹
         viewBinding.tvRebound.text = "${trainingDTO.pressRebound.toInt()}"
         //按压超时统计时间
