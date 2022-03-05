@@ -240,6 +240,7 @@ class CycleFragment : Fragment() {
             mMediaPlayer?.reset()
             mMediaPlayer = null
         }
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         return trainingDTO
     }
 

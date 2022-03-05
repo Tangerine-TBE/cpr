@@ -10,14 +10,11 @@ import android.location.LocationManager
 import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -36,7 +33,6 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
-import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.comm.ObserverManager
 import com.pr.perfectrecovery.databinding.ActivityCpractivityBinding
@@ -44,15 +40,10 @@ import com.pr.perfectrecovery.databinding.ItemBluetoothBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.ConvertUtil
 import com.pr.perfectrecovery.utils.DataVolatile
-import com.pr.perfectrecovery.view.itemlayout.PagerConfig
-import com.pr.perfectrecovery.view.itemlayout.PagerGridLayoutManager
-import com.pr.perfectrecovery.view.itemlayout.PagerGridSnapHelper
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.system.exitProcess
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -63,7 +54,7 @@ class CPRActivity : BaseActivity() {
     private val mDeviceAdapter = DeviceBluetoothAdapter()
     private var bleList = mutableListOf<BleDevice>()
     private var connectList = arrayListOf<BleDevice>()
-    private var isInitValue = false
+    private var isInitValueMap = mutableMapOf<String, Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +112,7 @@ class CPRActivity : BaseActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         if (event.code == BaseConstant.EVENT_CPR_START) {
-            isInitValue = false
+            isInitValueMap.clear()
             bindBluetooth()
         } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
             unBindBluetooth()
@@ -503,17 +494,19 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
+                    Log.e("debugDistance", "onCharacteristicChanged(): ${bleDevice?.device?.address}" )
                     val formatHexString = HexUtil.formatHexString(
                         characteristic.value,
                         false
                     )
                     runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     val dataDTO = DataVolatile.parseString(formatHexString)
+                    val mac = dataDTO.mac
+                    val isInitValue = isInitValueMap[mac] ?: false
                     if (!isInitValue) {
-                        isInitValue = true
-                        DataVolatile.initPreDistance(formatHexString)
+                        isInitValueMap[mac] = true
+                        DataVolatile.initPreDistance(formatHexString, mac)
                     }
-                    dataDTO.mac = bleDevice?.device?.address.toString()
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)
                 }

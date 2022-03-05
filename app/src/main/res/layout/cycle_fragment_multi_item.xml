@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:paddingTop="@dimen/dp_10"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layout_score">
@@ -180,7 +180,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:paddingTop="@dimen/dp_10"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layout_press">

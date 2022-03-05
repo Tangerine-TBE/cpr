@@ -1,7 +1,10 @@
 package com.pr.perfectrecovery.adapter
 
+import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blankj.utilcode.util.GsonUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -16,6 +19,7 @@ import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
+import kotlin.math.abs
 
 /**
  * desc   : 多模块界面适配器
@@ -50,43 +54,62 @@ class MultiActAdapter :
 
     override fun convert(holder: BaseViewHolder, item: BaseDataDTO) {
         // 先把需要用的数据初始化下
-
         val viewBinding = CycleFragmentMultiItemBinding.bind(holder.itemView)
-        viewBinding.position1.visibility = if (holder.adapterPosition % 2 == 0) View.GONE else View.VISIBLE
-        viewBinding.position2.visibility = if (holder.adapterPosition % 2 == 0) View.VISIBLE else View.GONE
-        viewBinding.position2.text = (holder.adapterPosition + 1).toString()
-        viewBinding.position1.text = (holder.adapterPosition + 1).toString()
-        viewBinding.ratingBar.isEnabled = false
+        showPosition(viewBinding, holder.adapterPosition)
         //先判断是哪个组件显示
         showView(viewBinding, item)
+//        setDataToView(viewBinding, item)
+    }
 
-
-        setDataToView(viewBinding, item)
+    @SuppressLint("SetTextI18n")
+    private fun showPosition(binding: CycleFragmentMultiItemBinding, position:Int) {
+        binding.position1.visibility = if (position % 2 == 0) View.GONE else View.VISIBLE
+        binding.position2.visibility = if (position % 2 == 0) View.VISIBLE else View.GONE
+        binding.position2.text = "${position + 1}"
+        binding.position1.text = "${position + 1}"
+        binding.ratingBar.isEnabled = false
     }
 
     private fun showView(binding: CycleFragmentMultiItemBinding, data: BaseDataDTO) {
-        binding.layoutScore.visibility = View.GONE
-        binding.layoutPress.visibility = View.GONE
-        binding.layoutLung.visibility = View.GONE
+//        binding.layoutScore.visibility = View.GONE
+//        binding.layoutPress.visibility = View.GONE
+//        binding.layoutLung.visibility = View.GONE
 
+        //获取上一次的视图，如果前面没缓存状态，则是首次进来，初始为按压的视图
         var curShowView = currentShowViewMap[data.mac]
         if (curShowView == null) {
             curShowView = binding.layoutPress
         }
-        if (data.distance == 255 && data.bpValue == 0) {
+        Log.e("debugDistance", "mac: ${data.mac}; distance new : ${data.distance} " )
+        Log.e("debugDistance", "mac: ${data.mac}; distance old : ${mBaseDataMap[data.mac]?.distance} " )
+
+        val isSame = mBaseDataMap[data.mac]?.let { isDataSame(it, data) }
+        if (isSame == true) {
+            return
+        }
+        mBaseDataMap[data.mac] = data
+
+        val preDistance = DataVolatile.preDistanceMap[data.mac]?: -1L
+        val isPress = abs(preDistance - data.distance) > 10
+        val isBlow = data.bpValue != 0
+
+        //没有按压 也没有吹气，显示上一次的视图
+        if (!isPress && !isBlow) {
             curShowView.visibility = View.VISIBLE
-        } else if (data.distance < 255 || data.bpValue == 0) {
+        } else if (isPress) {
+            binding.layoutScore.visibility = View.GONE
+            binding.layoutLung.visibility = View.GONE
             binding.layoutPress.visibility = View.VISIBLE
             curShowView = binding.layoutPress
-        } else if (data.bpValue > 0) {
+            pr(binding, data)
+        } else if(isBlow) {
+            binding.layoutPress.visibility = View.GONE
+            binding.layoutScore.visibility = View.GONE
             binding.layoutLung.visibility = View.VISIBLE
             curShowView = binding.layoutLung
-        } else {
-            binding.layoutScore.visibility = View.VISIBLE
-            curShowView = binding.layoutScore
+            qy(binding, data)
         }
         currentShowViewMap[data.mac] = curShowView
-
 
         // 未开始  显示灰色的图标
         if (!data.isStart) {
@@ -103,7 +126,7 @@ class MultiActAdapter :
             binding.chart.visibility = View.INVISIBLE
             binding.chartQy.visibility = View.INVISIBLE
         } else {
-            if(data.distance == 255 && data.bpValue == 0) {
+            if(!isPress && !isBlow) {
                 //开始，但是暂无数据
                 binding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
                 binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
@@ -141,10 +164,6 @@ class MultiActAdapter :
                         )
                 }
             }
-            //按压
-            pr(binding, data)
-            //吹气
-            qy(binding, data)
             //更新循环次数
             val pressCount = pressCountMap[data.mac] ?: 0
             val isTiming = isTimeingMap[data.mac] ?: false
@@ -204,7 +223,6 @@ class MultiActAdapter :
         binding.tvPress.text = "${(data.ERR_PR_POSI + data.ERR_PR_LOW + data.ERR_PR_HIGH + data.ERR_PR_UNBACK)}"
         //按压总数
         binding.tvPressTotal.text = "/${data.prSum}"
-        binding.tvLungTotal.text = "/${data.qySum}"
     }
 
     /**
@@ -256,5 +274,36 @@ class MultiActAdapter :
 
     fun getCycleCount(mac:String): Int{
         return cycleCountMap[mac] ?: 0
+    }
+
+    fun isDataSame(@NonNull oldItem: BaseDataDTO, @NonNull newItem: BaseDataDTO):Boolean{
+        return TextUtils.equals(oldItem.mac, newItem.mac)
+                && oldItem.electricity == newItem.electricity
+                && oldItem.distance == newItem.distance
+                && oldItem.bpValue == newItem.bpValue
+                && oldItem.blsType == newItem.blsType
+                && oldItem.usbConnectType == newItem.usbConnectType
+                && oldItem.aisleType == newItem.aisleType
+                && oldItem.connectType == newItem.connectType
+                && oldItem.psrType == newItem.psrType
+                && oldItem.workType == newItem.workType
+                && oldItem.pf == newItem.pf
+                && oldItem.cf == newItem.cf
+                && oldItem.prSum == newItem.prSum
+                && oldItem.qySum == newItem.qySum
+                && oldItem.ERR_PR_UNBACK == newItem.ERR_PR_UNBACK
+                && oldItem.ERR_PR_LOW == newItem.ERR_PR_LOW
+                && oldItem.ERR_PR_HIGH == newItem.ERR_PR_HIGH
+                && oldItem.ERR_PR_POSI == newItem.ERR_PR_POSI
+                && oldItem.ERR_QY_LOW == newItem.ERR_QY_LOW
+                && oldItem.ERR_QY_HIGH == newItem.ERR_QY_HIGH
+                && oldItem.ERR_QY_CLOSE == newItem.ERR_QY_CLOSE
+                && oldItem.PR_DEPTH_SUM == newItem.PR_DEPTH_SUM
+                && oldItem.PR_TIME_SUM == newItem.PR_TIME_SUM
+                && oldItem.QY_VOLUME_SUM == newItem.QY_VOLUME_SUM
+                && oldItem.QY_TIME_SUM == newItem.QY_TIME_SUM
+                && oldItem.PR_SEQRIGHT_TOTAL == newItem.PR_SEQRIGHT_TOTAL
+                && oldItem.QY_SERRIGHT_TOTAL == newItem.QY_SERRIGHT_TOTAL
+                && oldItem.isStart == newItem.isStart
     }
 }

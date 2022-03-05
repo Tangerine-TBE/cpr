@@ -32,7 +32,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class MultiActivity : BaseActivity() {
     private lateinit var binding: ActivityMultiBinding
-    private var adapter = MultiActAdapter()
+    private var adapter: MultiActAdapter? = null
     private var dataList = mutableListOf<BaseDataDTO>()
     private var isStart = false
     private var mTrainingBean: TrainingBean? = null
@@ -48,8 +48,6 @@ class MultiActivity : BaseActivity() {
         private const val INIT_VALUE = "fe0122000000ffffff000000000251000100d048"
     }
 
-    private val testMacs = arrayOf("00:1B:AB:6B:C4:4D", "00:1B:AB:6B:C4:6D")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMultiBinding.inflate(layoutInflater)
@@ -57,9 +55,7 @@ class MultiActivity : BaseActivity() {
         EventBus.getDefault().register(this)
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         dataSize = mTrainingBean?.list?.size!!
-        mTrainingBean?.list?.forEach { item ->
-            Log.e(TAG, "onCreate: ${item.toString()}", )
-        }
+        adapter = MultiActAdapter()
         initView()
         showData()
     }
@@ -67,10 +63,6 @@ class MultiActivity : BaseActivity() {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
         time = (configBean.operationTime * 1000).toLong()
-
-        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        binding.actMulRecycler.layoutManager = layoutManager
-        binding.actMulRecycler.adapter = adapter
 
         // 先初始化几个占位数据
         for (i in 0 until dataSize) {
@@ -84,8 +76,11 @@ class MultiActivity : BaseActivity() {
             dataList.add(item)
         }
 
-        adapter.setList(dataList)
-        adapter.notifyDataSetChanged()
+        adapter?.setList(dataList)
+
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.actMulRecycler.layoutManager = layoutManager
+        binding.actMulRecycler.adapter = adapter
 
         val timeDrawable = if (mTrainingBean?.isCheck == true) resources.getDrawable(R.mipmap.icon_wm_countdown) else resources.getDrawable(R.mipmap.icon_wm_time)
         binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
@@ -104,8 +99,7 @@ class MultiActivity : BaseActivity() {
                 while (iterator.hasNext()) {
                     iterator.next().isStart = true
                 }
-                adapter.setList(dataList)
-                adapter.notifyDataSetChanged()
+                adapter?.setList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
@@ -120,8 +114,7 @@ class MultiActivity : BaseActivity() {
                 while (iterator.hasNext()) {
                     iterator.next().isStart = false
                 }
-                adapter.setList(dataList)
-                adapter.notifyDataSetChanged()
+                adapter?.setList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 DataVolatile.isStart = false
@@ -143,23 +136,18 @@ class MultiActivity : BaseActivity() {
 
     private fun showData() {
         StatusLiveData.data.observe(this, Observer {
-            Log.e(TAG, "distance: ${it.distance}, bpValue :${it.bpValue}", )
+            Log.e(TAG, "mac: ${it.mac}; distance: ${it.distance}, bpValue :${it.bpValue}", )
             updateData(it)
-            adapter.setList(dataList)
-            adapter.notifyItemChanged(dataList.indexOf(it))
         })
     }
 
     private fun updateData(data:BaseDataDTO) {
-        var index = -1
+        Log.e("debugDistance", "distance source: ${data.distance} " )
         dataList.forEach {
-            if (it.mac == data.mac)
-                index = dataList.indexOf(it)
+            if (it.mac == data.mac) {
+                adapter?.setData(dataList.indexOf(it), data)
+            }
         }
-        if (index != -1) {
-            dataList.removeAt(index)
-        }
-        dataList.add(data)
     }
 
     var curStudentIndex = 0
@@ -170,23 +158,23 @@ class MultiActivity : BaseActivity() {
                 mHandler.removeCallbacks(counter)
             }
             if (!mTrainingBean?.isCheck!!) {
-                updataCycleData(timeZero)
+                updateCycleData(timeZero)
                 binding.tvTime.text = TimeUtils.timeParse(timeZero)
                 timeZero += 1000
             } else {
-                updataCycleData(time)
+                updateCycleData(time)
                 binding.tvTime.text = TimeUtils.timeParse(time)
                 time -= 1000
             }
         }
     }
 
-    fun updataCycleData(time:Long) {
+    fun updateCycleData(time:Long) {
         if (time % BaseConstant.INTERVAL_TIME == 0L) {
             curStudentIndex %= dataSize
             mTrainingBean?.list?.get(curStudentIndex)?.let {
-                binding.tvModel.text = "${it.count + 1}"
-                binding.tvCycle.text = adapter.getCycleCount(it.mac).toString()
+                binding.tvModel.text = "${it.count}"
+                binding.tvCycle.text = adapter?.getCycleCount(it.mac).toString()
             }
             curStudentIndex ++
         }

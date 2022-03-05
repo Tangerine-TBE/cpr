@@ -33,7 +33,8 @@ class TrainingSingleActivity : BaseActivity() {
     }
 
     private fun initView() {
-        blueToothList = intent.getParcelableArrayListExtra<BleDevice>(BaseConstant.CONNECT_BLE_DEVICES) as ArrayList<BleDevice>
+        blueToothList =
+            intent.getParcelableArrayListExtra<BleDevice>(BaseConstant.CONNECT_BLE_DEVICES) as ArrayList<BleDevice>
 
         /* Todo @chenhan 测试数据 需要删除 ========*/
 //        var bleDevice = blueToothList[0]
@@ -43,13 +44,13 @@ class TrainingSingleActivity : BaseActivity() {
 //        }
         /* =================*/
 
-//        if (blueToothList.size > 1) {
-//            isSingle = false
-//            initMany(blueToothList.size)
-//        } else {
+        if (blueToothList.size > 1) {
+            isSingle = false
+            initMany(blueToothList.size)
+        } else {
             isSingle = true
             initSingle()
-//        }
+        }
     }
 
     /**
@@ -138,7 +139,9 @@ class TrainingSingleActivity : BaseActivity() {
                 .inflate(R.layout.item_student_more, null, false)
             view.findViewById<TextView>(R.id.tvStudent).text = "学员  $i  姓名:"
             binding.more.mMultiStuContainer.addView(view)
-            nameList.add(view.findViewById(R.id.etName))
+            val editText = view.findViewById<EditText>(R.id.etName)
+            editText.tag = i
+            nameList.add(editText)
         }
 
         binding.bottom.ivStart.setOnClickListener {
@@ -160,13 +163,13 @@ class TrainingSingleActivity : BaseActivity() {
                 // 根据 BleDevice 的count跟学员顺序对应绑定
                 for (device in blueToothList) {
                     // count从0开始， 学员下标从0开始
-                    if (device.count == nameList.indexOf(name)) {
+                    if (device.count == name.tag) {
                         bean.count = device.count
-                        bean.mac = device.mac
+                        bean.mac = initMac(device.mac)
+                        //bean里面：设备mac 和 学员姓名 产生映射
+                        mTrainingBean.list.add(bean)
                     }
                 }
-                //bean里面：设备mac 和 学员姓名 产生映射
-                mTrainingBean.list.add(bean)
             }
 
             if (!binding.single.cbTraining.isChecked && !binding.single.cbCheck.isChecked) {
@@ -177,5 +180,10 @@ class TrainingSingleActivity : BaseActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    private fun initMac(mac: String): String {
+        var new = mac.replace(":","")
+        return new.lowercase()
     }
 }

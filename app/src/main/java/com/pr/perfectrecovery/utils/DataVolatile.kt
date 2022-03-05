@@ -227,6 +227,7 @@ object DataVolatile {
         stringBuffer.append("按压频率值：").append(PF_Value)
         stringBuffer.append("吹气频率值：").append(CF_Value)
 
+        dataDTO.mac = deviceMAC.toString()
         dataDTO.prSum = PR_SUM
         dataDTO.qySum = QY_SUM
         dataDTO.electricity = VI_Value
@@ -305,9 +306,11 @@ object DataVolatile {
 
     var preDistance: Long = 180
 
-    fun initPreDistance(data: String?) {
+    var preDistanceMap = mutableMapOf<String, Long>()
+
+    @Synchronized fun initPreDistance(data: String?, macAddress:String) {
         // long value=180;
-        if (data != null && data.length == 40) {
+        if (data != null && data.length == 52) {
             //按压距离
             val L_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
@@ -333,9 +336,12 @@ object DataVolatile {
                     )
                 )
             )
-            //preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
-            preDistance=150
+            preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
+//            preDistance=150
             // preDistance=L_d1.toLong();
+            macAddress?.let {
+                preDistanceMap[macAddress] = preDistance
+            }
         }
     }
 
