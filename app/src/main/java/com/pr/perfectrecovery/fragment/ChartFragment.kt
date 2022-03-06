@@ -83,8 +83,8 @@ class ChartFragment : Fragment() {
                 addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
-                    val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, true)
-                    addBarEntry(DataVolatile.qyValue(DataVolatile.QY_valueSet2), qyMax)
+                    val qyMax = DataVolatile.max(true)
+                    addBarEntry(DataVolatile.qyValue(), qyMax)
                 } else {
                     addBarEntry(0, 0)
                 }

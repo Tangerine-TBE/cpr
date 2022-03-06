@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
@@ -65,7 +66,7 @@ class MultiActivity : BaseActivity() {
 
         // 先初始化几个占位数据
         for (i in 0 until 6) {
-            var item = BaseDataDTO()
+            val item = BaseDataDTO()
             if (i < dataSize) {
                 val bean = mTrainingBean?.list?.get(i)
                 item.mac = bean?.mac.toString()
@@ -78,15 +79,13 @@ class MultiActivity : BaseActivity() {
                 item.distance = 0
                 item.bpValue = 0
             }
-
             dataList.add(item)
         }
 
-        adapter?.setList(dataList)
-
-        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val layoutManager = GridLayoutManager(this, 2)
         binding.actMulRecycler.layoutManager = layoutManager
         binding.actMulRecycler.adapter = adapter
+        adapter?.setList(dataList)
 
         val timeDrawable = if (mTrainingBean?.isCheck == true) resources.getDrawable(R.mipmap.icon_wm_countdown) else resources.getDrawable(R.mipmap.icon_wm_time)
         binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
@@ -100,7 +99,7 @@ class MultiActivity : BaseActivity() {
         binding.oprLayout.ivStart.setOnClickListener {
             isStart = !isStart
             if (isStart) {
-                DataVolatile.isStart = true
+                //DataVolatile.isStart = true
                 val iterator = dataList.iterator()
                 while (iterator.hasNext()) {
                     iterator.next().isStart = true
@@ -122,7 +121,7 @@ class MultiActivity : BaseActivity() {
                 adapter?.setList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
-                DataVolatile.isStart = false
+//                DataVolatile.isStart = false
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
                 counter.let { mHandler.removeCallbacks(it) }

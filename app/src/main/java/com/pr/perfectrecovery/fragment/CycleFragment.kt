@@ -186,7 +186,6 @@ class CycleFragment : Fragment() {
     }
 
     fun start() {
-        startTime = System.currentTimeMillis()
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
@@ -306,6 +305,9 @@ class CycleFragment : Fragment() {
     //当前是否为按压模式-吹气模式
     private var cyclePrCount = 0
     private var cycleQyCount = 0
+    private var isPr = false
+    private var isQy = false
+
     private var startTime: Long = 0
     private var endTime: Long = 0
 
@@ -315,6 +317,10 @@ class CycleFragment : Fragment() {
             mBaseDataDTO = dataDTO
             //计算循环次数
             cycle(dataDTO)
+            //第一次按压或吹气才开始计时
+            if(startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)){
+                startTime = System.currentTimeMillis()
+            }
             //按压
             pr(dataDTO)
             //吹气
@@ -323,7 +329,7 @@ class CycleFragment : Fragment() {
             if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
-                mHandler.postDelayed(counter, 5000)
+                mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
             }
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
@@ -350,7 +356,7 @@ class CycleFragment : Fragment() {
      */
     private fun cycle(dataDTO: BaseDataDTO) {
 //        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
-        if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
+        if (cycleQyCount > 0 && !isQy && isPr) {
             if (isCheck) {
                 if (cyclePrCount > configBean.prCount) {
                     //按压超次
@@ -398,6 +404,9 @@ class CycleFragment : Fragment() {
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()
             cyclePrCount++
+            cycleQyCount = 0
+            isPr = true
+            isQy = false
             //按压位置错误
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
@@ -439,7 +448,7 @@ class CycleFragment : Fragment() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
+                val qyMax = DataVolatile.max(false)
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -474,6 +483,8 @@ class CycleFragment : Fragment() {
         //记录吹气超次少次
         if (qyValue != dataDTO.qySum) {
             cycleQyCount++
+            isQy = true
+            isPr = false
         }
 
         if (dataDTO.bpValue <= 0 && qyRate > 0) {

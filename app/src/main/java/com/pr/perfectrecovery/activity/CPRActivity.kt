@@ -64,6 +64,7 @@ class CPRActivity : BaseActivity() {
         initView()
         //初始化蓝牙管理器
         initBluetooth()
+        initBle()
 //        ttl()
     }
 
@@ -93,16 +94,22 @@ class CPRActivity : BaseActivity() {
         }
 
         viewBinding.progressCircular.setOnClickListener {
-            if (!isRefresh) {
-                viewBinding.tvMsg.visibility = View.INVISIBLE
-                startRefresh()
-                checkPermissions()
-                isRefresh = true
+            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            if (!bluetoothAdapter.isEnabled) {
+                Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()
             } else {
-                isRefresh = false
-                stopRefresh()
-                //取消扫描蓝牙设备
-                BleManager.getInstance().cancelScan()
+                if (!isRefresh) {
+                    viewBinding.tvMsg.visibility = View.INVISIBLE
+                    startRefresh()
+                    checkPermissions()
+                    isRefresh = true
+                } else {
+                    isRefresh = false
+                    stopRefresh()
+                    //取消扫描蓝牙设备
+                    BleManager.getInstance().cancelScan()
+                }
+
             }
         }
         viewBinding.recyclerview.adapter = mDeviceAdapter
@@ -228,7 +235,7 @@ class CPRActivity : BaseActivity() {
                     .setCancelable(false)
                     .show()
             } else {
-                setScanRule()
+                initBle()
                 startScan()
             }
         }
@@ -333,7 +340,7 @@ class CPRActivity : BaseActivity() {
             })
     }
 
-    private fun setScanRule() {
+    private fun initBle() {
         val uuids: Array<String>?
 //        val str_uuid: String = et_uuid.getText().toString()
         val str_uuid: String = ""
@@ -429,7 +436,7 @@ class CPRActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_OPEN_GPS) {
             if (checkGPSIsOpen()) {
-                setScanRule()
+//                initBle()
                 startScan()
             }
         }

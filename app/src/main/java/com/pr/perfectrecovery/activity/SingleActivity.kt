@@ -67,7 +67,7 @@ class SingleActivity : BaseActivity() {
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
             if (isStart) {
-                DataVolatile.isStart = true
+//                DataVolatile.isStart = true
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment?.start()
@@ -92,7 +92,7 @@ class SingleActivity : BaseActivity() {
                 }
                 counter.let { mHandler.post(it) }
             } else {
-                DataVolatile.isStart = false
+//                DataVolatile.isStart = false
                 val mTrainingDTO = cycleFragment?.stop()
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
@@ -108,12 +108,12 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.blowScore = configBean.blowScore
                 mTrainingDTO?.processScore = configBean.processScore
                 mTrainingDTO?.deduction = configBean.deductionScore
-                mTrainingDTO?.pr_depth_sum = DataVolatile.PR_DEPTH_SUM
-                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM.toFloat()
-                mTrainingDTO?.qy_volume_sum = DataVolatile.QY_VOLUME_SUM
-                mTrainingDTO?.qy_time_sum = DataVolatile.QY_TIME_SUM.toFloat()
-                mTrainingDTO?.pr_seqright_total = DataVolatile.PR_SEQRIGHT_TOTAL
-                mTrainingDTO?.qy_serright_total = DataVolatile.QY_SERRIGHT_TOTAL
+//                mTrainingDTO?.pr_depth_sum = DataVolatile.PR_DEPTH_SUM
+//                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM.toFloat()
+//                mTrainingDTO?.qy_volume_sum = DataVolatile.QY_VOLUME_SUM
+//                mTrainingDTO?.qy_time_sum = DataVolatile.QY_TIME_SUM.toFloat()
+//                mTrainingDTO?.pr_seqright_total = DataVolatile.PR_SEQRIGHT_TOTAL
+//                mTrainingDTO?.qy_serright_total = DataVolatile.QY_SERRIGHT_TOTAL
                 //检查页面 结果
                 checkEventFragment?.getData().let {
                     if (it != null) {

@@ -75,7 +75,7 @@ class CycleViewModel : ViewModel() {
             (dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)
         if (dataDTO.aisleType == 1) {
             if (qyValue != dataDTO.qySum) {
-                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
+                val qyMax = DataVolatile.max(false)
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
 

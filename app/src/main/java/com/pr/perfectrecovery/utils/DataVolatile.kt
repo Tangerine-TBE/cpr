@@ -7,72 +7,72 @@ import kotlin.math.abs
 
 object DataVolatile {
     //电量值：  0-100%
-    var VI_Value = 0
+    private var VI_Value = 0
 
     //距离值：  30-150
-    var L_Value = 0
+    private var L_Value = 0
 
     //气压值：  0-2000ml
-    var QY_Value = 0
+    private var QY_Value = 0
 
     //蓝牙连接状态：   0-断开 1-连接
-    var BLS_Value = 0
+    private var BLS_Value = 0
 
     //USB连接状态: 0-断开 1-连接
-    var ULS_Value = 0
+    private var ULS_Value = 0
 
     //通道打开状态 0-关闭 1-打开
-    var TOS_Value = 0
+    private var TOS_Value = 0
 
     //连接方式  0-蓝牙 1-连接USB
-    var LKS_Value = 0
+    private var LKS_Value = 0
 
     //按压位置正确  0-错误  1-正确
-    var PSR_Value = 0
+    private var PSR_Value = 0
 
     //工作方式：00——休眠   01——工作    02——待机
-    var WS_Value = 0
+    private var WS_Value = 0
 
     //按压频率：0-200
-    var PF_Value = 0
+    private var PF_Value = 0
 
     //吹气频率：0-200
-    var CF_Value = 0
+    private var CF_Value = 0
 
     //按压次数
-    var PR_SUM = 0
+    private var PR_SUM = 0
 
     //吹气次数
-    var QY_SUM = 0
+    private var QY_SUM = 0
 
     //吹气上升或下降标志位
-    var top_flag = 0
+    private var top_flag = 0
 
     //按压上升或下降标志位
-    var low_flag = 0
+    private var low_flag = 0
 
-    val dataDTO = BaseDataDTO()
+    private val dataDTO = BaseDataDTO()
 
-    var Qliang = 0
+    private var Qliang = 0
 
     //是否开始数据传输
-    var isStart = false
+    private var isStart = false
 
-    var L_valueSet = mutableListOf<Int>()
-    var QY_valueSet = mutableListOf<Int>()
-    var QY_valueSet2 = mutableListOf<Int>()
-    var pt_valueSet = mutableListOf<Int>()
-    var deviceMAC: String? = null
+    private var L_valueSet = mutableListOf<Int>()
+    private var QY_valueSet = mutableListOf<Int>()
+    private var QY_valueSet2 = mutableListOf<Int>()
+    private var pt_valueSet = mutableListOf<Int>()
+    private var deviceMAC: String? = null
 
     /**
      * array 数据列表
      * isClear 清除数据集合
      */
-    fun max(array: List<Int>, isClear: Boolean): Int {
+    fun max(isClear: Boolean): Int {
         var maximum = 0
-        for (i in array.indices) {
-            if (maximum < array[i]) {
-                maximum = array[i]
+        for (i in QY_valueSet.indices) {
+            if (maximum < QY_valueSet[i]) {
+                maximum = QY_valueSet[i]
             }
         }
         if (isClear) {
@@ -84,9 +84,9 @@ object DataVolatile {
     /**
      * 获取吹气值和
      */
-    fun qyValue(array: List<Int>): Int {
+    fun qyValue(): Int {
         var sum = 0
-        for (i in array.indices) {
+        for (i in QY_valueSet2.indices) {
             sum += i
         }
         QY_valueSet2.clear()
@@ -100,13 +100,14 @@ object DataVolatile {
         //  parseString(data)
     }
 
+    val mapObject = mutableMapOf<String, BaseDataDTO>()
     /**
      * 解析蓝发送的数据
      *
      * @param data
      */
+    @Synchronized
     fun parseString(data: String?): BaseDataDTO {
-
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
         if (data != null && data.length == 40) {
             deviceMAC = "001b${data.substring(24, 28) + data.substring(32, 36)}"
@@ -261,6 +262,7 @@ object DataVolatile {
         dataDTO.QY_TIME_SUM = QY_TIME_SUM     //吹气时间总和
         dataDTO.PR_SEQRIGHT_TOTAL = PR_SEQRIGHT_TOTAL //按压频率正常的次数
         dataDTO.QY_SERRIGHT_TOTAL = QY_SERRIGHT_TOTAL //吹气频率正确的次数
+//        deviceMAC?.let { mapObject.put(it, dataDTO) }
         return dataDTO
     }
 
@@ -354,23 +356,23 @@ object DataVolatile {
         }
     }
 
-    var UNBACK_FLAG = 0
-    var ERR_FLAG = 0
-    var PR_DOTTIMSE_NUMBER = 0
-    var PR_RUN_FLAG = 0
-    var MIN_FLAG = 0;
+    private var UNBACK_FLAG = 0
+    private var ERR_FLAG = 0
+    private var PR_DOTTIMSE_NUMBER = 0
+    private var PR_RUN_FLAG = 0
+    private var MIN_FLAG = 0;
 
-    var PR_DEPTH_SUM = 0  //按压深度总和(mm)
-    var PR_TIME_SUM = 0    // 按压时间总和（ms）
-    var QY_VOLUME_SUM = 0  //吹气量总和
-    var QY_TIME_SUM = 0     //吹气时间总和
-    var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
-    var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+    private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
+    private var PR_TIME_SUM = 0    // 按压时间总和（ms）
+    private var QY_VOLUME_SUM = 0  //吹气量总和
+    private var QY_TIME_SUM = 0     //吹气时间总和
+    private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
+    private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
-    fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
+    private fun selectValue_P(L_d1: Int, L_d2: Int, L_d3: Int): Int {
         var value = 0
         var index = 0
         Log.e("TAG8", "$L_d1  $L_d2  $L_d3")
@@ -542,16 +544,16 @@ object DataVolatile {
     }
 
     //按压错误-按压未回弹
-    var ERR_PR_UNBACK = 0
+    private var ERR_PR_UNBACK = 0
 
     //按压错误-按压不足
-    var ERR_PR_LOW = 0
+    private var ERR_PR_LOW = 0
 
     //按压错误-按压过大
-    var ERR_PR_HIGH = 0
+    private var ERR_PR_HIGH = 0
 
     //按压错误-按压位置错误
-    var ERR_PR_POSI = 0
+    private var ERR_PR_POSI = 0
 
     /**
      * 初始化按压区间值
@@ -579,18 +581,18 @@ object DataVolatile {
     }
 
     //吹气错误-气压不足
-    var ERR_QY_LOW = 0
+    private var ERR_QY_LOW = 0
 
     //吹气错误-气压过大
-    var ERR_QY_HIGH = 0
+    private var ERR_QY_HIGH = 0
 
     //吹气错误-气压进胃
-    var ERR_QY_DEAD = 0
+    private var ERR_QY_DEAD = 0
 
     //吹气错误-气道未打开错误
-    var ERR_QY_CLOSE = 0
+    private var ERR_QY_CLOSE = 0
 
-    fun ERR_QyTotal(value: Int) {
+    private fun ERR_QyTotal(value: Int) {
         if (TOS_Value == 0) {
             ERR_QY_CLOSE++
         } else {
@@ -604,12 +606,12 @@ object DataVolatile {
         }
     }
 
-    var preTimeQY: Long = 0
+    private var preTimeQY: Long = 0
 
     /*
  * 根据吹气三次相邻的气压值找到有效值。
  * */
-    fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
+    private fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
         var value = 0
         if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
             top_flag = 1
@@ -618,7 +620,7 @@ object DataVolatile {
         }
         if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
             if (top_flag == 1) {
-                ERR_QyTotal(max(QY_valueSet, false))//每次筛选最大吹气值，去做错误次数的判断
+                ERR_QyTotal(max(false))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
@@ -632,7 +634,9 @@ object DataVolatile {
                     }
                 }
                 preTimeQY = changTimePress
+                Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
             }
+
         }
         value = if (QY_d1 <= QY_d2) {
             if (QY_d2 <= QY_d3) {
