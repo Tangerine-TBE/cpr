@@ -3,6 +3,11 @@ package com.pr.perfectrecovery.bean
 data class BaseDataDTO(
     //mac地址
     var mac: String = "",
+    var preDistance: Int = 0,//初始值
+    //吹气最大值
+    var qyMax: Int = 0,
+    // 吹气总和
+    var qyValueSum : Int = 0,
     //电量值：  0-100%
     var electricity: Int = 0,
     //距离值：  30-150
@@ -58,5 +63,6 @@ data class BaseDataDTO(
         return "BaseDataDTO(mac='$mac', distance=$distance, bpValue=$bpValue, pf=$pf, cf=$cf, prSum=$prSum, qySum=$qySum, PR_SEQRIGHT_TOTAL=$PR_SEQRIGHT_TOTAL, QY_SERRIGHT_TOTAL=$QY_SERRIGHT_TOTAL)"
     }
 
-
+    var PR_HIGH_VALUE : Int = 0
+    var PR_LOW_VALUE : Int = 0
 }

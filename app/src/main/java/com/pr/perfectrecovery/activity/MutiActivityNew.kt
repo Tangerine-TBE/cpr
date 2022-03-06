@@ -192,7 +192,7 @@ class MutiActivityNew : BaseActivity() {
             //吹气
             qy(viewBinding, dataDTO)
             //中断超时
-            if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
                 mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
@@ -251,7 +251,7 @@ class MutiActivityNew : BaseActivity() {
 //        if (dataDTO.psrType == 1) {
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
-        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO)
         //处理是否按压
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
@@ -298,7 +298,7 @@ class MutiActivityNew : BaseActivity() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = DataVolatile.max(false)
+                val qyMax = dataDTO.qyMax
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)

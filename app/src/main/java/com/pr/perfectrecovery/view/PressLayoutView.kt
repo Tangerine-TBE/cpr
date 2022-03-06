@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Scroller
 import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.utils.DataVolatile
 import kotlin.math.abs
 
@@ -81,11 +82,11 @@ class PressLayoutView : LinearLayout {
     }
 
     private var newY = 0
-    fun smoothScrollTo(destY: Int) {
+    fun smoothScrollTo(destY: Int, dataDTO: BaseDataDTO) {
         Log.e("smoothScrollTo_1", "$destY")
         //距离值：  30-150
         var destY = destY
-        destY = getNumber(destY)
+        destY = getNumber(destY, dataDTO)
         val height = height - (viewPress!!.height + 10)
         newY = abs(height.toFloat() / 10 * destY).toInt()
 
@@ -129,41 +130,41 @@ class PressLayoutView : LinearLayout {
         }
     }
 
-    private fun getNumber(value: Int): Int {
-        val number = abs(DataVolatile.preDistance.toInt() - value)
+    private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
+        val number = abs(dataDTO.preDistance - value)
         //Log.e("getNumber", "$value   计算后的按压距离值：$number")
         if (number < 10) {
             return 0
         }
         return when {
-            number < DataVolatile.PR_LOW_VALUE - 5 -> {
+            number < dataDTO.PR_LOW_VALUE - 5 -> {
                 1
             }
-            number < DataVolatile.PR_LOW_VALUE - 10 -> {
+            number < dataDTO.PR_LOW_VALUE - 10 -> {
                 2
             }
-            number < DataVolatile.PR_LOW_VALUE - 15 -> {
+            number < dataDTO.PR_LOW_VALUE - 15 -> {
                 3
             }
-            number < DataVolatile.PR_LOW_VALUE - 20 -> {
+            number < dataDTO.PR_LOW_VALUE - 20 -> {
                 4
             }
-            number < DataVolatile.PR_LOW_VALUE - 25 -> {
+            number < dataDTO.PR_LOW_VALUE - 25 -> {
                 5
             }
-            number < DataVolatile.PR_LOW_VALUE - 30 -> {
+            number < dataDTO.PR_LOW_VALUE - 30 -> {
                 6
             }
-            number < DataVolatile.PR_LOW_VALUE - 35 -> {
+            number < dataDTO.PR_LOW_VALUE - 35 -> {
                 7
             }
-            number < DataVolatile.PR_LOW_VALUE -> {
+            number < dataDTO.PR_LOW_VALUE -> {
                 8
             }
-            number <= DataVolatile.PR_HIGH_VALUE -> {
+            number <= dataDTO.PR_HIGH_VALUE -> {
                 9
             }
-            number > DataVolatile.PR_HIGH_VALUE -> {
+            number > dataDTO.PR_HIGH_VALUE -> {
                 10
             }
             else -> {

@@ -33,6 +33,7 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
+import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.comm.ObserverManager
 import com.pr.perfectrecovery.databinding.ActivityCpractivityBinding
@@ -477,6 +478,8 @@ class CPRActivity : BaseActivity() {
         )
     }
 
+    private val dataMap = mutableMapOf<String, DataVolatile>()
+    private var dataDTO = BaseDataDTO()
     private fun bind(bleDevice: BleDevice?) {
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
         //蓝牙服务列表
@@ -507,14 +510,23 @@ class CPRActivity : BaseActivity() {
                     )
                     runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     Log.e("TAG9", "原始数据${formatHexString}")
-                    val dataDTO = DataVolatile.parseString(formatHexString)
-                    Log.e("onCharacteristicChanged", "${dataDTO}", )
-                    val mac = dataDTO.mac
-                    val isInitValue = isInitValueMap[mac] ?: false
-                    if (!isInitValue) {
-                        isInitValueMap[mac] = true
-                        DataVolatile.initPreDistance(formatHexString, mac)
+                    val deviceMAC = "001b${
+                        formatHexString.substring(24, 28) + formatHexString.substring(
+                            32,
+                            36
+                        )
+                    }"
+
+                    val dataVolatile = dataMap[deviceMAC]
+                    if (dataVolatile != null) {
+                        dataDTO = dataVolatile.parseString(formatHexString)
+                    } else {
+                        val mDataVolatile = DataVolatile()
+                        mDataVolatile?.initPreDistance(formatHexString, deviceMAC)
+                        dataDTO = mDataVolatile.parseString(formatHexString)
+                        dataMap[dataDTO.mac] = mDataVolatile
                     }
+
                     //发送数据
                     StatusLiveData.data.postValue(dataDTO)
                 }
@@ -649,10 +661,10 @@ class CPRActivity : BaseActivity() {
                 if (length > 0) {
                     runOnUiThread {
                         Log.i("CPRActivity", ConvertUtil.toHexString(buffer, length))
-                        val dataDTO =
-                            DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))
-                        //发布数据
-                        StatusLiveData.data.postValue(dataDTO)
+//                        val dataDTO =
+//                            DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))
+//                        //发布数据
+//                        StatusLiveData.data.postValue(dataDTO)
                     }
                 }
             }

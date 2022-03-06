@@ -42,7 +42,7 @@ class SingleActivity : BaseActivity() {
         binding = ActivitySingleBinding.inflate(layoutInflater)
         setContentView(binding.root)
         EventBus.getDefault().register(this)
-        DataVolatile.dataClear()
+//        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         initView()
         initViewPager()

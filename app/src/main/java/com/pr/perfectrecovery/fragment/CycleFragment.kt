@@ -101,11 +101,11 @@ class CycleFragment : Fragment() {
         alphaAnimation()
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
-        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
-        DataVolatile.PR_LOW_VALUE = configBean.prLow()
+//        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
+//        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
         StatusLiveData.data.observe(requireActivity(), Observer {
-            if (it != null && it.isStart) {
+            if (it != null) {
                 setViewDate(it)
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
                 viewBinding.tvPress4.text = "气压值：${it.bpValue}"
@@ -113,8 +113,8 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress6.text = "吹气频率：${it.cf}"
                 viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
                 viewBinding.tvPress8.text = "按压位置：${it.psrType}"
-                viewBinding.tvPress9.text = "初始值：${DataVolatile.preDistance}"
-                viewBinding.tvPress10.text = "按压深度：${abs(DataVolatile.preDistance - it.distance)}"
+                viewBinding.tvPress9.text = "初始值：${it.preDistance}"
+                viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}"
             }
         })
     }
@@ -318,7 +318,7 @@ class CycleFragment : Fragment() {
             //计算循环次数
             cycle(dataDTO)
             //第一次按压或吹气才开始计时
-            if(startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)){
+            if (startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)) {
                 startTime = System.currentTimeMillis()
             }
             //按压
@@ -326,7 +326,7 @@ class CycleFragment : Fragment() {
             //吹气
             qy(dataDTO)
             //中断超时
-            if (!isTimeOut && dataDTO.distance == DataVolatile.preDistance.toInt() && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                 isTimeOut = true
                 mHandler.removeCallbacks(counter)
                 mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
@@ -397,7 +397,7 @@ class CycleFragment : Fragment() {
 //        if (dataDTO.psrType == 1) {
         //按压频率
         setRate(viewBinding.chart, dataDTO.pf)
-        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        viewBinding.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO)
         //处理是否按压
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
@@ -448,7 +448,7 @@ class CycleFragment : Fragment() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = DataVolatile.max(false)
+                val qyMax = dataDTO.qyMax
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -590,12 +590,12 @@ class CycleFragment : Fragment() {
     private val blowRunnable = Runnable {
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         setQyRate(viewBinding.chartQy, 0)
-        DataVolatile.setCF_Value()
+        //DataVolatile.setCF_Value()
     }
 
     //按压中断 - 开启计时器 频率清零
     private val runnableCF = Runnable {
-        DataVolatile.setCF_Value()
+        //DataVolatile.setCF_Value()
     }
 
     override fun onResume() {
@@ -620,7 +620,7 @@ class CycleFragment : Fragment() {
         mHandler5.removeCallbacksAndMessages(null)
         mHandler6.removeCallbacksAndMessages(null)
         //数据清零
-        DataVolatile.dataClear()
+//        DataVolatile.dataClear()
     }
 
     private var alphaAniShow: AlphaAnimation? = null

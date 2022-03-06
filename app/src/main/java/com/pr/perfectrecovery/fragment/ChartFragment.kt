@@ -79,12 +79,12 @@ class ChartFragment : Fragment() {
             if (it != null) {
                 setData(it)
                 addEntry(data, viewBinding.lineChart, it.cf.toFloat())
-                addEntry(data1, viewBinding.lineChart1, setValue(it.distance))
+                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
                 addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
-                    val qyMax = DataVolatile.max(true)
-                    addBarEntry(DataVolatile.qyValue(), qyMax)
+                    val qyMax = it.qyMax
+                    addBarEntry(it.qyValueSum, qyMax)
                 } else {
                     addBarEntry(0, 0)
                 }
@@ -111,30 +111,30 @@ class ChartFragment : Fragment() {
 
         viewBinding.constraintlayout3.setOnClickListener {
             val random = (1..100).random()
-            addEntry(data, viewBinding.lineChart1, setValue(random))
+           // addEntry(data, viewBinding.lineChart1, setValue(random))
         }
         setViewData()
     }
 
-    private fun setValue(value: Int): Float {
-        val depth = DataVolatile.preDistance - value
-        if (depth <= 0 || depth > DataVolatile.preDistance - 5) {
+    private fun setValue(value: Int, data: BaseDataDTO): Float {
+        val depth = data.preDistance - value
+        if (depth <= 0 || depth > data.preDistance - 5) {
             return 0f
-        } else if (depth > DataVolatile.PR_HIGH_VALUE + 15) {
+        } else if (depth > data.PR_HIGH_VALUE + 15) {
             return 6.5f
-        } else if (depth > DataVolatile.PR_HIGH_VALUE + 10) {
+        } else if (depth > data.PR_HIGH_VALUE + 10) {
             return 6.3f
-        } else if (depth > DataVolatile.PR_HIGH_VALUE + 5) {
+        } else if (depth > data.PR_HIGH_VALUE + 5) {
             return 6.2f
-        } else if (depth > DataVolatile.PR_HIGH_VALUE) {
+        } else if (depth > data.PR_HIGH_VALUE) {
             return 6.1f
-        } else if (depth in DataVolatile.PR_LOW_VALUE..DataVolatile.PR_HIGH_VALUE) {
+        } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
             return 5f
-        } else if (depth < DataVolatile.PR_LOW_VALUE - 5) {
+        } else if (depth < data.PR_LOW_VALUE - 5) {
             return 3f
-        } else if (depth < DataVolatile.PR_LOW_VALUE - 10) {
+        } else if (depth < data.PR_LOW_VALUE - 10) {
             return 2f
-        } else if (depth < DataVolatile.PR_LOW_VALUE - 15) {
+        } else if (depth < data.PR_LOW_VALUE - 15) {
             return 1f
         }
         return 0f

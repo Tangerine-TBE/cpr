@@ -5,7 +5,7 @@ import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import kotlin.math.abs
 
-object DataVolatile {
+class DataVolatile {
     //电量值：  0-100%
     private var VI_Value = 0
 
@@ -53,6 +53,8 @@ object DataVolatile {
 
     private var Qliang = 0
 
+    private val dataDTO = BaseDataDTO()
+
     //是否开始数据传输
     private var isStart = false
 
@@ -89,13 +91,6 @@ object DataVolatile {
         }
         QY_valueSet2.clear()
         return sum
-    }
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-        // val data = "fe06040a0b01052d5303030405010723090ab261" //1、先将接收到的数据转调用工具类的方法换成字符串
-        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        //  parseString(data)
     }
 
     val mapObject = mutableMapOf<String, BaseDataDTO>()
@@ -262,6 +257,10 @@ object DataVolatile {
         dataDTO.PR_SEQRIGHT_TOTAL = PR_SEQRIGHT_TOTAL //按压频率正常的次数
         dataDTO.QY_SERRIGHT_TOTAL = QY_SERRIGHT_TOTAL //吹气频率正确的次数
 //        deviceMAC?.let { mapObject.put(it, dataDTO) }
+        dataDTO.preDistance = preDistance.toInt()
+        dataDTO.qyMax = max(false)
+        dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
+        dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
         return dataDTO
     }
 
@@ -658,9 +657,8 @@ object DataVolatile {
         return value
     }
 
-
     //判断按压是否停止
-    private const val count = 20
+    private val count = 20
     private fun pt(p: Int): Boolean {
         if (p > (preDistance - 5)) {
             if (pt_valueSet.size == count) pt_valueSet.removeFirst()
