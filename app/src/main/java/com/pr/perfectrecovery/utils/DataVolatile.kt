@@ -51,8 +51,6 @@ object DataVolatile {
     //按压上升或下降标志位
     private var low_flag = 0
 
-    private val dataDTO = BaseDataDTO()
-
     private var Qliang = 0
 
     //是否开始数据传输
@@ -233,6 +231,7 @@ object DataVolatile {
         stringBuffer.append("按压频率值：").append(PF_Value)
         stringBuffer.append("吹气频率值：").append(CF_Value)
 
+        val dataDTO = BaseDataDTO()
         dataDTO.mac = deviceMAC.toString()
         dataDTO.prSum = PR_SUM
         dataDTO.qySum = QY_SUM
@@ -675,9 +674,5 @@ object DataVolatile {
             pt_valueSet.clear()
         }
         return false
-    }
-
-    fun getData(): BaseDataDTO? {
-        return dataDTO
     }
 }

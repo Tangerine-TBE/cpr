@@ -6,14 +6,13 @@
         android:layout_height="wrap_content"
         android:background="@drawable/multi_item_bg"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/dp_5">
+        >
     <!-- ======= layout_score ===================================================== -->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_score"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:visibility="gone"
-            android:layout_marginBottom="@dimen/dp_20"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -70,7 +69,6 @@
             android:id="@+id/layout_press"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:paddingTop="@dimen/dp_10"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -179,7 +177,6 @@
             android:id="@+id/layout_lung"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:paddingTop="@dimen/dp_10"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

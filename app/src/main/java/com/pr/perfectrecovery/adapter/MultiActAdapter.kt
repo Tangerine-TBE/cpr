@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.GsonUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.activity.MultiActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
@@ -61,6 +62,7 @@ class MultiActAdapter :
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseDataDTO) {
+        Log.e("MultiActivity.TAG", "updateData: index: ${holder.adapterPosition}, data is: ${item.mac}}", )
         val viewBinding = CycleFragmentMultiItemBinding.bind(holder.itemView)
         showPosition(viewBinding, holder.adapterPosition)
         showView(viewBinding, item)
@@ -113,14 +115,14 @@ class MultiActAdapter :
             binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
             binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
             binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
-            if(data.isStart) {
                 binding.ivPress.visibility = View.INVISIBLE
                 binding.pressLayoutView.visibility = View.VISIBLE
                 binding.dashBoard.visibility = View.INVISIBLE
                 binding.dashBoard2.visibility = View.INVISIBLE
                 binding.chart.visibility = View.VISIBLE
+                setRate(binding.chart, 0)
                 binding.chartQy.visibility = View.VISIBLE
-            }
+                setRate(binding.chartQy, 0)
         }
 
         //没有按压 也没有吹气，显示上一次的视图
@@ -137,7 +139,7 @@ class MultiActAdapter :
             binding.layoutScore.visibility = View.GONE
             binding.layoutLung.visibility = View.VISIBLE
             currentShowView = binding.layoutLung
-//            qy(binding, data)
+            qy(binding, data)
         }
     }
 

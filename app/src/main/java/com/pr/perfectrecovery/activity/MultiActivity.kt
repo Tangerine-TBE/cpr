@@ -3,6 +3,7 @@ package com.pr.perfectrecovery.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -114,12 +115,6 @@ class MultiActivity : BaseActivity() {
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 counter.let { mHandler.post(it) }
             } else {
-                val iterator = dataList.iterator()
-                while (iterator.hasNext()) {
-                    iterator.next().isStart = false
-                }
-                adapter?.setList(dataList)
-
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
 //                DataVolatile.isStart = false
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
@@ -154,7 +149,12 @@ class MultiActivity : BaseActivity() {
         }
         if (index != -1){
             adapter?.setData(index, data)
-            Log.e(TAG, "updateData: index: ${index}, data is: ${data.toString()}", )
+            Log.e(TAG, "updateData: index: ${index}, data is: ${data.mac}", )
+        }
+        if (TextUtils.equals(data.mac, dataList[0].mac)) {
+            binding.tv1.text = data.distance.toString()
+        } else if (TextUtils.equals(data.mac, dataList[1].mac)) {
+            binding.tv2.text = data.distance.toString()
         }
     }
 

@@ -175,7 +175,7 @@ class TrainingSingleActivity : BaseActivity() {
             if (!binding.single.cbTraining.isChecked && !binding.single.cbCheck.isChecked) {
                 ToastUtils.showShort(R.string.please_select_model)
             } else {
-                val intent = Intent(this, MultiActivity::class.java)
+                val intent = Intent(this, MutiActivityNew::class.java)
                 intent.putExtra(BaseConstant.TRAINING_BEAN, mTrainingBean)
                 startActivity(intent)
             }

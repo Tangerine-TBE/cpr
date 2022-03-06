@@ -8,4 +8,8 @@
         <attr name="batteryColor" format="color"/>
         <attr name="batteryPower" format="integer"/>
     </declare-styleable>
+    <declare-styleable name="AntoLineUtil">
+        <attr name="horizontalSpacing" format="dimension"/>
+        <attr name="verticalSpacing" format="dimension"/>
+    </declare-styleable>
 </resources>
