@@ -54,8 +54,7 @@ class MultiActivity : BaseActivity() {
         EventBus.getDefault().register(this)
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         dataSize = mTrainingBean?.list?.size!!
-        adapter = MultiActAdapter(this)
-        adapter?.isCheck(mTrainingBean?.isCheck ?: false)
+        adapter = MultiActAdapter()
         initView()
         showData()
     }
@@ -65,18 +64,25 @@ class MultiActivity : BaseActivity() {
         time = (configBean.operationTime * 1000).toLong()
 
         // 先初始化几个占位数据
-        for (i in 0 until dataSize) {
-            val bean = mTrainingBean?.list?.get(i)
+        for (i in 0 until 6) {
             var item = BaseDataDTO()
-            item.mac = bean?.mac.toString()
-            Log.e(TAG, "initView: mac: ${bean?.mac}", )
-            item.isStart = false
-            item.distance = 255
-            item.bpValue = 0
+            if (i < dataSize) {
+                val bean = mTrainingBean?.list?.get(i)
+                item.mac = bean?.mac.toString()
+                item.isStart = false
+                item.distance = 0
+                item.bpValue = 0
+            } else {
+                item.mac = BaseConstant.FAKE_MAC
+                item.isStart = false
+                item.distance = 0
+                item.bpValue = 0
+            }
+
             dataList.add(item)
         }
 
-        adapter?.submitList(dataList)
+        adapter?.setList(dataList)
 
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.actMulRecycler.layoutManager = layoutManager
@@ -95,11 +101,11 @@ class MultiActivity : BaseActivity() {
             isStart = !isStart
             if (isStart) {
                 DataVolatile.isStart = true
-//                val iterator = dataList.iterator()
-//                while (iterator.hasNext()) {
-//                    iterator.next().isStart = true
-//                }
-//                adapter?.submitList(dataList)
+                val iterator = dataList.iterator()
+                while (iterator.hasNext()) {
+                    iterator.next().isStart = true
+                }
+                adapter?.setList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
@@ -109,12 +115,11 @@ class MultiActivity : BaseActivity() {
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 counter.let { mHandler.post(it) }
             } else {
-                DataVolatile.isStart = true
-//                val iterator = dataList.iterator()
-//                while (iterator.hasNext()) {
-//                    iterator.next().isStart = false
-//                }
-//                adapter?.submitList(dataList)
+                val iterator = dataList.iterator()
+                while (iterator.hasNext()) {
+                    iterator.next().isStart = false
+                }
+                adapter?.setList(dataList)
 
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 DataVolatile.isStart = false
@@ -138,21 +143,20 @@ class MultiActivity : BaseActivity() {
         StatusLiveData.data.observe(this, Observer {
             Log.e(TAG, "mac: ${it.mac}; distance: ${it.distance}, bpValue :${it.bpValue}", )
             updateData(it)
-            adapter?.submitList(dataList)
-            adapter?.notifyDataSetChanged()
         })
     }
 
     private fun updateData(data:BaseDataDTO) {
         var index = -1
-        dataList.forEach {
+        adapter?.data?.forEach {
             if (it.mac == data.mac) {
-                index = dataList.indexOf(it)
+                index = adapter?.data?.indexOf(it) ?: -1
             }
         }
-        Log.e(TAG, "updateData: index is : ${index}, mac is: ${dataList[index].mac}", )
-        dataList.removeAt(index)
-        dataList.add(index, data)
+        if (index != -1){
+            adapter?.setData(index, data)
+            Log.e(TAG, "updateData: index: ${index}, data is: ${data.toString()}", )
+        }
     }
 
     var curStudentIndex = 0

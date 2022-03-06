@@ -1,27 +1,22 @@
 package com.pr.perfectrecovery.adapter
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RatingBar
-import android.widget.TextView
+import androidx.annotation.NonNull
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.GsonUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.bean.MessageEventData
+import com.pr.perfectrecovery.databinding.CycleFragmentMultiItemBinding
 import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.DialChart07View
-import com.pr.perfectrecovery.view.PressLayoutView2
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import kotlin.math.abs
@@ -32,10 +27,8 @@ import kotlin.math.abs
  * date   : 2022/2/24
  * version: 1.0
  */
-class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<MultiActAdapter.MyViewHolder>() {
-    private val dataDiffl: AsyncListDiffer<BaseDataDTO>
-    private val diffCallback: DiffUtil.ItemCallback<BaseDataDTO> = MyItemCallBack()
-
+class MultiActAdapter :
+    BaseQuickAdapter<BaseDataDTO, BaseViewHolder>(R.layout.cycle_fragment_multi_item) {
     private var configBean = ConfigBean()
     private var isCheck:Boolean = false
     private var cycleCount = 0
@@ -59,55 +52,35 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
     private var pressCount = 0
     private var isTimeing = false
     private var qyValue = 0
+    private var qyRate = 0
     private var currentShowView:ConstraintLayout? = null
 
     init {
-        dataDiffl = AsyncListDiffer(this, diffCallback)
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
     }
 
-    fun isCheck(check:Boolean) {
-        isCheck = check
+    override fun convert(holder: BaseViewHolder, item: BaseDataDTO) {
+        val viewBinding = CycleFragmentMultiItemBinding.bind(holder.itemView)
+        showPosition(viewBinding, holder.adapterPosition)
+        showView(viewBinding, item)
+//        setDataToView(viewBinding, item)
     }
 
-    fun getCycleCount(mac:String): Int{
-        return cycleCount
+    @SuppressLint("SetTextI18n")
+    private fun showPosition(binding: CycleFragmentMultiItemBinding, position:Int) {
+        binding.position1.visibility = if (position % 2 == 0) View.GONE else View.VISIBLE
+        binding.position2.visibility = if (position % 2 == 0) View.VISIBLE else View.GONE
+        binding.position2.text = "${position + 1}"
+        binding.position1.text = "${position + 1}"
+        binding.ratingBar.isEnabled = false
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val itemView = LayoutInflater.from(mContext).inflate(R.layout.cycle_fragment_multi_item, null)
-        return MyViewHolder(itemView)
-    }
-
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val item = getItem(position)
-        if (TextUtils.isEmpty(holder.mac)) {
-            holder.mac = item.mac
-        }
-        if (holder.mac == item.mac){
-            showPosition(holder, position)
-            showView(holder, item)
-            setDataToView(holder, item)
-        }
-    }
-
-    private fun showPosition(holder: MyViewHolder, position: Int) {
-        holder.position1?.visibility = if (position % 2 == 0) View.GONE else View.VISIBLE
-        holder.position2?.visibility = if (position % 2 == 0) View.VISIBLE else View.GONE
-        holder.position2?.text = (position + 1).toString()
-        holder.position1?.text = (position + 1).toString()
-        holder.ratingBar?.isEnabled = false
-    }
-
-    private fun showView(holder: MyViewHolder, data: BaseDataDTO) {
-        holder.layoutScore.visibility = View.GONE
-        holder.layoutPress.visibility = View.GONE
-        holder.layoutLung.visibility = View.GONE
+    private fun showView(binding: CycleFragmentMultiItemBinding, data: BaseDataDTO) {
 
         //获取上一次的视图，如果前面没缓存状态，则是首次进来，初始为按压的视图
         if (currentShowView == null) {
-            currentShowView = holder.layoutPress
+            currentShowView = binding.layoutPress
         }
 
         val preDistance = DataVolatile.preDistanceMap[data.mac]?: -1L
@@ -121,56 +94,54 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
         Log.e("debugDistance", "mac: ${data.mac}-> isPress: ${isPress}" )
         Log.e("debugDistance", "mac: ${data.mac}-> isBlow: ${isBlow} " )
 
+        // 假数据置灰
+        if (TextUtils.equals(data.mac, BaseConstant.FAKE_MAC)) {
+            binding.ivPress.visibility = View.VISIBLE
+            binding.ivPress.setImageResource(R.mipmap.icon_wm_press)
+            binding.ivLung.visibility = View.VISIBLE
+            binding.ivLung.setImageResource(R.mipmap.icon_wm_lung)
+            binding.dashBoard.visibility = View.VISIBLE
+            binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_1)
+            binding.dashBoard2.visibility = View.VISIBLE
+            binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_1)
+
+            binding.pressLayoutView.visibility = View.INVISIBLE
+            binding.chart.visibility = View.INVISIBLE
+            binding.chartQy.visibility = View.INVISIBLE
+        } else {
+            binding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
+            binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+            binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
+            binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
+            if(data.isStart) {
+                binding.ivPress.visibility = View.INVISIBLE
+                binding.pressLayoutView.visibility = View.VISIBLE
+                binding.dashBoard.visibility = View.INVISIBLE
+                binding.dashBoard2.visibility = View.INVISIBLE
+                binding.chart.visibility = View.VISIBLE
+                binding.chartQy.visibility = View.VISIBLE
+            }
+        }
+
         //没有按压 也没有吹气，显示上一次的视图
         if (!isPress && !isBlow) {
             currentShowView?.visibility = View.VISIBLE
         } else if (isPress) {
-            holder.layoutScore.visibility = View.GONE
-            holder.layoutLung.visibility = View.GONE
-            holder.layoutPress.visibility = View.VISIBLE
-            currentShowView = holder.layoutPress
-            pr(holder, data)
+            binding.layoutScore.visibility = View.GONE
+            binding.layoutLung.visibility = View.GONE
+            binding.layoutPress.visibility = View.VISIBLE
+            currentShowView = binding.layoutPress
+            pr(binding, data)
         } else if(isBlow) {
-            holder.layoutPress.visibility = View.GONE
-            holder.layoutScore.visibility = View.GONE
-            holder.layoutLung.visibility = View.VISIBLE
-            currentShowView = holder.layoutLung
+            binding.layoutPress.visibility = View.GONE
+            binding.layoutScore.visibility = View.GONE
+            binding.layoutLung.visibility = View.VISIBLE
+            currentShowView = binding.layoutLung
 //            qy(binding, data)
-        }
-
-        // 未开始  显示灰色的图标
-        if (!data.isStart) {
-            holder.ivPress.visibility = View.VISIBLE
-            holder.ivPress.setImageResource(R.mipmap.icon_wm_press)
-            holder.ivLung.visibility = View.VISIBLE
-            holder.ivLung.setImageResource(R.mipmap.icon_wm_lung)
-            holder.dashBoard.visibility = View.VISIBLE
-            holder.dashBoard.setImageResource(R.mipmap.icon_wm_bp_1)
-            holder.dashBoard2.visibility = View.VISIBLE
-            holder.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_1)
-
-            holder.pressLayoutView.visibility = View.INVISIBLE
-            holder.chart.visibility = View.INVISIBLE
-            holder.chartQy.visibility = View.INVISIBLE
-        } else {
-            if(!isPress && !isBlow) {
-                //开始，但是暂无数据
-                holder.ivPress.setImageResource(R.mipmap.icon_wm_normal)
-                holder.ivLung.setImageResource(R.mipmap.icon_lung_border)
-                holder.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
-                holder.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
-            } else {
-                holder.ivPress.visibility = View.INVISIBLE
-                holder.pressLayoutView.visibility = View.VISIBLE
-                holder.dashBoard.visibility = View.INVISIBLE
-                holder.dashBoard2.visibility = View.INVISIBLE
-                holder.chart.visibility = View.VISIBLE
-                holder.chartQy.visibility = View.VISIBLE
-            }
         }
     }
 
-    private fun setDataToView(holder: MyViewHolder, data: BaseDataDTO) {
+    private fun setDataToView(holder: CycleFragmentMultiItemBinding, data: BaseDataDTO) {
         mBaseData = data
         //计算循环次数
         cycle(data)
@@ -183,7 +154,6 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
     }
 
     private fun cycle(dataDTO: BaseDataDTO) {
-//        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
         if (dataDTO.prSum / configBean.prCount > cycleCount && dataDTO.qySum / configBean.qyCount > cycleCount) {
             if (isCheck) {
                 if (cyclePrCount > configBean.prCount) {
@@ -217,12 +187,12 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
         }
     }
 
-    private fun pr(holder: MyViewHolder, dataDTO: BaseDataDTO) {
+    private fun pr(binding: CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
         //按压位置 0-错误  1-正确
 //        if (dataDTO.psrType == 1) {
         //按压频率
-        setRate(holder.chart, dataDTO.pf)
-        holder.pressLayoutView.smoothScrollTo(dataDTO.distance)
+        setRate(binding.chart, dataDTO.pf)
+        binding.pressLayoutView.smoothScrollTo(dataDTO.distance)
         //处理是否按压
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
@@ -232,32 +202,91 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
             //按压位置错误
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
-                holder.ivPressAim.visibility = View.VISIBLE
+                binding.ivPressAim.visibility = View.VISIBLE
 //                mHandler3.removeCallbacksAndMessages(null)
 //                mHandler3.postAtTime(Runnable {
-//                    holder.ivPressAim.visibility = View.INVISIBLE
+//                    binding.ivPressAim.visibility = View.INVISIBLE
 //                }, 2000)
             } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
                 //按压未回弹
                 err_qr_unback = dataDTO.ERR_PR_UNBACK
-                holder.pressLayoutView.setUnBack()
+                binding.pressLayoutView.setUnBack()
             } else {
                 //按压不足
                 if (err_pr_low != dataDTO.ERR_PR_LOW) {
                     err_pr_low = dataDTO.ERR_PR_LOW
-                    holder.pressLayoutView.setDown()
+                    binding.pressLayoutView.setDown()
                 } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
                     err_pr_high = dataDTO.ERR_PR_HIGH
                 }
             }
         }
         //按压错误数统计
-        holder.tvPress.text =
+        binding.tvPress.text =
             "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
         //按压总数
-        holder.tvPressTotal.text = "/${dataDTO.prSum}"
+        binding.tvPressTotal.text = "/${dataDTO.prSum}"
     }
 
+    private fun qy(binding: CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
+        //通气道是否打开 0-关闭 1-打开
+        if (dataDTO.aisleType == 1) {
+            binding.ivAim.visibility = View.INVISIBLE
+            if (qyValue != dataDTO.qySum) {
+                val qyMax = DataVolatile.max(DataVolatile.QY_valueSet, false)
+                when {
+                    qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
+                        binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+                    }
+                    qyMax in configBean.qyHigh()..100 -> {//通气过大
+                        binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
+                    }
+                    qyMax < configBean.qyLow() -> {//通气不足
+                        binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
+                    }
+                    qyMax > configBean.qy_max -> {//吹气进胃
+                        binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
+                    }
+                }
+//                //吹气变灰
+//                mHandler1.removeCallbacks(blowRunnable)
+//                mHandler1.postDelayed(blowRunnable, 2000)
+//                stopOutTime()
+            }
+        } else {
+            if (dataDTO.bpValue > 5) {
+//                stopOutTime()
+                binding.ivAim.visibility = View.VISIBLE
+//                mHandler4.removeCallbacksAndMessages(null)
+//                mHandler4.postAtTime(this::setQyAimVisibility, 2000)
+            }
+        }
+        //记录吹气超次少次
+        if (qyValue != dataDTO.qySum) {
+            cycleQyCount++
+        }
+
+        if (dataDTO.bpValue <= 0 && qyRate > 0) {
+            //吹气频率清零
+            qyRate = 0//用于清空数据
+//            mHandler2.removeCallbacks(runnableCF)
+//            mHandler2.postDelayed(runnableCF, 10000)
+        } else {
+            if (qyRate == 0 && dataDTO.bpValue > 0) {
+                qyRate = dataDTO.bpValue
+            }
+        }
+
+        qyValue = dataDTO.qySum
+        //吹气频率
+        setRate(binding.chartQy, dataDTO.cf)
+        //吹气错误数统计
+        binding.tvLungError.text =
+            "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
+        binding.tvLungTotal.text = "/${dataDTO.qySum}"
+    }
+
+    //设置仪表数据
     private fun setRate(view: DialChart07View, value: Int) {
         val max = 200
         val min = 0
@@ -267,38 +296,38 @@ class MultiActAdapter(private val mContext: Context) : RecyclerView.Adapter<Mult
         view.invalidate()
     }
 
-    override fun getItemCount(): Int {
-        return dataDiffl.currentList.size
+    fun getCycleCount(mac:String): Int{
+        return cycleCount
     }
 
-    fun submitList(data: List<BaseDataDTO>?) {
-        dataDiffl.submitList(data)
+    fun isDataSame(@NonNull oldItem: BaseDataDTO, @NonNull newItem: BaseDataDTO):Boolean{
+        return TextUtils.equals(oldItem.mac, newItem.mac)
+                && oldItem.electricity == newItem.electricity
+                && oldItem.distance == newItem.distance
+                && oldItem.bpValue == newItem.bpValue
+                && oldItem.blsType == newItem.blsType
+                && oldItem.usbConnectType == newItem.usbConnectType
+                && oldItem.aisleType == newItem.aisleType
+                && oldItem.connectType == newItem.connectType
+                && oldItem.psrType == newItem.psrType
+                && oldItem.workType == newItem.workType
+                && oldItem.pf == newItem.pf
+                && oldItem.cf == newItem.cf
+                && oldItem.prSum == newItem.prSum
+                && oldItem.qySum == newItem.qySum
+                && oldItem.ERR_PR_UNBACK == newItem.ERR_PR_UNBACK
+                && oldItem.ERR_PR_LOW == newItem.ERR_PR_LOW
+                && oldItem.ERR_PR_HIGH == newItem.ERR_PR_HIGH
+                && oldItem.ERR_PR_POSI == newItem.ERR_PR_POSI
+                && oldItem.ERR_QY_LOW == newItem.ERR_QY_LOW
+                && oldItem.ERR_QY_HIGH == newItem.ERR_QY_HIGH
+                && oldItem.ERR_QY_CLOSE == newItem.ERR_QY_CLOSE
+                && oldItem.PR_DEPTH_SUM == newItem.PR_DEPTH_SUM
+                && oldItem.PR_TIME_SUM == newItem.PR_TIME_SUM
+                && oldItem.QY_VOLUME_SUM == newItem.QY_VOLUME_SUM
+                && oldItem.QY_TIME_SUM == newItem.QY_TIME_SUM
+                && oldItem.PR_SEQRIGHT_TOTAL == newItem.PR_SEQRIGHT_TOTAL
+                && oldItem.QY_SERRIGHT_TOTAL == newItem.QY_SERRIGHT_TOTAL
+                && oldItem.isStart == newItem.isStart
     }
-
-    fun getItem(position: Int): BaseDataDTO {
-        return dataDiffl.currentList[position]
-    }
-
-    class MyViewHolder(itemView : View): RecyclerView.ViewHolder(itemView) {
-        var mac = ""
-        //初始化view
-        val layoutScore = itemView.findViewById<ConstraintLayout>(R.id.layout_score)
-        val layoutPress = itemView.findViewById<ConstraintLayout>(R.id.layout_press)
-        val layoutLung = itemView.findViewById<ConstraintLayout>(R.id.layout_lung)
-        val position1 = itemView.findViewById<TextView>(R.id.position1)
-        val position2 = itemView.findViewById<TextView>(R.id.position2)
-        val ratingBar = itemView.findViewById<RatingBar>(R.id.ratingBar)
-        val ivPress = itemView.findViewById<ImageView>(R.id.ivPress)
-        val ivLung = itemView.findViewById<ImageView>(R.id.ivLung)
-        val dashBoard = itemView.findViewById<ImageView>(R.id.dashBoard)
-        val dashBoard2 = itemView.findViewById<ImageView>(R.id.dashBoard2)
-        val pressLayoutView = itemView.findViewById<PressLayoutView2>(R.id.pressLayoutView)
-        val chart = itemView.findViewById<DialChart07View>(R.id.chart)
-        val chartQy = itemView.findViewById<DialChart07View>(R.id.chartQy)
-        val ivPressAim = itemView.findViewById<ImageView>(R.id.ivPressAim)
-        val tvPress = itemView.findViewById<TextView>(R.id.tvPress)
-        val tvPressTotal = itemView.findViewById<TextView>(R.id.tvPressTotal)
-    }
-
-
 }

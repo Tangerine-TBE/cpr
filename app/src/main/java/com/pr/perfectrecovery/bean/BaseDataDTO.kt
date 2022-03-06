@@ -54,5 +54,9 @@ data class BaseDataDTO(
 ) {
     //是否开始
     var isStart = false
+    override fun toString(): String {
+        return "BaseDataDTO(mac='$mac', distance=$distance, bpValue=$bpValue, pf=$pf, cf=$cf, prSum=$prSum, qySum=$qySum, PR_SEQRIGHT_TOTAL=$PR_SEQRIGHT_TOTAL, QY_SERRIGHT_TOTAL=$QY_SERRIGHT_TOTAL)"
+    }
+
 
 }
