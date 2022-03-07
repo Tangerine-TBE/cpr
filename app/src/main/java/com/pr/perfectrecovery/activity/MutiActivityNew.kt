@@ -1,11 +1,10 @@
 package com.pr.perfectrecovery.activity
 
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
@@ -18,13 +17,13 @@ import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivityMultiNewBinding
 import com.pr.perfectrecovery.databinding.CycleFragmentMultiItemBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
-import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.utils.TimeUtils
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import kotlin.math.abs
 
 class MutiActivityNew : BaseActivity() {
     private lateinit var binding: ActivityMultiNewBinding
@@ -58,7 +57,7 @@ class MutiActivityNew : BaseActivity() {
     private var err_pr_high = 0
     private var err_pr_posi = 0
     private var err_qr_unback = 0
-    private var isTimeOut = false
+    private var isTimeOutMap = mutableMapOf<String, Boolean>()
     private var isTimeing = true
     /**处理循环次数- 以及考核 超次 少次 数据统计**/
     //当前是否为按压模式-吹气模式
@@ -68,9 +67,41 @@ class MutiActivityNew : BaseActivity() {
     private var isQy = false
     private var startTime: Long = 0
     private var endTime: Long = 0
+    private var currentShowView: ConstraintLayout? = null
+    //记录考核完成状态，onResume时恢复仪表盘
+    private var hasDoneMap = mutableMapOf<String, Boolean>()
+    private var handler:Handler = object :Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            val binding = msg.obj as CycleFragmentMultiItemBinding
+            when(msg.what) {
+                INIT_PRESS -> {
+                    initPress(binding)
+                }
+                INIT_LUNG -> {
+                    initLung(binding)
+                }
+                START_TIME -> {
+                    startTime(binding)
+                }
+                STOP_TIME -> {
+
+                }
+
+            }
+        }
+    }
+
 
     companion object {
         private const val TAG = "MutiActivityNew"
+        //初始化按压
+        private const val INIT_PRESS = 10001
+        //初始化吹气
+        private const val INIT_LUNG = 10002
+        //开始计时
+        private const val START_TIME = 10003
+        //结束计时
+        private const val STOP_TIME = 10004
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,15 +218,17 @@ class MutiActivityNew : BaseActivity() {
             if(startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)){
                 startTime = System.currentTimeMillis()
             }
-            //按压
-            pr(viewBinding, dataDTO)
-            //吹气
-            qy(viewBinding, dataDTO)
+            showView(viewBinding, dataDTO)
+//            //按压
+//            pr(viewBinding, dataDTO)
+//            //吹气
+//            qy(viewBinding, dataDTO)
             //中断超时
-            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
-                isTimeOut = true
-                mHandler.removeCallbacks(counter)
-                mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
+            val isTime = isTimeOutMap[dataDTO.mac] ?: false
+            if (!isTime && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+                isTimeOutMap[dataDTO.mac] = true
+                handler.removeMessages(START_TIME, viewBinding)
+                sendMsg(START_TIME, viewBinding, 1000)
             }
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
@@ -212,8 +245,30 @@ class MutiActivityNew : BaseActivity() {
         }
     }
 
+    private fun showView(viewBinding:CycleFragmentMultiItemBinding, data: BaseDataDTO) {
+        val preDistance = data.preDistance
+        val isPress = abs(preDistance - data.distance) > 10
+        val isBlow = data.bpValue > 5
+
+        //没有按压 也没有吹气，显示上一次的视图
+        if (!isPress && !isBlow) {
+            currentShowView?.visibility = View.VISIBLE
+        } else if (isPress) {
+            viewBinding.layoutScore.visibility = View.GONE
+            viewBinding.layoutLung.visibility = View.GONE
+            viewBinding.layoutPress.visibility = View.VISIBLE
+            currentShowView = viewBinding.layoutPress
+            pr(viewBinding, data)
+        } else if(isBlow) {
+            viewBinding.layoutPress.visibility = View.GONE
+            viewBinding.layoutScore.visibility = View.GONE
+            viewBinding.layoutLung.visibility = View.VISIBLE
+            currentShowView = viewBinding.layoutLung
+            qy(viewBinding, data)
+        }
+    }
+
     private fun cycle(dataDTO: BaseDataDTO) {
-//        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
         if (cycleQyCount > 0 && !isQy && isPr) {
             if (isCheck) {
                 if (cyclePrCount > configBean.prCount) {
@@ -256,7 +311,7 @@ class MutiActivityNew : BaseActivity() {
         if (dataDTO.prSum != prValue) {
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
-//            stopOutTime()
+            stopOutTime(viewBinding, dataDTO)
             cyclePrCount++
             cycleQyCount = 0
             isPr = true
@@ -265,10 +320,8 @@ class MutiActivityNew : BaseActivity() {
             if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.ERR_PR_POSI
                 viewBinding.ivPressAim.visibility = View.VISIBLE
-//                mHandler3.removeCallbacksAndMessages(null)
-//                mHandler3.postAtTime(Runnable {
-//                    viewBinding.ivPressAim.visibility = View.INVISIBLE
-//                }, 2000)
+                handler.removeMessages(INIT_PRESS, viewBinding)
+                sendMsg(INIT_PRESS, viewBinding)
             } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
                 //按压未回弹
                 err_qr_unback = dataDTO.ERR_PR_UNBACK
@@ -314,16 +367,14 @@ class MutiActivityNew : BaseActivity() {
                     }
                 }
                 //吹气变灰
-//                mHandler1.removeCallbacks(blowRunnable)
-//                mHandler1.postDelayed(blowRunnable, 2000)
-//                stopOutTime()
+                sendMsg(INIT_LUNG, viewBinding)
+                stopOutTime(viewBinding, dataDTO)
             }
         } else {
             if (dataDTO.bpValue > 5) {
-//                stopOutTime()
+                stopOutTime(viewBinding, dataDTO)
                 viewBinding.ivAim.visibility = View.VISIBLE
-//                mHandler4.removeCallbacksAndMessages(null)
-//                mHandler4.postAtTime(this::setQyAimVisibility, 2000)
+                sendMsg(INIT_LUNG, viewBinding)
             }
         }
         //记录吹气超次少次
@@ -336,8 +387,6 @@ class MutiActivityNew : BaseActivity() {
         if (dataDTO.bpValue <= 0 && qyRate > 0) {
             //吹气频率清零
             qyRate = 0//用于清空数据
-//            mHandler2.removeCallbacks(runnableCF)
-//            mHandler2.postDelayed(runnableCF, 10000)
         } else {
             if (qyRate == 0 && dataDTO.bpValue > 0) {
                 qyRate = dataDTO.bpValue
@@ -346,7 +395,7 @@ class MutiActivityNew : BaseActivity() {
 
         qyValue = dataDTO.qySum
         //吹气频率
-        setRate(viewBinding.chartQy, dataDTO.cf)
+        setQyRate(viewBinding.chartQy, dataDTO.cf)
         //吹气错误数统计
         viewBinding.tvLungError.text =
             "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
@@ -383,9 +432,9 @@ class MutiActivityNew : BaseActivity() {
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
         when (event.code) {
-            BaseConstant.EVENT_CPR_TIMEING -> {
-                counter.let { mHandler.post(it) }
-            }
+//            BaseConstant.EVENT_CPR_TIMEING -> {
+//                counter.let { mHandler.post(it) }
+//            }
         }
     }
 
@@ -426,6 +475,106 @@ class MutiActivityNew : BaseActivity() {
         val pf = p / 200f
         view.setCurrentStatus(pf)
         view.invalidate()
+    }
+
+    private fun setQyRate(view: DialChart07View, value: Int) {
+        val max = 16f
+        val min = 0
+        val p = value % (max - min + 1) + min
+        var pf = p / 200f
+
+        when {
+            value < 1 -> {
+                pf = 0.0f
+            }
+            value > 16 -> {
+                pf = 1.0f
+            }
+            value > 14 -> {
+                pf = 0.95f
+            }
+            value > 12 -> {
+                pf = 0.9f
+            }
+            value > 10 -> {
+                pf = 0.8f
+            }
+            value > 8 -> {
+                pf = 0.7f
+            }
+            value < 2 -> {
+                pf = 0.1f
+            }
+            value < 3 -> {
+                pf = 0.2f
+            }
+            value < 4 -> {
+                pf = 0.3f
+            }
+            value < 5 -> {
+                pf = 0.4f
+            }
+            value < 6 -> {
+                pf = 0.4f
+            }
+            value in 6..8 -> {
+                pf = 0.5f
+            }
+
+        }
+        Log.e("setQyRate", "Rate: ${pf}")
+        view.setCurrentStatus(pf)
+        view.invalidate()
+    }
+
+    private fun sendMsg(type:Int, binding: CycleFragmentMultiItemBinding, delayTime:Long = 2000) {
+        handler.removeMessages(type, binding)
+        var msg = Message()
+        msg.what = type
+        msg.obj = binding
+        handler.sendMessageDelayed(msg, delayTime)
+    }
+
+
+    private fun initPress(binding: CycleFragmentMultiItemBinding) {
+        binding.ivPressAim.visibility = View.INVISIBLE
+    }
+
+    private fun initLung(binding: CycleFragmentMultiItemBinding) {
+        binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+        binding.ivAim.visibility = View.INVISIBLE
+        setQyRate(binding.chartQy, 0)
+    }
+
+    private fun startTime(binding: CycleFragmentMultiItemBinding) {
+        binding.ctTime.visibility = View.VISIBLE
+        binding.ctTime.base = SystemClock.elapsedRealtime()
+        binding.ctTime.start()
+    }
+
+    private fun stopOutTime(viewBinding:CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
+        //暂停超时时间
+        val isTime = isTimeOutMap[dataDTO.mac] ?: false
+        if (isTime) {
+            isTimeOutMap[dataDTO.mac] = false
+            viewBinding.ctTime.visibility = View.INVISIBLE
+            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
+            mHandler.removeCallbacks(counter)
+            viewBinding.ctTime.base = SystemClock.elapsedRealtime()
+            viewBinding.ctTime.stop()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dataList.forEach {
+            if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC)) {
+                val binding = getItemViewByMac(it.mac)
+                setRate(binding.chart, 0)
+                setQyRate(binding.chartQy, 0)
+            }
+        }
+
     }
 
     override fun onDestroy() {
