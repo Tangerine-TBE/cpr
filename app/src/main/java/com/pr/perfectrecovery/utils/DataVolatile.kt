@@ -451,7 +451,11 @@ class DataVolatile {
                     preTimePress = changTimePress*/
                 }
                 MIN_FLAG = 1
-                value = L_d2
+                if((preDistance-L_d2>=45)&&(preDistance-L_d2<50)){
+                    value=(preDistance-50).toInt()
+                }else{
+                    value = L_d2
+                }
             }
         } else if (L_d2 < L_d3) {
             // PR_DOTTIMSE_NUMBER+=3
@@ -507,8 +511,11 @@ class DataVolatile {
                       Log.e("TAG6", "PF值：$PF_Value")
                  }
                  preTimePress = changTimePress*/
-
-                value = L_d1
+                if((preDistance-L_d1>=45)&&(preDistance-L_d1<50)){
+                    value=(preDistance-50).toInt()
+                }else{
+                    value = L_d1
+                }
             } else {
                 // PR_DOTTIMSE_NUMBER+=3
                 Log.e("TAG7", "初始位置$preDistance")
