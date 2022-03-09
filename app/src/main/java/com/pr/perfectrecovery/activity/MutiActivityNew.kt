@@ -4,6 +4,7 @@ import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.GsonUtils
@@ -447,7 +448,18 @@ class MutiActivityNew : BaseActivity() {
 
     //不让用户返回，只能点下面的返回按钮
     override fun onBackPressed() {
-        ToastUtils.showShort("请点击下方的返回键退出")
+        AlertDialog.Builder(this)
+            .setTitle("提示")
+            .setMessage("确认结束测试并退出？")
+            .setPositiveButton("确定") { dialog, _ ->
+                EventBus.getDefault().post(MessageEventData(BaseConstant.CLEAR_DEVICE_HISTORY_DATA, "", null))
+                dialog.cancel()
+                finish()
+            }
+            .setNegativeButton("取消"){ dialog , _ ->
+                dialog.cancel()
+            }
+            .create().show()
     }
 
     var curStudentIndex = 0
