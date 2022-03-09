@@ -124,6 +124,9 @@ class CPRActivity : BaseActivity() {
             bindBluetooth()
         } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
             unBindBluetooth()
+        } else if (event.code == BaseConstant.CLEAR_DEVICE_HISTORY_DATA) {
+            dataMap.clear()
+            isInitValueMap.clear()
         }
     }
 

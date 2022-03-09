@@ -7,6 +7,7 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
@@ -151,7 +152,10 @@ class MutiActivityNew : BaseActivity() {
             null
         )
 
-        binding.oprLayout.ivBack.setOnClickListener { finish() }
+        binding.oprLayout.ivBack.setOnClickListener {
+            EventBus.getDefault().post(MessageEventData(BaseConstant.CLEAR_DEVICE_HISTORY_DATA, "", null))
+            finish()
+        }
         binding.oprLayout.ivStart.setOnClickListener {
             isStart = !isStart
             if (isStart) {
@@ -163,6 +167,7 @@ class MutiActivityNew : BaseActivity() {
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 counter.let { mHandler.post(it) }
             } else {
+                stopAllOutTime()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
@@ -263,6 +268,7 @@ class MutiActivityNew : BaseActivity() {
             viewBinding.layoutPress.visibility = View.GONE
             viewBinding.layoutScore.visibility = View.GONE
             viewBinding.layoutLung.visibility = View.VISIBLE
+            viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
             currentShowView = viewBinding.layoutLung
             qy(viewBinding, data)
         }
@@ -425,7 +431,8 @@ class MutiActivityNew : BaseActivity() {
         StatusLiveData.data.observe(this, Observer {
             Log.e(TAG, "prindata: mac: ${it.mac}, distance: ${it.distance}", )
             val view = getItemViewByMac(it.mac)
-            setViewDate(view, it)
+            if (isStart)
+                setViewDate(view, it)
         })
     }
 
@@ -436,6 +443,11 @@ class MutiActivityNew : BaseActivity() {
 //                counter.let { mHandler.post(it) }
 //            }
         }
+    }
+
+    //不让用户返回，只能点下面的返回按钮
+    override fun onBackPressed() {
+        ToastUtils.showShort("请点击下方的返回键退出")
     }
 
     var curStudentIndex = 0
@@ -552,6 +564,16 @@ class MutiActivityNew : BaseActivity() {
         binding.ctTime.start()
     }
 
+    private fun stopAllOutTime() {
+        dataList.forEach {
+            if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC)) {
+                val b = getItemViewByMac(it.mac)
+                b.ctTime.stop()
+            }
+        }
+
+    }
+
     private fun stopOutTime(viewBinding:CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
         //暂停超时时间
         val isTime = isTimeOutMap[dataDTO.mac] ?: false
@@ -574,7 +596,6 @@ class MutiActivityNew : BaseActivity() {
                 setQyRate(binding.chartQy, 0)
             }
         }
-
     }
 
     override fun onDestroy() {
