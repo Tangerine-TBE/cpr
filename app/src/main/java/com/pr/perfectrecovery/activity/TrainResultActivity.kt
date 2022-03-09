@@ -3,7 +3,6 @@ package com.pr.perfectrecovery.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.CompoundButton
 import com.pr.perfectrecovery.base.BaseActivity
@@ -35,7 +34,6 @@ class TrainResultActivity : BaseActivity() {
             intent.putExtra(PDF_FLAG, flagPDF)
             context.startActivity(intent)
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +107,7 @@ class TrainResultActivity : BaseActivity() {
         //按压错误数
         viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount.toInt()}"
         //按压总数
-        viewBinding.tvLungTotal.text = "/${trainingDTO.pressTotal.toInt()}"
+        viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
         //按压位置错误
         viewBinding.tvLocation.text = "${trainingDTO.pressLocation}"
         //按压不足
@@ -135,15 +133,15 @@ class TrainResultActivity : BaseActivity() {
         //吹气错误数
         viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount.toInt()}"
         //吹气总数
-        viewBinding.tvHeartTotal.text = "/${trainingDTO.blowTotal.toInt()}"
+        viewBinding.tvHeartTotal.text = "/${trainingDTO.qySum}"
         //吹气错误
-        viewBinding.tvAirway.text = "${trainingDTO.blowClose.toInt()}"
+        viewBinding.tvAirway.text = "${trainingDTO.err_qy_close}"
         //吹气不足
-        viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow.toInt()}"
+        viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow}"
         //吹气过大
-        viewBinding.tvBLowBig.text = "${trainingDTO.blowHigh.toInt()}"
+        viewBinding.tvBLowBig.text = "${trainingDTO.blowHigh}"
         //吹气进胃
-        viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach.toInt()}"
+        viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach}"
         //平均吹气每分钟次数
         viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
         //吹气频率百分比
@@ -157,18 +155,7 @@ class TrainResultActivity : BaseActivity() {
     /**
      * 流程分数
      */
-    private fun processCheck(trainingDTO: TrainingDTO): Int {
-        viewBinding.layoutCheck.check.checkBox1.isChecked = trainingDTO.check1
-        viewBinding.layoutCheck.check.checkBox2.isChecked = trainingDTO.check2
-        viewBinding.layoutCheck.check.checkBox3.isChecked = trainingDTO.check3
-        viewBinding.layoutCheck.check.checkBox4.isChecked = trainingDTO.check4
-        viewBinding.layoutCheck.check.checkBox5.isChecked = trainingDTO.check5
-        viewBinding.layoutCheck.check.checkBox6.isChecked = trainingDTO.check6
-        viewBinding.layoutCheck.check.checkBox7.isChecked = trainingDTO.check7
-        viewBinding.layoutCheck.check.checkBox8.isChecked = trainingDTO.check8
-        viewBinding.layoutCheck.check.checkBox9.isChecked = trainingDTO.check9
-        viewBinding.layoutCheck.check.checkBox10.isChecked = trainingDTO.check10
-
+    private fun processCheck(trainingDTO: TrainingDTO): Float {
         //该页面禁止点击事件
         viewBinding.layoutCheck.check.checkBox1.isClickable = false
         viewBinding.layoutCheck.check.checkBox2.isClickable = false
@@ -211,10 +198,21 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.layoutCheck.check.checkBox10.setOnCheckedChangeListener(
             onCheckedChangeListener
         )
+        viewBinding.layoutCheck.check.checkBox1.isChecked = trainingDTO.check1
+        viewBinding.layoutCheck.check.checkBox2.isChecked = trainingDTO.check2
+        viewBinding.layoutCheck.check.checkBox3.isChecked = trainingDTO.check3
+        viewBinding.layoutCheck.check.checkBox4.isChecked = trainingDTO.check4
+        viewBinding.layoutCheck.check.checkBox5.isChecked = trainingDTO.check5
+        viewBinding.layoutCheck.check.checkBox6.isChecked = trainingDTO.check6
+        viewBinding.layoutCheck.check.checkBox7.isChecked = trainingDTO.check7
+        viewBinding.layoutCheck.check.checkBox8.isChecked = trainingDTO.check8
+        viewBinding.layoutCheck.check.checkBox9.isChecked = trainingDTO.check9
+        viewBinding.layoutCheck.check.checkBox10.isChecked = trainingDTO.check10
+
         if (trainingDTO.processScore > 0) {
-            return trainingDTO.processScore / 10 * listCheck.size
+            return ((trainingDTO.processScore / 10) * listCheck.size)
         }
-        return 0
+        return 0f
     }
 
     private val listCheck = mutableListOf<Int>()

@@ -94,6 +94,7 @@ class DataVolatile {
     }
 
     val mapObject = mutableMapOf<String, BaseDataDTO>()
+
     /**
      * 解析蓝发送的数据
      *
@@ -242,28 +243,32 @@ class DataVolatile {
         dataDTO.cf = CF_Value
         dataDTO.pf = PF_Value
         dataDTO.isStart = isStart
-        dataDTO.ERR_PR_HIGH = ERR_PR_HIGH
-        dataDTO.ERR_PR_LOW = ERR_PR_LOW
-        dataDTO.ERR_PR_POSI = ERR_PR_POSI
-        dataDTO.ERR_QY_CLOSE = ERR_QY_CLOSE
-        dataDTO.ERR_QY_DEAD = ERR_QY_DEAD
-        dataDTO.ERR_QY_HIGH = ERR_QY_HIGH
-        dataDTO.ERR_QY_LOW = ERR_QY_LOW
-        dataDTO.ERR_PR_UNBACK = ERR_PR_UNBACK
-        dataDTO.PR_DEPTH_SUM = PR_DEPTH_SUM  //按压深度总和(mm)
-        dataDTO.PR_TIME_SUM = PR_TIME_SUM    // 按压时间总和（ms）
-        dataDTO.QY_VOLUME_SUM = QY_VOLUME_SUM  //吹气量总和
-        dataDTO.QY_TIME_SUM = QY_TIME_SUM     //吹气时间总和
-        dataDTO.PR_SEQRIGHT_TOTAL = PR_SEQRIGHT_TOTAL //按压频率正常的次数
-        dataDTO.QY_SERRIGHT_TOTAL = QY_SERRIGHT_TOTAL //吹气频率正确的次数
+        dataDTO.err_pr_high = ERR_PR_HIGH
+        dataDTO.err_pr_low = ERR_PR_LOW
+        dataDTO.err_qy_close = ERR_QY_CLOSE
+        dataDTO.err_pr_posi = ERR_PR_POSI
+        dataDTO.err_qy_dead = ERR_QY_DEAD
+        dataDTO.err_qy_high = ERR_QY_HIGH
+        dataDTO.err_qy_low = ERR_QY_LOW
+        dataDTO.err_pr_unback = ERR_PR_UNBACK
+        dataDTO.pr_depth_sum = PR_DEPTH_SUM  //按压深度总和(mm)
+        dataDTO.pr_time_sum = PR_TIME_SUM    // 按压时间总和（ms）
+        dataDTO.qy_volume_sum = QY_VOLUME_SUM  //吹气量总和
+        dataDTO.qy_time_sum = QY_TIME_SUM     //吹气时间总和
+        dataDTO.pr_seqright_total = PR_SEQRIGHT_TOTAL //按压频率正常的次数
+        dataDTO.qy_serright_total = QY_SERRIGHT_TOTAL //吹气频率正确的次数
 //        deviceMAC?.let { mapObject.put(it, dataDTO) }
         dataDTO.preDistance = preDistance.toInt()
-        dataDTO.qyMax = max(false)
+        if (QY_SUM != qy) {
+            qy = QY_SUM
+            dataDTO.qyMax = max(false)
+        }
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
         return dataDTO
     }
 
+    private var qy = 0
     fun dataClear() {
         isStart = false
         //电量值：  0-100%
@@ -296,6 +301,10 @@ class DataVolatile {
         QY_TIME_SUM = 0     //吹气时间总和
         PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
         QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+        L_valueSet.clear()
+        QY_valueSet.clear()
+        QY_valueSet2.clear()
+        pt_valueSet.clear()
     }
 
     fun setCF_Value() {
@@ -451,9 +460,9 @@ class DataVolatile {
                     preTimePress = changTimePress*/
                 }
                 MIN_FLAG = 1
-                if((preDistance-L_d2>=45)&&(preDistance-L_d2<50)){
-                    value=(preDistance-50).toInt()
-                }else{
+                if ((preDistance - L_d2 >= 45) && (preDistance - L_d2 < 50)) {
+                    value = (preDistance - 50).toInt()
+                } else {
                     value = L_d2
                 }
             }
@@ -511,9 +520,9 @@ class DataVolatile {
                       Log.e("TAG6", "PF值：$PF_Value")
                  }
                  preTimePress = changTimePress*/
-                if((preDistance-L_d1>=45)&&(preDistance-L_d1<50)){
-                    value=(preDistance-50).toInt()
-                }else{
+                if ((preDistance - L_d1 >= 45) && (preDistance - L_d1 < 50)) {
+                    value = (preDistance - 50).toInt()
+                } else {
                     value = L_d1
                 }
             } else {

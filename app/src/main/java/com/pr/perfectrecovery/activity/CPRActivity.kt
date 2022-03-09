@@ -124,9 +124,10 @@ class CPRActivity : BaseActivity() {
             bindBluetooth()
         } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
             unBindBluetooth()
-        } else if (event.code == BaseConstant.CLEAR_DEVICE_HISTORY_DATA) {
-            dataMap.clear()
-            isInitValueMap.clear()
+            //清空当前map数据
+            dataMap.values.forEach { item ->
+                item.dataClear()
+            }
         }
     }
 
@@ -395,6 +396,14 @@ class CPRActivity : BaseActivity() {
             }
 
             override fun onScanning(bleDevice: BleDevice) {
+                //处理重复蓝牙问题
+                if (mDeviceAdapter.data.isNotEmpty()) {
+                    mDeviceAdapter.data.forEach { item ->
+                        if (bleDevice.mac == item.mac) {
+                            mDeviceAdapter.remove(item)
+                        }
+                    }
+                }
                 mDeviceAdapter.addData(bleDevice)
                 mDeviceAdapter.notifyDataSetChanged()
             }
