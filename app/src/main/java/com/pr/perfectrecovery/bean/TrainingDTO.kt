@@ -21,7 +21,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var operateTime: Long = 0//训练操作时间
     var cycleCount: Int = 0//循环次数
     var pressErrorCount: Float = 0f//按压错误数
-    var pressTotal: Float = 0f//按压总数
+    var prSum: Float = 0f//按压总数
     var pressLocation: Int = 0//按压位置错误数
     var pressLow: Int = 0//按压不足错误数
     var pressHigh: Int = 0//按压过大错误数
@@ -29,15 +29,15 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pressOutTime: Long = 0//按压超时
 
     var blowErrorCount: Float = 0f//吹气错误总数
-    var blowTotal: Int = 0//吹气总数
-    var blowClose: Int = 0//吹气气道错误数
+    var qySum: Int = 0//吹气总数
+    var err_qy_close: Int = 0//吹气气道错误数
     var blowLow: Int = 0//吹气不足错误数
     var blowHigh: Int = 0//吹气过大错误数
     var blowIntoStomach: Int = 0//吹气进胃错误数
 
     var prCount: Int = 0 //按压次数比例
     var qyCount: Int = 0 //吹气次数比例
-    var processScore: Int = 0//流程分数
+    var processScore: Float = 0f//流程分数
     var pressScore: Int = 0//按压分数
     var deduction: Float = 0f//扣分
     var blowScore: Int = 0//吹气、通气 分数
@@ -86,7 +86,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      *  按压频率合格率 = 正确按压频率次数 / 总按压次数
      */
     fun getPressRate(): Int {
-        return if (pressTotal > 0 && pr_seqright_total > 0) ((pr_seqright_total / pressTotal) * 100).roundToInt() else 0
+        return if (prSum > 0 && pr_seqright_total > 0) ((pr_seqright_total / prSum) * 100).roundToInt() else 0
     }
 
     /**
@@ -95,7 +95,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getReboundRate(): Int {
         //总数=正确按压次数+位置错误按压次数+未回弹按压次数
-        return if (pressTotal - pressRebound > 0 && pressTotal > 0) (((pressTotal - pressRebound) / pressTotal) * 100).roundToInt() else 0
+        return if (prSum - pressRebound > 0 && prSum > 0) (((prSum - pressRebound) / prSum) * 100).roundToInt() else 0
     }
 
     /**
@@ -104,15 +104,15 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getDepthRate(): Int {
         //总数=正确按压次数+位置错误按压次数+未回弹按压次数+深度错误的
-        return if ((pressTotal - pressErrorCount) > 0 && pressTotal > 0) (((pressTotal - pressErrorCount) / pressTotal) * 100).roundToInt() else 0
+        return if ((prSum - pressErrorCount) > 0 && prSum > 0) (((prSum - pressErrorCount) / prSum) * 100).roundToInt() else 0
     }
 
     /**
      * 按压平均次数/分
-     * 按压平均次数/分 = 按压总次数/按压总时间
+     * 按压平均次数/分 = 按压总次数/按压总时间ms * 60
      */
     fun getPressAverageTimes(): Int {
-        return if (pressTotal > 0 && pr_time_sum > 0) ((pressTotal / (pr_time_sum / 60))).roundToInt() else 0
+        return if (prSum > 0 && pr_time_sum > 0) (prSum / (pr_time_sum / 1000) * 60).roundToInt() else 0
     }
 
     /**
@@ -120,7 +120,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 按压平均次数/分 = 按压总深度/按压总次数
      */
     fun getPressAverageDepth(): Int {
-        return if (pressTotal > 0 && pr_depth_sum > 0) ((pr_depth_sum / pressTotal)).roundToInt() else 0
+        return if (prSum > 0 && pr_depth_sum > 0) ((pr_depth_sum / prSum)).roundToInt() else 0
     }
 
     /**
@@ -128,14 +128,14 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 通气合格率 = 正确通气量次数 / 通气总次数
      */
     fun getBlowAmount(): Int {
-        return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) ((blowTotal - blowErrorCount) / blowTotal * 100).roundToInt() else 0
+        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - blowErrorCount) / qySum * 100).roundToInt() else 0
     }
 
     /**
      * 吹气频率合格率
      */
     fun getBlowRate(): Int {
-        return if ((blowTotal - blowErrorCount) > 0 && blowTotal > 0) ((blowTotal - blowErrorCount) / blowTotal * 100).roundToInt() else 0
+        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - blowErrorCount) / qySum * 100).roundToInt() else 0
     }
 
     /**
@@ -143,7 +143,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      *  平均通气每分钟次数 = 通气总量 / 通气总次数
      */
     fun getBlowAverageNumber(): Int {
-        return if (blowTotal > 0 && qy_volume_sum > 0) qy_volume_sum / blowTotal else 0
+        return if (qySum > 0 && qy_volume_sum > 0) qy_volume_sum / qySum else 0
     }
 
     /**
@@ -152,21 +152,21 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      *  平均通气平均值 = 通气总次数 / 通气总时间
      */
     fun getBlowAverage(): Int {
-        return if (blowTotal > 0 && qy_time_sum > 0) (60000 / (qy_time_sum / blowTotal)).roundToInt() else 0
+        return if (qySum > 0 && qy_time_sum > 0) (60000 / (qy_time_sum / qySum)).roundToInt() else 0
     }
 
     /**
      * 按压分数
      */
     fun getPrScore(): Float {
-        return if (pressTotal > 0 && prCount > 0) pressTotal / prCount else 0f
+        return if (prSum > 0 && (prSum - pressErrorCount) > 0) (prSum - pressErrorCount) * pressScore / (prCount * cycleCount) else 0f
     }
 
     /**
      * 通气分数
      */
     fun getQyScore(): Float {
-        return if (blowTotal > 0 && qyCount > 0) (blowTotal / qyCount).toFloat() else 0f
+        return if (qySum > 0 && qyCount > 0) (qySum / qyCount).toFloat() else 0f
     }
 
     /**

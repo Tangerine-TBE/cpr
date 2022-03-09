@@ -265,6 +265,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dp_40"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
 
@@ -322,7 +323,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_28"
+                            android:layout_marginTop="@dimen/dp_20"
                             android:text="6cm"
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
@@ -345,11 +346,11 @@
                 <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/lineChart1"
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="65dp"
-                        app:layout_constraintBottom_toTopOf="@+id/lineChart2"
+                        android:layout_height="150dp"
+                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_marginStart="@dimen/dp_50"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/constraintlayout3" />
+                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintlayout4"
@@ -411,7 +412,7 @@
                         android:layout_width="0dp"
                         android:layout_height="84dp"
                         android:layout_marginStart="@dimen/dp_75"
-                        android:layout_marginTop="@dimen/dp_20"
+                        android:layout_marginTop="25dp"
                         app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/constraintlayout4"

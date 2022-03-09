@@ -1,7 +1,6 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
-import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,12 +20,11 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
-import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.bean.ConfigBean
+import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ChartFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.ChartViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
-import com.pr.perfectrecovery.utils.DataVolatile
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -69,11 +67,16 @@ class ChartFragment : Fragment() {
     private fun initView() {
         //曲线图表
         val data: LineData = getData(0f)
-        val data1: LineData = getData(0f)
+        val data1: LineData = getData(9.9f)
         val data2: LineData = getData(0f)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
-        LineChartUtils.setLineChart(viewBinding.lineChart1, data1)
+        LineChartUtils.setLineChart(
+            viewBinding.lineChart1,
+            data1,
+            configBean.depth,
+            configBean.depthEnd
+        )
         initLineChart(viewBinding.lineChart2, data2)
         StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
@@ -88,15 +91,6 @@ class ChartFragment : Fragment() {
                 } else {
                     addBarEntry(0, 0)
                 }
-                //吹气错误数统计
-                viewBinding.tvLungCount.text =
-                    "${(it.ERR_QY_CLOSE + it.ERR_QY_HIGH + it.ERR_QY_LOW + it.ERR_QY_DEAD)}"
-                //按压错误数统计
-                viewBinding.tvHeartCount.text =
-                    "${(it.ERR_PR_POSI + it.ERR_PR_LOW + it.ERR_PR_HIGH)}"
-                //按压总数
-                viewBinding.tvLungTotal.text = "/${it.qySum}"
-                viewBinding.tvHeartTotal.text = "/${it.prSum}"
             }
         }
 
@@ -111,31 +105,62 @@ class ChartFragment : Fragment() {
 
         viewBinding.constraintlayout3.setOnClickListener {
             val random = (1..100).random()
-           // addEntry(data, viewBinding.lineChart1, setValue(random))
+            // addEntry(data, viewBinding.lineChart1, setValue(random))
         }
         setViewData()
     }
 
     private fun setValue(value: Int, data: BaseDataDTO): Float {
         val depth = data.preDistance - value
-        if (depth <= 0 || depth > data.preDistance - 5) {
+        if (depth == 0 || depth > data.preDistance - 5) {
             return 0f
+        } else if (depth > data.PR_HIGH_VALUE + 20) {
+            return 9.9f
         } else if (depth > data.PR_HIGH_VALUE + 15) {
-            return 6.5f
+            return 9.0f
         } else if (depth > data.PR_HIGH_VALUE + 10) {
-            return 6.3f
+            return 8.5f
         } else if (depth > data.PR_HIGH_VALUE + 5) {
-            return 6.2f
+            return 8.3f
         } else if (depth > data.PR_HIGH_VALUE) {
-            return 6.1f
+            return 8.0f
         } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
-            return 5f
-        } else if (depth < data.PR_LOW_VALUE - 5) {
-            return 3f
-        } else if (depth < data.PR_LOW_VALUE - 10) {
-            return 2f
-        } else if (depth < data.PR_LOW_VALUE - 15) {
+            when {
+                depth > data.PR_LOW_VALUE + 5 -> {
+                    return 7.9f
+                }
+                depth > data.PR_LOW_VALUE + 10 -> {
+                    return 7f
+                }
+                depth > data.PR_LOW_VALUE + 15 -> {
+                    return 6f
+                }
+                depth > data.PR_LOW_VALUE + 20 -> {
+                    return 5f
+                }
+            }
+        } else if (data.PR_LOW_VALUE - 25 > 0 && depth < data.PR_LOW_VALUE - 25) {
             return 1f
+        } else if (depth < data.PR_LOW_VALUE - 22) {
+            return 2f
+        } else if (depth < data.PR_LOW_VALUE - 20) {
+            return 3.0f
+        } else if (depth < data.PR_LOW_VALUE - 18) {
+            return 3.2f
+        } else if (depth < data.PR_LOW_VALUE - 16) {
+            return 3.4f
+        } else if (depth < data.PR_LOW_VALUE - 14) {
+            return 3.6f
+        } else if (depth < data.PR_LOW_VALUE - 12) {
+            return 3.4f
+        } else if (depth < data.PR_LOW_VALUE - 10) {
+            return 3.0f
+        } else if (depth < data.PR_LOW_VALUE - 8) {
+            return 4.0f
+        } else if (depth < data.PR_LOW_VALUE - 5) {
+            return 4.5f
+        } else if (depth < data.PR_LOW_VALUE) {
+            return 4.9f
         }
         return 0f
     }
@@ -292,29 +317,36 @@ class ChartFragment : Fragment() {
     }
 
     private fun setData(data: BaseDataDTO) {
-        viewBinding.tvLungTotal.text = "/${configBean.prCount * configBean.cycles}"
-        viewBinding.tvLungCount.text = "${data.qySum}"
-        viewBinding.tvHeartTotal.text = "/${configBean.qyCount * configBean.cycles}"
-        viewBinding.tvHeartCount.text = "${data.prSum}"
+        //吹气总数
+        viewBinding.tvLungCount.text = "${(data.getQy_err_total())}"
+        viewBinding.tvLungTotal.text = "/${data.qySum}"
+
+        //按压总数
+        viewBinding.tvHeartCount.text = "${(data.getPr_err_total())}"
+        viewBinding.tvHeartTotal.text = "/${data.prSum}"
     }
 
     private fun getData(value: Float): LineData {
         val values = ArrayList<Entry>()
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
+        val VORDIPLOM_COLORS = intArrayOf(
+            Color.rgb(192, 255, 140), Color.rgb(255, 247, 140), Color.rgb(255, 208, 140),
+            Color.rgb(140, 234, 255), Color.rgb(255, 140, 157)
+        )
         val lineDataSet = LineDataSet(values, "DataSet 1")
         lineDataSet.lineWidth = 1.2f
         lineDataSet.circleRadius = 0f
         lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
         lineDataSet.color = Color.parseColor("#3DB38E")
-        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
+//        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
+        lineDataSet.circleColors = VORDIPLOM_COLORS.asList()
         lineDataSet.highLightColor = Color.parseColor("#3DB38E")
         lineDataSet.setDrawValues(true)
         lineDataSet.setDrawCircles(false)
         lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
         lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-
         val sets = ArrayList<ILineDataSet>()
         val d = LineDataSet(values, "")
         d.lineWidth = 0f
@@ -326,10 +358,11 @@ class ChartFragment : Fragment() {
         d.highLightColor = Color.TRANSPARENT
         d.setDrawValues(false)
         d.setDrawCircles(false)
+
         d.axisDependency = YAxis.AxisDependency.LEFT
         d.mode = LineDataSet.Mode.CUBIC_BEZIER
         d.highLightColor = Color.argb(0, 0, 0, 0)
-        d.setCircleColor(Color.argb(0, 0, 0, 0))
+        //d.setCircleColor(Color.argb(0, 0, 0, 0))
         d.color = Color.argb(0, 0, 0, 0)
         d.addEntry(Entry(0f, value))
 

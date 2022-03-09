@@ -11,16 +11,16 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IValueFormatter
+import kotlin.math.roundToInt
 
 object LineChartUtils {
 
-    fun setLineChart(chart: LineChart, lineData: LineData) {
-        (lineData.getDataSetByIndex(0) as LineDataSet).circleHoleColor = Color.TRANSPARENT
-        (lineData.getDataSetByIndex(0) as LineDataSet).setDrawCircles(false)
+    fun setLineChart(chart: LineChart, lineData: LineData, startNum: Int, endNum: Int) {
+
         chart.setDrawGridBackground(false)
         // no description text
         chart.description.isEnabled = false
-        chart.setNoDataText("no data")
+        chart.setNoDataText("暂无数据")
         // enable touch gestures
         chart.setTouchEnabled(false)
 
@@ -41,10 +41,28 @@ object LineChartUtils {
         leftAxis.isInverted = true
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
         leftAxis.mAxisMaximum = 10f
-        leftAxis.isEnabled = false
+        leftAxis.labelCount = 9
+        leftAxis.isEnabled = true
+        leftAxis.textSize = 12f
         leftAxis.textColor = Color.WHITE
-        leftAxis.setDrawGridLines(false)
-
+        leftAxis.setDrawGridLines(true)
+        leftAxis.setValueFormatter { value, axis ->
+//            when (value.roundToInt()) {
+//                0 -> {
+//                    "0cm"
+//                }
+//                1 -> {
+//                    "${startNum}cm"
+//                }
+//                2 -> {
+//                    "${endNum}cm"
+//                }
+//                else -> {
+//                    "10cm"
+//                }
+//            }
+            "${value.toInt()}cm"
+        }
         val rightAxis: YAxis = chart.axisRight
         rightAxis.isEnabled = false
         rightAxis.setDrawGridLines(false)

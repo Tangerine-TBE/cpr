@@ -202,30 +202,30 @@ class MultiActAdapter :
 //            stopOutTime()
             cyclePrCount++
             //按压位置错误
-            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
-                err_pr_posi = dataDTO.ERR_PR_POSI
+            if (err_pr_posi != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
+                err_pr_posi = dataDTO.err_pr_posi
                 binding.ivPressAim.visibility = View.VISIBLE
 //                mHandler3.removeCallbacksAndMessages(null)
 //                mHandler3.postAtTime(Runnable {
 //                    binding.ivPressAim.visibility = View.INVISIBLE
 //                }, 2000)
-            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
+            } else if (err_qr_unback != dataDTO.err_pr_unback) {
                 //按压未回弹
-                err_qr_unback = dataDTO.ERR_PR_UNBACK
+                err_qr_unback = dataDTO.err_pr_unback
                 binding.pressLayoutView.setUnBack()
             } else {
                 //按压不足
-                if (err_pr_low != dataDTO.ERR_PR_LOW) {
-                    err_pr_low = dataDTO.ERR_PR_LOW
+                if (err_pr_low != dataDTO.err_pr_low) {
+                    err_pr_low = dataDTO.err_pr_low
                     binding.pressLayoutView.setDown()
-                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
-                    err_pr_high = dataDTO.ERR_PR_HIGH
+                } else if (err_pr_high != dataDTO.err_pr_high) {//按压过大
+                    err_pr_high = dataDTO.err_pr_high
                 }
             }
         }
         //按压错误数统计
         binding.tvPress.text =
-            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
+            "${(dataDTO.err_pr_posi + dataDTO.err_pr_low + dataDTO.err_pr_high + dataDTO.err_pr_unback)}"
         //按压总数
         binding.tvPressTotal.text = "/${dataDTO.prSum}"
     }
@@ -284,7 +284,7 @@ class MultiActAdapter :
         setRate(binding.chartQy, dataDTO.cf)
         //吹气错误数统计
         binding.tvLungError.text =
-            "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
+            "${(dataDTO.err_qy_close + dataDTO.err_qy_high + dataDTO.err_qy_low + dataDTO.err_qy_dead)}"
         binding.tvLungTotal.text = "/${dataDTO.qySum}"
     }
 
@@ -317,19 +317,19 @@ class MultiActAdapter :
                 && oldItem.cf == newItem.cf
                 && oldItem.prSum == newItem.prSum
                 && oldItem.qySum == newItem.qySum
-                && oldItem.ERR_PR_UNBACK == newItem.ERR_PR_UNBACK
-                && oldItem.ERR_PR_LOW == newItem.ERR_PR_LOW
-                && oldItem.ERR_PR_HIGH == newItem.ERR_PR_HIGH
-                && oldItem.ERR_PR_POSI == newItem.ERR_PR_POSI
-                && oldItem.ERR_QY_LOW == newItem.ERR_QY_LOW
-                && oldItem.ERR_QY_HIGH == newItem.ERR_QY_HIGH
-                && oldItem.ERR_QY_CLOSE == newItem.ERR_QY_CLOSE
-                && oldItem.PR_DEPTH_SUM == newItem.PR_DEPTH_SUM
-                && oldItem.PR_TIME_SUM == newItem.PR_TIME_SUM
-                && oldItem.QY_VOLUME_SUM == newItem.QY_VOLUME_SUM
-                && oldItem.QY_TIME_SUM == newItem.QY_TIME_SUM
-                && oldItem.PR_SEQRIGHT_TOTAL == newItem.PR_SEQRIGHT_TOTAL
-                && oldItem.QY_SERRIGHT_TOTAL == newItem.QY_SERRIGHT_TOTAL
+                && oldItem.err_pr_unback == newItem.err_pr_unback
+                && oldItem.err_pr_low == newItem.err_pr_low
+                && oldItem.err_pr_high == newItem.err_pr_high
+                && oldItem.err_pr_posi == newItem.err_pr_posi
+                && oldItem.err_qy_low == newItem.err_qy_low
+                && oldItem.err_qy_high == newItem.err_qy_high
+                && oldItem.err_qy_close == newItem.err_qy_close
+                && oldItem.pr_depth_sum == newItem.pr_depth_sum
+                && oldItem.pr_time_sum == newItem.pr_time_sum
+                && oldItem.qy_volume_sum == newItem.qy_volume_sum
+                && oldItem.qy_time_sum == newItem.qy_time_sum
+                && oldItem.pr_seqright_total == newItem.pr_seqright_total
+                && oldItem.qy_serright_total == newItem.qy_serright_total
                 && oldItem.isStart == newItem.isStart
     }
 }

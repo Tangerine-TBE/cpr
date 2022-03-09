@@ -23,7 +23,6 @@ import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
-import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -210,27 +209,32 @@ class CycleFragment : Fragment() {
             trainingDTO.startTime = startTime
             trainingDTO.endTime = endTime
             trainingDTO.pressOutTime = timeOutTotal
-            trainingDTO.pressHigh = ERR_PR_HIGH
-            trainingDTO.pressLow = ERR_PR_LOW
-            trainingDTO.pressLocation = ERR_PR_POSI
-            trainingDTO.pressRebound = ERR_PR_UNBACK.toFloat()
+            trainingDTO.pressHigh = err_pr_high
+            trainingDTO.pressLow = err_pr_low
+            trainingDTO.pressLocation = err_pr_posi
+            trainingDTO.pressRebound = err_pr_unback.toFloat()
             //按压总错误数
-            trainingDTO.pressErrorCount =
-                (ERR_PR_HIGH + ERR_PR_LOW + ERR_PR_POSI + ERR_PR_UNBACK).toFloat()
-            trainingDTO.blowHigh = ERR_QY_HIGH
-            trainingDTO.blowLow = ERR_QY_LOW
-            trainingDTO.blowIntoStomach = ERR_QY_DEAD
-            trainingDTO.blowClose = ERR_QY_CLOSE
+            trainingDTO.pressErrorCount = mBaseDataDTO!!.getPr_err_total().toFloat()
+            trainingDTO.blowHigh = err_qy_high
+            trainingDTO.blowLow = err_qy_low
+            trainingDTO.blowIntoStomach = err_qy_dead
+            trainingDTO.err_qy_close = err_qy_close
             //吹气总错误数
-            trainingDTO.blowErrorCount =
-                (ERR_QY_HIGH + ERR_QY_LOW + ERR_QY_DEAD + ERR_QY_CLOSE).toFloat()
-            trainingDTO.pressTotal = prSum.toFloat()
-            trainingDTO.blowTotal = qySum
+            trainingDTO.blowErrorCount = mBaseDataDTO!!.getQy_err_total().toFloat()
+            trainingDTO.prSum = prSum.toFloat()
+            trainingDTO.qySum = qySum
             //超次少次
             trainingDTO.prManyCount = prManyCount
             trainingDTO.prLessCount = prLessCount
             trainingDTO.qyManyCount = qyManyCount
             trainingDTO.qyLessCount = qyLessCount
+
+            trainingDTO.pr_depth_sum = mBaseDataDTO!!.pr_depth_sum
+            trainingDTO.pr_time_sum = mBaseDataDTO!!.pr_time_sum.toFloat()
+            trainingDTO.qy_volume_sum = mBaseDataDTO!!.qy_volume_sum
+            trainingDTO.qy_time_sum = mBaseDataDTO!!.qy_time_sum.toFloat()
+            trainingDTO.pr_seqright_total = mBaseDataDTO!!.pr_seqright_total
+            trainingDTO.qy_serright_total = mBaseDataDTO!!.qy_serright_total
         }
         counter.let { mHandler.removeCallbacks(it) }
         viewBinding.ctTime.stop()
@@ -239,7 +243,6 @@ class CycleFragment : Fragment() {
             mMediaPlayer?.reset()
             mMediaPlayer = null
         }
-        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         return trainingDTO
     }
 
@@ -315,6 +318,12 @@ class CycleFragment : Fragment() {
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
+            //中断超时
+            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+                isTimeOut = true
+                mHandler.removeCallbacks(counter)
+                mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
+            }
             //计算循环次数
             cycle(dataDTO)
             //第一次按压或吹气才开始计时
@@ -325,12 +334,6 @@ class CycleFragment : Fragment() {
             pr(dataDTO)
             //吹气
             qy(dataDTO)
-            //中断超时
-            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
-                isTimeOut = true
-                mHandler.removeCallbacks(counter)
-                mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
-            }
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -408,34 +411,33 @@ class CycleFragment : Fragment() {
             isPr = true
             isQy = false
             //按压位置错误
-            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
-                err_pr_posi = dataDTO.ERR_PR_POSI
+            if (err_pr_posi != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
+                err_pr_posi = dataDTO.err_pr_posi
                 viewBinding.ivPressAim.visibility = View.VISIBLE
                 mHandler3.removeCallbacksAndMessages(null)
                 mHandler3.postAtTime(Runnable {
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
-            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
+            } else if (err_qr_unback != dataDTO.err_pr_unback) {
                 //按压未回弹
-                err_qr_unback = dataDTO.ERR_PR_UNBACK
+                err_qr_unback = dataDTO.err_pr_unback
                 viewBinding.pressLayoutView.setUnBack()
                 setPlayVoice(VOICE_MP3_WHT)
             } else {
                 //按压不足
-                if (err_pr_low != dataDTO.ERR_PR_LOW) {
-                    err_pr_low = dataDTO.ERR_PR_LOW
+                if (err_pr_low != dataDTO.err_pr_low) {
+                    err_pr_low = dataDTO.err_pr_low
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
-                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
-                    err_pr_high = dataDTO.ERR_PR_HIGH
+                } else if (err_pr_high != dataDTO.err_pr_high) {//按压过大
+                    err_pr_high = dataDTO.err_pr_high
                     setPlayVoice(VOICE_MP3_AYGD)
                 }
             }
         }
         //按压错误数统计
-        viewBinding.tvPress.text =
-            "${(dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)}"
+        viewBinding.tvPress.text = "${dataDTO.getPr_err_total()}"
         //按压总数
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
     }
@@ -502,8 +504,7 @@ class CycleFragment : Fragment() {
         //吹气频率
         setQyRate(viewBinding.chartQy, dataDTO.cf)
         //吹气错误数统计
-        viewBinding.tvLungError.text =
-            "${(dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)}"
+        viewBinding.tvLungError.text = "${(dataDTO.getQy_err_total())}"
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
     }
 
@@ -515,9 +516,9 @@ class CycleFragment : Fragment() {
         //暂停超时时间
         if (isTimeOut) {
             isTimeOut = false
+            mHandler.removeCallbacks(counter)
             viewBinding.ctTime.visibility = View.INVISIBLE
             timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
-            mHandler.removeCallbacks(counter)
             viewBinding.ctTime.base = SystemClock.elapsedRealtime()
             viewBinding.ctTime.stop()
         }
@@ -606,6 +607,7 @@ class CycleFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         StatusLiveData.data.value = null
         if (mMediaPlayer != null) {
             mMediaPlayer!!.stop()

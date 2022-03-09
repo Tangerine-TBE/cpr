@@ -106,14 +106,8 @@ class SingleActivity : BaseActivity() {
                 mTrainingDTO?.qyCount = configBean.qyCount
                 mTrainingDTO?.pressScore = configBean.pressScore
                 mTrainingDTO?.blowScore = configBean.blowScore
-                mTrainingDTO?.processScore = configBean.processScore
+                mTrainingDTO?.processScore = configBean.processScore.toFloat()
                 mTrainingDTO?.deduction = configBean.deductionScore
-//                mTrainingDTO?.pr_depth_sum = DataVolatile.PR_DEPTH_SUM
-//                mTrainingDTO?.pr_time_sum = DataVolatile.PR_TIME_SUM.toFloat()
-//                mTrainingDTO?.qy_volume_sum = DataVolatile.QY_VOLUME_SUM
-//                mTrainingDTO?.qy_time_sum = DataVolatile.QY_TIME_SUM.toFloat()
-//                mTrainingDTO?.pr_seqright_total = DataVolatile.PR_SEQRIGHT_TOTAL
-//                mTrainingDTO?.qy_serright_total = DataVolatile.QY_SERRIGHT_TOTAL
                 //检查页面 结果
                 checkEventFragment?.getData().let {
                     if (it != null) {

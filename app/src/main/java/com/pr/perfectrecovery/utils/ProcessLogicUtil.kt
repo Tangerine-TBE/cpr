@@ -41,25 +41,24 @@ object ProcessLogicUtil {
      * 按压处理逻辑
      */
     private fun prLogic(dataDTO: BaseDataDTO) {
-        val errorTotal =
-            (dataDTO.ERR_PR_POSI + dataDTO.ERR_PR_LOW + dataDTO.ERR_PR_HIGH + dataDTO.ERR_PR_UNBACK)
+        val errorTotal = dataDTO.getPr_err_total()
         //执行三次按压深度
         if (dataDTO.prSum != prValue) {
             //按压位置错误
-            if (err_pr_posi != dataDTO.ERR_PR_POSI && dataDTO.psrType == 0) {
-                err_pr_posi = dataDTO.ERR_PR_POSI
+            if (err_pr_posi != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
+                err_pr_posi = dataDTO.err_pr_posi
                 mDataCallback.onPrCallback(VOICE_MP3_AYWZCW, errorTotal)
-            } else if (err_qr_unback != dataDTO.ERR_PR_UNBACK) {
+            } else if (err_qr_unback != dataDTO.err_pr_unback) {
                 //按压未回弹
-                err_qr_unback = dataDTO.ERR_PR_UNBACK
+                err_qr_unback = dataDTO.err_pr_unback
                 mDataCallback.onPrCallback(VOICE_MP3_WHT, errorTotal)
             } else {
                 //按压不足
-                if (err_pr_low != dataDTO.ERR_PR_LOW) {
-                    err_pr_low = dataDTO.ERR_PR_LOW
+                if (err_pr_low != dataDTO.err_pr_low) {
+                    err_pr_low = dataDTO.err_pr_low
                     mDataCallback.onPrCallback(VOICE_MP3_AYBZ, errorTotal)
-                } else if (err_pr_high != dataDTO.ERR_PR_HIGH) {//按压过大
-                    err_pr_high = dataDTO.ERR_PR_HIGH
+                } else if (err_pr_high != dataDTO.err_pr_high) {//按压过大
+                    err_pr_high = dataDTO.err_pr_high
                     mDataCallback.onPrCallback(VOICE_MP3_AYGD, errorTotal)
                 }
             }
@@ -72,8 +71,7 @@ object ProcessLogicUtil {
      */
     private fun qyLogic(dataDTO: BaseDataDTO, configBean: ConfigBean) {
         //通气道是否打开 0-关闭 1-打开
-        val errorTotal =
-            (dataDTO.ERR_QY_CLOSE + dataDTO.ERR_QY_HIGH + dataDTO.ERR_QY_LOW + dataDTO.ERR_QY_DEAD)
+        val errorTotal = dataDTO.getQy_err_total()
         if (dataDTO.aisleType == 1) {
             if (qyValue != dataDTO.qySum) {
                 val qyMax = dataDTO.qyMax

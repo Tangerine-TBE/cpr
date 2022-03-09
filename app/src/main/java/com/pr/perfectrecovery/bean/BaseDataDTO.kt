@@ -7,7 +7,7 @@ data class BaseDataDTO(
     //吹气最大值
     var qyMax: Int = 0,
     // 吹气总和
-    var qyValueSum : Int = 0,
+    var qyValueSum: Int = 0,
     //电量值：  0-100%
     var electricity: Int = 0,
     //距离值：  30-150
@@ -35,34 +35,49 @@ data class BaseDataDTO(
     //吹起次数
     var qySum: Int = 0,
     //按压错误-未回弹
-    var ERR_PR_UNBACK: Int = 0,
+    var err_pr_unback: Int = 0,
     //按压错误-按压不足
-    var ERR_PR_LOW: Int = 0,
+    var err_pr_low: Int = 0,
     //按压错误-按压过大
-    var ERR_PR_HIGH: Int = 0,
+    var err_pr_high: Int = 0,
     //按压错误-按压位置错误
-    var ERR_PR_POSI: Int = 0,
+    var err_pr_posi: Int = 0,
     //吹气错误-气压不足
-    var ERR_QY_LOW: Int = 0,
+    var err_qy_low: Int = 0,
     //吹气错误-气压过大
-    var ERR_QY_HIGH: Int = 0,
+    var err_qy_high: Int = 0,
     //吹气错误-气压进胃
-    var ERR_QY_DEAD: Int = 0,
+    var err_qy_dead: Int = 0,
     //吹气错误-气道未打开错误
-    var ERR_QY_CLOSE: Int = 0,
-    var PR_DEPTH_SUM: Int = 0,//按压深度总和(mm)
-    var PR_TIME_SUM: Int = 0,   // 按压时间总和（ms）
-    var QY_VOLUME_SUM: Int = 0,  //吹气量总和
-    var QY_TIME_SUM: Int = 0,  //吹气时间总和
-    var PR_SEQRIGHT_TOTAL: Int = 0, //按压频率正常的次数
-    var QY_SERRIGHT_TOTAL: Int = 0 //吹气频率正确的次数
+    var err_qy_close: Int = 0,
+    var pr_depth_sum: Int = 0,//按压深度总和(mm)
+    var pr_time_sum: Int = 0,   // 按压时间总和（ms）
+    var qy_volume_sum: Int = 0,  //吹气量总和
+    var qy_time_sum: Int = 0,  //吹气时间总和
+    var pr_seqright_total: Int = 0, //按压频率正常的次数
+    var qy_serright_total: Int = 0 //吹气频率正确的次数
 ) {
     //是否开始
     var isStart = false
     override fun toString(): String {
-        return "BaseDataDTO(mac='$mac', distance=$distance, bpValue=$bpValue, pf=$pf, cf=$cf, prSum=$prSum, qySum=$qySum, PR_SEQRIGHT_TOTAL=$PR_SEQRIGHT_TOTAL, QY_SERRIGHT_TOTAL=$QY_SERRIGHT_TOTAL)"
+        return "BaseDataDTO(mac='$mac', distance=$distance, bpValue=$bpValue, pf=$pf, cf=$cf, prSum=$prSum, qySum=$qySum, PR_SEQRIGHT_TOTAL=$pr_seqright_total, QY_SERRIGHT_TOTAL=$qy_serright_total)"
     }
 
-    var PR_HIGH_VALUE : Int = 0
-    var PR_LOW_VALUE : Int = 0
+    /**
+     * 获取按压错误总数
+     */
+    fun getPr_err_total(): Int {
+        return err_pr_unback + err_pr_low + err_pr_high + err_pr_posi
+    }
+
+    /**
+     * 获取吹气总数
+     */
+    fun getQy_err_total(): Int {
+        return err_qy_close + err_qy_low + err_qy_dead + err_qy_high
+    }
+
+
+    var PR_HIGH_VALUE: Int = 0
+    var PR_LOW_VALUE: Int = 0
 }
