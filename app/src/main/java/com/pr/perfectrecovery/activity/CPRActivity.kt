@@ -674,4 +674,10 @@ class CPRActivity : BaseActivity() {
         }
     }
 
+    override fun finish() {
+        super.finish()
+        BleManager.getInstance().disconnectAllDevice()
+        BleManager.getInstance().destroy()
+    }
+
 }
