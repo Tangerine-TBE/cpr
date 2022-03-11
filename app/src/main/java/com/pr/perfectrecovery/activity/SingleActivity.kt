@@ -212,6 +212,7 @@ class SingleActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         counter.let { mHandler.removeCallbacks(it) }
+        cycleFragment = null
 //        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         EventBus.getDefault().unregister(this)
     }

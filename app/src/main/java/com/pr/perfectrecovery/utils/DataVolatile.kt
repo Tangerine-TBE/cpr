@@ -259,16 +259,14 @@ class DataVolatile {
         dataDTO.qy_serright_total = QY_SERRIGHT_TOTAL //吹气频率正确的次数
 //        deviceMAC?.let { mapObject.put(it, dataDTO) }
         dataDTO.preDistance = preDistance.toInt()
-        if (QY_SUM != qy) {
-            qy = QY_SUM
-            dataDTO.qyMax = max(false)
-        }
+        //QY_MAX_VOLUME_SUM += dataDTO.qyMax
+        dataDTO.QY_valueSet = QY_valueSet
+        dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
         return dataDTO
     }
 
-    private var qy = 0
     fun dataClear() {
         isStart = false
         //电量值：  0-100%
@@ -299,6 +297,7 @@ class DataVolatile {
         PR_TIME_SUM = 0    // 按压时间总和（ms）
         QY_VOLUME_SUM = 0  //吹气量总和
         QY_TIME_SUM = 0     //吹气时间总和
+        QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
         PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
         QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
         L_valueSet.clear()
@@ -357,7 +356,7 @@ class DataVolatile {
             preDistance = ((L_d1 + L_d2 + L_d3) / 3).toLong();
             //preDistance=150
             // preDistance=L_d1.toLong();
-            macAddress?.let {
+            macAddress.let {
                 preDistanceMap[macAddress] = preDistance
             }
         }
@@ -372,6 +371,7 @@ class DataVolatile {
     private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
     private var PR_TIME_SUM = 0    // 按压时间总和（ms）
     private var QY_VOLUME_SUM = 0  //吹气量总和
+    private var QY_MAX_VOLUME_SUM = 0 //每次吹气峰值总和
     private var QY_TIME_SUM = 0     //吹气时间总和
     private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
     private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
@@ -399,6 +399,9 @@ class DataVolatile {
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
+                if (L_d3 <= 30) {
+                    return L_d3.toInt()
+                }
                 value = L_d3
                 low_flag = 0
                 if (UNBACK_FLAG == 1) {
@@ -460,11 +463,7 @@ class DataVolatile {
                     preTimePress = changTimePress*/
                 }
                 MIN_FLAG = 1
-                if ((preDistance - L_d2 >= 45) && (preDistance - L_d2 < 50)) {
-                    value = (preDistance - 50).toInt()
-                } else {
-                    value = L_d2
-                }
+                value = L_d2
             }
         } else if (L_d2 < L_d3) {
             // PR_DOTTIMSE_NUMBER+=3
@@ -520,11 +519,8 @@ class DataVolatile {
                       Log.e("TAG6", "PF值：$PF_Value")
                  }
                  preTimePress = changTimePress*/
-                if ((preDistance - L_d1 >= 45) && (preDistance - L_d1 < 50)) {
-                    value = (preDistance - 50).toInt()
-                } else {
-                    value = L_d1
-                }
+
+                value = L_d1
             } else {
                 // PR_DOTTIMSE_NUMBER+=3
                 Log.e("TAG7", "初始位置$preDistance")

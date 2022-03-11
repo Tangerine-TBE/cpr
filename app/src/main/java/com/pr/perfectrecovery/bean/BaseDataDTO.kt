@@ -4,8 +4,6 @@ data class BaseDataDTO(
     //mac地址
     var mac: String = "",
     var preDistance: Int = 0,//初始值
-    //吹气最大值
-    var qyMax: Int = 0,
     // 吹气总和
     var qyValueSum: Int = 0,
     //电量值：  0-100%
@@ -54,9 +52,28 @@ data class BaseDataDTO(
     var pr_time_sum: Int = 0,   // 按压时间总和（ms）
     var qy_volume_sum: Int = 0,  //吹气量总和
     var qy_time_sum: Int = 0,  //吹气时间总和
+    var qy_max_volume_sum: Int = 0,//吹气每次最值大总和
     var pr_seqright_total: Int = 0, //按压频率正常的次数
-    var qy_serright_total: Int = 0 //吹气频率正确的次数
+    var qy_serright_total: Int = 0,//吹气频率正确的次数
+    var QY_valueSet: MutableList<Int> = mutableListOf<Int>()
 ) {
+
+    /**
+     * array 数据列表
+     * isClear 清除数据集合
+     */
+    fun qyMax(): Int {
+        var maximum = 0
+        for (i in QY_valueSet.indices) {
+            if (maximum < QY_valueSet[i]) {
+                maximum = QY_valueSet[i]
+            }
+        }
+        qy_max_volume_sum += maximum
+        QY_valueSet.clear()
+        return maximum
+    }
+
     //是否开始
     var isStart = false
     override fun toString(): String {

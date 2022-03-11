@@ -235,7 +235,7 @@ class MultiActAdapter :
         if (dataDTO.aisleType == 1) {
             binding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = dataDTO.qyMax
+                val qyMax = dataDTO.qyMax()
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)

@@ -548,6 +548,8 @@ class CPRActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
+        BleManager.getInstance().disconnectAllDevice()
+        BleManager.getInstance().destroy()
     }
 
     private fun initTTL() {

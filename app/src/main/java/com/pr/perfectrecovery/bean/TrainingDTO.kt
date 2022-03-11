@@ -13,7 +13,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var pr_depth_sum = 0  //按压深度总和(mm)
     var pr_time_sum: Float = 0f   // 按压时间总和（ms）
     var qy_volume_sum = 0  //吹气量总和
-    var qy_time_sum: Float = 0f     //吹气时间总和
+    var qy_max_volume_sum: Int = 0//吹气每次最值大总和
+    var qy_time_sum: Float = 0f//吹气时间总和
     var pr_seqright_total = 0 //按压频率正常的次数
     var qy_serright_total = 0 //吹气频率正确的次数
 
@@ -143,7 +144,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      *  平均通气每分钟次数 = 通气总量 / 通气总次数
      */
     fun getBlowAverageNumber(): Int {
-        return if (qySum > 0 && qy_volume_sum > 0) qy_volume_sum / qySum else 0
+        return if (qySum > 0 && qy_max_volume_sum > 0) qy_max_volume_sum * (qyCount * cycleCount) / qySum else 0
     }
 
     /**
@@ -157,6 +158,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      * 按压分数
+     * 正确按压次数 * 按压设定分数 / 按压设定总数
      */
     fun getPrScore(): Float {
         return if (prSum > 0 && (prSum - pressErrorCount) > 0) (prSum - pressErrorCount) * pressScore / (prCount * cycleCount) else 0f
@@ -164,9 +166,10 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      * 通气分数
+     * 正确吹气次数 * 吹气设定分数 / 吹气设定总数
      */
     fun getQyScore(): Float {
-        return if (qySum > 0 && qyCount > 0) (qySum / qyCount).toFloat() else 0f
+        return if (qySum > 0 && (qySum - blowErrorCount) > 0) ((qySum - blowErrorCount) * blowScore / (qyCount * cycleCount)) else 0f
     }
 
     /**
@@ -183,5 +186,4 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     fun getPressTime(): Int {
         return if (pr_time_sum > 0) (pr_time_sum / (endTime - startTime) * 100).roundToInt() else 0
     }
-
 }

@@ -86,7 +86,7 @@ class ChartFragment : Fragment() {
                 addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
-                    val qyMax = it.qyMax
+                    val qyMax = it.qyMax()
                     addBarEntry(it.qyValueSum, qyMax)
                 } else {
                     addBarEntry(0, 0)

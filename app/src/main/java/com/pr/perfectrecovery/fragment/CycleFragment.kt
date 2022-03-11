@@ -37,7 +37,6 @@ private const val ARG_PARAM3 = "param3"
  */
 class CycleFragment : Fragment() {
     private lateinit var viewBinding: CycleFragmentBinding
-    private var counter = Counter()
     private var mMediaPlayer: MediaPlayer? = null
     private var isTS: Boolean = false
     private var isYY: Boolean = false
@@ -116,6 +115,16 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}"
             }
         })
+
+        //事件监听器，时间发生变化时可进行操作
+        viewBinding.ctTime.setOnChronometerTickListener {
+            //SystemClock.elapsedRealtime()系统当前时间
+            //chronometer.getBase()记录计时器开始时的时间
+            if ((SystemClock.elapsedRealtime() - viewBinding.ctTime.base) >= 1000) {
+                timeOutTotal += 1000
+                Log.e("elapsedRealtime", "initView: $timeOutTotal")
+            }
+        }
     }
 
     private val VOICE_MP3_BGM: Int = 1//节奏音乐
@@ -235,8 +244,9 @@ class CycleFragment : Fragment() {
             trainingDTO.qy_time_sum = mBaseDataDTO!!.qy_time_sum.toFloat()
             trainingDTO.pr_seqright_total = mBaseDataDTO!!.pr_seqright_total
             trainingDTO.qy_serright_total = mBaseDataDTO!!.qy_serright_total
+            trainingDTO.qy_max_volume_sum = mBaseDataDTO!!.qy_max_volume_sum
         }
-        counter.let { mHandler.removeCallbacks(it) }
+        mHandler.removeCallbacks(counter)
         viewBinding.ctTime.stop()
         if (mMediaPlayer != null) {
             mMediaPlayer?.stop()
@@ -284,13 +294,12 @@ class CycleFragment : Fragment() {
     private val mHandler5 = object : Handler(Looper.getMainLooper()) {}
     private val mHandler6 = object : Handler(Looper.getMainLooper()) {}
 
-    private inner class Counter : Runnable {
-        override fun run() {
-            viewBinding.ctTime.visibility = View.VISIBLE
-            //记录一次按压超时
-            viewBinding.ctTime.base = SystemClock.elapsedRealtime()
-            viewBinding.ctTime.start()
-        }
+    private val counter = Runnable {
+        isTimeOut = true
+        viewBinding.ctTime.visibility = View.VISIBLE
+        //记录一次按压超时
+        viewBinding.ctTime.base = SystemClock.elapsedRealtime()
+        viewBinding.ctTime.start()
     }
 
     private var prValue = 0
@@ -310,6 +319,7 @@ class CycleFragment : Fragment() {
     private var cycleQyCount = 0
     private var isPr = false
     private var isQy = false
+    private var isQyAim = false
 
     private var startTime: Long = 0
     private var endTime: Long = 0
@@ -319,21 +329,47 @@ class CycleFragment : Fragment() {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
             //中断超时
-            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+            if (!isTimeOut && dataDTO.distance == dataDTO.preDistance
+                && dataDTO.bpValue <= 0 && dataDTO.prSum > 0
+            ) {
                 isTimeOut = true
-                mHandler.removeCallbacks(counter)
+                mHandler.removeCallbacksAndMessages(null)
                 mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
             }
-            //计算循环次数
-            cycle(dataDTO)
+
             //第一次按压或吹气才开始计时
             if (startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)) {
                 startTime = System.currentTimeMillis()
             }
-            //按压
-            pr(dataDTO)
-            //吹气
-            qy(dataDTO)
+
+            if ((dataDTO.preDistance - dataDTO.distance) < 15 && dataDTO.bpValue > 0) {
+                //吹气
+                qy(dataDTO)
+            } else {
+                //按压
+                pr(dataDTO)
+                //吹气
+//            qy(dataDTO)
+            }
+            //清空吹气频率
+            if (dataDTO.bpValue <= 0 && qyRate > 0) {
+                //吹气频率清零
+                qyRate = 0//用于清空数据
+                mHandler2.removeCallbacks(runnableCF)
+                mHandler2.postDelayed(runnableCF, 10000)
+            } else {
+                if (qyRate == 0 && dataDTO.bpValue > 0) {
+                    qyRate = dataDTO.bpValue
+                }
+            }
+            //清空吹气图标
+            if (viewBinding.ivAim.isShown && isQyAim) {
+                isQyAim = false
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
+            }
+            //计算循环次数
+            cycle(dataDTO)
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -357,9 +393,13 @@ class CycleFragment : Fragment() {
     吹气在整个流程的结尾：
     达到设定的次数结束整个流程，没有达到设定的次数，等待继续吹，如果一直没有吹，一直等到流程的时间用完，这个时候算出这个循环少次
      */
+    private var isCycle: Boolean = false
     private fun cycle(dataDTO: BaseDataDTO) {
 //        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
-        if (cycleQyCount > 0 && !isQy && isPr) {
+        if (isQy && !isPr && !isCycle) {
+            isCycle = true
+            isQy = false
+            isPr = false
             if (isCheck) {
                 if (cyclePrCount > configBean.prCount) {
                     //按压超次
@@ -410,12 +450,12 @@ class CycleFragment : Fragment() {
             cycleQyCount = 0
             isPr = true
             isQy = false
+            isCycle = false
             //按压位置错误
             if (err_pr_posi != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.err_pr_posi
                 viewBinding.ivPressAim.visibility = View.VISIBLE
-                mHandler3.removeCallbacksAndMessages(null)
-                mHandler3.postAtTime(Runnable {
+                mHandler3.postDelayed({
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
@@ -436,6 +476,7 @@ class CycleFragment : Fragment() {
                 }
             }
         }
+
         //按压错误数统计
         viewBinding.tvPress.text = "${dataDTO.getPr_err_total()}"
         //按压总数
@@ -450,7 +491,8 @@ class CycleFragment : Fragment() {
         if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = dataDTO.qyMax
+                val qyMax = dataDTO.qyMax()
+                Log.e("qyMax", "qy:${qyMax}")
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -478,8 +520,9 @@ class CycleFragment : Fragment() {
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
                 viewBinding.ivAim.visibility = View.VISIBLE
+                isQyAim = true
                 mHandler4.removeCallbacksAndMessages(null)
-                mHandler4.postAtTime(this::setQyAimVisibility, 2000)
+                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             }
         }
         //记录吹气超次少次
@@ -488,18 +531,6 @@ class CycleFragment : Fragment() {
             isQy = true
             isPr = false
         }
-
-        if (dataDTO.bpValue <= 0 && qyRate > 0) {
-            //吹气频率清零
-            qyRate = 0//用于清空数据
-            mHandler2.removeCallbacks(runnableCF)
-            mHandler2.postDelayed(runnableCF, 10000)
-        } else {
-            if (qyRate == 0 && dataDTO.bpValue > 0) {
-                qyRate = dataDTO.bpValue
-            }
-        }
-
         qyValue = dataDTO.qySum
         //吹气频率
         setQyRate(viewBinding.chartQy, dataDTO.cf)
@@ -510,6 +541,7 @@ class CycleFragment : Fragment() {
 
     private fun setQyAimVisibility() {
         viewBinding.ivAim.visibility = View.INVISIBLE
+        setQyRate(viewBinding.chartQy, 0)
     }
 
     private fun stopOutTime() {
@@ -518,7 +550,7 @@ class CycleFragment : Fragment() {
             isTimeOut = false
             mHandler.removeCallbacks(counter)
             viewBinding.ctTime.visibility = View.INVISIBLE
-            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
+//            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
             viewBinding.ctTime.base = SystemClock.elapsedRealtime()
             viewBinding.ctTime.stop()
         }

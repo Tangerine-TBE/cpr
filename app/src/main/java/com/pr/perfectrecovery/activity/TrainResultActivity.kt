@@ -9,6 +9,7 @@ import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
 import com.pr.perfectrecovery.utils.TimeUtils
+import kotlin.math.roundToInt
 
 /**
  * 训练结果-操作明细 成绩结果
@@ -52,7 +53,6 @@ class TrainResultActivity : BaseActivity() {
 
     private fun initData() {
         val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
-        trainingDTO.save()
         //判断模式- false 训练  true 考核
         if (trainingDTO.isCheck) {
             viewBinding.layoutCheck.root.visibility = View.VISIBLE
@@ -81,11 +81,14 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.layoutCheck.tvVentilationScore.text = "${trainingDTO.getQyScore()}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
-
+            val scoreTotal =
+                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO)
             //分数星星配置
-            viewBinding.layoutCheck.ratingBar.progress = trainingDTO.score.toInt()
+            viewBinding.layoutCheck.ratingBar.progress = scoreTotal.roundToInt()
             //总得分
-            viewBinding.layoutCheck.tvScore.text = "${trainingDTO.score}"
+            viewBinding.layoutCheck.tvScore.text = "${scoreTotal}"
+            //总分数
+            trainingDTO.score = scoreTotal
 
             //按压超次
             viewBinding.tvOutBoutCount.text = "${trainingDTO.prManyCount}次"
@@ -150,6 +153,8 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
         //吹气平均值
         viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
+
+        trainingDTO.save()
     }
 
     /**

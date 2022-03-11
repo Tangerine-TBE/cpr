@@ -106,7 +106,7 @@ class MainActivity : BaseActivity() {
             data.tidalFrequency = 6
             data.tidalFrequencyEnd = 8
             data.operationTime = 120
-            data.interruptTime = 30
+            data.interruptTime = 5
             data.cycles = 5
             data.prCount = 30
             data.qyCount = 2

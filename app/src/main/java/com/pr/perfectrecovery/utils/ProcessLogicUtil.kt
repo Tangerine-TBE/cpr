@@ -74,7 +74,7 @@ object ProcessLogicUtil {
         val errorTotal = dataDTO.getQy_err_total()
         if (dataDTO.aisleType == 1) {
             if (qyValue != dataDTO.qySum) {
-                val qyMax = dataDTO.qyMax
+                val qyMax = dataDTO.qyMax()
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
 
