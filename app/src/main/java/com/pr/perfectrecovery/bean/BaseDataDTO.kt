@@ -69,7 +69,6 @@ data class BaseDataDTO(
                 maximum = QY_valueSet[i]
             }
         }
-        qy_max_volume_sum += maximum
         QY_valueSet.clear()
         return maximum
     }

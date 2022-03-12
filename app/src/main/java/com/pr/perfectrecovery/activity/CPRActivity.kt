@@ -119,14 +119,23 @@ class CPRActivity : BaseActivity() {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public fun onEvent(event: MessageEventData) {
-        if (event.code == BaseConstant.EVENT_CPR_START) {
-            isInitValueMap.clear()
-            bindBluetooth()
-        } else if (event.code == BaseConstant.EVENT_CPR_STOP) {
-            unBindBluetooth()
-            //清空当前map数据
-            dataMap.values.forEach { item ->
-                item.dataClear()
+        when (event.code) {
+            BaseConstant.EVENT_CPR_START -> {
+                isInitValueMap.clear()
+                bindBluetooth()
+            }
+            BaseConstant.EVENT_CPR_STOP -> {
+                unBindBluetooth()
+                //清空当前map数据
+                dataMap.values.forEach { item ->
+                    item.dataClear()
+                }
+            }
+            BaseConstant.EVENT_CPR_CLEAR -> {
+                //清空当前map数据
+                dataMap.values.forEach { item ->
+                    item.dataClear()
+                }
             }
         }
     }

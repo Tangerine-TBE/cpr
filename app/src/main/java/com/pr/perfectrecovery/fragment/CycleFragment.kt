@@ -363,11 +363,11 @@ class CycleFragment : Fragment() {
                 }
             }
             //清空吹气图标
-            if (viewBinding.ivAim.isShown && isQyAim) {
-                isQyAim = false
-                mHandler4.removeCallbacksAndMessages(null)
-                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
-            }
+//            if (viewBinding.ivAim.isShown && isQyAim) {
+//                isQyAim = false
+//                mHandler4.removeCallbacksAndMessages(null)
+//                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
+//            }
             //计算循环次数
             cycle(dataDTO)
             //更新循环次数
@@ -488,31 +488,31 @@ class CycleFragment : Fragment() {
      */
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
-        if (dataDTO.aisleType == 1) {
+        if (dataDTO.aisleType == 1 && dataDTO.bpValue > 5) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
                 val qyMax = dataDTO.qyMax()
                 Log.e("qyMax", "qy:${qyMax}")
                 when {
-                    qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
+                    qyMax in 35..55 -> {//通气正常
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
-                    qyMax in configBean.qyHigh()..100 -> {//通气过大
+                    qyMax > 55 -> {//通气过大
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    qyMax < configBean.qyLow() -> {//通气不足
+                    qyMax in 5..35 -> {//通气不足
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax > configBean.qy_max -> {//吹气进胃
+                    qyMax > 75 -> {//吹气进胃
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
                 }
                 //吹气变灰
-                mHandler1.removeCallbacks(blowRunnable)
-                mHandler1.postDelayed(blowRunnable, 2000)
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler1.postDelayed(this::setQyAimVisibility, 2000)
                 stopOutTime()
             }
         } else {
@@ -539,9 +539,14 @@ class CycleFragment : Fragment() {
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
     }
 
+    /**
+     * 吹气图恢复状态
+     */
     private fun setQyAimVisibility() {
         viewBinding.ivAim.visibility = View.INVISIBLE
         setQyRate(viewBinding.chartQy, 0)
+        viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
+        //EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_CLEAR, "", null))
     }
 
     private fun stopOutTime() {
@@ -561,7 +566,10 @@ class CycleFragment : Fragment() {
         val max = 200
         val min = 0
         val p = value % (max - min + 1) + min
-        val pf = p / 200f
+        var pf = p / 200f
+        if (pf > 0) {
+            pf += 0.03f
+        }
         view.setCurrentStatus(pf)
         view.invalidate()
     }
@@ -615,15 +623,6 @@ class CycleFragment : Fragment() {
         Log.e("setQyRate", "Rate: ${pf}")
         view.setCurrentStatus(pf)
         view.invalidate()
-    }
-
-    /**
-     * 吹气图恢复状态
-     */
-    private val blowRunnable = Runnable {
-        viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
-        setQyRate(viewBinding.chartQy, 0)
-        //DataVolatile.setCF_Value()
     }
 
     //按压中断 - 开启计时器 频率清零

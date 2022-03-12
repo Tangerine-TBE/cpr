@@ -259,7 +259,10 @@ class DataVolatile {
         dataDTO.qy_serright_total = QY_SERRIGHT_TOTAL //吹气频率正确的次数
 //        deviceMAC?.let { mapObject.put(it, dataDTO) }
         dataDTO.preDistance = preDistance.toInt()
-        //QY_MAX_VOLUME_SUM += dataDTO.qyMax
+        if (QY_SUM != qy) {
+            qy = QY_SUM
+            QY_MAX_VOLUME_SUM += max(true)
+        }
         dataDTO.QY_valueSet = QY_valueSet
         dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
@@ -267,6 +270,7 @@ class DataVolatile {
         return dataDTO
     }
 
+    private var qy = 0
     fun dataClear() {
         isStart = false
         //电量值：  0-100%
@@ -305,17 +309,6 @@ class DataVolatile {
         QY_valueSet2.clear()
         pt_valueSet.clear()
     }
-
-    fun setCF_Value() {
-        CF_Value = 0
-    }
-
-    fun setPF_Value() {
-        PF_Value = 0
-    }
-
-    var preTimePress: Long = 0
-
     /*
 * 获取初始位置，每次连接成功后调用一次初始化方法
 * */
