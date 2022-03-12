@@ -388,10 +388,14 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
+        if(preDistance-L_d1<30&&preDistance-L_d2<30&&preDistance-L_d3<30&&abs(L_d1-L_d2)<15&&abs(L_d2-L_d3)<15){
+            return (L_d1+L_d2+L_d3)/3
+        }
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
+                //消抖，小于30的不算做按压
                 if (L_d3 <= 30) {
                     return L_d3.toInt()
                 }
@@ -468,6 +472,7 @@ class DataVolatile {
                 if (ERR_FLAG == 0) {
                     Err_PrTotal(L_d1)
                 } else {
+
                     ERR_FLAG = 0;
                 }
                 PR_RUN_FLAG = 1;
@@ -637,7 +642,7 @@ class DataVolatile {
                     }
                 }
                 preTimeQY = changTimePress
-                Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
+               // Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
             }
 
         }
