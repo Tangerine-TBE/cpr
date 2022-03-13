@@ -63,6 +63,7 @@ class DataVolatile {
     private var QY_valueSet2 = mutableListOf<Int>()
     private var pt_valueSet = mutableListOf<Int>()
     private var deviceMAC: String? = null
+    private var QY_RUN_FLAG=0
 
     /**
      * array 数据列表
@@ -207,11 +208,19 @@ class DataVolatile {
             Log.e("TAG11", "当前的按压值$L_d1  $L_d2  $L_d3")
             Log.e("TAG11", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
             //判断是按压还是吹气，执行相应的动作
-            if(selectMax(QY_d1,QY_d2,QY_d3)>5&&preDistance-selectMin(L_d1, L_d2, L_d3)<20){
-                //吹气数据
+            /*
+            * 吹气状态的判断：
+            * 1：当三个值均为0，代表完成一次按压；
+            * 2：当有一个值小于5也默认完成一次按压
+            * */
+            if(selectMax(QY_d1,QY_d2,QY_d3)>10){
+                QY_RUN_FLAG=1
+            }
+            if(QY_RUN_FLAG==1){
                 Log.e("TAG11", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
             }else{
+                //吹气数据
                 Log.e("TAG11", "判断为按压状态")
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
                 //清空频率
@@ -405,9 +414,7 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
-        if(preDistance-L_d1<30&&preDistance-L_d2<30&&preDistance-L_d3<30&&abs(L_d1-L_d2)<15&&abs(L_d2-L_d3)<15){
-            return L_d2
-        }
+
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
@@ -644,6 +651,7 @@ class DataVolatile {
             QY_VOLUME_SUM += Qliang
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
+            QY_RUN_FLAG=0
             if (top_flag == 1) {
                 ERR_QyTotal(max(false))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
