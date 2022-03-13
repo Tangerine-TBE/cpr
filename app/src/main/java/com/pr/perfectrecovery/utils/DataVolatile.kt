@@ -80,6 +80,16 @@ class DataVolatile {
         }
         return maximum
     }
+    fun selectMax(L1:Int,L2:Int,L3:Int):Int{
+        var value1 = kotlin.math.max(L1, L2)
+        var value2 =kotlin.math.max(L2, L3)
+        return kotlin.math.max(value1, value2)
+    }
+    fun selectMin(L1:Int,L2:Int,L3:Int):Int{
+        var value1 = kotlin.math.min(L1, L2)
+        var value2 =kotlin.math.min(L2, L3)
+        return kotlin.math.min(value1, value2)
+    }
 
     /**
      * 获取吹气值和
@@ -169,10 +179,7 @@ class DataVolatile {
                     )
                 )
             )
-            L_Value = selectValue_P(L_d1, L_d2, L_d3)
-            //清空频率
-            pt(L_Value)
-            //吹气数据
+
             val QY_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
@@ -195,11 +202,21 @@ class DataVolatile {
                         22,
                         24
                     )
-                )
+                ),
             )
-
-            //不做气压值的算法处理
-            QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+            Log.e("TAG11", "当前的按压值$L_d1  $L_d2  $L_d3")
+            Log.e("TAG11", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
+            //判断是按压还是吹气，执行相应的动作
+            if(selectMin(QY_d1,QY_d2,QY_d3)>5&&preDistance-selectMin(L_d1, L_d2, L_d3)<20){
+                //吹气数据
+                Log.e("TAG11", "判断为吹气状态")
+                QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+            }else{
+                Log.e("TAG11", "判断为按压状态")
+                L_Value = selectValue_P(L_d1, L_d2, L_d3)
+                //清空频率
+                pt(L_Value)
+            }
 
             //频率
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
@@ -389,7 +406,7 @@ class DataVolatile {
             return preDistance.toInt()
         }
         if(preDistance-L_d1<30&&preDistance-L_d2<30&&preDistance-L_d3<30&&abs(L_d1-L_d2)<15&&abs(L_d2-L_d3)<15){
-            return (L_d1+L_d2+L_d3)/3
+            return L_d2
         }
         // int low_flag=0;
         if (L_d1 >= L_d2) {
@@ -626,7 +643,7 @@ class DataVolatile {
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
         }
-        if (QY_d1 == 0 && QY_d2 == 0 && QY_d3 == 0) {
+        if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             if (top_flag == 1) {
                 ERR_QyTotal(max(false))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
@@ -644,7 +661,6 @@ class DataVolatile {
                 preTimeQY = changTimePress
                // Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
             }
-
         }
         value = if (QY_d1 <= QY_d2) {
             if (QY_d2 <= QY_d3) {
@@ -666,7 +682,6 @@ class DataVolatile {
         }
         return value
     }
-
     //判断按压是否停止
     private val count = 20
     private fun pt(p: Int): Boolean {
