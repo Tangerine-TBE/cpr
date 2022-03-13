@@ -408,6 +408,7 @@ class DataVolatile {
             L_valueSet.add(index + 2, L_d3)
             index += 3
         }
+        //消除传感器自身的波动误差
         if (abs(preDistance - L_d1) < 10 && abs(preDistance - L_d2) < 10 && abs(preDistance - L_d3) < 10
         ) {
             low_flag = 0
@@ -428,10 +429,17 @@ class DataVolatile {
                 if (UNBACK_FLAG == 1) {
                     ERR_PR_UNBACK++
                     UNBACK_FLAG = 0
-                    Log.e("TAG7", "未回弹")
+                    //Log.e("TAG7", "未回弹")
                     ERR_FLAG = 1;
                 }
             } else {
+                //当最低点距离小于30时不作为按压一次处理
+                if(preDistance-L_d2<30){
+                    return L_d2
+                }
+                if(abs(L_d1-L_d2)<10&&abs(L_d1-L_d2)<10&&abs(L_d1-L_d2)<10){
+                    return L_d2
+                }
                 if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                     low_flag = 1
                     PR_SUM++
@@ -453,10 +461,6 @@ class DataVolatile {
                             } else if (MIN_FLAG == 2) {
                                 PR_DOTTIMSE_NUMBER = L_valueSet.size + 2
                             }
-                            for (item in L_valueSet) {
-                                Log.e("TAG8", "距离数 ${item}")
-                            }
-                            Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                             PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
                             PF_Value = (PF_Value + (60000 / (PR_DOTTIMSE_NUMBER * 40)).toInt()) / 2
                             if (PF_Value in 100..120) {
@@ -469,29 +473,22 @@ class DataVolatile {
                         PR_DEPTH_SUM += (preDistance - L_d2 + 5).toInt()
 
                     }
-                    // Log.e("TAG4", "$L_d2")
-                    /*val changTimePress = System.currentTimeMillis()
-                    if (PR_SUM > 1) {
-                        val time = changTimePress - preTimePress+40
-                        PF_Value = (PF_Value.toInt()+(60000 / time).toInt())/2
-                        if (PF_Value > 150) {
-                            PF_Value = 150;
-                        } else if (PF_Value < 60) {
-                            PF_Value = 60;
-                        }
-                      Log.e("TAG6", "PF值：$PF_Value")
-                    }
-                    preTimePress = changTimePress*/
+
                 }
                 MIN_FLAG = 1
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
             // PR_DOTTIMSE_NUMBER+=3
+            if(preDistance-L_d1<30){
+                return L_d1
+            }
+            if(abs(L_d2-L_d1)<10&&abs(L_d3-L_d2)<10&&abs(L_d3-L_d1)<10){
+                return L_d1
+            }
             if (low_flag == 0) {
                 low_flag = 1
                 PR_SUM++
-
                 // Log.e("TAG5", "$PR_SUM")
                 if (ERR_FLAG == 0) {
                     Err_PrTotal(L_d1)
@@ -511,10 +508,6 @@ class DataVolatile {
                         } else if (MIN_FLAG == 2) {
                             PR_DOTTIMSE_NUMBER = L_valueSet.size
                         }
-                        for (item in L_valueSet) {
-                            Log.e("TAG8", "距离数 ${item}")
-                        }
-                        Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                         PR_TIME_SUM += (PR_DOTTIMSE_NUMBER * 40).toInt()
                         PF_Value = (PF_Value + (60000 / (PR_DOTTIMSE_NUMBER * 40)).toInt()) / 2
                         if (PF_Value in 100..120) {
@@ -527,21 +520,6 @@ class DataVolatile {
                     PR_DEPTH_SUM += (preDistance - L_d1 + 5).toInt()
                 }
                 MIN_FLAG = 2
-                // Log.e("TAG6", "$L_d1")
-                /* val changTimePress = System.currentTimeMillis()
-                 if (PR_SUM > 1) {
-                     PR_RUN_FLAG=1;
-                     val time = changTimePress - preTimePress+70
-                     PF_Value = (PF_Value.toInt()+(60000 / time).toInt())/2
-                     if (PF_Value > 150) {
-                         PF_Value = 150;
-                     } else if (PF_Value < 60) {
-                         PF_Value = 60;
-                     }
-                      Log.e("TAG6", "PF值：$PF_Value")
-                 }
-                 preTimePress = changTimePress*/
-
                 value = L_d1
             } else {
                 // PR_DOTTIMSE_NUMBER+=3
