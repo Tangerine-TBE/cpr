@@ -26,5 +26,6 @@ object BaseConstant {
     //假的蓝牙地址
     val FAKE_MAC = "FAKE_MAC"
     val CLEAR_DEVICE_HISTORY_DATA = 10008
+    val DEVICE_DISCONNECTED = 10009
 
 }

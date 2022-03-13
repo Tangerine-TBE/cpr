@@ -326,6 +326,14 @@ class CPRActivity : BaseActivity() {
                         ToastUtils.showLong(bleDevice.name + getString(R.string.disconnected))
                         ObserverManager.getInstance().notifyObserver(bleDevice)
                     }
+                    EventBus.getDefault()
+                        .post(
+                            MessageEventData(
+                                BaseConstant.DEVICE_DISCONNECTED,
+                                bleDevice.mac,
+                                null
+                            )
+                        )
                     viewBinding.tvConnections.text = "设备连接数：${count}"
 
                     //断开蓝牙连接
