@@ -8,5 +8,5 @@
         android:drawable="@drawable/icon_wm_star_gray" />
     <item
         android:id="@android:id/progress"
-        android:drawable="@drawable/icon_wm_star_red" />
+        android:drawable="@drawable/icon_wm_star_y" />
 </layer-list>

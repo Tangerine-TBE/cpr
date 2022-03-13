@@ -4,6 +4,7 @@ import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.RatingBar
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
@@ -16,6 +17,7 @@ import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.bean.MessageEventData
+import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityMultiNewBinding
 import com.pr.perfectrecovery.databinding.CycleFragmentMultiItemBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
@@ -32,15 +34,15 @@ class MutiActivityNew : BaseActivity() {
     private var dataList = mutableListOf<BaseDataDTO>()
     private var isStart = false
     private var mTrainingBean: TrainingBean? = null
-    private val mHandler = object : Handler(Looper.getMainLooper()) {}
+    private val headTimeHandler = object : Handler(Looper.getMainLooper()) {}
     private var time: Long = 0
     private var timeZero: Long = 0
     private var counter = Counter()
     private var dataSize = 0
     private var isCheck: Boolean = false
-    private var mBaseDataDTO: BaseDataDTO? = null
+    private var mBaseDataDTOMap = mutableMapOf<String, BaseDataDTO>()
     private var configBean = ConfigBean()
-    private var cycleCount = 0
+    private var cycleCountMap = mutableMapOf<String, Int>()
     //按压少次
     private var prLessCount: Int = 0
     //按压多次
@@ -63,13 +65,17 @@ class MutiActivityNew : BaseActivity() {
     private var isTimeing = true
     /**处理循环次数- 以及考核 超次 少次 数据统计**/
     //当前是否为按压模式-吹气模式
-    private var cyclePrCount = 0
-    private var cycleQyCount = 0
-    private var isPr = false
-    private var isQy = false
-    private var startTime: Long = 0
+    private var cyclePrCountMap = mutableMapOf<String, Int>()
+    private var cycleQyCountMap = mutableMapOf<String, Int>()
+    private var isPrMap = mutableMapOf<String, Boolean>()
+    private var isQyMap = mutableMapOf<String, Boolean>()
+    private var isCycleMap = mutableMapOf<String, Boolean>()
+    private var startTimeMap = mutableMapOf<String, Long>()
     private var endTime: Long = 0
     private var currentShowView: ConstraintLayout? = null
+    private var curStudentIndex = 0
+    //是否已经结束
+    private var isOver = false
     //记录考核完成状态，onResume时恢复仪表盘
     private var hasDoneMap = mutableMapOf<String, Boolean>()
     private var handler:Handler = object :Handler(Looper.getMainLooper()) {
@@ -158,6 +164,11 @@ class MutiActivityNew : BaseActivity() {
             finish()
         }
         binding.oprLayout.ivStart.setOnClickListener {
+            if (isOver) {
+                val notice = "本次${if (isCheck) "考核" else "练习"}已结束"
+                ToastUtils.showShort(notice)
+                return@setOnClickListener
+            }
             isStart = !isStart
             if (isStart) {
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
@@ -166,13 +177,15 @@ class MutiActivityNew : BaseActivity() {
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvModel.setTextColor(resources.getColor(R.color.color_37B48B))
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
-                counter.let { mHandler.post(it) }
+                counter.let { headTimeHandler.post(it) }
             } else {
                 stopAllOutTime()
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                counter.let { mHandler.removeCallbacks(it) }
+                counter.let { headTimeHandler.removeCallbacks(it) }
+                showScore()
+                isOver = true
             }
         }
     }
@@ -217,12 +230,13 @@ class MutiActivityNew : BaseActivity() {
 
     private fun setViewDate(viewBinding:CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
-            mBaseDataDTO = dataDTO
+            mBaseDataDTOMap[dataDTO.mac] = dataDTO
             //计算循环次数
             cycle(dataDTO)
             //第一次按压或吹气才开始计时
+            val startTime = startTimeMap[dataDTO.mac] ?: 0L
             if(startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)){
-                startTime = System.currentTimeMillis()
+                startTimeMap[dataDTO.mac] = System.currentTimeMillis()
             }
             showView(viewBinding, dataDTO)
 //            //按压
@@ -276,8 +290,17 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun cycle(dataDTO: BaseDataDTO) {
-        if (cycleQyCount > 0 && !isQy && isPr) {
+//        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
+        val isPr = isPrMap[dataDTO.mac] ?: false
+        val isQy = isQyMap[dataDTO.mac] ?: false
+        val isCycle = isCycleMap[dataDTO.mac] ?: false
+        if (isQy && !isPr && !isCycle) {
+            isCycleMap[dataDTO.mac] = true
+            isQyMap[dataDTO.mac] = false
+            isPrMap[dataDTO.mac] = false
             if (isCheck) {
+                val cyclePrCount = cyclePrCountMap[dataDTO.mac] ?: 0
+                val cycleQyCount = cycleQyCountMap[dataDTO.mac] ?: 0
                 if (cyclePrCount > configBean.prCount) {
                     //按压超次
                     prManyCount += cyclePrCount - configBean.prCount
@@ -292,19 +315,12 @@ class MutiActivityNew : BaseActivity() {
                     //吹气少次
                     qyLessCount += configBean.qyCount - cycleQyCount
                 }
-                cyclePrCount = 0
-                cycleQyCount = 0
+                cyclePrCountMap[dataDTO.mac] = 0
+                cycleQyCountMap[dataDTO.mac] = 0
             }
-            cycleCount++
-            //更新循环次数
-            EventBus.getDefault()
-                .post(
-                    MessageEventData(
-                        BaseConstant.EVENT_SINGLE_DATA_CYCLE,
-                        "$cycleCount",
-                        null
-                    )
-                )
+            var cycleCount = cycleCountMap[dataDTO.mac] ?: 0
+            cycleCount ++
+            cycleCountMap[dataDTO.mac] = cycleCount
         }
     }
 
@@ -319,10 +335,13 @@ class MutiActivityNew : BaseActivity() {
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime(viewBinding, dataDTO)
-            cyclePrCount++
-            cycleQyCount = 0
-            isPr = true
-            isQy = false
+            var prCount = cyclePrCountMap[dataDTO.mac] ?: 0
+            prCount ++
+            cyclePrCountMap[dataDTO.mac] = prCount
+            cycleQyCountMap[dataDTO.mac] = 0
+            isPrMap[dataDTO.mac] = true
+            isQyMap[dataDTO.mac] = false
+            isCycleMap[dataDTO.mac] = false
             //按压位置错误
             if (err_pr_posi != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
                 err_pr_posi = dataDTO.err_pr_posi
@@ -386,9 +405,11 @@ class MutiActivityNew : BaseActivity() {
         }
         //记录吹气超次少次
         if (qyValue != dataDTO.qySum) {
-            cycleQyCount++
-            isQy = true
-            isPr = false
+            var qyCount = cycleQyCountMap[dataDTO.mac] ?: 0
+            qyCount++
+            cycleQyCountMap[dataDTO.mac] = qyCount
+            isQyMap[dataDTO.mac] = true
+            isPrMap[dataDTO.mac] = false
         }
 
         if (dataDTO.bpValue <= 0 && qyRate > 0) {
@@ -462,12 +483,11 @@ class MutiActivityNew : BaseActivity() {
             .create().show()
     }
 
-    var curStudentIndex = 0
     private inner class Counter : Runnable {
         override fun run() {
-            mHandler.postDelayed(this, 1000);//一秒钟循环计时一次
+            headTimeHandler.postDelayed(this, 1000);//一秒钟循环计时一次
             if (time <= 0) {
-                mHandler.removeCallbacks(counter)
+                headTimeHandler.removeCallbacks(counter)
             }
             if (!mTrainingBean?.isCheck!!) {
                 updateCycleData(timeZero)
@@ -486,7 +506,7 @@ class MutiActivityNew : BaseActivity() {
             curStudentIndex %= dataSize
             mTrainingBean?.list?.get(curStudentIndex)?.let {
                 binding.tvModel.text = "${it.count}"
-//                binding.tvCycle.text = adapter?.getCycleCount(it.mac).toString()
+                binding.tvCycle.text = "${cycleCountMap[it.mac] ?: 0}"
             }
             curStudentIndex ++
         }
@@ -559,6 +579,74 @@ class MutiActivityNew : BaseActivity() {
         handler.sendMessageDelayed(msg, delayTime)
     }
 
+    private fun showScore() {
+        dataList.forEach { data->
+            if (!TextUtils.equals(data.mac, BaseConstant.FAKE_MAC)) {
+                val item = getItemViewByMac(data.mac)
+                item.layoutLung.visibility = View.GONE
+                item.layoutPress.visibility = View.GONE
+                item.layoutScore.visibility = View.VISIBLE
+                val score = countScore()
+                var ratingBar : RatingBar = item.ratingBar
+                when(score) {
+                    in 0..20 ->{
+                        item.ratingBarRed.visibility = View.VISIBLE
+                        item.ratingBar.visibility = View.GONE
+                        item.ratingBarYellow.visibility = View.GONE
+                        ratingBar = item.ratingBarRed
+                    }
+                    in 21..60 ->{
+                        item.ratingBarYellow.visibility = View.VISIBLE
+                        item.ratingBar.visibility = View.GONE
+                        item.ratingBarRed.visibility = View.GONE
+                        ratingBar = item.ratingBarYellow
+                    }
+                    in 61..100 ->{
+                        item.ratingBar.visibility = View.VISIBLE
+                        item.ratingBarRed.visibility = View.GONE
+                        item.ratingBarYellow.visibility = View.GONE
+                        ratingBar = item.ratingBar
+                    }
+                }
+                item.tvScore.text = "$score"
+                ratingBar.rating = (5.0 * countScore() / 100).toFloat()
+
+                item.layoutScore.setOnClickListener {
+
+
+
+                    val mTrainingDTO = TrainingDTO()
+                    mTrainingDTO.isCheck = mTrainingBean!!.isCheck
+                    mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+                    mTrainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
+                    mTrainingDTO.prCount = configBean.prCount
+                    mTrainingDTO.qyCount = configBean.qyCount
+                    mTrainingDTO.pressScore = configBean.pressScore
+                    mTrainingDTO.blowScore = configBean.blowScore
+                    mTrainingDTO.processScore = configBean.processScore.toFloat()
+                    mTrainingDTO.deduction = configBean.deductionScore
+
+
+                    mTrainingDTO.check1 = true
+                    mTrainingDTO.check2 = true
+                    mTrainingDTO.check3 = true
+                    mTrainingDTO.check4 = true
+                    mTrainingDTO.check5 = true
+                    mTrainingDTO.check6 = true
+                    mTrainingDTO.check7 = true
+                    mTrainingDTO.check8 = true
+                    mTrainingDTO.check9 = true
+                    mTrainingDTO.check10 = true
+                    TrainResultActivity.start(this, mTrainingDTO)
+                }
+            }
+        }
+    }
+
+
+    private fun countScore() : Int{
+        return 80
+    }
 
     private fun initPress(binding: CycleFragmentMultiItemBinding) {
         binding.ivPressAim.visibility = View.INVISIBLE
@@ -571,9 +659,11 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun startTime(binding: CycleFragmentMultiItemBinding) {
-        binding.ctTime.visibility = View.VISIBLE
-        binding.ctTime.base = SystemClock.elapsedRealtime()
-        binding.ctTime.start()
+        if (isStart) {
+            binding.ctTime.visibility = View.VISIBLE
+            binding.ctTime.base = SystemClock.elapsedRealtime()
+            binding.ctTime.start()
+        }
     }
 
     private fun stopAllOutTime() {
@@ -593,7 +683,7 @@ class MutiActivityNew : BaseActivity() {
             isTimeOutMap[dataDTO.mac] = false
             viewBinding.ctTime.visibility = View.INVISIBLE
             timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.ctTime.base
-            mHandler.removeCallbacks(counter)
+            handler.removeCallbacks(counter)
             viewBinding.ctTime.base = SystemClock.elapsedRealtime()
             viewBinding.ctTime.stop()
         }
@@ -612,7 +702,7 @@ class MutiActivityNew : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        counter.let { mHandler.removeCallbacks(it) }
+        counter.let { headTimeHandler.removeCallbacks(it) }
         EventBus.getDefault().unregister(this)
     }
 }
