@@ -207,7 +207,7 @@ class DataVolatile {
             Log.e("TAG11", "当前的按压值$L_d1  $L_d2  $L_d3")
             Log.e("TAG11", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
             //判断是按压还是吹气，执行相应的动作
-            if(selectMin(QY_d1,QY_d2,QY_d3)>5&&preDistance-selectMin(L_d1, L_d2, L_d3)<20){
+            if(selectMax(QY_d1,QY_d2,QY_d3)>5&&preDistance-selectMin(L_d1, L_d2, L_d3)<20){
                 //吹气数据
                 Log.e("TAG11", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
