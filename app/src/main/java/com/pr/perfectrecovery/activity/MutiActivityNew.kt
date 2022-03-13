@@ -176,13 +176,7 @@ class MutiActivityNew : BaseActivity() {
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 counter.let { headTimeHandler.post(it) }
             } else {
-                stopAllOutTime()
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
-                binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
-                binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                counter.let { headTimeHandler.removeCallbacks(it) }
-                showScore()
-                isOver = true
+                stop()
             }
         }
     }
@@ -227,6 +221,14 @@ class MutiActivityNew : BaseActivity() {
 
     private fun setViewDate(viewBinding:CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
+            //判断是否已经完成考试
+            if (cycleCountMap[dataDTO.mac] == configBean.cycles) {
+                hasDoneMap[dataDTO.mac] = true
+                endTimeMap[dataDTO.mac] = System.currentTimeMillis()
+                showSingleScore(dataDTO.mac)
+                return
+            }
+
             mBaseDataDTOMap[dataDTO.mac] = dataDTO
             //计算循环次数
             cycle(dataDTO)
@@ -464,13 +466,13 @@ class MutiActivityNew : BaseActivity() {
         StatusLiveData.data.observe(this, Observer {
             Log.e(TAG, "prindata: mac: ${it.mac}, distance: ${it.distance}", )
             val view = getItemViewByMac(it.mac)
-            if (isStart)
+            if (isStart && hasDoneMap[it.mac] != true)
                 setViewDate(view, it)
         })
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public fun onEvent(event: MessageEventData) {
+    fun onEvent(event: MessageEventData) {
         when (event.code) {
             BaseConstant.DEVICE_DISCONNECTED -> {
                 // 断连置灰
@@ -510,8 +512,9 @@ class MutiActivityNew : BaseActivity() {
 
     private inner class Counter : Runnable {
         override fun run() {
-            headTimeHandler.postDelayed(this, 1000);//一秒钟循环计时一次
+            headTimeHandler.postDelayed(this, 1000)//一秒钟循环计时一次
             if (time <= 0) {
+                stop()
                 headTimeHandler.removeCallbacks(counter)
             }
             if (!mTrainingBean?.isCheck!!) {
@@ -596,6 +599,16 @@ class MutiActivityNew : BaseActivity() {
         view.invalidate()
     }
 
+    private fun stop() {
+        stopAllOutTime()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
+        binding.oprLayout.ivStart.setBackgroundResource(R.drawable.start_play_hight)
+        binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
+        counter.let { headTimeHandler.removeCallbacks(it) }
+        showAllScore()
+        isOver = true
+    }
+
     private fun sendMsg(type:Int, binding: CycleFragmentMultiItemBinding, delayTime:Long = 2000) {
         handler.removeMessages(type, binding)
         var msg = Message()
@@ -604,50 +617,54 @@ class MutiActivityNew : BaseActivity() {
         handler.sendMessageDelayed(msg, delayTime)
     }
 
-    private fun showScore() {
+    private fun showAllScore() {
         dataList.forEach { data->
-            if (!TextUtils.equals(data.mac, BaseConstant.FAKE_MAC)) {
-                val item = getItemViewByMac(data.mac)
-                item.layoutLung.visibility = View.GONE
-                item.layoutPress.visibility = View.GONE
-                item.layoutScore.visibility = View.VISIBLE
-                val score = countScore()
-                var ratingBar : RatingBar = item.ratingBar
-                when(score) {
-                    in 0..20 ->{
-                        item.ratingBarRed.visibility = View.VISIBLE
-                        item.ratingBar.visibility = View.GONE
-                        item.ratingBarYellow.visibility = View.GONE
-                        ratingBar = item.ratingBarRed
-                    }
-                    in 21..60 ->{
-                        item.ratingBarYellow.visibility = View.VISIBLE
-                        item.ratingBar.visibility = View.GONE
-                        item.ratingBarRed.visibility = View.GONE
-                        ratingBar = item.ratingBarYellow
-                    }
-                    in 61..100 ->{
-                        item.ratingBar.visibility = View.VISIBLE
-                        item.ratingBarRed.visibility = View.GONE
-                        item.ratingBarYellow.visibility = View.GONE
-                        ratingBar = item.ratingBar
-                    }
-                }
-                item.tvScore.text = "$score"
-                ratingBar.rating = (5.0 * countScore() / 100).toFloat()
+            showSingleScore(data.mac)
+        }
+    }
 
-                item.layoutScore.setOnClickListener {
-                    gotoDetail(data)
+    private fun showSingleScore(mac: String) {
+        if (!TextUtils.equals(mac, BaseConstant.FAKE_MAC)) {
+            val item = getItemViewByMac(mac)
+            item.layoutLung.visibility = View.GONE
+            item.layoutPress.visibility = View.GONE
+            item.layoutScore.visibility = View.VISIBLE
+            val score = countScore()
+            var ratingBar : RatingBar = item.ratingBar
+            when(score) {
+                in 0..20 ->{
+                    item.ratingBarRed.visibility = View.VISIBLE
+                    item.ratingBar.visibility = View.GONE
+                    item.ratingBarYellow.visibility = View.GONE
+                    ratingBar = item.ratingBarRed
                 }
+                in 21..60 ->{
+                    item.ratingBarYellow.visibility = View.VISIBLE
+                    item.ratingBar.visibility = View.GONE
+                    item.ratingBarRed.visibility = View.GONE
+                    ratingBar = item.ratingBarYellow
+                }
+                in 61..100 ->{
+                    item.ratingBar.visibility = View.VISIBLE
+                    item.ratingBarRed.visibility = View.GONE
+                    item.ratingBarYellow.visibility = View.GONE
+                    ratingBar = item.ratingBar
+                }
+            }
+            item.tvScore.text = "$score"
+            ratingBar.rating = (5.0 * countScore() / 100).toFloat()
+
+            item.layoutScore.setOnClickListener {
+                gotoDetail(mac)
             }
         }
     }
 
-    private fun gotoDetail(data :BaseDataDTO) {
+    private fun gotoDetail(mac: String) {
         val mTrainingDTO = TrainingDTO()
         mTrainingDTO.isCheck = mTrainingBean!!.isCheck
         mTrainingBean?.list?.forEach {
-            if (TextUtils.equals(it.mac, data.mac))
+            if (TextUtils.equals(it.mac, mac))
                 mTrainingDTO.name = it.name
         }
 
@@ -671,29 +688,29 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.check9 = true
         mTrainingDTO.check10 = true
 
-        mTrainingDTO.startTime = startTimeMap[data.mac] ?: 0
-        mTrainingDTO.endTime = endTimeMap[data.mac] ?: 0
-        mTrainingDTO.pressOutTime = timeOutTotalMap[data.mac] ?: 0
-        mTrainingDTO.pressHigh = errPrHighMap[data.mac] ?: 0
-        mTrainingDTO.pressLow = errPrLowMap[data.mac] ?: 0
-        mTrainingDTO.pressLocation = errPrPosiMap[data.mac] ?: 0
+        mTrainingDTO.startTime = startTimeMap[mac] ?: 0
+        mTrainingDTO.endTime = endTimeMap[mac] ?: 0
+        mTrainingDTO.pressOutTime = timeOutTotalMap[mac] ?: 0
+        mTrainingDTO.pressHigh = errPrHighMap[mac] ?: 0
+        mTrainingDTO.pressLow = errPrLowMap[mac] ?: 0
+        mTrainingDTO.pressLocation = errPrPosiMap[mac] ?: 0
         //按压总错误数
-        mTrainingDTO.pressErrorCount = mBaseDataDTOMap[data.mac]!!.getPr_err_total().toFloat()
+        mTrainingDTO.pressErrorCount = mBaseDataDTOMap[mac]!!.getPr_err_total().toFloat()
         //吹气总错误数
-        mTrainingDTO.blowErrorCount = mBaseDataDTOMap[data.mac]!!.getQy_err_total().toFloat()
+        mTrainingDTO.blowErrorCount = mBaseDataDTOMap[mac]!!.getQy_err_total().toFloat()
         //超次少次
-        mTrainingDTO.prManyCount = prManyCountMap[data.mac] ?: 0
-        mTrainingDTO.prLessCount = prLessCountMap[data.mac] ?: 0
-        mTrainingDTO.qyManyCount = qyManyCountMap[data.mac] ?: 0
-        mTrainingDTO.qyLessCount = qyLessCountMap[data.mac] ?: 0
+        mTrainingDTO.prManyCount = prManyCountMap[mac] ?: 0
+        mTrainingDTO.prLessCount = prLessCountMap[mac] ?: 0
+        mTrainingDTO.qyManyCount = qyManyCountMap[mac] ?: 0
+        mTrainingDTO.qyLessCount = qyLessCountMap[mac] ?: 0
 
-        mTrainingDTO.pr_depth_sum = mBaseDataDTOMap[data.mac]!!.pr_depth_sum
-        mTrainingDTO.pr_time_sum = mBaseDataDTOMap[data.mac]!!.pr_time_sum.toFloat()
-        mTrainingDTO.qy_volume_sum = mBaseDataDTOMap[data.mac]!!.qy_volume_sum
-        mTrainingDTO.qy_time_sum = mBaseDataDTOMap[data.mac]!!.qy_time_sum.toFloat()
-        mTrainingDTO.pr_seqright_total = mBaseDataDTOMap[data.mac]!!.pr_seqright_total
-        mTrainingDTO.qy_serright_total = mBaseDataDTOMap[data.mac]!!.qy_serright_total
-        mTrainingDTO.qy_max_volume_sum = mBaseDataDTOMap[data.mac]!!.qy_max_volume_sum
+        mTrainingDTO.pr_depth_sum = mBaseDataDTOMap[mac]!!.pr_depth_sum
+        mTrainingDTO.pr_time_sum = mBaseDataDTOMap[mac]!!.pr_time_sum.toFloat()
+        mTrainingDTO.qy_volume_sum = mBaseDataDTOMap[mac]!!.qy_volume_sum
+        mTrainingDTO.qy_time_sum = mBaseDataDTOMap[mac]!!.qy_time_sum.toFloat()
+        mTrainingDTO.pr_seqright_total = mBaseDataDTOMap[mac]!!.pr_seqright_total
+        mTrainingDTO.qy_serright_total = mBaseDataDTOMap[mac]!!.qy_serright_total
+        mTrainingDTO.qy_max_volume_sum = mBaseDataDTOMap[mac]!!.qy_max_volume_sum
         TrainResultActivity.start(this, mTrainingDTO)
     }
 
@@ -720,13 +737,14 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun stopAllOutTime() {
+        val endTime = System.currentTimeMillis()
         dataList.forEach {
             if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC)) {
+                endTimeMap[it.mac] = endTime
                 val b = getItemViewByMac(it.mac)
                 b.ctTime.stop()
             }
         }
-
     }
 
     private fun stopOutTime(viewBinding:CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
