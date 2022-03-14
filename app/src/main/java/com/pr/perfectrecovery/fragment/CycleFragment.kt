@@ -434,6 +434,7 @@ class CycleFragment : Fragment() {
         if (isCheck) {
             if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
                 isCheck = false
+                qyMany()
                 //结束跳转至结果页面
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_END, "", null))
