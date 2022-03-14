@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_color">
 
     <ImageView
-        android:id="@+id/ivIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/icon_wm_more"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/ivIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/icon_wm_more"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/mRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon"
-        tools:itemCount="6"
-        tools:listitem="@layout/item_student_more" />
+            android:id="@+id/mRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/ivIcon"
+            tools:itemCount="6"
+            tools:listitem="@layout/item_student_more" />
 
     <TextView
-        android:id="@+id/tv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="65dp"
-        android:layout_marginTop="@dimen/dp_20"
-        android:text="操作模式 ："
-        android:textColor="#ffffffff"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mRecyclerView" />
+            android:id="@+id/tv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="65dp"
+            android:layout_marginTop="@dimen/dp_20"
+            android:text="操作模式 ："
+            android:textColor="#ffffffff"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mRecyclerView" />
 
     <CheckBox
-        android:id="@+id/cbTraining"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_24"
-        android:button="@drawable/checkbox_bg"
-        android:checked="true"
-        android:paddingStart="@dimen/dp_4"
-        android:text="练习"
-        android:textColor="@color/color_37B48B"
-        android:textSize="@dimen/text_16"
-        app:layout_constraintBottom_toBottomOf="@+id/tv1"
-        app:layout_constraintStart_toEndOf="@+id/tv1"
-        app:layout_constraintTop_toTopOf="@+id/tv1" />
+            android:id="@+id/cbTraining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_24"
+            android:button="@drawable/checkbox_bg"
+            android:checked="true"
+            android:paddingStart="@dimen/dp_4"
+            android:text="练习"
+            android:textColor="@color/color_37B48B"
+            android:textSize="@dimen/text_16"
+            app:layout_constraintBottom_toBottomOf="@+id/tv1"
+            app:layout_constraintStart_toEndOf="@+id/tv1"
+            app:layout_constraintTop_toTopOf="@+id/tv1" />
 
     <CheckBox
-        android:id="@+id/cbCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_24"
-        android:button="@drawable/checkbox_bg"
-        android:checked="false"
-        android:paddingStart="@dimen/dp_4"
-        android:text="考核"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_16"
-        app:layout_constraintBottom_toBottomOf="@+id/cbTraining"
-        app:layout_constraintStart_toEndOf="@+id/cbTraining"
-        app:layout_constraintTop_toTopOf="@+id/cbTraining" />
+            android:id="@+id/cbCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_24"
+            android:button="@drawable/checkbox_bg"
+            android:checked="false"
+            android:paddingStart="@dimen/dp_4"
+            android:text="考核"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_16"
+            app:layout_constraintBottom_toBottomOf="@+id/cbTraining"
+            app:layout_constraintStart_toEndOf="@+id/cbTraining"
+            app:layout_constraintTop_toTopOf="@+id/cbTraining" />
 
     <View
-        android:id="@+id/viewline"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginStart="@dimen/dp_16"
-        android:layout_marginTop="@dimen/dp_20"
-        android:layout_marginEnd="@dimen/dp_16"
-        android:background="#1eFFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv1" />
+            android:id="@+id/viewline"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginStart="@dimen/dp_16"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_marginEnd="@dimen/dp_16"
+            android:background="#1eFFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv1" />
 </androidx.constraintlayout.widget.ConstraintLayout>

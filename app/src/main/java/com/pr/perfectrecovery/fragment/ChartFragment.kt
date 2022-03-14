@@ -86,7 +86,7 @@ class ChartFragment : Fragment() {
                 addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
-                    val qyMax = it.qyMax()
+                    val qyMax = it.qyMaxValue
                     addBarEntry(it.qyValueSum, qyMax)
                 } else {
                     addBarEntry(0, 0)
@@ -115,7 +115,7 @@ class ChartFragment : Fragment() {
         if (depth == 0 || depth > data.preDistance - 5) {
             return 0f
         } else if (depth > data.PR_HIGH_VALUE + 20) {
-            return 9.9f
+            return 9.5f
         } else if (depth > data.PR_HIGH_VALUE + 15) {
             return 9.0f
         } else if (depth > data.PR_HIGH_VALUE + 10) {

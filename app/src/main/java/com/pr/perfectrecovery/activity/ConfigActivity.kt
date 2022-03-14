@@ -112,7 +112,7 @@ class ConfigActivity : BaseActivity() {
 
         override fun afterTextChanged(p0: Editable?) {
             val value = p0.toString().trim()
-            if (TextUtils.isEmpty(value) || value.toInt() > 11 || value.toInt() < 0) {
+            if (TextUtils.isEmpty(value) || value.toInt() > 10 || value.toInt() < 1) {
                 viewBinding.tvMsg.text = "按压深度输入范围：整数1～10"
             } else {
                 if (!TextUtils.isEmpty(viewBinding.etDepth.text.toString().trim())) {
@@ -302,11 +302,12 @@ class ConfigActivity : BaseActivity() {
         override fun afterTextChanged(p0: Editable?) {
             //中断扣分
             val value = p0.toString().trim()
-            if (!TextUtils.isEmpty(value) && value.toInt() in 10..600) {
-                dataDTO?.cycles = value.toInt()
+            if (!TextUtils.isEmpty(value) && value.toInt() in 60..600) {
+                viewBinding.tvMsg2.text = ""
+                dataDTO?.operationTime = value.toInt()
                 save()
             } else {
-                viewBinding.tvMsg.text = "操作时长输入范围：10-600（s）"
+                viewBinding.tvMsg2.text = "操作时长输入范围：60-600（s）"
             }
         }
     }

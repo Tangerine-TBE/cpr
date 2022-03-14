@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_color">
 
     <ImageView
-        android:id="@+id/ivLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_60"
-        android:src="@mipmap/icon_wm_logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvCPR"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="@dimen/dp_80"
-        android:drawablePadding="@dimen/dp_4"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:text="@string/home_cpr"
-        android:textColor="#ffffffff"
-        android:textSize="18sp"
-        app:drawableTopCompat="@mipmap/icon_wm_cpr"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
-
-    <TextView
-        android:id="@+id/tvStatistical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="55dp"
-        android:drawablePadding="@dimen/dp_4"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:text="@string/home_statistical"
-        android:textColor="#ffffffff"
-        android:textSize="18sp"
-        app:drawableTopCompat="@mipmap/icon_wm_attedndace"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvCPR" />
-
-    <TextView
-        android:id="@+id/tvSetting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_40"
-        android:drawablePadding="@dimen/dp_4"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:text="@string/home_setting"
-        android:textColor="#ffffffff"
-        android:textSize="18sp"
-        app:drawableTopCompat="@mipmap/icon_wm_setting"
-        app:layout_constraintEnd_toEndOf="@+id/tvCPR"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/tvCPR"
-        app:layout_constraintTop_toBottomOf="@+id/tvCPR" />
-
-    <TextView
-        android:id="@+id/tvExit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_40"
-        android:drawablePadding="@dimen/dp_4"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:text="@string/home_exit"
-        android:textColor="#ffffffff"
-        android:textSize="18sp"
-        app:drawableTopCompat="@mipmap/icon_wm_exit"
-        app:layout_constraintEnd_toEndOf="@+id/tvStatistical"
-        app:layout_constraintStart_toStartOf="@+id/tvStatistical"
-        app:layout_constraintTop_toBottomOf="@+id/tvStatistical" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="66dp"
-        android:background="#22231D"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:id="@+id/tvVersion"
+            android:id="@+id/ivLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawablePadding="@dimen/dp_6"
-            android:gravity="center"
-            android:text="@string/home_version"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_13"
-            android:textStyle="bold"
-            app:drawableTopCompat="@mipmap/icon_wm_bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/dp_60"
+            android:src="@mipmap/icon_wm_logo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/tvCPR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="55dp"
+            android:layout_marginTop="@dimen/dp_80"
+            android:drawablePadding="@dimen/dp_4"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/home_cpr"
+            android:textColor="#ffffffff"
+            android:textSize="18sp"
+            app:drawableTopCompat="@mipmap/icon_wm_cpr"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
+
+    <TextView
+            android:id="@+id/tvStatistical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="55dp"
+            android:drawablePadding="@dimen/dp_4"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/home_statistical"
+            android:textColor="#ffffffff"
+            android:textSize="18sp"
+            app:drawableTopCompat="@mipmap/icon_wm_attedndace"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvCPR" />
+
+    <TextView
+            android:id="@+id/tvSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_40"
+            android:drawablePadding="@dimen/dp_4"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/home_setting"
+            android:textColor="#ffffffff"
+            android:textSize="18sp"
+            app:drawableTopCompat="@mipmap/icon_wm_setting"
+            app:layout_constraintEnd_toEndOf="@+id/tvCPR"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvCPR"
+            app:layout_constraintTop_toBottomOf="@+id/tvCPR" />
+
+    <TextView
+            android:id="@+id/tvExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_40"
+            android:drawablePadding="@dimen/dp_4"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/home_exit"
+            android:textColor="#ffffffff"
+            android:textSize="18sp"
+            app:drawableTopCompat="@mipmap/icon_wm_exit"
+            app:layout_constraintEnd_toEndOf="@+id/tvStatistical"
+            app:layout_constraintStart_toStartOf="@+id/tvStatistical"
+            app:layout_constraintTop_toBottomOf="@+id/tvStatistical" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:background="#22231D"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+                android:id="@+id/tvVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/dp_6"
+                android:gravity="center"
+                android:text="@string/home_version"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_13"
+                android:textStyle="bold"
+                app:drawableTopCompat="@mipmap/icon_wm_bottom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

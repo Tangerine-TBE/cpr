@@ -13,7 +13,7 @@
     <!-- 底部 -->
     <item android:bottom="@dimen/dp_40">
         <bitmap
-            android:gravity="bottom|center_horizontal"
-            android:src="@mipmap/icon_wm_logo" />
+                android:gravity="bottom|center_horizontal"
+                android:src="@mipmap/icon_wm_logo" />
     </item>
 </layer-list>

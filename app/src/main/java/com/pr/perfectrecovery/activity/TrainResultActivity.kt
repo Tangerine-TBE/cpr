@@ -9,6 +9,8 @@ import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
 import com.pr.perfectrecovery.utils.TimeUtils
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 /**
@@ -61,7 +63,7 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.gruops.visibility = View.GONE
             viewBinding.layoutCheck.tvName.text = "${trainingDTO.name}"
             viewBinding.layoutCheck.tvScale.text = "${trainingDTO.prCount}:${trainingDTO.qyCount}"
-            //倒计时
+            //操作时长倒计时
             viewBinding.layoutCheck.tvCountdown.text = TimeUtils.timeParse(trainingDTO.operateTime)
             //流程分数
             viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}分"
@@ -74,11 +76,14 @@ class TrainResultActivity : BaseActivity() {
 
             /*-----------------------------总结得分项----------------------------------*/
             //按压得分
-            viewBinding.layoutCheck.tvPressScore.text = "${trainingDTO.getPrScore()}"
+            viewBinding.layoutCheck.tvPressScore.text =
+                "${getNoMoreThanTwoDigits(trainingDTO.getPrScore())}"
             //中断扣分
-            viewBinding.layoutCheck.tvInterruptScore.text = "${trainingDTO.getTimeOutScore()}"
+            viewBinding.layoutCheck.tvInterruptScore.text =
+                "${getNoMoreThanTwoDigits(trainingDTO.getTimeOutScore())}"
             //通气得分
-            viewBinding.layoutCheck.tvVentilationScore.text = "${trainingDTO.getQyScore()}"
+            viewBinding.layoutCheck.tvVentilationScore.text =
+                "${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
             val scoreTotal =
@@ -86,7 +91,7 @@ class TrainResultActivity : BaseActivity() {
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.progress = scoreTotal.roundToInt()
             //总得分
-            viewBinding.layoutCheck.tvScore.text = "${scoreTotal}"
+            viewBinding.layoutCheck.tvScore.text = "${getNoMoreThanTwoDigits(scoreTotal)}"
             //总分数
             trainingDTO.score = scoreTotal
 
@@ -112,15 +117,15 @@ class TrainResultActivity : BaseActivity() {
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
         //按压位置错误
-        viewBinding.tvLocation.text = "${trainingDTO.pressLocation}"
+        viewBinding.tvLocation.text = "${trainingDTO.err_pr_posi}"
         //按压不足
-        viewBinding.tvInsufficient.text = "${trainingDTO.pressLow}"
+        viewBinding.tvInsufficient.text = "${trainingDTO.err_pr_low}"
         //按压过大
-        viewBinding.tvPressBig.text = "${trainingDTO.pressHigh}"
+        viewBinding.tvPressBig.text = "${trainingDTO.err_pr_high}"
         //按压未回弹
-        viewBinding.tvRebound.text = "${trainingDTO.pressRebound.toInt()}"
+        viewBinding.tvRebound.text = "${trainingDTO.err_pr_unback}"
         //按压超时统计时间
-        viewBinding.tvPressTime.text = "${TimeUtils.timeParse(trainingDTO.pressOutTime)}"
+        viewBinding.tvPressTime.text = "${TimeUtils.timeParse(trainingDTO.timeOutTotal)}"
         //平均每分钟按压次数
         viewBinding.tvAverageCount.text = "平均：${trainingDTO.getPressAverageTimes()}次/分"
         //按压频率合格率
@@ -140,11 +145,11 @@ class TrainResultActivity : BaseActivity() {
         //吹气错误
         viewBinding.tvAirway.text = "${trainingDTO.err_qy_close}"
         //吹气不足
-        viewBinding.tvCInsufficient.text = "${trainingDTO.blowLow}"
+        viewBinding.tvCInsufficient.text = "${trainingDTO.err_qy_low}"
         //吹气过大
-        viewBinding.tvBLowBig.text = "${trainingDTO.blowHigh}"
+        viewBinding.tvBLowBig.text = "${trainingDTO.err_qy_high}"
         //吹气进胃
-        viewBinding.tvIntoStomach.text = "${trainingDTO.blowIntoStomach}"
+        viewBinding.tvIntoStomach.text = "${trainingDTO.err_qy_dead}"
         //平均吹气每分钟次数
         viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
         //吹气频率百分比
@@ -155,6 +160,19 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
 
         trainingDTO.save()
+    }
+
+    /**
+     * 对入参保留最多两位小数(舍弃末尾的0)，如:
+     * 3.345->3.34
+     * 3.40->3.4
+     * 3.0->3
+     */
+    fun getNoMoreThanTwoDigits(number: Float): String {
+        val format = DecimalFormat("0.#")
+        //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+        format.roundingMode = RoundingMode.HALF_UP
+        return format.format(number)
     }
 
     /**

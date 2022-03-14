@@ -348,7 +348,19 @@
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="@+id/view1"
                             app:layout_constraintStart_toEndOf="@+id/view1"
-                            app:layout_constraintTop_toTopOf="@+id/view1" />
+                            app:layout_constraintTop_toTopOf="@+id/view1"
+                            android:id="@+id/textView13" />
+
+                    <TextView
+                            android:id="@+id/tvMsg2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/dp_20"
+                            android:textColor="@color/color_text_selected"
+                            android:textSize="14sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/textView13"
+                            app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout

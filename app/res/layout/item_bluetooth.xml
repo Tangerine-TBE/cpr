@@ -1,186 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:foreground="?android:attr/selectableItemBackground">
-
-    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#22231D"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
-        app:cardPreventCornerOverlap="false"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toTopOf="parent">
+        android:foreground="?android:attr/selectableItemBackground">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:paddingStart="@dimen/dp_10"
-            android:paddingEnd="@dimen/dp_10"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#22231D"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="true"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/ivDot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_10"
-                android:src="@drawable/dot_8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvBluetoothName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_4"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_14"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/ivDot"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvBluetoothStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_40"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_18"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/tvBluetoothName"
-                app:layout_constraintStart_toEndOf="@+id/tvBluetoothName"
-                app:layout_constraintTop_toTopOf="@+id/tvBluetoothName" />
-
-            <com.pr.perfectrecovery.view.BatteryView
-                android:id="@+id/battery"
-                android:layout_width="32dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="@dimen/dp_10"
-                android:layout_marginEnd="@dimen/dp_12"
-                android:background="#fff"
-                android:gravity="center"
-                android:visibility="gone"
-                app:batteryColor="@android:color/white"
-                app:batteryOrientation="horizontal"
-                app:batteryPower="70"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvPower"
-                android:layout_width="32dp"
-                android:layout_height="16dp"
-                android:layout_marginStart="@dimen/dp_10"
-                android:layout_marginEnd="@dimen/dp_12"
-                android:gravity="center"
-                android:text="70%"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_12"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/loadingDot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/dp_8"
-                android:orientation="horizontal"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvBluetoothStatus"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:background="@drawable/dot_wihte_5dp" />
+            <ImageView
+                    android:id="@+id/ivDot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:src="@drawable/dot_8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvBluetoothName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_4"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_14"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ivDot"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvBluetoothStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_40"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_18"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvBluetoothName"
+                    app:layout_constraintStart_toEndOf="@+id/tvBluetoothName"
+                    app:layout_constraintTop_toTopOf="@+id/tvBluetoothName" />
+
+            <com.pr.perfectrecovery.view.BatteryView
+                    android:id="@+id/battery"
+                    android:layout_width="32dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_12"
+                    android:background="#fff"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    app:batteryColor="@android:color/white"
+                    app:batteryOrientation="horizontal"
+                    app:batteryPower="70"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvPower"
+                    android:layout_width="32dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_12"
+                    android:gravity="center"
+                    android:text="70%"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_12"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                    android:id="@+id/loadingDot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/dp_8"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvBluetoothStatus"
+                    app:layout_constraintTop_toTopOf="parent">
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_wihte_alpah_90_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:background="@drawable/dot_wihte_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_wihte_alpah_80_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_wihte_alpah_90_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_wihte_alpah_70_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_wihte_alpah_80_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_wihte_alpah_50_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_wihte_alpah_70_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_wihte_alpah_30_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_wihte_alpah_50_5dp" />
+
+                <View
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_wihte_alpah_30_5dp" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/loadingDot2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/dp_8"
-                android:orientation="horizontal"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvBluetoothStatus"
-                app:layout_constraintTop_toTopOf="parent">
+                    android:id="@+id/loadingDot2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/dp_8"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvBluetoothStatus"
+                    app:layout_constraintTop_toTopOf="parent">
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:background="@drawable/dot_grenn_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:background="@drawable/dot_grenn_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_grenn_alpah_90_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_grenn_alpah_90_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_grenn_alpah_80_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_grenn_alpah_80_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_grenn_alpah_70_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_grenn_alpah_70_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_grenn_alpah_30_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_grenn_alpah_30_5dp" />
 
                 <View
-                    android:layout_width="5dp"
-                    android:layout_height="5dp"
-                    android:layout_marginStart="@dimen/dp_4"
-                    android:background="@drawable/dot_grenn_alpah_10_5dp" />
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:background="@drawable/dot_grenn_alpah_10_5dp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

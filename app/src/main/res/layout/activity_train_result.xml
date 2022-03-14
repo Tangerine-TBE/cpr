@@ -359,7 +359,6 @@
                                 android:id="@+id/tvRebound"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="@dimen/dp_12"
                                 android:text="0次"
                                 android:textColor="@color/color_text_selected"
                                 android:textSize="18sp"
@@ -408,7 +407,7 @@
                                 android:textSize="14sp"
                                 android:layout_marginTop="@dimen/dp_6"
                                 app:layout_constraintTop_toBottomOf="@+id/viewline3"
-                                app:layout_constraintEnd_toEndOf="@+id/tvRebound" />
+                                app:layout_constraintEnd_toEndOf="@+id/tv23" />
 
                         <TextView
                                 android:id="@+id/tvSmallBoutCount"
@@ -418,8 +417,7 @@
                                 android:textColor="@color/color_text_selected"
                                 android:textSize="18sp"
                                 app:layout_constraintTop_toBottomOf="@+id/tvSmallBout"
-                                app:layout_constraintEnd_toEndOf="@+id/tvSmallBout"
-                                app:layout_constraintStart_toStartOf="@+id/tvRebound" />
+                                app:layout_constraintEnd_toEndOf="@+id/tvSmallBout" />
 
                         <androidx.constraintlayout.widget.Group
                                 android:id="@+id/groupPr"
@@ -589,7 +587,7 @@
                                 android:textSize="14sp"
                                 android:layout_marginTop="@dimen/dp_6"
                                 app:layout_constraintTop_toBottomOf="@+id/viewline4"
-                                app:layout_constraintEnd_toEndOf="@+id/tvIntoStomach" />
+                                app:layout_constraintEnd_toEndOf="@+id/tv7" />
 
                         <TextView
                                 android:id="@+id/tvBlowSmallCount"
@@ -599,8 +597,7 @@
                                 android:textColor="@color/color_text_selected"
                                 android:textSize="18sp"
                                 app:layout_constraintTop_toBottomOf="@+id/tvBlowSmallBout"
-                                app:layout_constraintEnd_toEndOf="@+id/tvBlowSmallBout"
-                                app:layout_constraintStart_toStartOf="@+id/tvBlowSmallBout" />
+                                app:layout_constraintEnd_toEndOf="@+id/tvBlowSmallBout" />
 
                         <androidx.constraintlayout.widget.Group
                                 android:id="@+id/groupQy"

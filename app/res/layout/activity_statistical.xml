@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color"
-    tools:context=".activity.StatisticalActivity">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_color"
+        tools:context=".activity.StatisticalActivity">
 
     <include
-        android:id="@+id/top"
-        layout="@layout/layout_top"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_48"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintlayout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#3DB38E"
-        app:layout_constraintTop_toBottomOf="@+id/top">
-
-        <TextView
-            android:id="@+id/tv1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
-            android:text="姓名"
-            android:textColor="#ffffffff"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv2"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/top"
+            layout="@layout/layout_top"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_48"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tv2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="模式"
-            android:textColor="#ffffffff"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@+id/tv3"
-            app:layout_constraintStart_toEndOf="@+id/tv1"
-            app:layout_constraintTop_toTopOf="@+id/tv1" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintlayout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#3DB38E"
+            app:layout_constraintTop_toBottomOf="@+id/top">
 
         <TextView
-            android:id="@+id/tv3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="操作时间"
-            android:textColor="#ffffffff"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@+id/tv4"
-            app:layout_constraintStart_toEndOf="@+id/tv2"
-            app:layout_constraintTop_toTopOf="@+id/tv2" />
+                android:id="@+id/tv1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_30"
+                android:text="姓名"
+                android:textColor="#ffffffff"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tv2"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/dp_30"
-            android:text="结果"
-            android:textColor="#ffffffff"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tv3"
-            app:layout_constraintTop_toTopOf="@+id/tv3" />
+                android:id="@+id/tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="模式"
+                android:textColor="#ffffffff"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/tv3"
+                app:layout_constraintStart_toEndOf="@+id/tv1"
+                app:layout_constraintTop_toTopOf="@+id/tv1" />
+
+        <TextView
+                android:id="@+id/tv3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="操作时间"
+                android:textColor="#ffffffff"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/tv4"
+                app:layout_constraintStart_toEndOf="@+id/tv2"
+                app:layout_constraintTop_toTopOf="@+id/tv2" />
+
+        <TextView
+                android:id="@+id/tv4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dp_30"
+                android:text="结果"
+                android:textColor="#ffffffff"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv3"
+                app:layout_constraintTop_toTopOf="@+id/tv3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.yanzhenjie.recyclerview.SwipeRecyclerView
-        android:id="@+id/recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom"
-        app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottom"
+            app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
 
     <include
-        android:id="@+id/bottom"
-        layout="@layout/layout_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+            android:id="@+id/bottom"
+            layout="@layout/layout_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

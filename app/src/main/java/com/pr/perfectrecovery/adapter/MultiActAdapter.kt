@@ -31,7 +31,7 @@ import kotlin.math.abs
 class MultiActAdapter :
     BaseQuickAdapter<BaseDataDTO, BaseViewHolder>(R.layout.cycle_fragment_multi_item) {
     private var configBean = ConfigBean()
-    private var isCheck:Boolean = false
+    private var isCheck: Boolean = false
     private var cycleCount = 0
     private var cyclePrCount = 0
     private var prManyCount = 0
@@ -41,20 +41,25 @@ class MultiActAdapter :
     private var qyLessCount = 0
     private var mBaseData: BaseDataDTO? = null
     private var prValue = 0
+
     //按压位置错误
     private var err_pr_posi = 0
+
     //按压未回弹
     private var err_qr_unback = 0
+
     // 按压不足
     private var err_pr_low = 0
+
     // 按压过大
     private var err_pr_high = 0
+
     // 按压总数
     private var pressCount = 0
     private var isTimeing = false
     private var qyValue = 0
     private var qyRate = 0
-    private var currentShowView:ConstraintLayout? = null
+    private var currentShowView: ConstraintLayout? = null
 
     init {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
@@ -62,7 +67,10 @@ class MultiActAdapter :
     }
 
     override fun convert(holder: BaseViewHolder, item: BaseDataDTO) {
-        Log.e("MultiActivity.TAG", "updateData: index: ${holder.adapterPosition}, data is: ${item.mac}}", )
+        Log.e(
+            "MultiActivity.TAG",
+            "updateData: index: ${holder.adapterPosition}, data is: ${item.mac}}",
+        )
         val viewBinding = CycleFragmentMultiItemBinding.bind(holder.itemView)
         showPosition(viewBinding, holder.adapterPosition)
         showView(viewBinding, item)
@@ -70,7 +78,7 @@ class MultiActAdapter :
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showPosition(binding: CycleFragmentMultiItemBinding, position:Int) {
+    private fun showPosition(binding: CycleFragmentMultiItemBinding, position: Int) {
         binding.position1.visibility = if (position % 2 == 0) View.GONE else View.VISIBLE
         binding.position2.visibility = if (position % 2 == 0) View.VISIBLE else View.GONE
         binding.position2.text = "${position + 1}"
@@ -89,12 +97,21 @@ class MultiActAdapter :
         val isPress = abs(preDistance - data.distance) > 10
         val isBlow = data.bpValue > 5
 
-        Log.e("debugDistance", "mac: ${data.mac}-> preDistance : ${preDistance}, cur:${data.distance} " )
-        Log.e("debugDistance", "mac: ${data.mac}-> new : ${data.distance}, old:${mBaseData?.distance} " )
-        Log.e("debugDistance", "mac: ${data.mac}-> new : ${data.distance}, old:${mBaseData?.distance} " )
-        Log.e("debugDistance", "mac: ${data.mac}-> bpValue: ${data.bpValue} " )
-        Log.e("debugDistance", "mac: ${data.mac}-> isPress: ${isPress}" )
-        Log.e("debugDistance", "mac: ${data.mac}-> isBlow: ${isBlow} " )
+        Log.e(
+            "debugDistance",
+            "mac: ${data.mac}-> preDistance : ${preDistance}, cur:${data.distance} "
+        )
+        Log.e(
+            "debugDistance",
+            "mac: ${data.mac}-> new : ${data.distance}, old:${mBaseData?.distance} "
+        )
+        Log.e(
+            "debugDistance",
+            "mac: ${data.mac}-> new : ${data.distance}, old:${mBaseData?.distance} "
+        )
+        Log.e("debugDistance", "mac: ${data.mac}-> bpValue: ${data.bpValue} ")
+        Log.e("debugDistance", "mac: ${data.mac}-> isPress: ${isPress}")
+        Log.e("debugDistance", "mac: ${data.mac}-> isBlow: ${isBlow} ")
 
         // 假数据置灰
         if (TextUtils.equals(data.mac, BaseConstant.FAKE_MAC)) {
@@ -115,14 +132,14 @@ class MultiActAdapter :
             binding.ivLung.setImageResource(R.mipmap.icon_lung_border)
             binding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
             binding.dashBoard2.setImageResource(R.mipmap.icon_wm_bp_2)
-                binding.ivPress.visibility = View.INVISIBLE
-                binding.pressLayoutView.visibility = View.VISIBLE
-                binding.dashBoard.visibility = View.INVISIBLE
-                binding.dashBoard2.visibility = View.INVISIBLE
-                binding.chart.visibility = View.VISIBLE
-                setRate(binding.chart, 0)
-                binding.chartQy.visibility = View.VISIBLE
-                setRate(binding.chartQy, 0)
+            binding.ivPress.visibility = View.INVISIBLE
+            binding.pressLayoutView.visibility = View.VISIBLE
+            binding.dashBoard.visibility = View.INVISIBLE
+            binding.dashBoard2.visibility = View.INVISIBLE
+            binding.chart.visibility = View.VISIBLE
+            setRate(binding.chart, 0)
+            binding.chartQy.visibility = View.VISIBLE
+            setRate(binding.chartQy, 0)
         }
 
         //没有按压 也没有吹气，显示上一次的视图
@@ -134,7 +151,7 @@ class MultiActAdapter :
             binding.layoutPress.visibility = View.VISIBLE
             currentShowView = binding.layoutPress
             pr(binding, data)
-        } else if(isBlow) {
+        } else if (isBlow) {
             binding.layoutPress.visibility = View.GONE
             binding.layoutScore.visibility = View.GONE
             binding.layoutLung.visibility = View.VISIBLE
@@ -235,7 +252,7 @@ class MultiActAdapter :
         if (dataDTO.aisleType == 1) {
             binding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = dataDTO.qyMax()
+                val qyMax = dataDTO.qyMaxValue
                 when {
                     qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
                         binding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -298,11 +315,11 @@ class MultiActAdapter :
         view.invalidate()
     }
 
-    fun getCycleCount(mac:String): Int{
+    fun getCycleCount(mac: String): Int {
         return cycleCount
     }
 
-    fun isDataSame(@NonNull oldItem: BaseDataDTO, @NonNull newItem: BaseDataDTO):Boolean{
+    fun isDataSame(@NonNull oldItem: BaseDataDTO, @NonNull newItem: BaseDataDTO): Boolean {
         return TextUtils.equals(oldItem.mac, newItem.mac)
                 && oldItem.electricity == newItem.electricity
                 && oldItem.distance == newItem.distance

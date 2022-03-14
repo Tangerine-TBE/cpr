@@ -23,6 +23,7 @@ object BaseConstant {
     val EVENT_CPR_DISCONNENT = 10006
     val EVENT_CPR_TIMEING = 10007
     val EVENT_CPR_CLEAR = 10008
+    val EVENT_SINGLE_END = 10009
     //假的蓝牙地址
     val FAKE_MAC = "FAKE_MAC"
     val CLEAR_DEVICE_HISTORY_DATA = 10008
