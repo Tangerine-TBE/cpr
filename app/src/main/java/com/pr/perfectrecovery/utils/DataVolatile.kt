@@ -415,21 +415,21 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
+        if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
+            return L_d2
+        }
 
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
                 //消抖，小于30的不算做按压
-                if (L_d3 <= 30) {
-                    return L_d3.toInt()
-                }
                 value = L_d3
                 low_flag = 0
                 if (UNBACK_FLAG == 1) {
                     ERR_PR_UNBACK++
                     UNBACK_FLAG = 0
-                    //Log.e("TAG7", "未回弹")
+                    Log.e("TAG12", "按压未回弹")
                     ERR_FLAG = 1;
                 }
             } else {
@@ -437,9 +437,9 @@ class DataVolatile {
                 if(preDistance-L_d2<30){
                     return L_d2
                 }
-                if(abs(L_d1-L_d2)<10&&abs(L_d1-L_d2)<10&&abs(L_d1-L_d2)<10){
+              /*  if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
                     return L_d2
-                }
+                }*/
                 if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                     low_flag = 1
                     PR_SUM++
@@ -483,17 +483,17 @@ class DataVolatile {
             if(preDistance-L_d1<30){
                 return L_d1
             }
-            if(abs(L_d2-L_d1)<10&&abs(L_d3-L_d2)<10&&abs(L_d3-L_d1)<10){
+           /* if(abs(L_d2-L_d1)<15&&abs(L_d3-L_d2)<15&&abs(L_d3-L_d1)<15){
                 return L_d1
-            }
+            }*/
             if (low_flag == 0) {
                 low_flag = 1
+
                 PR_SUM++
                 // Log.e("TAG5", "$PR_SUM")
                 if (ERR_FLAG == 0) {
                     Err_PrTotal(L_d1)
                 } else {
-
                     ERR_FLAG = 0;
                 }
                 PR_RUN_FLAG = 1;
@@ -528,10 +528,10 @@ class DataVolatile {
                     UNBACK_FLAG = 0
                     low_flag = 0
                     //Log.e("TAG7", "初始位置$preDistance")
-                    Log.e("TAG7", "回到初始位置，复位$L_d3")
+                   // Log.e("TAG7", "回到初始位置，复位$L_d3")
                 } else {
                     UNBACK_FLAG = 1
-                    Log.e("TAG7", "未回弹$L_d3")
+                  //  Log.e("TAG7", "未回弹$L_d3")
                 }
                 value = L_d3
             }
