@@ -6,6 +6,15 @@ import com.pr.perfectrecovery.livedata.StatusLiveData
 import kotlin.math.abs
 
 class DataVolatile {
+
+    companion object {
+        /**
+         * 初始化按压区间值
+         */
+        var PR_LOW_VALUE = 45
+        var PR_HIGH_VALUE = 60
+    }
+
     //电量值：  0-100%
     private var VI_Value = 0
 
@@ -81,14 +90,16 @@ class DataVolatile {
         }
         return maximum
     }
-    fun selectMax(L1:Int,L2:Int,L3:Int):Int{
-        var value1 = kotlin.math.max(L1, L2)
-        var value2 =kotlin.math.max(L2, L3)
+
+    fun selectMax(L1: Int, L2: Int, L3: Int): Int {
+        val value1 = kotlin.math.max(L1, L2)
+        val value2 = kotlin.math.max(L2, L3)
         return kotlin.math.max(value1, value2)
     }
-    fun selectMin(L1:Int,L2:Int,L3:Int):Int{
-        var value1 = kotlin.math.min(L1, L2)
-        var value2 =kotlin.math.min(L2, L3)
+
+    fun selectMin(L1: Int, L2: Int, L3: Int): Int {
+        val value1 = kotlin.math.min(L1, L2)
+        val value2 = kotlin.math.min(L2, L3)
         return kotlin.math.min(value1, value2)
     }
 
@@ -287,9 +298,11 @@ class DataVolatile {
         dataDTO.preDistance = preDistance.toInt()
         if (QY_SUM != qy) {
             qy = QY_SUM
-            QY_MAX_VOLUME_SUM += max(true)
+            val max = max(true)
+            dataDTO.qyValueSum = qyValue()
+            dataDTO.qyMaxValue = max
+            QY_MAX_VOLUME_SUM += max
         }
-        dataDTO.QY_valueSet = QY_valueSet
         dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
@@ -564,12 +577,6 @@ class DataVolatile {
 
     //按压错误-按压位置错误
     private var ERR_PR_POSI = 0
-
-    /**
-     * 初始化按压区间值
-     */
-    var PR_LOW_VALUE = 45
-    var PR_HIGH_VALUE = 60
 
     private fun Err_PrTotal(l: Int) {
 

@@ -49,12 +49,13 @@ class SingleActivity : BaseActivity() {
     }
 
     private var isStart = false
+    var configBean: ConfigBean? = null
     private fun initView() {
         binding.bottom.ivBack.setOnClickListener { finish() }
         binding.tvName.text = mTrainingBean?.name
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
-        val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
-        operateTime = (configBean.operationTime * 1000).toLong()
+        configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
+        operateTime = (configBean!!.operationTime * 1000).toLong()
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
                 resources.getDrawable(R.mipmap.icon_wm_countdown),
@@ -92,42 +93,7 @@ class SingleActivity : BaseActivity() {
                 }
                 counter.let { mHandler.post(it) }
             } else {
-//                DataVolatile.isStart = false
-                val mTrainingDTO = cycleFragment?.stop()
-                binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
-                binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                counter.let { mHandler.removeCallbacks(it) }
-                mTrainingDTO?.isCheck = mTrainingBean!!.isCheck
-                mTrainingDTO?.name = binding.tvName.text.toString().trim()
-                mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
-                mTrainingDTO?.operateTime = if (operateTime2 > 0) operateTime2 else 0
-                mTrainingDTO?.timeTotal = (configBean.operationTime * 1000).toLong()
-                mTrainingDTO?.prCount = configBean.prCount
-                mTrainingDTO?.qyCount = configBean.qyCount
-                mTrainingDTO?.pressScore = configBean.pressScore
-                mTrainingDTO?.blowScore = configBean.blowScore
-                mTrainingDTO?.processScore = configBean.processScore.toFloat()
-                mTrainingDTO?.deduction = configBean.deductionScore
-                //检查页面 结果
-                checkEventFragment?.getData().let {
-                    if (it != null) {
-                        mTrainingDTO?.check1 = it.check1
-                        mTrainingDTO?.check2 = it.check2
-                        mTrainingDTO?.check3 = it.check3
-                        mTrainingDTO?.check4 = it.check4
-                        mTrainingDTO?.check5 = it.check5
-                        mTrainingDTO?.check6 = it.check6
-                        mTrainingDTO?.check7 = it.check7
-                        mTrainingDTO?.check8 = it.check8
-                        mTrainingDTO?.check9 = it.check9
-                        mTrainingDTO?.check10 = it.check10
-                    }
-                }
-
-                if (mTrainingDTO != null) {
-                    TrainResultActivity.start(this, mTrainingDTO)
-                }
-                finish()
+                startResult()
             }
         }
 
@@ -136,6 +102,37 @@ class SingleActivity : BaseActivity() {
                 binding.tvBattery.power = it.electricity
             }
         })
+    }
+
+    private fun startResult() {
+        val mTrainingDTO = cycleFragment?.stop()
+        binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
+        binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
+        counter.let { mHandler.removeCallbacks(it) }
+        mTrainingDTO?.isCheck = mTrainingBean!!.isCheck
+        mTrainingDTO?.name = binding.tvName.text.toString().trim()
+        mTrainingDTO?.cycleCount = binding.tvCycle.text.toString().trim().toInt()
+        mTrainingDTO?.operateTime = if (operateTime2 > 0) operateTime2 else 0
+        //检查页面 结果
+        checkEventFragment?.getData().let {
+            if (it != null) {
+                mTrainingDTO?.check1 = it.check1
+                mTrainingDTO?.check2 = it.check2
+                mTrainingDTO?.check3 = it.check3
+                mTrainingDTO?.check4 = it.check4
+                mTrainingDTO?.check5 = it.check5
+                mTrainingDTO?.check6 = it.check6
+                mTrainingDTO?.check7 = it.check7
+                mTrainingDTO?.check8 = it.check8
+                mTrainingDTO?.check9 = it.check9
+                mTrainingDTO?.check10 = it.check10
+            }
+        }
+
+        if (mTrainingDTO != null) {
+            TrainResultActivity.start(this, mTrainingDTO)
+        }
+        finish()
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -150,6 +147,12 @@ class SingleActivity : BaseActivity() {
             }
             BaseConstant.EVENT_CPR_TIMEING -> {
                 counter.let { mHandler.post(it) }
+            }
+            BaseConstant.EVENT_CPR_TIMEING -> {
+                counter.let { mHandler.post(it) }
+            }
+            BaseConstant.EVENT_SINGLE_END -> {
+                startResult()
             }
         }
     }
@@ -213,6 +216,7 @@ class SingleActivity : BaseActivity() {
         super.onDestroy()
         counter.let { mHandler.removeCallbacks(it) }
         cycleFragment = null
+        checkEventFragment = null
 //        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         EventBus.getDefault().unregister(this)
     }
@@ -227,21 +231,18 @@ class SingleActivity : BaseActivity() {
     private inner class Counter : Runnable {
         override fun run() {
             mHandler.postDelayed(this, 1000)//一秒钟循环计时一次
-            if (operateTime <= 0) {
-                binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
-                binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
-                mHandler.removeCallbacks(counter)
-                cycleFragment?.stop()
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
-            }
             //训练模式 考核模式
-            operateTime2 += 1000
-            if (!mTrainingBean?.isCheck!!) {
-                binding.tvTime.text = TimeUtils.timeParse(operateTime2)
-            } else {
+            if (mTrainingBean?.isCheck!!) {
                 operateTime -= 1000
                 binding.tvTime.text = TimeUtils.timeParse(operateTime)
+                if (operateTime <= 0) {
+                    mHandler.removeCallbacksAndMessages(null)
+                    startResult()
+                }
+            } else {
+                binding.tvTime.text = TimeUtils.timeParse(operateTime2)
             }
+            operateTime2 += 1000
         }
     }
 }

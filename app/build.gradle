@@ -6,13 +6,13 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('F:\\andriod\\perfect-recovery\\pr.jks')
+            storeFile file('E:\\workSpace\\perfect-recovery\\pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'
         }
         release {
-            storeFile file('F:\\andriod\\perfect-recovery\\pr.jks')
+            storeFile file('E:\\workSpace\\perfect-recovery\\pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'

@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemClickListener
@@ -34,6 +35,7 @@ import com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
+import com.pr.perfectrecovery.bean.ConfigBean
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.comm.ObserverManager
 import com.pr.perfectrecovery.databinding.ActivityCpractivityBinding
@@ -41,6 +43,7 @@ import com.pr.perfectrecovery.databinding.ItemBluetoothBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.ConvertUtil
 import com.pr.perfectrecovery.utils.DataVolatile
+import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -70,6 +73,11 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun initView() {
+        val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
+        val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
+        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
+        DataVolatile.PR_LOW_VALUE = configBean.prLow()
+
         //查看是否有蓝牙权限
         checkPermissions()
         viewBinding.bottom.ivBack.setOnClickListener { finish() }

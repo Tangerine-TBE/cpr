@@ -102,7 +102,7 @@ class CycleFragment : Fragment() {
 //        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
 //        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
-        StatusLiveData.data.observe(requireActivity(), Observer {
+        StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
@@ -114,7 +114,7 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
                 viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}"
             }
-        })
+        }
 
         //事件监听器，时间发生变化时可进行操作
         viewBinding.ctTime.setOnChronometerTickListener {
@@ -213,24 +213,26 @@ class CycleFragment : Fragment() {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
+//        qyMany()
         val trainingDTO = TrainingDTO()
+        //此处返回结果数据
         mBaseDataDTO?.apply {
             trainingDTO.startTime = startTime
             trainingDTO.endTime = endTime
-            trainingDTO.pressOutTime = timeOutTotal
-            trainingDTO.pressHigh = err_pr_high
-            trainingDTO.pressLow = err_pr_low
-            trainingDTO.pressLocation = err_pr_posi
-            trainingDTO.pressRebound = err_pr_unback.toFloat()
+            trainingDTO.timeOutTotal = timeOutTotal
+            trainingDTO.err_pr_high = err_pr_high
+            trainingDTO.err_pr_low = err_pr_low
+            trainingDTO.err_pr_posi = err_pr_posi
+            trainingDTO.err_pr_unback = err_pr_unback
             //按压总错误数
-            trainingDTO.pressErrorCount = mBaseDataDTO!!.getPr_err_total().toFloat()
-            trainingDTO.blowHigh = err_qy_high
-            trainingDTO.blowLow = err_qy_low
-            trainingDTO.blowIntoStomach = err_qy_dead
+            trainingDTO.pressErrorCount = mBaseDataDTO!!.getPr_err_total()
+            trainingDTO.err_qy_high = err_qy_high
+            trainingDTO.err_qy_low = err_qy_low
+            trainingDTO.err_qy_dead = err_qy_dead
             trainingDTO.err_qy_close = err_qy_close
-            //吹气总错误数
+            //吹气总错误数s
             trainingDTO.blowErrorCount = mBaseDataDTO!!.getQy_err_total().toFloat()
-            trainingDTO.prSum = prSum.toFloat()
+            trainingDTO.prSum = prSum
             trainingDTO.qySum = qySum
             //超次少次
             trainingDTO.prManyCount = prManyCount
@@ -238,13 +240,21 @@ class CycleFragment : Fragment() {
             trainingDTO.qyManyCount = qyManyCount
             trainingDTO.qyLessCount = qyLessCount
 
-            trainingDTO.pr_depth_sum = mBaseDataDTO!!.pr_depth_sum
-            trainingDTO.pr_time_sum = mBaseDataDTO!!.pr_time_sum.toFloat()
-            trainingDTO.qy_volume_sum = mBaseDataDTO!!.qy_volume_sum
-            trainingDTO.qy_time_sum = mBaseDataDTO!!.qy_time_sum.toFloat()
-            trainingDTO.pr_seqright_total = mBaseDataDTO!!.pr_seqright_total
-            trainingDTO.qy_serright_total = mBaseDataDTO!!.qy_serright_total
-            trainingDTO.qy_max_volume_sum = mBaseDataDTO!!.qy_max_volume_sum
+            trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
+            trainingDTO.prCount = configBean.prCount
+            trainingDTO.qyCount = configBean.qyCount
+            trainingDTO.pressScore = configBean.pressScore
+            trainingDTO.blowScore = configBean.blowScore
+            trainingDTO.processScore = configBean.processScore.toFloat()
+            trainingDTO.deduction = configBean.deductionScore
+
+            trainingDTO.pr_depth_sum = pr_depth_sum
+            trainingDTO.pr_time_sum = pr_time_sum
+            trainingDTO.qy_volume_sum = qy_volume_sum
+            trainingDTO.qy_time_sum = qy_time_sum
+            trainingDTO.pr_seqright_total = pr_seqright_total
+            trainingDTO.qy_serright_total = qy_serright_total
+            trainingDTO.qy_max_volume_sum = qy_max_volume_sum
         }
         mHandler.removeCallbacks(counter)
         viewBinding.ctTime.stop()
@@ -312,6 +322,7 @@ class CycleFragment : Fragment() {
     private var err_pr_posi = 0
     private var err_qr_unback = 0
     private var isTimeOut = false
+    private var err_qy_close = 0
 
     /**处理循环次数- 以及考核 超次 少次 数据统计**/
     //当前是否为按压模式-吹气模式
@@ -336,40 +347,28 @@ class CycleFragment : Fragment() {
                 mHandler.removeCallbacksAndMessages(null)
                 mHandler.postDelayed(counter, (configBean.interruptTime * 1000).toLong())
             }
-
             //第一次按压或吹气才开始计时
             if (startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)) {
                 startTime = System.currentTimeMillis()
             }
-
-            if ((dataDTO.preDistance - dataDTO.distance) < 15 && dataDTO.bpValue > 0) {
-                //吹气
-                qy(dataDTO)
-            } else {
-                //按压
-                pr(dataDTO)
-                //吹气
-//            qy(dataDTO)
-            }
-            //清空吹气频率
-            if (dataDTO.bpValue <= 0 && qyRate > 0) {
-                //吹气频率清零
+            //按压
+            pr(dataDTO)
+            //吹气
+            qy(dataDTO)
+            //清空吹气图标
+            if ((viewBinding.ivAim.isShown && isQyAim) || (dataDTO.bpValue <= 0 && qyRate > 0)) {
                 qyRate = 0//用于清空数据
-                mHandler2.removeCallbacks(runnableCF)
-                mHandler2.postDelayed(runnableCF, 10000)
+                isQyAim = false
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             } else {
                 if (qyRate == 0 && dataDTO.bpValue > 0) {
                     qyRate = dataDTO.bpValue
                 }
             }
-            //清空吹气图标
-//            if (viewBinding.ivAim.isShown && isQyAim) {
-//                isQyAim = false
-//                mHandler4.removeCallbacksAndMessages(null)
-//                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
-//            }
             //计算循环次数
             cycle(dataDTO)
+
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -395,29 +394,12 @@ class CycleFragment : Fragment() {
      */
     private var isCycle: Boolean = false
     private fun cycle(dataDTO: BaseDataDTO) {
-//        if ((cyclePrCount >= configBean.prCount && cycleQyCount >= configBean.qyCount) || (isPress && cycleQyCount > 0 && cyclePrCount > 0)) {
+        qyEnd()
         if (isQy && !isPr && !isCycle) {
             isCycle = true
             isQy = false
             isPr = false
-            if (isCheck) {
-                if (cyclePrCount > configBean.prCount) {
-                    //按压超次
-                    prManyCount += cyclePrCount - configBean.prCount
-                } else {
-                    //按压少次
-                    prLessCount += configBean.prCount - cyclePrCount
-                }
-                if (cycleQyCount > configBean.qyCount) {
-                    //吹气超次
-                    qyManyCount += cycleQyCount - configBean.qyCount
-                } else {
-                    //吹气少次
-                    qyLessCount += configBean.qyCount - cycleQyCount
-                }
-                cyclePrCount = 0
-                cycleQyCount = 0
-            }
+            prMany()
             cycleCount++
             //更新循环次数
             EventBus.getDefault()
@@ -428,7 +410,47 @@ class CycleFragment : Fragment() {
                         null
                     )
                 )
+        }
+    }
 
+    private var qyManyCycle = 0
+    private fun qyMany() {
+        if (isCheck && cycleCount != qyManyCycle) {
+            qyManyCycle = cycleCount
+            if (cycleQyCount > configBean.qyCount) {
+                //吹气超次
+                qyManyCount += cycleQyCount - configBean.qyCount
+                Log.e("qyManyCount 吹气超次", "qyManyCount: $qyManyCount")
+            } else if (cycleQyCount < configBean.qyCount) {
+                //吹气少次
+                qyLessCount += configBean.qyCount - cycleQyCount
+                Log.e("qyLessCount 吹气少次", "qyLessCount: $qyLessCount")
+            }
+            cycleQyCount = 0
+        }
+    }
+
+    private fun qyEnd() {
+        if (isCheck) {
+            if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
+                isCheck = false
+                //结束跳转至结果页面
+                EventBus.getDefault()
+                    .post(MessageEventData(BaseConstant.EVENT_SINGLE_END, "", null))
+            }
+        }
+    }
+
+    private fun prMany() {
+        if (isCheck) {
+            if (cyclePrCount > configBean.prCount) {
+                //按压超次
+                prManyCount += cyclePrCount - configBean.prCount
+            } else if (cyclePrCount < configBean.prCount) {
+                //按压少次
+                prLessCount += configBean.prCount - cyclePrCount
+            }
+            cyclePrCount = 0
         }
     }
 
@@ -446,6 +468,7 @@ class CycleFragment : Fragment() {
             prValue = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime()
+            qyMany()
             cyclePrCount++
             cycleQyCount = 0
             isPr = true
@@ -476,7 +499,6 @@ class CycleFragment : Fragment() {
                 }
             }
         }
-
         //按压错误数统计
         viewBinding.tvPress.text = "${dataDTO.getPr_err_total()}"
         //按压总数
@@ -488,24 +510,28 @@ class CycleFragment : Fragment() {
      */
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
-        if (dataDTO.aisleType == 1 && dataDTO.bpValue > 5) {
+        if (dataDTO.aisleType == 1) {
             viewBinding.ivAim.visibility = View.INVISIBLE
             if (qyValue != dataDTO.qySum) {
-                val qyMax = dataDTO.qyMax()
+                stopOutTime()
+                cycleQyCount++
+                isQy = true
+                isPr = false
+                val qyMax = dataDTO.qyMaxValue
                 Log.e("qyMax", "qy:${qyMax}")
                 when {
-                    qyMax in 35..55 -> {//通气正常
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
-                    }
-                    qyMax > 55 -> {//通气过大
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
-                        setPlayVoice(VOICE_MP3_CQGD)
-                    }
-                    qyMax in 5..35 -> {//通气不足
+                    qyMax < configBean.qyLow() -> {//通气不足
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax > 75 -> {//吹气进胃
+                    qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+                    }
+                    qyMax in configBean.qyHigh()..75 -> {//通气过大
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
+                        setPlayVoice(VOICE_MP3_CQGD)
+                    }
+                    qyMax > configBean.qy_max -> {//吹气进胃
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
@@ -513,23 +539,20 @@ class CycleFragment : Fragment() {
                 //吹气变灰
                 mHandler4.removeCallbacksAndMessages(null)
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
-                stopOutTime()
             }
         } else {
-            if (dataDTO.bpValue > 5) {
+            if (dataDTO.err_qy_close != err_qy_close) {
+                err_qy_close = dataDTO.err_qy_close
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
                 viewBinding.ivAim.visibility = View.VISIBLE
                 isQyAim = true
+                cycleQyCount++
+                isQy = true
+                isPr = false
                 mHandler4.removeCallbacksAndMessages(null)
                 mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             }
-        }
-        //记录吹气超次少次
-        if (qyValue != dataDTO.qySum) {
-            cycleQyCount++
-            isQy = true
-            isPr = false
         }
         qyValue = dataDTO.qySum
         //吹气频率

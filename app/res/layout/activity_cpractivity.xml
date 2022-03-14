@@ -1,146 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/theme_color"
-    tools:context=".activity.CPRActivity">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/theme_color"
+        tools:context=".activity.CPRActivity">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_15"
-        android:layout_marginTop="27dp"
-        android:src="@mipmap/icon_wm_top_logo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_marginTop="27dp"
+            android:src="@mipmap/icon_wm_top_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/iv2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        android:src="@mipmap/icon_wm_cpr_bt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            android:id="@+id/iv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:src="@mipmap/icon_wm_cpr_bt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <TextView
-        android:id="@+id/tvModelNum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        android:text="请检查设备和蓝牙模型"
-        android:textColor="#FC7574"
-        android:textSize="@dimen/text_14"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv2" />
+            android:id="@+id/tvModelNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:text="请检查设备和蓝牙模型"
+            android:textColor="#FC7574"
+            android:textSize="@dimen/text_14"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv2" />
 
     <View
-        android:id="@+id/view"
-        android:layout_width="5dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="@dimen/dp_10"
-        android:background="@drawable/border_dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvModelNum" />
+            android:id="@+id/view"
+            android:layout_width="5dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="@dimen/dp_10"
+            android:background="@drawable/border_dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvModelNum" />
 
     <TextView
-        android:id="@+id/tvDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_6"
-        android:text="可用的模型如下："
-        android:textColor="#3DB38E"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/view"
-        app:layout_constraintStart_toEndOf="@+id/view"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+            android:id="@+id/tvDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_6"
+            android:text="可用的模型如下："
+            android:textColor="#3DB38E"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/view"
+            app:layout_constraintStart_toEndOf="@+id/view"
+            app:layout_constraintTop_toTopOf="@+id/view" />
 
     <TextView
-        android:id="@+id/tvHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="此版本最多支持6个模型"
-        android:textColor="#3DB38E"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+            android:id="@+id/tvHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="此版本最多支持6个模型"
+            android:textColor="#3DB38E"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/view" />
 
     <ProgressBar
-        android:id="@+id/progress_circular"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="@dimen/dp_50"
-        android:indeterminate="false"
-        android:indeterminateDrawable="@mipmap/icon_wm_refresh"
-        android:indeterminateDuration="900"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvDesc" />
+            android:id="@+id/progress_circular"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="@dimen/dp_50"
+            android:indeterminate="false"
+            android:indeterminateDrawable="@mipmap/icon_wm_refresh"
+            android:indeterminateDuration="900"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvDesc" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="@dimen/dp_10"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDesc"
-        tools:listitem="@layout/item_bluetooth" />
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="@dimen/dp_10"
+            android:layout_marginEnd="28dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDesc"
+            tools:listitem="@layout/item_bluetooth" />
 
     <TextView
-        android:id="@+id/tvLog"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"
-        android:fadeScrollbars="true"
-        android:scrollbars="vertical"
-        android:textColor="@color/black"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerview"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:fadeScrollbars="true"
+            android:scrollbars="vertical"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerview"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvConnections"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="设备连接数："
-        android:textColor="#3DB38E"
-        android:textSize="16sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/bottom" />
+            android:id="@+id/tvConnections"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设备连接数："
+            android:textColor="#3DB38E"
+            android:textSize="16sp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/bottom" />
 
     <Button
-        android:id="@+id/btnOpen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TTL串口调试"
-        android:textColor="#3DB38E"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/tvConnections"
-        app:layout_constraintTop_toBottomOf="@+id/tvConnections" />
+            android:id="@+id/btnOpen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TTL串口调试"
+            android:textColor="#3DB38E"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvConnections"
+            app:layout_constraintTop_toBottomOf="@+id/tvConnections" />
 
     <include
-        android:id="@+id/bottom"
-        layout="@layout/layout_bottom_right"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+            android:id="@+id/bottom"
+            layout="@layout/layout_bottom_right"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

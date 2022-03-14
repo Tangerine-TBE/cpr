@@ -210,6 +210,7 @@
                 android:numStars="5"
                 android:rating="0"
                 android:stepSize="0.5"
+                android:progress="100"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -283,7 +284,7 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_6"
+                    android:layout_marginStart="4dp"
                     android:layout_marginBottom="@dimen/dp_5"
                     android:text="分"
                     android:textColor="#909090"

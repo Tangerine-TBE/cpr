@@ -157,7 +157,7 @@ class TrainingSingleActivity : BaseActivity() {
                     return@setOnClickListener
                 }
 
-                var bean = TrainingBean()
+                val bean = TrainingBean()
                 bean.name = name.text.toString()
                 bean.isCheck = mTrainingBean.isCheck
                 // 根据 BleDevice 的count跟学员顺序对应绑定
@@ -183,7 +183,7 @@ class TrainingSingleActivity : BaseActivity() {
     }
 
     private fun initMac(mac: String): String {
-        var new = mac.replace(":","")
+        val new = mac.replace(":","")
         return new.lowercase()
     }
 }
