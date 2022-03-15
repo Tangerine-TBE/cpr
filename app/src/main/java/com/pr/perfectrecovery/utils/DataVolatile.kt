@@ -437,7 +437,6 @@ class DataVolatile {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
                 if(selectMax(abs(L_d1-L_d2),abs(L_d1-L_d3),abs(L_d2-L_d3))>10) {
-                    value = L_d3
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
                         ERR_PR_UNBACK++
@@ -446,15 +445,13 @@ class DataVolatile {
                         ERR_FLAG = 1;
                     }
                 }
+                value = L_d3
             } else {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
                     //当最低点距离小于30时不作为按压一次处理
                     if (preDistance - L_d2 < 30) {
                         return L_d2
                     }
-                    /*  if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
-                    return L_d2
-                }*/
                     if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                         low_flag = 1
                         PR_SUM++
@@ -492,8 +489,8 @@ class DataVolatile {
 
                     }
                     MIN_FLAG = 1
-                    value = L_d2
                 }
+                value = L_d2
             }
         } else if (L_d2 < L_d3) {
             if(selectMax(abs(L_d1-L_d2),abs(L_d1-L_d3),abs(L_d2-L_d3))>10) {
@@ -554,6 +551,7 @@ class DataVolatile {
                     value = L_d3
                 }
             }
+            value = L_d2
         } else {
             if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
                 // PR_DOTTIMSE_NUMBER+=3
@@ -566,8 +564,8 @@ class DataVolatile {
                     UNBACK_FLAG = 1
                     Log.e("TAG7", "未回弹$L_d2")
                 }
-                value = L_d2
             }
+            value = L_d2
         }
         return value
     }
