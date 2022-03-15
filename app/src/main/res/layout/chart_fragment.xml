@@ -25,7 +25,7 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/dp_44"
                         android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_40"
+                        android:layout_marginTop="@dimen/dp_30"
                         android:layout_marginEnd="@dimen/dp_10"
                         app:cardBackgroundColor="#B322231D"
                         app:cardCornerRadius="8dp"
@@ -38,6 +38,16 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
+
+                        <ImageView
+                                android:id="@+id/ivLung"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:src="@mipmap/icon_wm_chart_lung"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                                 android:id="@+id/tvLungCount"
@@ -65,16 +75,6 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-                <ImageView
-                        android:id="@+id/ivLung"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="@dimen/dp_20"
-                        android:src="@mipmap/icon_wm_chart_lung"
-                        app:layout_constraintStart_toStartOf="@+id/cardView1"
-                        app:layout_constraintTop_toTopOf="parent" />
-
                 <androidx.cardview.widget.CardView
                         android:id="@+id/cardView2"
                         android:layout_width="0dp"
@@ -91,6 +91,16 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
+
+                        <ImageView
+                                android:id="@+id/ivHeart"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@mipmap/icon_wm_chart_heart"
+                                android:layout_marginStart="@dimen/dp_10"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent" />
 
                         <TextView
                                 android:id="@+id/tvHeartCount"
@@ -116,16 +126,6 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
-
-                <ImageView
-                        android:id="@+id/ivHeart"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="@dimen/dp_20"
-                        android:src="@mipmap/icon_wm_chart_heart"
-                        app:layout_constraintStart_toStartOf="@+id/cardView2"
-                        app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintlayout"

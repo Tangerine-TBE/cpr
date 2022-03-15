@@ -159,20 +159,5 @@ class StatisticalActivity : BaseActivity() {
         }
     }
 
-    private fun getScoreResult(score: Float): String {
-        var result = ""
-        when {
-            score > 80 -> {
-                result = "优秀"
-            }
-            score > 60 -> {
-                result = "一般"
-            }
-            score < 60 -> {
-                result = "较差"
-            }
-        }
-        return result
-    }
 }
 

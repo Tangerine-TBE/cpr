@@ -133,9 +133,9 @@ class PressLayoutView : LinearLayout {
     private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
         val number = abs(dataDTO.preDistance - value)
         //Log.e("getNumber", "$value   计算后的按压距离值：$number")
-        if (number < 10) {
-            return 0
-        }
+//        if (number < 10) {
+//            return 0
+//        }
         return when {
             number < dataDTO.PR_LOW_VALUE - 5 -> {
                 1
