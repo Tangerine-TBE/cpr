@@ -644,7 +644,7 @@ class DataVolatile {
  * */
     private fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
         var value = 0
-        if (QY_d1 > 0 || QY_d2 > 0 || QY_d3 > 0) {
+        if (QY_d1 > 5 || QY_d2 > 5 || QY_d3 > 5) {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
@@ -652,7 +652,7 @@ class DataVolatile {
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG=0
             if (top_flag == 1) {
-                ERR_QyTotal(max(false))//每次筛选最大吹气值，去做错误次数的判断
+                ERR_QyTotal(max(true))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
