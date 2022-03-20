@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:background="@drawable/multi_item_bg"
+        android:layout_gravity="center">
+
+    <ImageView
+            android:id="@+id/test_press_heart"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="19dp"
+            android:layout_marginStart="18dp"
+            android:background="@mipmap/icon_wm_start_level_heart" />
+
+    <TextView
+            android:id="@+id/test_press_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/test_pres_total"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="20"
+            android:layout_marginTop="27dp"
+            android:textSize="20sp"
+            android:textColor="#FC7574" />
+
+    <TextView
+            android:id="@+id/test_pres_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="/200"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="27dp"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF" />
+
+    <TextView
+            android:id="@+id/test_cycle_icon"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/test_press_heart"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="18dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:text="4"
+            android:textColor="#3DB38E"
+            android:background="@mipmap/icon_wm_start_level_cycle" />
+
+    <TextView
+            android:id="@+id/test_cycle_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/test_pres_total"
+            android:text="4"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF" />
+
+    <ImageView
+            android:id="@+id/test_lung"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/test_cycle_icon"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="18dp"
+            android:background="@mipmap/icon_wm_start_level_lung" />
+
+    <TextView
+            android:id="@+id/test_lung_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/test_pres_total"
+            app:layout_constraintTop_toBottomOf="@+id/test_cycle_total"
+            android:text="20"
+            android:layout_marginTop="24dp"
+            android:textSize="20sp"
+            android:textColor="#FC7574" />
+
+    <TextView
+            android:id="@+id/test_lung_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/test_cycle_total"
+            android:text="/200"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
