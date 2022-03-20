@@ -141,7 +141,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      *  平均通气每分钟次数 = 通气总量 / 通气总次数
      */
     fun getBlowAverageNumber(): Int {
-        return if (qySum > 0 && qy_max_volume_sum > 0) qy_max_volume_sum * (qyCount * cycleCount) / qySum else 0
+        return if (qySum > 0 && qy_max_volume_sum > 0) qy_max_volume_sum / qySum else 0
     }
 
     /**

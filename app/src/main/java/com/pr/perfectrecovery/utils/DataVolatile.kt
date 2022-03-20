@@ -342,22 +342,22 @@ class DataVolatile {
      * 吹气体积
      */
     private fun getQyMax(value: Int): Int {
-        var qy: Float = 0f
+        var qy = 0
         when {
             value < 30 -> {
-                qy += abs(20 * value - 100)
+                qy = abs(20 * value - 100)
             }
             value in 30..60 -> {
-                qy += abs((10.0f / 3.0f) * value + 400)
+                qy = abs((10.0f / 3.0f) * value + 400).toInt()
             }
-            value in 60..65 -> {
-                qy += abs((40.0f / 3.0f) * value - 200)
+            value in 60..105 -> {
+                qy = abs((40.0f / 3.0f) * value - 200).toInt()
             }
             value > 105 -> {
-                qy += 1200
+                qy = 1200
             }
         }
-        return qy.toInt()
+        return qy
     }
 
     private var qy = 0
@@ -673,7 +673,7 @@ class DataVolatile {
                 value < QY_LOW_VALUE -> {
                     ERR_QY_LOW++
                 }
-                value in QY_LOW_VALUE..QY_HIGH_VALUE -> {
+                value in QY_HIGH_VALUE..1200 -> {
                     ERR_QY_HIGH++
                 }
                 value > 1200 -> {
