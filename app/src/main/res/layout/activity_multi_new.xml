@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/theme_color"
-        tools:context=".activity.MultiActivity">
+        tools:context=".activity.MutiActivityNew">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/activity_mul_head"
@@ -88,65 +88,84 @@
                 app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/activity_mul_head"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/opr_layout">
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/opr_layout"
+            android:paddingStart="@dimen/dp_10"
+            android:paddingEnd="@dimen/dp_10"
+            android:paddingTop="@dimen/dp_15"
+            android:paddingBottom="@dimen/dp_15"
+            >
 
-        <androidx.constraintlayout.helper.widget.Flow
-                android:id="@+id/flow"
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:flow_horizontalGap="5dp"
-                app:flow_verticalGap="5dp"
-                app:flow_wrapMode="aligned"
-                app:constraint_referenced_ids="item1,item2,item3,item4,item5,item6" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
 
-        <include
-                android:id="@+id/item1"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
-        <include
-                android:id="@+id/item2"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
-        <include
-                android:id="@+id/item3"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
-        <include
-                android:id="@+id/item4"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
-        <include
-                android:id="@+id/item5"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
-        <include
-                android:id="@+id/item6"
-                layout="@layout/cycle_fragment_multi_item"
-                android:layout_width="170dp"
-                android:layout_height="200dp"
-                />
+            <include
+                    android:id="@+id/item1"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <include
+                    android:id="@+id/item2"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <include
+                    android:id="@+id/item3"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
+
+            <include
+                    android:id="@+id/item4"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <include
+                    android:id="@+id/item5"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
+
+            <include
+                    android:id="@+id/item6"
+                    layout="@layout/cycle_fragment_multi_item"
+                    android:layout_width="170dp"
+                    android:layout_weight="1"
+                    android:layout_height="210dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <include
             android:id="@+id/opr_layout"
             layout="@layout/layout_bottom_right_light"
