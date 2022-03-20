@@ -667,6 +667,8 @@ class DataVolatile {
                 }
                 preTimeQY = changTimePress
                // Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
+            }else{
+                return 0
             }
         }
         value = if (QY_d1 <= QY_d2) {
