@@ -150,7 +150,7 @@
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequencyEnd"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -171,9 +171,19 @@
 
                     <View
                             android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="#1A3DB38E"
+                            app:layout_constraintEnd_toEndOf="@+id/view2"
+                            app:layout_constraintTop_toBottomOf="@+id/view2"
+                            app:layout_constraintStart_toStartOf="@+id/view2"
+                            app:layout_constraintBottom_toTopOf="@+id/view8" />
+
+                    <View
+                            android:id="@+id/view8"
+                            android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequency"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -213,10 +223,11 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                     <View
+                            android:id="@+id/viewml"
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolumeEnd"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -236,11 +247,20 @@
                             app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
 
                     <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="#1A3DB38E"
+                            app:layout_constraintEnd_toEndOf="@+id/viewml"
+                            app:layout_constraintTop_toBottomOf="@+id/viewml"
+                            app:layout_constraintStart_toStartOf="@+id/viewml"
+                            app:layout_constraintBottom_toTopOf="@+id/viewBar" />
+
+                    <View
                             android:id="@+id/viewBar"
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolume"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -287,7 +307,7 @@
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_4"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvDepth"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -307,11 +327,20 @@
                             app:layout_constraintTop_toBottomOf="@+id/tvDepth" />
 
                     <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="#1A3DB38E"
+                            app:layout_constraintEnd_toEndOf="@+id/viewline"
+                            app:layout_constraintTop_toBottomOf="@+id/viewline"
+                            app:layout_constraintStart_toStartOf="@+id/viewline"
+                            app:layout_constraintBottom_toTopOf="@+id/viewcm" />
+
+                    <View
                             android:id="@+id/viewline"
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/textView22"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -331,6 +360,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView22" />
 
                     <View
+                            android:id="@+id/viewcm"
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
@@ -375,7 +405,7 @@
                             android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequencyEnd"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -396,9 +426,19 @@
 
                     <View
                             android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="#1A3DB38E"
+                            app:layout_constraintEnd_toEndOf="@+id/view3"
+                            app:layout_constraintTop_toBottomOf="@+id/view3"
+                            app:layout_constraintStart_toStartOf="@+id/view3"
+                            app:layout_constraintBottom_toTopOf="@+id/viewcpm" />
+
+                    <View
+                            android:id="@+id/viewcpm"
+                            android:layout_width="0dp"
                             android:layout_height="1dp"
                             android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
+                            android:layout_marginEnd="@dimen/dp_10"
                             android:background="#1EFFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequency"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -412,7 +452,7 @@
                         android:layout_width="0dp"
                         android:layout_height="84dp"
                         android:layout_marginStart="@dimen/dp_75"
-                        android:layout_marginTop="25dp"
+                        android:layout_marginTop="@dimen/dp_28"
                         app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/constraintlayout4"

@@ -13,6 +13,9 @@ class DataVolatile {
          */
         var PR_LOW_VALUE = 45
         var PR_HIGH_VALUE = 60
+
+        var QY_LOW_VALUE = 35
+        var QY_HIGH_VALUE = 50
     }
 
     //电量值：  0-100%
@@ -70,9 +73,27 @@ class DataVolatile {
     private var L_valueSet = mutableListOf<Int>()
     private var QY_valueSet = mutableListOf<Int>()
     private var QY_valueSet2 = mutableListOf<Int>()
+    private var QY_valueSet3 = mutableListOf<Int>()
     private var pt_valueSet = mutableListOf<Int>()
+    private var py_valueSet = mutableListOf<Int>()
+
     private var deviceMAC: String? = null
-    private var QY_RUN_FLAG=0
+    private var QY_RUN_FLAG = 0
+
+    /**
+     * array 数据列表
+     * isClear 清除数据集合
+     */
+    fun qyMax(): Int {
+        var maximum = 0
+        for (i in QY_valueSet3.indices) {
+            if (maximum < QY_valueSet3[i]) {
+                maximum = QY_valueSet3[i]
+            }
+        }
+        QY_valueSet3.clear()
+        return maximum
+    }
 
     /**
      * array 数据列表
@@ -114,8 +135,6 @@ class DataVolatile {
         QY_valueSet2.clear()
         return sum
     }
-
-    val mapObject = mutableMapOf<String, BaseDataDTO>()
 
     /**
      * 解析蓝发送的数据
@@ -224,41 +243,41 @@ class DataVolatile {
             * 1：当三个值均为0，代表完成一次按压；
             * 2：当有一个值小于5也默认完成一次按压
             * */
-            if(selectMax(QY_d1,QY_d2,QY_d3)>10){
-                QY_RUN_FLAG=1
+            if (selectMax(QY_d1, QY_d2, QY_d3) > 10) {
+                QY_RUN_FLAG = 1
             }
-            if(QY_RUN_FLAG==1){
+            if (QY_RUN_FLAG == 1) {
                 Log.e("TAG11", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
-            }else{
+            } else {
                 //吹气数据
                 Log.e("TAG11", "判断为按压状态")
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
                 //清空频率
                 pt(L_Value)
             }
-
+            py(QY_Value)
             //频率
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // Log.e("TAG9", "按压频率：$pfvalue")
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
-           var v= DataFormatUtils.byteArrayToInt(
-               DataFormatUtils.hexStr2Bytes(
-                   "00" + data.substring(
-                       30,
-                       32
-                   )
-               )
-           )
-           if(abs(v-VI_Value)>5){
-               if(v<5){
-                   VI_Value=5
-               }else if(v>95){
-                   VI_Value=100
-               }else{
-                   VI_Value=(v/5).toInt()*5
-               }
-           }
+            var v = DataFormatUtils.byteArrayToInt(
+                DataFormatUtils.hexStr2Bytes(
+                    "00" + data.substring(
+                        30,
+                        32
+                    )
+                )
+            )
+            if (abs(v - VI_Value) > 5) {
+                if (v < 5) {
+                    VI_Value = 5
+                } else if (v > 95) {
+                    VI_Value = 100
+                } else {
+                    VI_Value = (v / 5).toInt() * 5
+                }
+            }
 
         }
         val stringBuffer = StringBuffer()
@@ -308,15 +327,37 @@ class DataVolatile {
         dataDTO.preDistance = preDistance.toInt()
         if (QY_SUM != qy) {
             qy = QY_SUM
-            val max = max(true)
+            val max = qyMax()
             dataDTO.qyValueSum = qyValue()
-            dataDTO.qyMaxValue = max
-            QY_MAX_VOLUME_SUM += max
+            dataDTO.qyMaxValue = getQyMax(max)
+            QY_MAX_VOLUME_SUM += getQyMax(max)
         }
         dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
         return dataDTO
+    }
+
+    /**
+     * 吹气体积
+     */
+    private fun getQyMax(value: Int): Int {
+        var qy: Float = 0f
+        when {
+            value < 30 -> {
+                qy += abs(20 * value - 100)
+            }
+            value in 30..60 -> {
+                qy += abs((10.0f / 3.0f) * value + 400)
+            }
+            value in 60..65 -> {
+                qy += abs((40.0f / 3.0f) * value - 200)
+            }
+            value > 105 -> {
+                qy += 1200
+            }
+        }
+        return qy.toInt()
     }
 
     private var qy = 0
@@ -356,6 +397,7 @@ class DataVolatile {
         L_valueSet.clear()
         QY_valueSet.clear()
         QY_valueSet2.clear()
+        py_valueSet.clear()
         pt_valueSet.clear()
     }
     /*
@@ -438,15 +480,15 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
-       /* if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
-            return L_d2
-        }*/
+        /* if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
+             return L_d2
+         }*/
 
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
-                if(selectMax(abs(L_d1-L_d2),abs(L_d1-L_d3),abs(L_d2-L_d3))>10) {
+                if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
                         ERR_PR_UNBACK++
@@ -503,7 +545,7 @@ class DataVolatile {
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
-            if(selectMax(abs(L_d1-L_d2),abs(L_d1-L_d3),abs(L_d2-L_d3))>10) {
+            if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
                 // PR_DOTTIMSE_NUMBER+=3
                 if (preDistance - L_d1 < 30) {
                     return L_d1
@@ -627,12 +669,16 @@ class DataVolatile {
         if (TOS_Value == 0) {
             ERR_QY_CLOSE++
         } else {
-            if (value in 1..39) {
-                ERR_QY_LOW++
-            } else if (value in 81..120) {
-                ERR_QY_HIGH++
-            } else if (value > 120) {
-                ERR_QY_DEAD++
+            when {
+                value < QY_LOW_VALUE -> {
+                    ERR_QY_LOW++
+                }
+                value in QY_LOW_VALUE..QY_HIGH_VALUE -> {
+                    ERR_QY_HIGH++
+                }
+                value > 1200 -> {
+                    ERR_QY_DEAD++
+                }
             }
         }
     }
@@ -650,9 +696,9 @@ class DataVolatile {
             QY_VOLUME_SUM += Qliang
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
-            QY_RUN_FLAG=0
+            QY_RUN_FLAG = 0
             if (top_flag == 1) {
-                ERR_QyTotal(max(true))//每次筛选最大吹气值，去做错误次数的判断
+                ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 top_flag = 0
@@ -666,8 +712,8 @@ class DataVolatile {
                     }
                 }
                 preTimeQY = changTimePress
-               // Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
-            }else{
+                // Log.e("TAG10", "吹气的时间累加和$QY_TIME_SUM")
+            } else {
                 return 0
             }
         }
@@ -688,9 +734,11 @@ class DataVolatile {
         if (value > 0) {
             QY_valueSet2.add(value)
             QY_valueSet.add(value)
+            QY_valueSet3.add(value)
         }
         return value
     }
+
     //判断按压是否停止
     private val count = 20
     private fun pt(p: Int): Boolean {
@@ -704,6 +752,22 @@ class DataVolatile {
             }
         } else {
             pt_valueSet.clear()
+        }
+        return false
+    }
+
+    //判断按压是否停止
+    private fun py(p: Int): Boolean {
+        if (p == 0) {
+            if (py_valueSet.size == count) py_valueSet.removeFirst()
+            py_valueSet.add(p)
+            if (py_valueSet.size == count) {
+                py_valueSet.clear()
+                CF_Value = 0
+                return true
+            }
+        } else {
+            py_valueSet.clear()
         }
         return false
     }

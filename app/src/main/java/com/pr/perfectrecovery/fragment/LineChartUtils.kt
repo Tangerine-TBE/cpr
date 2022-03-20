@@ -23,7 +23,7 @@ object LineChartUtils {
         chart.setNoDataText("暂无数据")
         // enable touch gestures
         chart.setTouchEnabled(false)
-
+        chart.setDrawBorders(true)
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
@@ -40,32 +40,21 @@ object LineChartUtils {
         val leftAxis: YAxis = chart.axisLeft
         leftAxis.isInverted = true
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        leftAxis.mAxisMaximum = 10f
-        leftAxis.labelCount = 9
+        leftAxis.mAxisMaximum = 5f
+        leftAxis.labelCount = 5
         leftAxis.isEnabled = true
         leftAxis.textSize = 12f
         leftAxis.textColor = Color.WHITE
         leftAxis.setDrawGridLines(true)
         leftAxis.setValueFormatter { value, axis ->
-//            when (value.roundToInt()) {
-//                0 -> {
-//                    "0cm"
-//                }
-//                1 -> {
-//                    "${startNum}cm"
-//                }
-//                2 -> {
-//                    "${endNum}cm"
-//                }
-//                else -> {
-//                    "10cm"
-//                }
-//            }
             "${value.toInt()}cm"
         }
         val rightAxis: YAxis = chart.axisRight
         rightAxis.isEnabled = false
         rightAxis.setDrawGridLines(false)
+//        rightAxis.mAxisMaximum = 5f
+//        rightAxis.labelCount = 5
+//        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
         val l = chart.legend
         l.isEnabled = false

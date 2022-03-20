@@ -506,6 +506,12 @@ class CycleFragment : Fragment() {
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
     }
 
+
+    private var err_qy_low = 0
+    private var err_qy_high = 0
+    private var err_qy_posi = 0
+    private var err_qy_dead = 0
+
     /**
      * 吹气状态
      */
@@ -521,24 +527,28 @@ class CycleFragment : Fragment() {
                 val qyMax = dataDTO.qyMaxValue
                 Log.e("qyMax", "qy:${qyMax}")
                 when {
-                    qyMax < configBean.qyLow() -> {//通气不足
+                    dataDTO.err_qy_low != err_qy_low -> {
+                        err_qy_low = dataDTO.err_qy_low
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax in configBean.qyLow()..configBean.qyHigh() -> {//通气正常
-                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
-                    }
-                    qyMax in configBean.qyHigh()..75 -> {//通气过大
+                    dataDTO.err_qy_high != err_qy_high -> {
+                        err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    qyMax > configBean.qy_max -> {//吹气进胃
+                    dataDTO.err_qy_dead != err_qy_dead -> {
+                        err_qy_dead = dataDTO.err_qy_dead
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
                     }
+                    else -> {
+                        viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
+                    }
                 }
+
                 //吹气变灰
-                mHandler4.removeCallbacksAndMessages(null)
+                mHandler1.removeCallbacksAndMessages(null)
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
             }
         } else {
@@ -598,60 +608,50 @@ class CycleFragment : Fragment() {
         view.invalidate()
     }
 
-    //按压频率
+    //吹气频率
     private fun setQyRate(view: DialChart07View, value: Int) {
-        val max = 16f
+        val max = configBean.tidalFrequencyEnd
         val min = 0
         val p = value % (max - min + 1) + min
-        var pf = p / 200f
-
+        var pf: Float = 0f
         when {
             value < 1 -> {
                 pf = 0.0f
             }
-            value > 16 -> {
-                pf = 1.0f
-            }
-            value > 14 -> {
-                pf = 0.95f
-            }
-            value > 12 -> {
-                pf = 0.9f
-            }
-            value > 10 -> {
-                pf = 0.8f
-            }
-            value > 8 -> {
-                pf = 0.7f
-            }
-            value < 2 -> {
-                pf = 0.1f
-            }
-            value < 3 -> {
-                pf = 0.2f
-            }
-            value < 4 -> {
-                pf = 0.3f
-            }
-            value < 5 -> {
-                pf = 0.4f
-            }
-            value < 6 -> {
-                pf = 0.4f
-            }
-            value in 6..8 -> {
+            value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
                 pf = 0.5f
             }
-
+            value > configBean.tidalFrequencyEnd + 5 -> {
+                pf = 1.0f
+            }
+            value > configBean.tidalFrequencyEnd + 4 -> {
+                pf = 0.95f
+            }
+            value > configBean.tidalFrequencyEnd + 3 -> {
+                pf = 0.9f
+            }
+            value > configBean.tidalFrequencyEnd + 2 -> {
+                pf = 0.8f
+            }
+            value > configBean.tidalFrequencyEnd + 1 -> {
+                pf = 0.7f
+            }
+            value < configBean.tidalFrequency - 5 -> {
+                pf = 0.4f
+            }
+            value < configBean.tidalFrequency - 4 -> {
+                pf = 0.3f
+            }
+            value < configBean.tidalFrequency - 3 -> {
+                pf = 0.2f
+            }
+            value < configBean.tidalFrequency - 2 -> {
+                pf = 0.1f
+            }
         }
-        Log.e("setQyRate", "Rate: ${pf}")
+        Log.e("setQyRate", "Rate: $pf")
         view.setCurrentStatus(pf)
         view.invalidate()
-    }
-
-    //按压中断 - 开启计时器 频率清零
-    private val runnableCF = Runnable {
-        //DataVolatile.setCF_Value()
     }
 
     override fun onResume() {

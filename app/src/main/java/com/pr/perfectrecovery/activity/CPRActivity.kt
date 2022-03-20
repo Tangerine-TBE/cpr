@@ -77,7 +77,8 @@ class CPRActivity : BaseActivity() {
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
         DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
         DataVolatile.PR_LOW_VALUE = configBean.prLow()
-
+        DataVolatile.QY_HIGH_VALUE = configBean.tidalVolumeEnd
+        DataVolatile.QY_LOW_VALUE = configBean.tidalVolume
         //查看是否有蓝牙权限
         checkPermissions()
         viewBinding.bottom.ivBack.setOnClickListener { finish() }

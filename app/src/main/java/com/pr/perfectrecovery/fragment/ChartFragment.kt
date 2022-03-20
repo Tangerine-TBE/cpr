@@ -96,11 +96,11 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            addBarEntry(Random().nextInt(800), 30)
+//            addBarEntry(Random().nextInt(800), 20)
         }
 
         viewBinding.constraintlayout.setOnClickListener {
-            addEntry(data, viewBinding.lineChart, 0f)
+//            addEntry(data, viewBinding.lineChart, 0f)
         }
 
         viewBinding.constraintlayout3.setOnClickListener {
@@ -115,15 +115,15 @@ class ChartFragment : Fragment() {
         if (depth == 0 || depth > data.preDistance - 5) {
             return 0f
         } else if (depth > data.PR_HIGH_VALUE + 20) {
-            return 9.5f
-        } else if (depth > data.PR_HIGH_VALUE + 15) {
             return 9.0f
+        } else if (depth > data.PR_HIGH_VALUE + 15) {
+            return 8.8f
         } else if (depth > data.PR_HIGH_VALUE + 10) {
             return 8.5f
         } else if (depth > data.PR_HIGH_VALUE + 5) {
             return 8.3f
         } else if (depth > data.PR_HIGH_VALUE) {
-            return 8.0f
+            return 8.1f
         } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
             when {
                 depth > data.PR_LOW_VALUE + 5 -> {
@@ -228,6 +228,7 @@ class ChartFragment : Fragment() {
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
             setTouchEnabled(false)
+            isHighlightFullBarEnabled = false
 //            scaleX = 1.5f
             //x轴设置
             xAxis.apply {
@@ -235,16 +236,15 @@ class ChartFragment : Fragment() {
                 setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
                 //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
                 granularity = 1f // only intervals of 1 day
-                labelCount = 30
-                /*valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                      //TODO 自定义X轴label格式
-                    }
-                }*/
+                mAxisMinimum = 0f
             }
             xAxis.setLabelCount(12, false)
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
+            axisLeft.textColor = Color.WHITE
+            axisLeft.labelCount = 4
+            axisLeft.axisMaxLabels = 4
+            axisLeft.mAxisMaximum = 1200f
             axisRight.isEnabled = false
             setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
             isScaleXEnabled = true                             //支持x轴缩放
@@ -259,48 +259,85 @@ class ChartFragment : Fragment() {
             mBarDataSet!!.setDrawValues(false)
             val dataSets = ArrayList<IBarDataSet>()
             dataSets.add(mBarDataSet!!)
+            colors.add(
+                ContextCompat.getColor(requireContext(), R.color.tran)
+            )
+            mBarDataSet!!.colors = colors
             val barData = BarData(dataSets)
+            barData.addEntry(BarEntry(0f, 3.8f), 0)
             data = barData
 //            data.barWidth = 0.3f
+//            addBarEntry(0, 100)
         }
     }
 
     private val values = ArrayList<BarEntry>()
     private val colors = ArrayList<Int>()
+    private var filterValue = 0
 
     //这里要进行图像绘制，所以要切回UI线程，否则会报错
     private fun addBarEntry(value: Int, value2: Int) {
-        Log.e("addBarEntry", "$value")
+        if (value2 > 0) {
+            Log.e("addBarEntry", "$value2")
+        }
         viewBinding.barChart.apply {
             if (barData != null) {
-//                barData.addEntry(BarEntry(value.toFloat(), 0f), 0)
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
-                data.addEntry(BarEntry(entryCount.toFloat(), value.toFloat()), 0)
-                data.notifyDataChanged()
-                when {
-                    value2 in configBean.qyLow()..configBean.qyHigh() -> {
-                        colors.add(
-                            ContextCompat.getColor(requireContext(), R.color.color_37B48B)
-                        )
+                if (value2 > 0) {
+                    when {
+                        value2 <= configBean.tidalVolume - 10 -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                        }
+                        value2 <= configBean.tidalVolume - 5 -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 0.8f), 0)
+                        }
+                        value2 <= configBean.tidalVolume -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 1.0f), 0)
+                        }
+                        value2 <= configBean.tidalVolumeEnd -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 2.2f), 0)
+                        }
+                        value2 > configBean.tidalVolumeEnd -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 3.4f), 0)
+                        }
+                        else -> {
+                            data.addEntry(BarEntry(entryCount.toFloat(), 3.6f), 0)
+                        }
                     }
-                    value2 < configBean.qyLow() -> {
+                    when {
+                        value2 < configBean.tidalVolume -> {
+                            colors.add(
+                                ContextCompat.getColor(requireContext(), R.color.color_FDC457)
+                            )
+                        }
+                        value2 <= configBean.tidalVolumeEnd -> {
+                            colors.add(
+                                ContextCompat.getColor(requireContext(), R.color.color_37B48B)
+                            )
+                        }
+                        value2 > configBean.tidalVolumeEnd -> {
+                            colors.add(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.color_text_selected
+                                )
+                            )
+                        }
+                    }
+                } else {
+                    //延迟移动度
+                    if (filterValue == 0) {
+                        filterValue = 1
                         colors.add(
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )
+                        data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                    } else {
+                        filterValue = 0
                     }
-                    value2 > configBean.qy_max -> {
-                        colors.add(
-                            ContextCompat.getColor(requireContext(), R.color.color_text_selected)
-                        )
-                    }
-                }
-                //给一个默认值
-                if (colors.isEmpty()) {
-                    colors.add(
-                        ContextCompat.getColor(requireContext(), R.color.color_37B48B)
-                    )
                 }
                 mBarDataSet!!.colors = colors
+                data.notifyDataChanged()
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
                 setVisibleXRangeMaximum(12f)
