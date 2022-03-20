@@ -541,7 +541,8 @@ class CycleFragment : Fragment() {
                         err_qy_dead = dataDTO.err_qy_dead
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
-                    } else -> {
+                    }
+                    else -> {
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
                 }

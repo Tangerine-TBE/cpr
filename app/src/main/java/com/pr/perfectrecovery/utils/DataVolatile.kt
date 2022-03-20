@@ -245,6 +245,8 @@ class DataVolatile {
             * */
             if (selectMax(QY_d1, QY_d2, QY_d3) > 10) {
                 QY_RUN_FLAG = 1
+            } else {
+                QY_Value = 0
             }
             if (QY_RUN_FLAG == 1) {
                 Log.e("TAG11", "判断为吹气状态")
@@ -673,10 +675,10 @@ class DataVolatile {
                 value < QY_LOW_VALUE -> {
                     ERR_QY_LOW++
                 }
-                value in QY_HIGH_VALUE..1200 -> {
+                value in QY_HIGH_VALUE..1199 -> {
                     ERR_QY_HIGH++
                 }
-                value > 1200 -> {
+                value >= 1200 -> {
                     ERR_QY_DEAD++
                 }
             }

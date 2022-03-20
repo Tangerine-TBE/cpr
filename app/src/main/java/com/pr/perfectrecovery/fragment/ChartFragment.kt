@@ -285,12 +285,6 @@ class ChartFragment : Fragment() {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 if (value2 > 0) {
                     when {
-                        value2 <= configBean.tidalVolume - 10 -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
-                        }
-                        value2 <= configBean.tidalVolume - 5 -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 0.8f), 0)
-                        }
                         value2 <= configBean.tidalVolume -> {
                             data.addEntry(BarEntry(entryCount.toFloat(), 1.0f), 0)
                         }
