@@ -240,14 +240,6 @@ class CycleFragment : Fragment() {
             trainingDTO.qyManyCount = qyManyCount
             trainingDTO.qyLessCount = qyLessCount
 
-            trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
-            trainingDTO.prCount = configBean.prCount
-            trainingDTO.qyCount = configBean.qyCount
-            trainingDTO.pressScore = configBean.pressScore
-            trainingDTO.blowScore = configBean.blowScore
-            trainingDTO.processScore = configBean.processScore.toFloat()
-            trainingDTO.deduction = configBean.deductionScore
-
             trainingDTO.pr_depth_sum = pr_depth_sum
             trainingDTO.pr_time_sum = pr_time_sum
             trainingDTO.qy_volume_sum = qy_volume_sum
@@ -256,6 +248,14 @@ class CycleFragment : Fragment() {
             trainingDTO.qy_serright_total = qy_serright_total
             trainingDTO.qy_max_volume_sum = qy_max_volume_sum
         }
+        trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
+        trainingDTO.prCount = configBean.prCount
+        trainingDTO.qyCount = configBean.qyCount
+        trainingDTO.cycles = configBean.cycles
+        trainingDTO.pressScore = configBean.pressScore
+        trainingDTO.blowScore = configBean.blowScore
+        trainingDTO.processScore = configBean.processScore.toFloat()
+        trainingDTO.deduction = configBean.deductionScore
         mHandler.removeCallbacks(counter)
         viewBinding.ctTime.stop()
         if (mMediaPlayer != null) {
@@ -597,12 +597,21 @@ class CycleFragment : Fragment() {
 
     //按压频率
     private fun setRate(view: DialChart07View, value: Int) {
-        val max = 200
-        val min = 0
-        val p = value % (max - min + 1) + min
-        var pf = p / 200f
-        if (pf > 0) {
-            pf += 0.03f
+        var pf = 0f
+        if (value > 0) {
+            when {
+                value < configBean.depthFrequency -> {
+                    pf = (0.33f / configBean.depthFrequency) * value
+                }
+                value in configBean.depthFrequency..configBean.depthFrequencyEnd -> {
+                    pf =
+                        (0.33f / (configBean.depthFrequencyEnd - configBean.depthFrequency) * (value - configBean.depthFrequency) + 0.33f)
+                }
+                value > configBean.depthFrequencyEnd -> {
+                    pf =
+                        (0.33f / (200 - configBean.depthFrequencyEnd) * (value - configBean.depthFrequencyEnd) + 0.66f)
+                }
+            }
         }
         view.setCurrentStatus(pf)
         view.invalidate()
@@ -610,43 +619,20 @@ class CycleFragment : Fragment() {
 
     //吹气频率
     private fun setQyRate(view: DialChart07View, value: Int) {
-        val max = configBean.tidalFrequencyEnd
-        val min = 0
-        val p = value % (max - min + 1) + min
         var pf: Float = 0f
-        when {
-            value < 1 -> {
-                pf = 0.0f
-            }
-            value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
-                pf = 0.5f
-            }
-            value > configBean.tidalFrequencyEnd + 5 -> {
-                pf = 1.0f
-            }
-            value > configBean.tidalFrequencyEnd + 4 -> {
-                pf = 0.95f
-            }
-            value > configBean.tidalFrequencyEnd + 3 -> {
-                pf = 0.9f
-            }
-            value > configBean.tidalFrequencyEnd + 2 -> {
-                pf = 0.8f
-            }
-            value > configBean.tidalFrequencyEnd + 1 -> {
-                pf = 0.7f
-            }
-            value < configBean.tidalFrequency - 5 -> {
-                pf = 0.4f
-            }
-            value < configBean.tidalFrequency - 4 -> {
-                pf = 0.3f
-            }
-            value < configBean.tidalFrequency - 3 -> {
-                pf = 0.2f
-            }
-            value < configBean.tidalFrequency - 2 -> {
-                pf = 0.1f
+        if (value > 0) {
+            when {
+                value < configBean.tidalFrequency -> {
+                    pf = (0.33f / configBean.tidalFrequency) * value
+                }
+                value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
+                    pf =
+                        (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
+                }
+                value > configBean.tidalFrequencyEnd -> {
+                    pf =
+                        (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
+                }
             }
         }
         Log.e("setQyRate", "Rate: $pf")

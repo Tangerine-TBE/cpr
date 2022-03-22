@@ -87,7 +87,7 @@ class TrainResultActivity : BaseActivity() {
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
             val scoreTotal =
-                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO)
+                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO) - trainingDTO.getScoreTotal()
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.progress = scoreTotal.roundToInt()
             //总得分
@@ -168,7 +168,7 @@ class TrainResultActivity : BaseActivity() {
      * 3.40->3.4
      * 3.0->3
      */
-    fun getNoMoreThanTwoDigits(number: Float): String {
+    private fun getNoMoreThanTwoDigits(number: Float): String {
         val format = DecimalFormat("0.#")
         //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
         format.roundingMode = RoundingMode.HALF_UP

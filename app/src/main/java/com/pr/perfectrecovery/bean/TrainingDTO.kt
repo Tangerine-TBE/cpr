@@ -35,6 +35,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     var prCount: Int = 0 //按压次数比例
     var qyCount: Int = 0 //吹气次数比例
+    var cycles: Int = 0//循环次数
     var processScore: Float = 0f//流程分数
     var pressScore: Int = 0//按压分数
     var deduction: Float = 0f//扣分
@@ -182,5 +183,14 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getPressTime(): Int {
         return if (pr_time_sum > 0) (pr_time_sum.toFloat() / (endTime - startTime) * 100).roundToInt() else 0
+    }
+
+    /**
+     * 获取扣分数
+     */
+    fun getScoreTotal(): Float {
+        val qy = (blowScore.toFloat() / (qyCount * cycles.toFloat())) * (qyManyCount + qyLessCount)
+        val pr = (pressScore.toFloat() / (prCount * cycles.toFloat())) * (prManyCount + prLessCount)
+        return qy + pr
     }
 }
