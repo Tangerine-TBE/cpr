@@ -220,16 +220,16 @@ class CycleFragment : Fragment() {
             trainingDTO.startTime = startTime
             trainingDTO.endTime = endTime
             trainingDTO.timeOutTotal = timeOutTotal
-            trainingDTO.err_pr_high = err_pr_high
-            trainingDTO.err_pr_low = err_pr_low
-            trainingDTO.err_pr_posi = err_pr_posi
-            trainingDTO.err_pr_unback = err_pr_unback
+            trainingDTO.err_pr_high = err_pr_high - err_pr_high_many
+            trainingDTO.err_pr_low = err_pr_low - err_pr_low_many
+            trainingDTO.err_pr_posi = err_pr_posi - err_pr_posi_many
+            trainingDTO.err_pr_unback = err_pr_unback - err_pr_unback_many
             //按压总错误数
             trainingDTO.pressErrorCount = mBaseDataDTO!!.getPr_err_total()
-            trainingDTO.err_qy_high = err_qy_high
-            trainingDTO.err_qy_low = err_qy_low
-            trainingDTO.err_qy_dead = err_qy_dead
-            trainingDTO.err_qy_close = err_qy_close
+            trainingDTO.err_qy_high = err_qy_high - err_qy_high_many
+            trainingDTO.err_qy_low = err_qy_low - err_qy_low_many
+            trainingDTO.err_qy_dead = err_qy_dead - err_qy_dead_many
+            trainingDTO.err_qy_close = err_qy_close - err_qy_posi_many
             //吹气总错误数s
             trainingDTO.blowErrorCount = mBaseDataDTO!!.getQy_err_total().toFloat()
             trainingDTO.prSum = prSum
@@ -317,12 +317,7 @@ class CycleFragment : Fragment() {
 
     //通气频率
     private var qyRate = 0
-    private var err_pr_low = 0
-    private var err_pr_high = 0
-    private var err_pr_posi = 0
-    private var err_qr_unback = 0
     private var isTimeOut = false
-    private var err_qy_close = 0
 
     /**处理循环次数- 以及考核 超次 少次 数据统计**/
     //当前是否为按压模式-吹气模式
@@ -455,6 +450,16 @@ class CycleFragment : Fragment() {
         }
     }
 
+    private var err_pr_low = 0
+    private var err_pr_high = 0
+    private var err_pr_posi = 0
+    private var err_pr_unback = 0
+
+    private var err_pr_low_many = 0
+    private var err_pr_high_many = 0
+    private var err_pr_posi_many = 0
+    private var err_pr_unback_many = 0
+
     /**
      * 按压处理逻辑
      */
@@ -483,24 +488,35 @@ class CycleFragment : Fragment() {
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
-                subPr()
-            } else if (err_qr_unback != dataDTO.err_pr_unback) {
+                //处理超次后记录
+                if (cyclePrCount > configBean.prCount) {
+                    err_pr_posi_many += 1
+                }
+            } else if (err_pr_unback != dataDTO.err_pr_unback) {
                 //按压未回弹
-                err_qr_unback = dataDTO.err_pr_unback
+                err_pr_unback = dataDTO.err_pr_unback
                 viewBinding.pressLayoutView.setUnBack()
                 setPlayVoice(VOICE_MP3_WHT)
-                subPr()
+                //处理超次后记录
+                if (cyclePrCount > configBean.prCount) {
+                    err_pr_unback_many += 1
+                }
             } else {
-                //按压不足
-                if (err_pr_low != dataDTO.err_pr_low) {
+                if (err_pr_low != dataDTO.err_pr_low) {//按压不足
                     err_pr_low = dataDTO.err_pr_low
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
-                    subPr()
+                    //处理超次后记录
+                    if (cyclePrCount > configBean.prCount) {
+                        err_pr_low_many += 1
+                    }
                 } else if (err_pr_high != dataDTO.err_pr_high) {//按压过大
                     err_pr_high = dataDTO.err_pr_high
                     setPlayVoice(VOICE_MP3_AYGD)
-                    subPr()
+                    //处理超次后记录
+                    if (cyclePrCount > configBean.prCount) {
+                        err_pr_high_many += 1
+                    }
                 }
             }
         }
@@ -510,17 +526,15 @@ class CycleFragment : Fragment() {
         viewBinding.tvPressTotal.text = "/${dataDTO.prSum}"
     }
 
-    private fun subPr() {
-        if (prManyCount > 0) {
-            prManyCount--
-        }
-    }
-
-
     private var err_qy_low = 0
     private var err_qy_high = 0
-    private var err_qy_posi = 0
     private var err_qy_dead = 0
+    private var err_qy_close = 0
+
+    private var err_qy_low_many = 0
+    private var err_qy_high_many = 0
+    private var err_qy_posi_many = 0
+    private var err_qy_dead_many = 0
 
     /**
      * 吹气状态
@@ -541,19 +555,28 @@ class CycleFragment : Fragment() {
                         err_qy_low = dataDTO.err_qy_low
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
-                        subQy()
+                        //处理超次时记录
+                        if (cycleQyCount > configBean.qyCount) {
+                            err_qy_low_many += 1
+                        }
                     }
                     dataDTO.err_qy_high != err_qy_high -> {
                         err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
-                        subQy()
+                        //处理超次时记录
+                        if (cycleQyCount > configBean.qyCount) {
+                            err_qy_high_many += 1
+                        }
                     }
                     dataDTO.err_qy_dead != err_qy_dead -> {
                         err_qy_dead = dataDTO.err_qy_dead
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
-                        subQy()
+                        //处理超次时记录
+                        if (cycleQyCount > configBean.qyCount) {
+                            err_qy_dead_many += 1
+                        }
                     }
                     else -> {
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -566,7 +589,6 @@ class CycleFragment : Fragment() {
             }
         } else {
             if (dataDTO.err_qy_close != err_qy_close) {
-                subQy()
                 err_qy_close = dataDTO.err_qy_close
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
@@ -575,6 +597,10 @@ class CycleFragment : Fragment() {
                 cycleQyCount++
                 isQy = true
                 isPr = false
+                //处理超次时记录
+                if (cycleQyCount > configBean.qyCount) {
+                    err_qy_posi_many += 1
+                }
                 mHandler4.removeCallbacksAndMessages(null)
                 mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             }
@@ -585,12 +611,6 @@ class CycleFragment : Fragment() {
         //吹气错误数统计
         viewBinding.tvLungError.text = "${(dataDTO.getQy_err_total())}"
         viewBinding.tvLungTotal.text = "/${dataDTO.qySum}"
-    }
-
-    private fun subQy() {
-        if (qyManyCount > 0) {
-            qyManyCount--
-        }
     }
 
     /**
