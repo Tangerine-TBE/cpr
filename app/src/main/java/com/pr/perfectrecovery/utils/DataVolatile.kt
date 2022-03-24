@@ -109,6 +109,7 @@ class DataVolatile {
         if (isClear) {
             QY_valueSet.clear()
         }
+
         return maximum
     }
 
@@ -461,6 +462,7 @@ class DataVolatile {
     private var QY_TIME_SUM = 0     //吹气时间总和
     private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
     private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+    private  var L_compare=0;//距离参考值，记录上次的有效值
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
@@ -490,18 +492,19 @@ class DataVolatile {
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
-                if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
+                if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
                         ERR_PR_UNBACK++
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
                         ERR_FLAG = 1;
+
                     }
                 }
                 value = L_d3
             } else {
-                if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
+                if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     //当最低点距离小于30时不作为按压一次处理
                     if (preDistance - L_d2 < 30) {
                         return L_d2
@@ -547,7 +550,7 @@ class DataVolatile {
                 value = L_d2
             }
         } else if (L_d2 < L_d3) {
-            if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
+            if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                 // PR_DOTTIMSE_NUMBER+=3
                 if (preDistance - L_d1 < 30) {
                     return L_d1
@@ -561,7 +564,11 @@ class DataVolatile {
                     PR_SUM++
                     // Log.e("TAG5", "$PR_SUM")
                     if (ERR_FLAG == 0) {
-                        Err_PrTotal(L_d1)
+                        if(L_compare<L_d1){
+                            Err_PrTotal(L_compare)
+                        }else{
+                            Err_PrTotal(L_d1)
+                        }
                     } else {
                         ERR_FLAG = 0;
                     }
@@ -607,7 +614,7 @@ class DataVolatile {
             }
             value = L_d2
         } else {
-            if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 10) {
+            if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                 // PR_DOTTIMSE_NUMBER+=3
                 Log.e("TAG7", "初始位置$preDistance")
                 if (abs(preDistance - L_d2) < 12) {
@@ -621,6 +628,7 @@ class DataVolatile {
             }
             value = L_d2
         }
+        L_compare=value
         return value
     }
 
@@ -640,16 +648,19 @@ class DataVolatile {
 
         if (PSR_Value == 0) {
             ERR_PR_POSI++
+            Log.e("TAG11", "按压位置错误")
         } else {
             var value = abs(preDistance - l)
             if (value < PR_LOW_VALUE) {
                 ERR_PR_LOW++
-                //   Log.e("TAG1", "按压不足")
-                //    Log.e("TAG1", "$value")
+                Log.e("TAG11", "$PR_LOW_VALUE")
+                   Log.e("TAG11", "按压不足")
+                    Log.e("TAG11", "$value")
             } else if (value > PR_HIGH_VALUE) {
                 ERR_PR_HIGH++
-                //    Log.e("TAG2", "按压过深")
-                //   Log.e("TAG2", "$value")
+                    Log.e("TAG11", "$PR_HIGH_VALUE")
+                    Log.e("TAG11", "按压过深")
+                   Log.e("TAG11", "$value")
             }
             // Log.e("TAG3", "$value")
         }
