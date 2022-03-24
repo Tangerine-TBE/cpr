@@ -213,6 +213,8 @@ class CycleFragment : Fragment() {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
+        prMany()
+        qyMany()
 //        qyMany()
         val trainingDTO = TrainingDTO()
         //此处返回结果数据
@@ -410,7 +412,7 @@ class CycleFragment : Fragment() {
 
     private var qyManyCycle = 0
     private fun qyMany() {
-        if (isCheck && cycleCount != qyManyCycle) {
+        if (isCheck && cycleCount != qyManyCycle && cycleQyCount > 0) {
             qyManyCycle = cycleCount
             if (cycleQyCount > configBean.qyCount) {
                 //吹气超次
@@ -439,7 +441,7 @@ class CycleFragment : Fragment() {
 
     private fun prMany() {
         if (isCheck) {
-            if (cyclePrCount > configBean.prCount) {
+            if (cyclePrCount > configBean.prCount && cyclePrCount > 0) {
                 //按压超次
                 prManyCount += cyclePrCount - configBean.prCount
             } else if (cyclePrCount < configBean.prCount) {
