@@ -159,7 +159,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 正确按压次数 * 按压设定分数 / 按压设定总数
      */
     fun getPrScore(): Float {
-        return if (prSum > 0 && (prSum - pressErrorCount) > 0) (prSum - pressErrorCount) * pressScore / (prCount * cycleCount).toFloat() else 0f
+        var value = 0f
+        if (prSum > 0 && (prSum - pressErrorCount) > 0) {
+            value =
+                (prSum - pressErrorCount) * pressScore / (prCount * cycleCount).toFloat() - getPrManyScore()
+        }
+        return if (value > 0) value else 0f
     }
 
     /**
@@ -167,7 +172,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 正确吹气次数 * 吹气设定分数 / 吹气设定总数
      */
     fun getQyScore(): Float {
-        return if (qySum > 0 && (qySum - blowErrorCount) > 0) ((qySum - blowErrorCount) * blowScore / (qyCount * cycleCount)) else 0f
+        var value = 0f
+        if (qySum > 0 && (qySum - blowErrorCount) > 0) {
+            value =
+                ((qySum - blowErrorCount) * blowScore / (qyCount * cycleCount)) - getQyManyScore()
+        }
+        return if (value > 0) value else 0f
     }
 
     /**
@@ -186,11 +196,20 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     }
 
     /**
+     * 超次少次扣分
+     */
+    fun getPrManyScore(): Float {
+        return (pressScore.toFloat() / (prCount * cycles.toFloat())) * (prManyCount + prLessCount)
+    }
+
+    fun getQyManyScore(): Float {
+        return (blowScore.toFloat() / (qyCount * cycles.toFloat())) * (qyManyCount + qyLessCount)
+    }
+
+    /**
      * 获取扣分数
      */
     fun getScoreTotal(): Float {
-        val qy = (blowScore.toFloat() / (qyCount * cycles.toFloat())) * (qyManyCount + qyLessCount)
-        val pr = (pressScore.toFloat() / (prCount * cycles.toFloat())) * (prManyCount + prLessCount)
-        return qy + pr
+        return getPrManyScore() + getQyManyScore()
     }
 }

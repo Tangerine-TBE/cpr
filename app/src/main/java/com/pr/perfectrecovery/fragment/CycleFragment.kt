@@ -483,20 +483,24 @@ class CycleFragment : Fragment() {
                     viewBinding.ivPressAim.visibility = View.INVISIBLE
                 }, 2000)
                 setPlayVoice(VOICE_MP3_AYWZCW)
+                prManyCount--
             } else if (err_qr_unback != dataDTO.err_pr_unback) {
                 //按压未回弹
                 err_qr_unback = dataDTO.err_pr_unback
                 viewBinding.pressLayoutView.setUnBack()
                 setPlayVoice(VOICE_MP3_WHT)
+                prManyCount--
             } else {
                 //按压不足
                 if (err_pr_low != dataDTO.err_pr_low) {
                     err_pr_low = dataDTO.err_pr_low
                     viewBinding.pressLayoutView.setDown()
                     setPlayVoice(VOICE_MP3_AYBZ)
+                    prManyCount--
                 } else if (err_pr_high != dataDTO.err_pr_high) {//按压过大
                     err_pr_high = dataDTO.err_pr_high
                     setPlayVoice(VOICE_MP3_AYGD)
+                    prManyCount--
                 }
             }
         }
@@ -531,16 +535,19 @@ class CycleFragment : Fragment() {
                         err_qy_low = dataDTO.err_qy_low
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
+                        qyManyCount--
                     }
                     dataDTO.err_qy_high != err_qy_high -> {
                         err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
+                        qyManyCount--
                     }
                     dataDTO.err_qy_dead != err_qy_dead -> {
                         err_qy_dead = dataDTO.err_qy_dead
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
+                        qyManyCount--
                     }
                     else -> {
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
@@ -553,6 +560,7 @@ class CycleFragment : Fragment() {
             }
         } else {
             if (dataDTO.err_qy_close != err_qy_close) {
+                qyManyCount--
                 err_qy_close = dataDTO.err_qy_close
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
