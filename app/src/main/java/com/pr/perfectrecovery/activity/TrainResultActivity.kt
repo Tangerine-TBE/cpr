@@ -92,7 +92,7 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.layoutCheck.ratingBar.progress = scoreTotal.roundToInt()
             //总得分
             viewBinding.layoutCheck.tvScore.text =
-                "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0}"
+                "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
             //总分数
             trainingDTO.score = scoreTotal
 

@@ -718,8 +718,8 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
         mTrainingDTO.prCount = configBean.prCount
         mTrainingDTO.qyCount = configBean.qyCount
-        mTrainingDTO.pressScore = configBean.pressScore
-        mTrainingDTO.blowScore = configBean.blowScore
+        mTrainingDTO.pressScore = configBean.pressScore.toFloat()
+        mTrainingDTO.blowScore = configBean.blowScore.toFloat()
         mTrainingDTO.processScore = configBean.processScore.toFloat()
         mTrainingDTO.deduction = configBean.deductionScore
 

@@ -16,6 +16,15 @@ class DataVolatile {
 
         var QY_LOW_VALUE = 35
         var QY_HIGH_VALUE = 50
+
+        //默认单次循环吹气次数
+        var QY_DEFAULT_TIMES = 2
+
+        //默认单次按压循环的次数是30
+        var PR_DEFAULT_TIMES = 30;
+
+        //操作模式false-训练 true-考核模式
+        var MODEL: Boolean = true
     }
 
     //电量值：  0-100%
@@ -462,7 +471,7 @@ class DataVolatile {
     private var QY_TIME_SUM = 0     //吹气时间总和
     private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
     private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
-    private  var L_compare=0;//距离参考值，记录上次的有效值
+    private var L_compare = 0;//距离参考值，记录上次的有效值
 
     /*
     * 根据按压三次相邻的距离值找到有效值。
@@ -484,11 +493,11 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
-        if(QY_CYCLE_TIMES<QY_DEFAULT_TIMES&&QY_CYCLE_TIMES>0){
-            QY_TIMES_TOOLITTLE=QY_DEFAULT_TIMES-QY_CYCLE_TIMES
-            QY_CYCLE_TIMES=0
-        }else{
-            QY_CYCLE_TIMES=0
+        if (QY_CYCLE_TIMES < QY_DEFAULT_TIMES && QY_CYCLE_TIMES > 0) {
+            QY_TIMES_TOOLITTLE = QY_DEFAULT_TIMES - QY_CYCLE_TIMES
+            QY_CYCLE_TIMES = 0
+        } else {
+            QY_CYCLE_TIMES = 0
         }
 
         // int low_flag=0;
@@ -569,9 +578,9 @@ class DataVolatile {
                     PR_CYCLE_TIMES++
                     // Log.e("TAG5", "$PR_SUM")
                     if (ERR_FLAG == 0) {
-                        if(L_compare<L_d1){
+                        if (L_compare < L_d1) {
                             Err_PrTotal(L_compare)
-                        }else{
+                        } else {
                             Err_PrTotal(L_d1)
                         }
                     } else {
@@ -633,7 +642,7 @@ class DataVolatile {
             }
             value = L_d2
         }
-        L_compare=value
+        L_compare = value
         return value
     }
 
@@ -650,18 +659,18 @@ class DataVolatile {
     private var ERR_PR_POSI = 0
 
     //按压超次
-    private var ERR_PR_TOOMORE=0
+    private var ERR_PR_TOOMORE = 0
+
     //按压少次
-    private var ERR_PR_TOOLITTLE=0
-    //默认单次按压循环的次数是30
-    private var PR_DEFAULT_TIMES=30;
+    private var ERR_PR_TOOLITTLE = 0
+
     //单次按压循环的次数
-    private var PR_CYCLE_TIMES=0;
+    private var PR_CYCLE_TIMES = 0;
 
     private fun Err_PrTotal(l: Int) {
-        if(model && (PR_CYCLE_TIMES>PR_DEFAULT_TIMES)) {
+        if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
             ERR_PR_TOOMORE++
-        }else {
+        } else {
             if (PSR_Value == 0) {
                 ERR_PR_POSI++
                 Log.e("TAG11", "按压位置错误")
@@ -695,20 +704,19 @@ class DataVolatile {
     //吹气错误-气道未打开错误
     private var ERR_QY_CLOSE = 0
 
-    //默认单次循环吹气次数
-    private var QY_DEFAULT_TIMES=2
     //单次循环吹气次数
-    private var QY_CYCLE_TIMES=0;
+    private var QY_CYCLE_TIMES = 0
+
     //吹气超次
-    private var QY_TIMES_TOOMORE=0
+    private var QY_TIMES_TOOMORE = 0
+
     //吹气少次
-    private var QY_TIMES_TOOLITTLE=0;
-    //操作模式false-训练 true-考核模式
-    private var  model:Boolean=true
+    private var QY_TIMES_TOOLITTLE = 0
+
     private fun ERR_QyTotal(value: Int) {
-        if(model&&QY_CYCLE_TIMES>QY_DEFAULT_TIMES){
+        if (MODEL && QY_CYCLE_TIMES > QY_DEFAULT_TIMES) {
             QY_TIMES_TOOMORE++
-        }else {
+        } else {
             if (TOS_Value == 0) {
                 ERR_QY_CLOSE++
             } else {
@@ -738,10 +746,10 @@ class DataVolatile {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
-           /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
-                ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
-            }*/
-            PR_CYCLE_TIMES=0
+            /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
+                 ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
+             }*/
+            PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0

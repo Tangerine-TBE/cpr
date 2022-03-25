@@ -37,9 +37,9 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var qyCount: Int = 0 //吹气次数比例
     var cycles: Int = 0//循环次数
     var processScore: Float = 0f//流程分数
-    var pressScore: Int = 0//按压分数
+    var pressScore: Float = 0f//按压分数
     var deduction: Float = 0f//扣分
-    var blowScore: Int = 0//吹气、通气 分数
+    var blowScore: Float = 0f//吹气、通气 分数
 
     var prManyCount: Int = 0//按压多次
     var prLessCount: Int = 0//按压少次
@@ -162,9 +162,9 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
         var value = 0f
         if (prSum > 0 && (prSum - pressErrorCount) > 0) {
             value =
-                (prSum - pressErrorCount) * pressScore / (prCount * cycleCount).toFloat() - getPrManyScore()
+                (prSum - pressErrorCount.toFloat()) * pressScore / (prCount * cycleCount).toFloat() - getPrManyScore()
         }
-        return if (value > 0) value else 0f
+        return if (value > 0) value else 0.0f
     }
 
     /**
@@ -175,9 +175,9 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
         var value = 0f
         if (qySum > 0 && (qySum - blowErrorCount) > 0) {
             value =
-                ((qySum - blowErrorCount) * blowScore / (qyCount * cycleCount)) - getQyManyScore()
+                ((qySum - blowErrorCount) * blowScore / (qyCount.toFloat() * cycleCount.toFloat())) - getQyManyScore()
         }
-        return if (value > 0) value else 0f
+        return if (value > 0) value else 0.0f
     }
 
     /**
@@ -199,7 +199,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 超次少次扣分
      */
     fun getPrManyScore(): Float {
-        return (pressScore.toFloat() / (prCount * cycles.toFloat())) * (prManyCount + prLessCount)
+        return (pressScore / (prCount * cycles.toFloat())) * (prManyCount + prLessCount)
     }
 
     fun getQyManyScore(): Float {

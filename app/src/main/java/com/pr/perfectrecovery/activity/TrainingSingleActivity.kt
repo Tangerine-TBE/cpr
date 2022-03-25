@@ -13,7 +13,9 @@ import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
+import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
+import org.greenrobot.eventbus.EventBus
 
 /**
  * 训练模式- 单人 - 多人
@@ -71,6 +73,9 @@ class TrainingSingleActivity : BaseActivity() {
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
                     mTrainingBean.isCheck = true
+                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
+                    messageEventData.isCheck = true
+                    EventBus.getDefault().post(messageEventData)
                     //考核模式  禁止使用语音和提示音
                     binding.single.switchBeat.isChecked = false
                     binding.single.switchVoice.isChecked = false
@@ -79,6 +84,9 @@ class TrainingSingleActivity : BaseActivity() {
                 }
                 //练习模式
                 R.id.cbTraining -> {
+                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
+                    messageEventData.isCheck = false
+                    EventBus.getDefault().post(messageEventData)
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
                     mTrainingBean.isCheck = false
@@ -183,7 +191,7 @@ class TrainingSingleActivity : BaseActivity() {
     }
 
     private fun initMac(mac: String): String {
-        val new = mac.replace(":","")
+        val new = mac.replace(":", "")
         return new.lowercase()
     }
 }

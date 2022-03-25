@@ -112,57 +112,30 @@ class ChartFragment : Fragment() {
 
     private fun setValue(value: Int, data: BaseDataDTO): Float {
         val depth = data.preDistance - value
-        if (depth == 0 || depth > data.preDistance - 5) {
-            return 0f
-        } else if (depth > data.PR_HIGH_VALUE + 20) {
-            return 9.0f
-        } else if (depth > data.PR_HIGH_VALUE + 15) {
-            return 8.8f
-        } else if (depth > data.PR_HIGH_VALUE + 10) {
-            return 8.5f
-        } else if (depth > data.PR_HIGH_VALUE + 5) {
-            return 8.3f
-        } else if (depth > data.PR_HIGH_VALUE) {
-            return 8.1f
-        } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
-            when {
-                depth > data.PR_LOW_VALUE + 5 -> {
-                    return 7.9f
-                }
-                depth > data.PR_LOW_VALUE + 10 -> {
-                    return 7f
-                }
-                depth > data.PR_LOW_VALUE + 15 -> {
-                    return 6f
-                }
-                depth > data.PR_LOW_VALUE + 20 -> {
-                    return 5f
-                }
-            }
-        } else if (data.PR_LOW_VALUE - 25 > 0 && depth < data.PR_LOW_VALUE - 25) {
-            return 1f
-        } else if (depth < data.PR_LOW_VALUE - 22) {
-            return 2f
-        } else if (depth < data.PR_LOW_VALUE - 20) {
-            return 3.0f
-        } else if (depth < data.PR_LOW_VALUE - 18) {
-            return 3.2f
-        } else if (depth < data.PR_LOW_VALUE - 16) {
-            return 3.4f
-        } else if (depth < data.PR_LOW_VALUE - 14) {
-            return 3.6f
-        } else if (depth < data.PR_LOW_VALUE - 12) {
-            return 3.4f
-        } else if (depth < data.PR_LOW_VALUE - 10) {
-            return 3.0f
-        } else if (depth < data.PR_LOW_VALUE - 8) {
-            return 4.0f
-        } else if (depth < data.PR_LOW_VALUE - 5) {
-            return 4.5f
-        } else if (depth < data.PR_LOW_VALUE) {
-            return 4.9f
-        }
-        return 0f
+//        Log.e("depth", "$depth")
+//        if (depth > data.PR_HIGH_VALUE) {
+//            return 8.1f
+//        } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
+//            when {
+//                depth > data.PR_LOW_VALUE + 5 -> {
+//                    return 7.9f
+//                }
+//                depth > data.PR_LOW_VALUE + 10 -> {
+//                    return 7f
+//                }
+//                depth > data.PR_LOW_VALUE + 15 -> {
+//                    return 6f
+//                }
+//                depth > data.PR_LOW_VALUE + 20 -> {
+//                    return 5f
+//                }
+//            }
+//        } else if (depth > 5) {
+//            return 1f
+//        } else if (depth < data.PR_LOW_VALUE) {
+//            return 3f
+//        }
+        return depth.toFloat()
     }
 
     private fun setViewData() {

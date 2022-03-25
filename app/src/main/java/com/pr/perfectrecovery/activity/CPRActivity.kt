@@ -79,6 +79,9 @@ class CPRActivity : BaseActivity() {
         DataVolatile.PR_LOW_VALUE = configBean.prLow()
         DataVolatile.QY_HIGH_VALUE = configBean.tidalVolumeEnd
         DataVolatile.QY_LOW_VALUE = configBean.tidalVolume
+        DataVolatile.PR_DEFAULT_TIMES = configBean.prCount
+        DataVolatile.QY_DEFAULT_TIMES = configBean.qyCount
+
         //查看是否有蓝牙权限
         checkPermissions()
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
@@ -145,6 +148,9 @@ class CPRActivity : BaseActivity() {
                 dataMap.values.forEach { item ->
                     item.dataClear()
                 }
+            }
+            BaseConstant.EVENT_CPR_CHECK -> {
+                DataVolatile.MODEL = event.isCheck
             }
         }
     }
