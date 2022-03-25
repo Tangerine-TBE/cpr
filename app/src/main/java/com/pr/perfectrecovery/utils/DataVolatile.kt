@@ -484,9 +484,12 @@ class DataVolatile {
             UNBACK_FLAG = 0
             return preDistance.toInt()
         }
-        /* if(abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15&&abs(L_d1-L_d2)<15){
-             return L_d2
-         }*/
+        if(QY_CYCLE_TIMES<QY_DEFAULT_TIMES&&QY_CYCLE_TIMES>0){
+            QY_TIMES_TOOLITTLE=QY_DEFAULT_TIMES-QY_CYCLE_TIMES
+            QY_CYCLE_TIMES=0
+        }else{
+            QY_CYCLE_TIMES=0
+        }
 
         // int low_flag=0;
         if (L_d1 >= L_d2) {
@@ -512,6 +515,7 @@ class DataVolatile {
                     if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                         low_flag = 1
                         PR_SUM++
+                        PR_CYCLE_TIMES++
                         //  Log.e("TAG5", "$PR_SUM")
                         if (ERR_FLAG == 0) {
                             Err_PrTotal(L_d2)
@@ -562,6 +566,7 @@ class DataVolatile {
                     low_flag = 1
 
                     PR_SUM++
+                    PR_CYCLE_TIMES++
                     // Log.e("TAG5", "$PR_SUM")
                     if (ERR_FLAG == 0) {
                         if(L_compare<L_d1){
@@ -644,25 +649,37 @@ class DataVolatile {
     //按压错误-按压位置错误
     private var ERR_PR_POSI = 0
 
-    private fun Err_PrTotal(l: Int) {
+    //按压超次
+    private var ERR_PR_TOOMORE=0
+    //按压少次
+    private var ERR_PR_TOOLITTLE=0
+    //默认单次按压循环的次数是30
+    private var PR_DEFAULT_TIMES=30;
+    //单次按压循环的次数
+    private var PR_CYCLE_TIMES=0;
 
-        if (PSR_Value == 0) {
-            ERR_PR_POSI++
-            Log.e("TAG11", "按压位置错误")
-        } else {
-            var value = abs(preDistance - l)
-            if (value < PR_LOW_VALUE) {
-                ERR_PR_LOW++
-                Log.e("TAG11", "$PR_LOW_VALUE")
-                   Log.e("TAG11", "按压不足")
+    private fun Err_PrTotal(l: Int) {
+        if(PR_CYCLE_TIMES>PR_DEFAULT_TIMES) {
+            ERR_PR_TOOMORE++
+        }else {
+            if (PSR_Value == 0) {
+                ERR_PR_POSI++
+                Log.e("TAG11", "按压位置错误")
+            } else {
+                var value = abs(preDistance - l)
+                if (value < PR_LOW_VALUE) {
+                    ERR_PR_LOW++
+                    Log.e("TAG11", "$PR_LOW_VALUE")
+                    Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-            } else if (value > PR_HIGH_VALUE) {
-                ERR_PR_HIGH++
+                } else if (value > PR_HIGH_VALUE) {
+                    ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
-                   Log.e("TAG11", "$value")
+                    Log.e("TAG11", "$value")
+                }
+                // Log.e("TAG3", "$value")
             }
-            // Log.e("TAG3", "$value")
         }
     }
 
@@ -678,19 +695,32 @@ class DataVolatile {
     //吹气错误-气道未打开错误
     private var ERR_QY_CLOSE = 0
 
+    //默认单次循环吹气次数
+    private var QY_DEFAULT_TIMES=2
+    //单次循环吹气次数
+    private var QY_CYCLE_TIMES=0;
+    //吹气超次
+    private var QY_TIMES_TOOMORE=0
+    //吹气少次
+    private var QY_TIMES_TOOLITTLE=0;
+
     private fun ERR_QyTotal(value: Int) {
-        if (TOS_Value == 0) {
-            ERR_QY_CLOSE++
-        } else {
-            when {
-                value < QY_LOW_VALUE -> {
-                    ERR_QY_LOW++
-                }
-                value in QY_HIGH_VALUE..1199 -> {
-                    ERR_QY_HIGH++
-                }
-                value >= 1200 -> {
-                    ERR_QY_DEAD++
+        if(QY_CYCLE_TIMES>QY_DEFAULT_TIMES){
+            QY_TIMES_TOOMORE++
+        }else {
+            if (TOS_Value == 0) {
+                ERR_QY_CLOSE++
+            } else {
+                when {
+                    value < QY_LOW_VALUE -> {
+                        ERR_QY_LOW++
+                    }
+                    value in QY_HIGH_VALUE..1199 -> {
+                        ERR_QY_HIGH++
+                    }
+                    value >= 1200 -> {
+                        ERR_QY_DEAD++
+                    }
                 }
             }
         }
@@ -707,13 +737,19 @@ class DataVolatile {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
+            if(PR_CYCLE_TIMES<30&&PR_CYCLE_TIMES>0){
+                ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
+            }
+            PR_CYCLE_TIMES=0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0
             if (top_flag == 1) {
-                ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
+
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
+                QY_CYCLE_TIMES++
+                ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
                 top_flag = 0
                 Qliang = 0
                 if (QY_SUM > 1) {
