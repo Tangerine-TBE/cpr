@@ -659,7 +659,7 @@ class DataVolatile {
     private var PR_CYCLE_TIMES=0;
 
     private fun Err_PrTotal(l: Int) {
-        if(PR_CYCLE_TIMES>PR_DEFAULT_TIMES) {
+        if(model && (PR_CYCLE_TIMES>PR_DEFAULT_TIMES)) {
             ERR_PR_TOOMORE++
         }else {
             if (PSR_Value == 0) {
@@ -703,9 +703,10 @@ class DataVolatile {
     private var QY_TIMES_TOOMORE=0
     //吹气少次
     private var QY_TIMES_TOOLITTLE=0;
-
+    //操作模式false-训练 true-考核模式
+    private var  model:Boolean=true
     private fun ERR_QyTotal(value: Int) {
-        if(QY_CYCLE_TIMES>QY_DEFAULT_TIMES){
+        if(model&&QY_CYCLE_TIMES>QY_DEFAULT_TIMES){
             QY_TIMES_TOOMORE++
         }else {
             if (TOS_Value == 0) {
@@ -737,9 +738,9 @@ class DataVolatile {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
-            if(PR_CYCLE_TIMES<30&&PR_CYCLE_TIMES>0){
+           /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                 ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
-            }
+            }*/
             PR_CYCLE_TIMES=0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
