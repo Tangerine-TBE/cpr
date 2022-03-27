@@ -82,10 +82,6 @@ class PressLayoutView2 : LinearLayout {
     }
 
     private var newY = 0
-    private var prCount = 0
-    private var down = 0
-    private var isDown = false
-    private var isRate = false
     fun smoothScrollTo(destY: Int, dataDTO: BaseDataDTO) {
         Log.e("smoothScrollTo_1", "$destY")
         //距离值：  30-150
@@ -136,30 +132,29 @@ class PressLayoutView2 : LinearLayout {
 
     private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
         val number = abs(dataDTO.preDistance - value)
-        //Log.e("getNumber", "$value   计算后的按压距离值：$number")
         if (number < 10) {
             return 0
         }
         return when {
-            number < dataDTO.PR_LOW_VALUE - 5 -> {
+            number < dataDTO.PR_LOW_VALUE - 20 -> {
                 1
             }
-            number < dataDTO.PR_LOW_VALUE - 10 -> {
+            number < dataDTO.PR_LOW_VALUE - 17 -> {
                 2
             }
-            number < dataDTO.PR_LOW_VALUE - 15 -> {
+            number < dataDTO.PR_LOW_VALUE - 14 -> {
                 3
             }
-            number < dataDTO.PR_LOW_VALUE - 20 -> {
+            number < dataDTO.PR_LOW_VALUE - 11 -> {
                 4
             }
-            number < dataDTO.PR_LOW_VALUE - 25 -> {
+            number < dataDTO.PR_LOW_VALUE - 8 -> {
                 5
             }
-            number < dataDTO.PR_LOW_VALUE - 30 -> {
+            number < dataDTO.PR_LOW_VALUE - 5 -> {
                 6
             }
-            number < dataDTO.PR_LOW_VALUE - 35 -> {
+            number < dataDTO.PR_LOW_VALUE - 2 -> {
                 7
             }
             number < dataDTO.PR_LOW_VALUE -> {
