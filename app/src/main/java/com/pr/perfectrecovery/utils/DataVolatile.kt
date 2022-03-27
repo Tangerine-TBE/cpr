@@ -676,12 +676,12 @@ class DataVolatile {
                 Log.e("TAG11", "按压位置错误")
             } else {
                 var value = abs(preDistance - l)
-                if (value < PR_LOW_VALUE) {
+                if (value < PR_LOW_VALUE*2-28) {
                     ERR_PR_LOW++
                     Log.e("TAG11", "$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-                } else if (value > PR_HIGH_VALUE) {
+                } else if (value > PR_HIGH_VALUE*2-12) {
                     ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
