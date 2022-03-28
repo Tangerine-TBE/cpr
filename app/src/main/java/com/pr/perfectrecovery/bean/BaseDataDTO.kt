@@ -57,7 +57,9 @@ data class BaseDataDTO(
     var qy_serright_total: Int = 0,//吹气频率正确的次数
     var qyMaxValue: Int = 0//吹气最大值
 ) {
-
+    var L_d1 = 0
+    var L_d2 = 0
+    var L_d3 = 0
     //是否开始
     var isStart = false
     override fun toString(): String {
@@ -77,7 +79,6 @@ data class BaseDataDTO(
     fun getQy_err_total(): Int {
         return err_qy_close + err_qy_low + err_qy_dead + err_qy_high
     }
-
 
     var PR_HIGH_VALUE: Int = 0
     var PR_LOW_VALUE: Int = 0

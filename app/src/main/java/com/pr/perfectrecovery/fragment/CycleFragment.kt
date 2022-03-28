@@ -213,8 +213,8 @@ class CycleFragment : Fragment() {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
-        prMany()
-        qyMany()
+//        prMany()
+//        qyMany()
 //        qyMany()
         val trainingDTO = TrainingDTO()
         //此处返回结果数据

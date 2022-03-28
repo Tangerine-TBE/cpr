@@ -24,7 +24,7 @@ class DataVolatile {
         var PR_DEFAULT_TIMES = 30;
 
         //操作模式false-训练 true-考核模式
-        var MODEL: Boolean = true
+        var MODEL: Boolean = false
     }
 
     //电量值：  0-100%
@@ -75,6 +75,9 @@ class DataVolatile {
     private var Qliang = 0
 
     private val dataDTO = BaseDataDTO()
+    private var L_d1 = 0
+    private var L_d2 = 0
+    private var L_d3 = 0
 
     //是否开始数据传输
     private var isStart = false
@@ -196,7 +199,7 @@ class DataVolatile {
                 PSR_Value = 0
             }
             //按压距离
-            val L_d1 = DataFormatUtils.byteArrayToInt(
+            L_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
                         12,
@@ -204,7 +207,7 @@ class DataVolatile {
                     )
                 )
             )
-            val L_d2 = DataFormatUtils.byteArrayToInt(
+            L_d2 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
                         14,
@@ -212,7 +215,7 @@ class DataVolatile {
                     )
                 )
             )
-            val L_d3 = DataFormatUtils.byteArrayToInt(
+            L_d3 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
                         16,
@@ -347,6 +350,11 @@ class DataVolatile {
         dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
+
+        dataDTO.L_d1 = L_d1
+        dataDTO.L_d2 = L_d2
+        dataDTO.L_d3 = L_d3
+
         return dataDTO
     }
 
@@ -675,13 +683,13 @@ class DataVolatile {
                 ERR_PR_POSI++
                 Log.e("TAG11", "按压位置错误")
             } else {
-                var value = abs(preDistance - l)
-                if (value < PR_LOW_VALUE*2-28) {
+                val value = abs(preDistance - l)
+                if (value < PR_LOW_VALUE * 2 - 28) {
                     ERR_PR_LOW++
                     Log.e("TAG11", "$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-                } else if (value > PR_HIGH_VALUE*2-12) {
+                } else if (value > PR_HIGH_VALUE * 2 - 30) {
                     ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")

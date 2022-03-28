@@ -352,7 +352,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_20"
+                            android:layout_marginTop="@dimen/dp_30"
                             android:text="6cm"
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
@@ -377,8 +377,7 @@
                         android:id="@+id/lineChart1"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
-                        android:layout_marginTop="@dimen/dp_30"
-                        android:layout_marginStart="@dimen/dp_50"
+                        android:layout_marginTop="@dimen/dp_32"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
 
@@ -386,7 +385,7 @@
                         android:id="@+id/constraintlayout4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_40"
+                        android:layout_marginTop="@dimen/dp_50"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
 
                     <TextView
@@ -417,7 +416,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_28"
+                            android:layout_marginTop="@dimen/dp_30"
                             android:text="100cpm"
                             android:textColor="#ffffffff"
                             android:textSize="13sp"

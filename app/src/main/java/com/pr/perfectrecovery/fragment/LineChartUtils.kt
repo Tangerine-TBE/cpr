@@ -2,16 +2,11 @@ package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IValueFormatter
-import kotlin.math.roundToInt
+
 
 object LineChartUtils {
 
@@ -20,14 +15,13 @@ object LineChartUtils {
         chart.setDrawGridBackground(false)
         // no description text
         chart.description.isEnabled = false
-        chart.setNoDataText("暂无数据")
+        chart.setNoDataText("")
         // enable touch gestures
         chart.setTouchEnabled(false)
         chart.setDrawBorders(true)
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)
-
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
 
@@ -36,19 +30,47 @@ object LineChartUtils {
         xl.axisMinimum = 0f
         xl.setDrawGridLines(false)
         xl.isEnabled = false
+        xl.granularity = 1f
+        //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
+        val limitLine = LimitLine(startNum.toFloat())
+        //设置限制线的宽
+        limitLine.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine.label = ""
+        limitLine.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine.enableDashedLine(10f, 10f, 0f)
+
+        val limitLine2 = LimitLine(endNum.toFloat())
+        //设置限制线的宽
+        limitLine2.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine2.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine2.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine2.label = ""
+        limitLine2.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine2.enableDashedLine(10f, 10f, 0f)
 
         val leftAxis: YAxis = chart.axisLeft
         leftAxis.isInverted = true
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        leftAxis.mAxisMaximum = 5f
-        leftAxis.labelCount = 5
-        leftAxis.isEnabled = true
+        leftAxis.mAxisMaximum = 10f
+        leftAxis.labelCount = 10
+        leftAxis.isEnabled = false
         leftAxis.textSize = 12f
         leftAxis.textColor = Color.WHITE
         leftAxis.setDrawGridLines(true)
         leftAxis.setValueFormatter { value, axis ->
             "${value.toInt()}cm"
         }
+        //左边Y轴添加限制线
+        leftAxis.addLimitLine(limitLine)
+        leftAxis.addLimitLine(limitLine2)
         val rightAxis: YAxis = chart.axisRight
         rightAxis.isEnabled = false
         rightAxis.setDrawGridLines(false)

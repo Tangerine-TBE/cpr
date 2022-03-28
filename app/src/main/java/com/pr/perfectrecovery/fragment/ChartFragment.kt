@@ -67,22 +67,28 @@ class ChartFragment : Fragment() {
     private fun initView() {
         //曲线图表
         val data: LineData = getData(0f)
-        val data1: LineData = getData(9.9f)
+        val data1: LineData = getData(0f)
         val data2: LineData = getData(0f)
+//        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
+//        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
+        depth_threshold_low = configBean.prLow() * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
+        depth_threshold_high = configBean.prHigh() * 2 - 30  //上限值放大8mm
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(
             viewBinding.lineChart1,
             data1,
-            configBean.depth,
-            configBean.depthEnd
+            6,
+            9
         )
+//        initLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
         StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setData(it)
                 addEntry(data, viewBinding.lineChart, it.cf.toFloat())
                 addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
+//                addEntry(data2, viewBinding.lineChart1, it)
                 addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
@@ -110,32 +116,25 @@ class ChartFragment : Fragment() {
         setViewData()
     }
 
+    private var depth_threshold_low = 0
+    private var depth_threshold_high = 0
     private fun setValue(value: Int, data: BaseDataDTO): Float {
         val depth = data.preDistance - value
-//        Log.e("depth", "$depth")
-//        if (depth > data.PR_HIGH_VALUE) {
-//            return 8.1f
-//        } else if (depth in data.PR_LOW_VALUE..data.PR_HIGH_VALUE) {
-//            when {
-//                depth > data.PR_LOW_VALUE + 5 -> {
-//                    return 7.9f
-//                }
-//                depth > data.PR_LOW_VALUE + 10 -> {
-//                    return 7f
-//                }
-//                depth > data.PR_LOW_VALUE + 15 -> {
-//                    return 6f
-//                }
-//                depth > data.PR_LOW_VALUE + 20 -> {
-//                    return 5f
-//                }
-//            }
-//        } else if (depth > 5) {
-//            return 1f
-//        } else if (depth < data.PR_LOW_VALUE) {
-//            return 3f
-//        }
-        return depth.toFloat()
+        Log.e("depth", "$depth")
+//        depth_threshold_low = data.PR_LOW_VALUE * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
+//        depth_threshold_high = data.PR_HIGH_VALUE * 2 - 12  //上限值放大8mm
+        if (depth == 0 || depth <= 8) {
+            return 0f                         //    小于8的按压曲线归零
+        } else if (depth <= depth_threshold_low) {
+            return (6 / depth_threshold_low.toFloat() * depth.toFloat())       //  按压不足 显示区域0-6
+        } else if (depth in depth_threshold_low..depth_threshold_high) {
+            return (3 / (depth_threshold_high - depth_threshold_low).toFloat() * (depth.toFloat() - depth_threshold_low.toFloat()) + 6.0f)    //按压正确 显示区域6-9
+        } else if (depth in depth_threshold_high..129) {
+            return (1 / (129 - depth_threshold_high.toFloat()) * (depth - depth_threshold_high.toFloat()) + 9)                  // 按压过大 显示区域9-10
+        } else if (depth >= 129) {
+            return 9.5f   // 按压显示到极限高度10
+        }
+        return 0f
     }
 
     private fun setViewData() {
@@ -156,7 +155,7 @@ class ChartFragment : Fragment() {
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
         lineChart.setDrawGridBackground(false)
-        lineChart.setNoDataText("no data")
+        lineChart.setNoDataText("暂无数据")
         val xAxis: XAxis = lineChart.xAxis
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
@@ -335,11 +334,10 @@ class ChartFragment : Fragment() {
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
         val VORDIPLOM_COLORS = intArrayOf(
-            Color.rgb(192, 255, 140), Color.rgb(255, 247, 140), Color.rgb(255, 208, 140),
-            Color.rgb(140, 234, 255), Color.rgb(255, 140, 157)
+            Color.rgb(61, 179, 142)
         )
         val lineDataSet = LineDataSet(values, "DataSet 1")
-        lineDataSet.lineWidth = 1.2f
+        lineDataSet.lineWidth = 1.0f
         lineDataSet.circleRadius = 0f
         lineDataSet.circleHoleRadius = 0f
         lineDataSet.valueTextColor = Color.WHITE
@@ -347,30 +345,32 @@ class ChartFragment : Fragment() {
 //        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
         lineDataSet.circleColors = VORDIPLOM_COLORS.asList()
         lineDataSet.highLightColor = Color.parseColor("#3DB38E")
-        lineDataSet.setDrawValues(true)
+        lineDataSet.setDrawValues(false)
         lineDataSet.setDrawCircles(false)
         lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
+//        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
         lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
         val sets = ArrayList<ILineDataSet>()
-        val d = LineDataSet(values, "")
-        d.lineWidth = 0f
-        d.circleRadius = 0f
-        d.circleHoleRadius = 0f
-        d.valueTextColor = Color.TRANSPARENT
-        d.color = Color.TRANSPARENT
-        d.setCircleColor(Color.TRANSPARENT)
-        d.highLightColor = Color.TRANSPARENT
-        d.setDrawValues(false)
-        d.setDrawCircles(false)
-
-        d.axisDependency = YAxis.AxisDependency.LEFT
-        d.mode = LineDataSet.Mode.CUBIC_BEZIER
-        d.highLightColor = Color.argb(0, 0, 0, 0)
-        //d.setCircleColor(Color.argb(0, 0, 0, 0))
-        d.color = Color.argb(0, 0, 0, 0)
-        d.addEntry(Entry(0f, value))
-
-        sets.add(d)
+//        val d = LineDataSet(values, "")
+//        d.lineWidth = 0f
+//        d.circleRadius = 0f
+//        d.circleHoleRadius = 0f
+//        d.valueTextColor = Color.TRANSPARENT
+//        d.color = Color.TRANSPARENT
+//        d.setCircleColor(Color.TRANSPARENT)
+//        d.highLightColor = Color.TRANSPARENT
+//        d.setDrawValues(false)
+//        d.setDrawCircles(false)
+//
+//        d.axisDependency = YAxis.AxisDependency.LEFT
+//        d.mode = LineDataSet.Mode.CUBIC_BEZIER
+//        d.highLightColor = Color.argb(0, 0, 0, 0)
+//        //d.setCircleColor(Color.argb(0, 0, 0, 0))
+//        d.color = Color.argb(0, 0, 0, 0)
+//        d.addEntry(Entry(0f, 99f))
+//        sets.add(d)
+        lineDataSet.addEntry(Entry(0f, 9.5f))
+        lineDataSet.addEntry(Entry(0f, 0f))
         sets.add(lineDataSet)
         // create a data object with the data sets
         return LineData(sets)
@@ -383,12 +383,12 @@ class ChartFragment : Fragment() {
      * @param yValues y值
      */
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
-        val entryCount = (lineData.getDataSetByIndex(1) as LineDataSet).entryCount
+        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
         val entry = Entry(
             entryCount.toFloat(), yValues
         )
         // 创建一个点
-        lineData.addEntry(entry, 1) // 将entry添加到指定索引处的折线中
+        lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
         lineChart.data = lineData
         //通知数据已经改变
         lineData.notifyDataChanged()
@@ -397,9 +397,9 @@ class ChartFragment : Fragment() {
         lineData.notifyDataChanged()
         lineChart.notifyDataSetChanged()
         //把yValues移到指定索引的位置
-        lineChart.moveViewToAnimated(entryCount - 4f, yValues, YAxis.AxisDependency.LEFT, 1000)
+        lineChart.moveViewToAnimated(entryCount - 1f, yValues, YAxis.AxisDependency.LEFT, 800)
         lineChart.setVisibleXRangeMaximum(30f)
-//        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
+        //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
         lineChart.moveViewToX((lineData.entryCount - 29).toFloat())
         lineChart.invalidate()
     }

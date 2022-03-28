@@ -94,7 +94,9 @@ class TrainResultActivity : BaseActivity() {
             viewBinding.layoutCheck.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
             //总分数
-            trainingDTO.score = scoreTotal
+            if (trainingDTO.isCheck) {
+                trainingDTO.score = getNoMoreThanTwoDigits(scoreTotal).toFloat()
+            }
 
             //按压超次
             viewBinding.tvOutBoutCount.text = "${trainingDTO.prManyCount}次"
