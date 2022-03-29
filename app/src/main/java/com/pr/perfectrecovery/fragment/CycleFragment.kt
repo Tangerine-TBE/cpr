@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
@@ -213,8 +212,15 @@ class CycleFragment : Fragment() {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
-        if (cycleCount == 0) {
-            prMany()
+        //计算当前是否超次少次
+        prMany()
+        if (cycleCount < configBean.cycles) {
+            /**
+             * 计算未循环少次
+             */
+            val number = configBean.cycles - cycleCount
+            prLessCount += number * configBean.prCount - configBean.prCount
+            qyLessCount += number * configBean.qyCount
         }
 //        qyMany()
         val trainingDTO = TrainingDTO()
@@ -237,11 +243,6 @@ class CycleFragment : Fragment() {
             trainingDTO.blowErrorCount = mBaseDataDTO!!.getQy_err_total().toFloat()
             trainingDTO.prSum = prSum
             trainingDTO.qySum = qySum
-            //超次少次
-            trainingDTO.prManyCount = prManyCount
-            trainingDTO.prLessCount = prLessCount
-            trainingDTO.qyManyCount = qyManyCount
-            trainingDTO.qyLessCount = qyLessCount
 
             trainingDTO.pr_depth_sum = pr_depth_sum
             trainingDTO.pr_time_sum = pr_time_sum
@@ -251,6 +252,13 @@ class CycleFragment : Fragment() {
             trainingDTO.qy_serright_total = qy_serright_total
             trainingDTO.qy_max_volume_sum = qy_max_volume_sum
         }
+
+        //超次少次
+        trainingDTO.prManyCount = prManyCount
+        trainingDTO.prLessCount = prLessCount
+        trainingDTO.qyManyCount = qyManyCount
+        trainingDTO.qyLessCount = qyLessCount
+
         trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
         trainingDTO.prCount = configBean.prCount
         trainingDTO.qyCount = configBean.qyCount
@@ -392,7 +400,7 @@ class CycleFragment : Fragment() {
      */
     private var isCycle: Boolean = false
     private fun cycle(dataDTO: BaseDataDTO) {
-        qyEnd()
+        cycleEnd()
         if (isQy && !isPr && !isCycle) {
             isCycle = true
             isQy = false
@@ -428,7 +436,10 @@ class CycleFragment : Fragment() {
         }
     }
 
-    private fun qyEnd() {
+    /**
+     * 循环结束统计结果
+     */
+    private fun cycleEnd() {
         if (isCheck) {
             if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
                 /**

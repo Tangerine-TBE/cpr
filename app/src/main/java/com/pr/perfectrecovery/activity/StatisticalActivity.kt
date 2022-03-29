@@ -153,7 +153,7 @@ class StatisticalActivity : BaseActivity() {
             if (item.isCheck) {
                 binding.tvResult.text = "${item.score}分"
             } else {
-                binding.tvResult.text = ""
+                binding.tvResult.text = "--"
             }
             if (isDel) {
                 cbCheck.visibility = View.VISIBLE
