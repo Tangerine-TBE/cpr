@@ -213,8 +213,9 @@ class CycleFragment : Fragment() {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
-//        prMany()
-//        qyMany()
+        if (cycleCount == 0) {
+            prMany()
+        }
 //        qyMany()
         val trainingDTO = TrainingDTO()
         //此处返回结果数据
@@ -430,6 +431,10 @@ class CycleFragment : Fragment() {
     private fun qyEnd() {
         if (isCheck) {
             if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
+                /**
+                 * 此处避免多次结算循环多次少次 -
+                 * isCheck 只在当前页面不影响
+                 */
                 isCheck = false
                 qyMany()
                 //结束跳转至结果页面
