@@ -208,25 +208,24 @@ class CycleFragment : Fragment() {
         startMP3()
     }
 
-    private var stopQyCount: Int = 0
     fun stop(): TrainingDTO {
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
         //计算当前是否超次少次
-        prMany()
-        if (qyManyCycle == 0) {
-            qyManyCycle++
-            stopQyCount++
-        }
         qyMany()
+        /**
+         * 计算未循环少次
+         */
         if (cycleCount < configBean.cycles) {
-            /**
-             * 计算未循环少次
-             */
             val number = configBean.cycles - cycleCount
-            prLessCount += number * configBean.prCount - configBean.prCount
-            qyLessCount += number * configBean.qyCount - stopQyCount
+            if (number > 0 && cyclePrCount > 0) {
+                prLessCount += (number - 1) * configBean.prCount
+                prMany()
+            } else {
+                prLessCount += number * configBean.prCount
+            }
+            qyLessCount += number * configBean.qyCount
         }
 //        qyMany()
         val trainingDTO = TrainingDTO()

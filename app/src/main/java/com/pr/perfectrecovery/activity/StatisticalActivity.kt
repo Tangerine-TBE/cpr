@@ -145,15 +145,14 @@ class StatisticalActivity : BaseActivity() {
     private val mAdapter = object :
         BaseQuickAdapter<TrainingDTO, BaseViewHolder>(R.layout.item_statistical) {
         override fun convert(holder: BaseViewHolder, item: TrainingDTO) {
-            val binding = ItemStatisticalBinding.bind(holder.itemView)
             holder.setText(R.id.tvName, if (!TextUtils.isEmpty(item.name)) item.name else "无名")
                 .setText(R.id.tvModel, if (item.isCheck) "考核" else "训练")
                 .setText(R.id.tvTime, TimeUtils.stampToDate(System.currentTimeMillis()))
             val cbCheck = holder.getView<CheckBox>(R.id.cbCheck)
             if (item.isCheck) {
-                binding.tvResult.text = "${item.score}分"
+                holder.setText(R.id.tvResult, "${item.score}分")
             } else {
-                binding.tvResult.text = "--"
+                holder.setText(R.id.tvResult, "--")
             }
             if (isDel) {
                 cbCheck.visibility = View.VISIBLE

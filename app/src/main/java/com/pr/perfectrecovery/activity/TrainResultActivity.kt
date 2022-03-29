@@ -86,8 +86,13 @@ class TrainResultActivity : BaseActivity() {
                 "${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
-            val scoreTotal =
-                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO) - trainingDTO.getTimeOutScore()
+            var scoreTotal: Float =
+                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO)
+            if (scoreTotal > trainingDTO.getTimeOutScore()) {
+                scoreTotal -= trainingDTO.getTimeOutScore()
+            } else {
+                scoreTotal = 0.0f
+            }
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.rating = (scoreTotal / 20.0f)
             //总得分
