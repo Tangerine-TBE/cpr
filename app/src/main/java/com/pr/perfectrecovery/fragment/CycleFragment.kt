@@ -214,6 +214,7 @@ class CycleFragment : Fragment() {
         isStart = false
         //计算当前是否超次少次
         prMany()
+        qyMany()
         if (cycleCount < configBean.cycles) {
             /**
              * 计算未循环少次
@@ -421,7 +422,7 @@ class CycleFragment : Fragment() {
 
     private var qyManyCycle = 0
     private fun qyMany() {
-        if (isCheck && cycleCount != qyManyCycle && cycleQyCount > 0) {
+        if (isCheck && cycleCount != qyManyCycle) {
             qyManyCycle = cycleCount
             if (cycleQyCount > configBean.qyCount) {
                 //吹气超次
