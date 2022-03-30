@@ -21,7 +21,7 @@ class DataVolatile {
         var QY_DEFAULT_TIMES = 2
 
         //默认单次按压循环的次数是30
-        var PR_DEFAULT_TIMES = 30;
+        var PR_DEFAULT_TIMES = 30
 
         //操作模式false-训练 true-考核模式
         var MODEL: Boolean = false

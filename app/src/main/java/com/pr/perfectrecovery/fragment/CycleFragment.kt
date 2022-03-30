@@ -22,6 +22,7 @@ import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -113,6 +114,14 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
                 viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}"
             }
+        }
+
+        val dataDTO = BaseDataDTO()
+        viewBinding.chartQy.setOnClickListener {
+//            dataDTO.aisleType = 1
+//            dataDTO.qySum += 1
+//            dataDTO.err_qy_high += 1
+//            setViewDate(dataDTO)
         }
 
         //事件监听器，时间发生变化时可进行操作
@@ -548,17 +557,17 @@ class CycleFragment : Fragment() {
                 val qyMax = dataDTO.qyMaxValue
                 Log.e("qyMax", "qy:${qyMax}")
                 when {
-                    dataDTO.err_qy_low != err_qy_low -> {
+                    qyMax < configBean.tidalVolume -> {
                         err_qy_low = dataDTO.err_qy_low
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    dataDTO.err_qy_high != err_qy_high -> {
+                    qyMax in configBean.tidalVolumeEnd..1199 -> {
                         err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)
                     }
-                    dataDTO.err_qy_dead != err_qy_dead -> {
+                    qyMax >= 1200 -> {
                         err_qy_dead = dataDTO.err_qy_dead
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                         setPlayVoice(VOICE_MP3_CQJW)
