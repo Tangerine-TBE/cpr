@@ -276,7 +276,7 @@ class DataVolatile {
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // Log.e("TAG9", "按压频率：$pfvalue")
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
-            var v = DataFormatUtils.byteArrayToInt(
+            var VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
                         30,
@@ -284,7 +284,7 @@ class DataVolatile {
                     )
                 )
             )
-            if (abs(v - VI_Value) > 5) {
+            /*if (abs(v - VI_Value) > 5) {
                 if (v < 5) {
                     VI_Value = 5
                 } else if (v > 95) {
@@ -292,7 +292,7 @@ class DataVolatile {
                 } else {
                     VI_Value = (v / 5).toInt() * 5
                 }
-            }
+            }*/
 
         }
         val stringBuffer = StringBuffer()
