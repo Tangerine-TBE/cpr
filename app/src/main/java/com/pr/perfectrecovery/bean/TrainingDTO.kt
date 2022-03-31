@@ -162,7 +162,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
         var value = 0f
         if (prSum > 0 && (prSum - pressErrorCount) > 0) {
             value =
-                (prSum - pressErrorCount.toFloat()) * pressScore / (prCount * cycleCount).toFloat() - getPrManyScore()
+                (prSum - pressErrorCount.toFloat()) * pressScore / (prCount * cycles).toFloat() - getPrManyScore()
         }
         return if (value > 0) value else 0.0f
     }
@@ -174,10 +174,9 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     fun getQyScore(): Float {
         var value = 0f
         if (qySum > 0 && (qySum - blowErrorCount) > 0) {
-            value =
-                ((qySum - blowErrorCount) * blowScore / (qyCount.toFloat() * cycleCount.toFloat())) - getQyManyScore()
+            value = ((qySum - blowErrorCount) * (blowScore / (qyCount * cycles))) - getQyManyScore()
         }
-        return if (value > 0) value else 0.0f
+        return if (value > 0) value else 0f
     }
 
     /**
@@ -206,10 +205,4 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
         return (blowScore.toFloat() / (qyCount * cycles.toFloat())) * (qyManyCount + qyLessCount)
     }
 
-    /**
-     * 获取扣分数
-     */
-    fun getScoreTotal(): Float {
-        return getPrManyScore() + getQyManyScore()
-    }
 }

@@ -2,7 +2,6 @@ package com.pr.perfectrecovery.utils
 
 import android.util.Log
 import com.pr.perfectrecovery.bean.BaseDataDTO
-import com.pr.perfectrecovery.livedata.StatusLiveData
 import kotlin.math.abs
 
 class DataVolatile {
@@ -25,7 +24,13 @@ class DataVolatile {
 
         //操作模式false-训练 true-考核模式
         var MODEL: Boolean = false
+
+        fun setModel(model: Boolean) {
+            MODEL = model
+            Log.e("CPRActivity", "MODEL =  $MODEL")
+        }
     }
+
 
     //电量值：  0-100%
     private var VI_Value = 0
@@ -351,6 +356,9 @@ class DataVolatile {
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
         dataDTO.PR_LOW_VALUE = PR_LOW_VALUE
 
+        dataDTO.QY_TIMES_TOOMORE = QY_TIMES_TOOMORE
+        dataDTO.ERR_PR_TOOMORE = ERR_PR_TOOMORE
+
         dataDTO.L_d1 = L_d1
         dataDTO.L_d2 = L_d2
         dataDTO.L_d3 = L_d3
@@ -412,8 +420,10 @@ class DataVolatile {
         QY_VOLUME_SUM = 0  //吹气量总和
         QY_TIME_SUM = 0     //吹气时间总和
         QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
-        PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
-        QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+        PR_SEQRIGHT_TOTAL = 0 //按压频率正常的次数
+        QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
+        QY_TIMES_TOOMORE = 0
+        ERR_PR_TOOMORE = 0
         L_valueSet.clear()
         QY_valueSet.clear()
         QY_valueSet2.clear()
@@ -499,7 +509,7 @@ class DataVolatile {
         ) {
             low_flag = 0
             UNBACK_FLAG = 0
-            return preDistance.toInt()+
+            return preDistance.toInt()
         }
         if (QY_CYCLE_TIMES < QY_DEFAULT_TIMES && QY_CYCLE_TIMES > 0) {
             QY_TIMES_TOOLITTLE = QY_DEFAULT_TIMES - QY_CYCLE_TIMES
@@ -684,12 +694,12 @@ class DataVolatile {
                 Log.e("TAG11", "按压位置错误")
             } else {
                 val value = abs(preDistance - l)
-                if (value < PR_LOW_VALUE * 2 - 28) {
+                if (value < PR_LOW_VALUE * 1.4) {
                     ERR_PR_LOW++
                     Log.e("TAG11", "$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-                } else if (value > PR_HIGH_VALUE * 2 - 30) {
+                } else if (value > PR_HIGH_VALUE * 1.4) {
                     ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
@@ -757,7 +767,7 @@ class DataVolatile {
             /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                  ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
              }*/
-           // PR_CYCLE_TIMES = 0
+            // PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0

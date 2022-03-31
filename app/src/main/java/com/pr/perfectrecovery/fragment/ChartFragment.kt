@@ -30,6 +30,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * 曲线
@@ -71,8 +72,8 @@ class ChartFragment : Fragment() {
         val data2: LineData = getData(0f)
 //        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
-        depth_threshold_low = configBean.prLow() * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
-        depth_threshold_high = configBean.prHigh() * 2 - 30  //上限值放大8mm
+        depth_threshold_low = (configBean.prLow() * 1.4).toInt()   //下限值放大8mm  需要定义变量  上下限阈值要放缩
+        depth_threshold_high = (configBean.prHigh() * 1.4).toInt()  //上限值放大8mm
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(

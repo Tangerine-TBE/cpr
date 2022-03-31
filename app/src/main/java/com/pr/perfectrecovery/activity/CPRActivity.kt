@@ -150,7 +150,8 @@ class CPRActivity : BaseActivity() {
                 }
             }
             BaseConstant.EVENT_CPR_CHECK -> {
-                DataVolatile.MODEL = event.isCheck
+                Log.e("CPRActivity",  "${event.isCheck}")
+                DataVolatile.setModel(event.isCheck)
             }
         }
     }
@@ -213,7 +214,7 @@ class CPRActivity : BaseActivity() {
     private val REQUEST_CODE_PERMISSION_LOCATION = 2
     private fun checkPermissions() {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (!bluetoothAdapter.isEnabled) {
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled) {
             Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()
             return
         }

@@ -48,6 +48,8 @@ data class BaseDataDTO(
     var err_qy_dead: Int = 0,
     //吹气错误-气道未打开错误
     var err_qy_close: Int = 0,
+    var QY_TIMES_TOOMORE: Int = 0,
+    var ERR_PR_TOOMORE: Int = 0,
     var pr_depth_sum: Int = 0,//按压深度总和(mm)
     var pr_time_sum: Int = 0,   // 按压时间总和（ms）
     var qy_volume_sum: Int = 0,  //吹气量总和
@@ -60,6 +62,7 @@ data class BaseDataDTO(
     var L_d1 = 0
     var L_d2 = 0
     var L_d3 = 0
+
     //是否开始
     var isStart = false
     override fun toString(): String {
@@ -70,14 +73,14 @@ data class BaseDataDTO(
      * 获取按压错误总数
      */
     fun getPr_err_total(): Int {
-        return err_pr_unback + err_pr_low + err_pr_high + err_pr_posi
+        return err_pr_unback + err_pr_low + err_pr_high + err_pr_posi + ERR_PR_TOOMORE
     }
 
     /**
      * 获取吹气总数
      */
     fun getQy_err_total(): Int {
-        return err_qy_close + err_qy_low + err_qy_dead + err_qy_high
+        return err_qy_close + err_qy_low + err_qy_dead + err_qy_high + QY_TIMES_TOOMORE
     }
 
     var PR_HIGH_VALUE: Int = 0
