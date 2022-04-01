@@ -348,9 +348,10 @@ class DataVolatile {
         if (QY_SUM != qy) {
             qy = QY_SUM
             val max = qyMax()
+            val qyMax = getQyMax(max)
             dataDTO.qyValueSum = qyValue()
-            dataDTO.qyMaxValue = getQyMax(max)
-            QY_MAX_VOLUME_SUM += getQyMax(max)
+            dataDTO.qyMaxValue = qyMax
+            QY_MAX_VOLUME_SUM += qyMax
         }
         dataDTO.qy_max_volume_sum = QY_MAX_VOLUME_SUM
         dataDTO.PR_HIGH_VALUE = PR_HIGH_VALUE
