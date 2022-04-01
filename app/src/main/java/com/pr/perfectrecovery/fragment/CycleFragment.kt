@@ -112,7 +112,9 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
                 viewBinding.tvPress8.text = "按压位置：${it.psrType}"
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
-                viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}"
+                viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}" +
+                        "\n 按压超次：${it.ERR_PR_TOOMORE}   \n本页按压超次：${prManyCount}" +
+                        "\n 吹气超次：${it.QY_TIMES_TOOMORE} \n本页吹气超次：${qyManyCount}"
             }
         }
 
