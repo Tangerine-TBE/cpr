@@ -281,7 +281,7 @@ class DataVolatile {
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // Log.e("TAG9", "按压频率：$pfvalue")
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
-            var VI_Value = DataFormatUtils.byteArrayToInt(
+            VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
                         30,
