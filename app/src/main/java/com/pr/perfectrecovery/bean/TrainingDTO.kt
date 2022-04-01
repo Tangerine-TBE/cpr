@@ -119,7 +119,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 按压平均次数/分 = 按压总深度/按压总次数
      */
     fun getPressAverageDepth(): Int {
-        return if (prSum > 0 && pr_depth_sum > 0) ((pr_depth_sum.toFloat() / prSum.toFloat())).roundToInt() else 0
+        return if (prSum > 0 && pr_depth_sum > 0) ((pr_depth_sum.toFloat() / prSum.toFloat()) / 1.4).roundToInt() else 0
     }
 
     /**
@@ -138,8 +138,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     }
 
     /**
-     *  平均通气每分钟次数
-     *  平均通气每分钟次数 = 通气总量 / 通气总次数
+     *  平均通气平均值
+     *  平均通气平均值 = 通气总量 / 通气总次数
      */
     fun getBlowAverageNumber(): Int {
         return if (qySum > 0 && qy_max_volume_sum > 0) qy_max_volume_sum / qySum else 0

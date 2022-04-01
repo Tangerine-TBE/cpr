@@ -425,6 +425,7 @@ class DataVolatile {
         QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
         QY_TIMES_TOOMORE = 0
         ERR_PR_TOOMORE = 0
+        PR_CYCLE_TIMES = 0
         L_valueSet.clear()
         QY_valueSet.clear()
         QY_valueSet2.clear()
@@ -684,7 +685,7 @@ class DataVolatile {
     private var ERR_PR_TOOLITTLE = 0
 
     //单次按压循环的次数
-    private var PR_CYCLE_TIMES = 0;
+    private var PR_CYCLE_TIMES = 0
 
     private fun Err_PrTotal(l: Int) {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
