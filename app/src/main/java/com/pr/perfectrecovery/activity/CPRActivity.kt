@@ -69,7 +69,7 @@ class CPRActivity : BaseActivity() {
         //初始化蓝牙管理器
         initBluetooth()
         initBle()
-//        ttl()
+        ttl()
     }
 
     private fun initView() {
@@ -150,7 +150,7 @@ class CPRActivity : BaseActivity() {
                 }
             }
             BaseConstant.EVENT_CPR_CHECK -> {
-                Log.e("CPRActivity",  "${event.isCheck}")
+                Log.e("CPRActivity", "${event.isCheck}")
                 DataVolatile.setModel(event.isCheck)
             }
         }
@@ -555,27 +555,30 @@ class CPRActivity : BaseActivity() {
                     )
                     runOnUiThread { Log.e("CPRActivity", formatHexString) }
                     Log.e("TAG9", "原始数据${formatHexString}")
-                    val deviceMAC = "001b${
-                        formatHexString.substring(24, 28) + formatHexString.substring(
-                            32,
-                            36
-                        )
-                    }"
-
-                    val dataVolatile = dataMap[deviceMAC]
-                    if (dataVolatile != null) {
-                        dataDTO = dataVolatile.parseString(formatHexString)
-                    } else {
-                        val mDataVolatile = DataVolatile()
-                        mDataVolatile?.initPreDistance(formatHexString, deviceMAC)
-                        dataDTO = mDataVolatile.parseString(formatHexString)
-                        dataMap[dataDTO.mac] = mDataVolatile
-                    }
-
-                    //发送数据
-                    StatusLiveData.data.postValue(dataDTO)
+                    sendMessage(formatHexString)
                 }
             })
+    }
+
+    private fun sendMessage(formatHexString: String) {
+        val deviceMAC = "001b${
+            formatHexString.substring(24, 28) + formatHexString.substring(
+                32,
+                36
+            )
+        }"
+
+        val dataVolatile = dataMap[deviceMAC]
+        if (dataVolatile != null) {
+            dataDTO = dataVolatile.parseString(formatHexString)
+        } else {
+            val mDataVolatile = DataVolatile()
+            mDataVolatile.initPreDistance(formatHexString, deviceMAC)
+            dataDTO = mDataVolatile.parseString(formatHexString)
+            dataMap[dataDTO.mac] = mDataVolatile
+        }
+        //发送数据
+        StatusLiveData.data.postValue(dataDTO)
     }
 
     override fun onDestroy() {
@@ -647,11 +650,6 @@ class CPRActivity : BaseActivity() {
                             this, "设备初始化失败!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Toast.makeText(
-                            this, "打开" +
-                                    "设备失败!",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         return
                     }
                     Toast.makeText(
@@ -707,11 +705,9 @@ class CPRActivity : BaseActivity() {
                 val length: Int = BaseApplication.driver!!.ReadData(buffer, 64)
                 if (length > 0) {
                     runOnUiThread {
-                        Log.i("CPRActivity", ConvertUtil.toHexString(buffer, length))
-//                        val dataDTO =
-//                            DataVolatile.parseString(ConvertUtil.toHexString(buffer, length))
-//                        //发布数据
-//                        StatusLiveData.data.postValue(dataDTO)
+                        val formatHexString = ConvertUtil.toHexString(buffer, length)
+                        Log.i("CPRActivity", "data -- ${formatHexString}")
+                        sendMessage(formatHexString)
                     }
                 }
             }
