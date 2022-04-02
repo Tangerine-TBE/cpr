@@ -4,7 +4,10 @@ import android.Manifest
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.*
@@ -60,6 +63,24 @@ class CPRActivity : BaseActivity() {
     private var connectList = arrayListOf<BleDevice>()
     private var isInitValueMap = mutableMapOf<String, Boolean>()
 
+    //监听USB连接状态
+    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val action = intent.action
+            if (action == "android.hardware.usb.action.USB_STATE") {
+                val connected = intent.extras!!.getBoolean("connected")
+                if (connected) {
+                    Toast.makeText(this@CPRActivity, "USB已连接", Toast.LENGTH_SHORT).show()
+                    viewBinding.tvMsg.text = "USB已连接"
+                    openTTL()
+                } else {
+                    viewBinding.tvMsg.text = "USB已断开"
+                    Toast.makeText(this@CPRActivity, "USB已断开", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCpractivityBinding.inflate(layoutInflater)
@@ -69,7 +90,14 @@ class CPRActivity : BaseActivity() {
         //初始化蓝牙管理器
         initBluetooth()
         initBle()
+        registerBroadcast()
         ttl()
+    }
+
+    private fun registerBroadcast() {
+        val filter = IntentFilter()
+        filter.addAction("android.hardware.usb.action.USB_STATE")
+        registerReceiver(broadcastReceiver, filter)
     }
 
     private fun initView() {
@@ -642,6 +670,7 @@ class CPRActivity : BaseActivity() {
                         this, "打开设备失败!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    viewBinding.tvMsg.text = "打开设备失败"
                     BaseApplication.driver?.CloseDevice()
                 }
                 0 -> {
@@ -650,8 +679,10 @@ class CPRActivity : BaseActivity() {
                             this, "设备初始化失败!",
                             Toast.LENGTH_SHORT
                         ).show()
+                        viewBinding.tvMsg.text = "设备初始化失败"
                         return
                     }
+                    viewBinding.tvMsg.text = "打开设备成功"
                     Toast.makeText(
                         this, "打开设备成功!",
                         Toast.LENGTH_SHORT

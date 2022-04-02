@@ -121,7 +121,7 @@ class TrainResultActivity : BaseActivity() {
         viewBinding.tvCycleCount.text = "${trainingDTO.cycleCount}"
 
         //按压错误数
-        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount.toInt()}"
+        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
         //按压位置错误
