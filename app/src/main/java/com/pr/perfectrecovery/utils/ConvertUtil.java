@@ -29,7 +29,7 @@ public class ConvertUtil {
                         + Integer.toHexString(arg[i] < 0 ? arg[i] + 256
                         : arg[i])
                         : Integer.toHexString(arg[i] < 0 ? arg[i] + 256
-                        : arg[i])) + " ";
+                        : arg[i])) + "";
             }
             return result;
         }

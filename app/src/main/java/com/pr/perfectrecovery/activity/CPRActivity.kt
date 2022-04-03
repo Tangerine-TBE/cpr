@@ -16,6 +16,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -70,12 +71,12 @@ class CPRActivity : BaseActivity() {
             if (action == "android.hardware.usb.action.USB_STATE") {
                 val connected = intent.extras!!.getBoolean("connected")
                 if (connected) {
-                    Toast.makeText(this@CPRActivity, "USB已连接", Toast.LENGTH_SHORT).show()
-                    viewBinding.tvMsg.text = "USB已连接"
+//                    Toast.makeText(this@CPRActivity, "USB已连接", Toast.LENGTH_SHORT).show()
+//                    viewBinding.tvMsg.text = "USB已连接"
                     openTTL()
                 } else {
-                    viewBinding.tvMsg.text = "USB已断开"
-                    Toast.makeText(this@CPRActivity, "USB已断开", Toast.LENGTH_SHORT).show()
+//                    viewBinding.tvMsg.text = "USB已断开"
+//                    Toast.makeText(this@CPRActivity, "USB已断开", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -117,7 +118,7 @@ class CPRActivity : BaseActivity() {
             startActivity(Intent(this, ConfigActivity::class.java))
         }
 
-        viewBinding.btnOpen.setOnClickListener {
+        viewBinding.ctUsb.setOnClickListener {
             openTTL()
         }
 
@@ -577,18 +578,23 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
-                    val formatHexString = HexUtil.formatHexString(
-                        characteristic.value,
-                        false
-                    )
-                    runOnUiThread { Log.e("CPRActivity", formatHexString) }
-                    Log.e("TAG9", "原始数据${formatHexString}")
-                    sendMessage(formatHexString)
+                    if (!isOpen) {
+                        val formatHexString = HexUtil.formatHexString(
+                            characteristic.value,
+                            false
+                        )
+                        runOnUiThread { Log.e("CPRActivity", formatHexString) }
+                        Log.e("TAG9", "原始数据${formatHexString}")
+                        sendMessage(formatHexString)
+                    }
                 }
             })
     }
 
     private fun sendMessage(formatHexString: String) {
+        if (TextUtils.isEmpty(formatHexString)) {
+            return
+        }
         val deviceMAC = "001b${
             formatHexString.substring(24, 28) + formatHexString.substring(
                 32,
@@ -605,6 +611,12 @@ class CPRActivity : BaseActivity() {
             dataDTO = mDataVolatile.parseString(formatHexString)
             dataMap[dataDTO.mac] = mDataVolatile
         }
+//        mDeviceAdapter.data.forEach { item ->
+//            if (item.mac == dataDTO.mac) {
+//                item.power = dataDTO.electricity
+//                mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
+//            }
+//        }
         //发送数据
         StatusLiveData.data.postValue(dataDTO)
     }
@@ -666,53 +678,50 @@ class CPRActivity : BaseActivity() {
         if (!isOpen) {
             when (BaseApplication.driver?.ResumeUsbList()) {
                 -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备
-                    Toast.makeText(
-                        this, "打开设备失败!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    viewBinding.tvMsg.text = "打开设备失败"
+                    Toast.makeText(this, "打开设备失败!", Toast.LENGTH_SHORT).show()
                     BaseApplication.driver?.CloseDevice()
+                    isOpen = false
+                    viewBinding.ctUsb.isChecked = false
                 }
                 0 -> {
                     if (!BaseApplication.driver?.UartInit()!!) { //对串口设备进行初始化操作
-                        Toast.makeText(
-                            this, "设备初始化失败!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this, "设备初始化失败!", Toast.LENGTH_SHORT).show()
                         viewBinding.tvMsg.text = "设备初始化失败"
+                        viewBinding.ctUsb.isChecked = false
                         return
                     }
-                    viewBinding.tvMsg.text = "打开设备成功"
-                    Toast.makeText(
-                        this, "打开设备成功!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "打开设备成功!", Toast.LENGTH_SHORT).show()
                     initTTL()
                     isOpen = true
+                    viewBinding.ctUsb.isChecked = true
                     ReadThread().start() //开启读线程读取串口接收的数据
                 }
                 else -> {
-                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-                    builder.setIcon(R.mipmap.icon_wm_logo)
-                    builder.setTitle("未授权限")
-                    builder.setMessage("确认退出吗？")
-                    builder.setPositiveButton(
-                        "确定"
-                    ) { dialog, which ->
-                        //System.exit(0)
-                        dialog.dismiss()
-                    }
-                    builder.setNegativeButton(
-                        "返回"
-                    ) { dialog, which ->
-                        dialog.dismiss()
-                    }
-                    builder.show()
+                    viewBinding.ctUsb.isChecked = false
+                    Toast.makeText(this, "未授权限!", Toast.LENGTH_SHORT).show()
+//                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+//                    builder.setIcon(R.mipmap.icon_wm_logo)
+//                    builder.setTitle("未授权限")
+//                    builder.setMessage("确认退出吗？")
+//                    builder.setPositiveButton(
+//                        "确定"
+//                    ) { dialog, which ->
+//                        //System.exit(0)
+//                        dialog.dismiss()
+//                    }
+//                    builder.setNegativeButton(
+//                        "返回"
+//                    ) { dialog, which ->
+//                        dialog.dismiss()
+//                    }
+//                    builder.show()
                 }
             }
         } else {
             //关闭USB TTL
             isOpen = false
+            Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
+            viewBinding.ctUsb.isChecked = false
             try {
                 Thread.sleep(200)
             } catch (e: InterruptedException) {
@@ -737,8 +746,8 @@ class CPRActivity : BaseActivity() {
                 if (length > 0) {
                     runOnUiThread {
                         val formatHexString = ConvertUtil.toHexString(buffer, length)
-                        Log.i("CPRActivity", "data -- ${formatHexString}")
-                        sendMessage(formatHexString)
+                        Log.i("CPRActivity", "data -- ${formatHexString.trim()}")
+                        sendMessage(formatHexString.trim())
                     }
                 }
             }

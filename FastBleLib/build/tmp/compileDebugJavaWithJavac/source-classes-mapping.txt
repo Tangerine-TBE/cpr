@@ -6,8 +6,8 @@ com/clj/fastble/data/BleWriteState.java
  com.clj.fastble.data.BleWriteState
 com/clj/fastble/data/BleConnectStateParameter.java
  com.clj.fastble.data.BleConnectStateParameter
-com/clj/fastble/callback/BleScanAndConnectCallback.java
- com.clj.fastble.callback.BleScanAndConnectCallback
+com/clj/fastble/callback/BleWriteCallback.java
+ com.clj.fastble.callback.BleWriteCallback
 com/clj/fastble/exception/GattException.java
  com.clj.fastble.exception.GattException
 com/clj/fastble/callback/BleRssiCallback.java
@@ -19,8 +19,8 @@ com/clj/fastble/data/BleScanState.java
  com.clj.fastble.data.BleScanState
 com/clj/fastble/callback/BleBaseCallback.java
  com.clj.fastble.callback.BleBaseCallback
-com/clj/fastble/callback/BleGattCallback.java
- com.clj.fastble.callback.BleGattCallback
+com/clj/fastble/exception/OtherException.java
+ com.clj.fastble.exception.OtherException
 com/clj/fastble/utils/BleLog.java
  com.clj.fastble.utils.BleLog
 com/clj/fastble/callback/BleNotifyCallback.java
@@ -37,14 +37,10 @@ com/clj/fastble/exception/ConnectException.java
  com.clj.fastble.exception.ConnectException
 com/clj/fastble/exception/BleException.java
  com.clj.fastble.exception.BleException
-com/clj/fastble/scan/BleScanner.java
- com.clj.fastble.scan.BleScanner
- com.clj.fastble.scan.BleScanner$1
- com.clj.fastble.scan.BleScanner$1$1
- com.clj.fastble.scan.BleScanner$BleScannerHolder
-com/clj/fastble/BleManager.java
- com.clj.fastble.BleManager
- com.clj.fastble.BleManager$BleManagerHolder
+com/clj/fastble/exception/TimeoutException.java
+ com.clj.fastble.exception.TimeoutException
+com/clj/fastble/data/BleMsg.java
+ com.clj.fastble.data.BleMsg
 com/clj/fastble/bluetooth/SplitWriter.java
  com.clj.fastble.bluetooth.SplitWriter
  com.clj.fastble.bluetooth.SplitWriter$1
@@ -54,16 +50,21 @@ com/clj/fastble/bluetooth/BleBluetooth.java
  com.clj.fastble.bluetooth.BleBluetooth$1
  com.clj.fastble.bluetooth.BleBluetooth$LastState
  com.clj.fastble.bluetooth.BleBluetooth$MainHandler
-com/clj/fastble/data/BleMsg.java
- com.clj.fastble.data.BleMsg
-com/clj/fastble/callback/BleWriteCallback.java
- com.clj.fastble.callback.BleWriteCallback
+com/clj/fastble/callback/BleScanAndConnectCallback.java
+ com.clj.fastble.callback.BleScanAndConnectCallback
 com/clj/fastble/bluetooth/MultipleBluetoothController.java
  com.clj.fastble.bluetooth.MultipleBluetoothController
  com.clj.fastble.bluetooth.MultipleBluetoothController$1
+com/clj/fastble/scan/BleScanner.java
+ com.clj.fastble.scan.BleScanner
+ com.clj.fastble.scan.BleScanner$1
+ com.clj.fastble.scan.BleScanner$1$1
+ com.clj.fastble.scan.BleScanner$BleScannerHolder
 com/clj/fastble/bluetooth/BleConnector.java
  com.clj.fastble.bluetooth.BleConnector
  com.clj.fastble.bluetooth.BleConnector$1
+com/clj/fastble/callback/BleGattCallback.java
+ com.clj.fastble.callback.BleGattCallback
 com/clj/fastble/scan/BleScanPresenter.java
  com.clj.fastble.scan.BleScanPresenter
  com.clj.fastble.scan.BleScanPresenter$1
@@ -73,10 +74,6 @@ com/clj/fastble/scan/BleScanPresenter.java
  com.clj.fastble.scan.BleScanPresenter$5
  com.clj.fastble.scan.BleScanPresenter$6
  com.clj.fastble.scan.BleScanPresenter$ScanHandler
-com/clj/fastble/exception/TimeoutException.java
- com.clj.fastble.exception.TimeoutException
-com/clj/fastble/exception/OtherException.java
- com.clj.fastble.exception.OtherException
 com/clj/fastble/callback/BleScanPresenterImp.java
  com.clj.fastble.callback.BleScanPresenterImp
 com/clj/fastble/data/BleDevice.java
@@ -84,3 +81,6 @@ com/clj/fastble/data/BleDevice.java
  com.clj.fastble.data.BleDevice$1
 com/clj/fastble/callback/BleScanCallback.java
  com.clj.fastble.callback.BleScanCallback
+com/clj/fastble/BleManager.java
+ com.clj.fastble.BleManager
+ com.clj.fastble.BleManager$BleManagerHolder

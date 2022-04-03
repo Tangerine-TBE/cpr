@@ -14,6 +14,7 @@ public class BleDevice implements Parcelable {
     private long mTimestampNanos;
     private boolean isLoading;
     private int mCount;
+    private int power;
 
     public BleDevice(BluetoothDevice device) {
         mDevice = device;
@@ -80,6 +81,14 @@ public class BleDevice implements Parcelable {
             return mDevice.getName() + mDevice.getAddress();
         }
         return "";
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public BluetoothDevice getDevice() {

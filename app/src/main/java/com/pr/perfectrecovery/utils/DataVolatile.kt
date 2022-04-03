@@ -769,7 +769,7 @@ class DataVolatile {
             /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                  ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
              }*/
-             PR_CYCLE_TIMES = 0
+            PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0
