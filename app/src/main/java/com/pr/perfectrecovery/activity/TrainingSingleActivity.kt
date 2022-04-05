@@ -40,14 +40,6 @@ class TrainingSingleActivity : BaseActivity() {
         blueToothList =
             intent.getParcelableArrayListExtra<BleDevice>(BaseConstant.CONNECT_BLE_DEVICES) as ArrayList<BleDevice>
 
-        /* Todo @chenhan 测试数据 需要删除 ========*/
-//        var bleDevice = blueToothList[0]
-//        bleDevice?.let {
-//            it.count = 1
-//            blueToothList.add(it)
-//        }
-        /* =================*/
-
         if (blueToothList.size > 1) {
             isSingle = false
             initMany(blueToothList.size)

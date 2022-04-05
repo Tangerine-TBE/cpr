@@ -78,7 +78,7 @@
             android:id="@+id/test_lung_error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/test_pres_total"
+            app:layout_constraintEnd_toStartOf="@+id/test_lung_total"
             app:layout_constraintTop_toBottomOf="@+id/test_cycle_total"
             android:text="20"
             android:layout_marginTop="24dp"

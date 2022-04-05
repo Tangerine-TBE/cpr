@@ -22,8 +22,7 @@ class DeviceBluetoothAdapter :
             viewBinding.tvBluetoothStatus.text = ""
         }
         //判断蓝牙是否链接
-        val isConnected: Boolean = BleManager.getInstance().isConnected(item)
-        if (isConnected) {//该蓝牙已连接
+        if (item.isConnected) {//该蓝牙已连接
             viewBinding.tvBluetoothName.setTextColor(context.resources.getColor(R.color.color_37B48B))
             viewBinding.tvBluetoothStatus.setTextColor(context.resources.getColor(R.color.color_37B48B))
             viewBinding.loadingDot2.visibility =

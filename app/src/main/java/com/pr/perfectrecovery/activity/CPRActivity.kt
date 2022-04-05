@@ -16,7 +16,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -182,6 +181,14 @@ class CPRActivity : BaseActivity() {
                 Log.e("CPRActivity", "${event.isCheck}")
                 DataVolatile.setModel(event.isCheck)
             }
+            BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
+                dataMap.clear()
+                isInitValueMap.clear()
+                //清空当前map数据
+                dataMap.values.forEach { item ->
+                    item.dataClear()
+                }
+            }
         }
     }
 
@@ -199,7 +206,7 @@ class CPRActivity : BaseActivity() {
 
     private val itemClick =
         OnItemClickListener { adapter, view, position ->
-            if (isItemClick) {
+            if (isItemClickable) {
                 val bleDevice = mDeviceAdapter.getItem(position)
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
                     if (count >= 6) {//处理提示语设备连接过多提示
@@ -309,7 +316,7 @@ class CPRActivity : BaseActivity() {
         mDeviceAdapter.setList(deviceList)
     }
 
-    private var isItemClick = true
+    private var isItemClickable = true
     private var count = 0
     private fun connect(bleDevice: BleDevice, position: Int) {
         BleManager.getInstance()
@@ -317,7 +324,7 @@ class CPRActivity : BaseActivity() {
             .setOperateTimeout(5000)
             .connect(bleDevice, object : BleGattCallback() {
                 override fun onStartConnect() {
-                    isItemClick = false
+                    isItemClickable = false
                     bleDevice.isLoading = true
                     mDeviceAdapter.remove(bleDevice)
                     mDeviceAdapter.addData(position, bleDevice)
@@ -325,9 +332,10 @@ class CPRActivity : BaseActivity() {
 
                 override fun onConnectFail(bleDevice: BleDevice, exception: BleException) {
                     bleDevice.isLoading = false
+                    bleDevice.isConnected = false
                     mDeviceAdapter.remove(bleDevice)
                     mDeviceAdapter.addData(position, bleDevice)
-                    isItemClick = true
+                    isItemClickable = true
                     if (exception.code == BleException.ERROR_CODE_TIMEOUT) {
                         viewBinding.tvMsg.text = "连接超时，请重新连接"
                     } else {
@@ -343,6 +351,7 @@ class CPRActivity : BaseActivity() {
                     count++
                     //处理已连接的设备靠前
                     mDeviceAdapter.remove(bleDevice)
+                    bleDevice.isConnected = true
                     bleDevice.isLoading = false
                     bleDevice.count = count
                     if (mDeviceAdapter.data.size == 0) {
@@ -354,7 +363,7 @@ class CPRActivity : BaseActivity() {
                     bleList.add(bleDevice)
                     viewBinding.tvConnections.text = "设备连接数：${count}"
                     //bind(bleDevice)
-                    isItemClick = true
+                    isItemClickable = true
                 }
 
                 override fun onDisConnected(
@@ -398,11 +407,21 @@ class CPRActivity : BaseActivity() {
                     }
 
 //                unBind(bleDevice)
+                    val newList = mutableListOf<BleDevice>()
+                    for (item in bleList) {
+                        if (item.count > bleDevice.count) {
+                            item.count --
+                        }
+                        newList.add(item)
+                    }
                     mDeviceAdapter.remove(bleDevice)
+                    newList.remove(bleDevice)
+                    bleDevice.isConnected = false
                     bleDevice.isLoading = false
                     bleDevice.count = 0
-                    mDeviceAdapter.addData(bleDevice)
-                    isItemClick = true
+                    newList.add(bleDevice)
+                    mDeviceAdapter.setList(newList)
+                    isItemClickable = true
                 }
             })
     }

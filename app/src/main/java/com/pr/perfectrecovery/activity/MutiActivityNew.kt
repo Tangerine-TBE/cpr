@@ -63,14 +63,14 @@ class MutiActivityNew : BaseActivity() {
 
     //通气频率
     private var qyRateMap = mutableMapOf<String, Int>()
-    private var errPrLowMap = mutableMapOf<String, Int>()
-    private var errPrHighMap = mutableMapOf<String, Int>()
-    private var errPrPosiMap = mutableMapOf<String, Int>()
-    private var errQrUnbackMap = mutableMapOf<String, Int>()
-    private var errQyLowMap = mutableMapOf<String, Int>()
-    private var errQyHighMap = mutableMapOf<String, Int>()
-    private var errQyDeadMap = mutableMapOf<String, Int>()
-    private var errQyCloseMap = mutableMapOf<String, Int>()
+    private var err_pr_low_Map = mutableMapOf<String, Int>()
+    private var err_pr_high_Map = mutableMapOf<String, Int>()
+    private var err_pr_posi_Map = mutableMapOf<String, Int>()
+    private var err_pr_unback_Map = mutableMapOf<String, Int>()
+    private var err_qy_low_Map = mutableMapOf<String, Int>()
+    private var err_qy_high_Map = mutableMapOf<String, Int>()
+    private var err_qy_dead_Map = mutableMapOf<String, Int>()
+    private var err_qy_close_Map = mutableMapOf<String, Int>()
     private var isTimeOutMap = mutableMapOf<String, Boolean>()
     private var isTimeingMap = mutableMapOf<String, Boolean>()
 
@@ -220,7 +220,7 @@ class MutiActivityNew : BaseActivity() {
             it.layoutPress.chart.visibility = View.VISIBLE
             it.layoutLung.chartQy.visibility = View.VISIBLE
             setRate(it.layoutPress.chart, 0)
-            setRate(it.layoutLung.chartQy, 0)
+            setQyRate(it.layoutLung.chartQy, 0)
         }
     }
 
@@ -240,10 +240,12 @@ class MutiActivityNew : BaseActivity() {
         binding.item6.position2.visibility = View.GONE
     }
 
+    @Synchronized
     private fun setViewData(viewBinding: CycleFragmentMultiItemBinding?, dataDTO: BaseDataDTO?) {
         viewBinding?.let {
-            if (dataDTO != null) {
+            dataDTO?.let {
                 //判断是否已经完成考试
+                //TODO @chen 条件可能是多个的，不单单判断循环次数
                 if (cycleCountMap[dataDTO.mac] == configBean.cycles) {
                     hasDoneMap[dataDTO.mac] = true
                     endTimeMap[dataDTO.mac] = System.currentTimeMillis()
@@ -251,17 +253,19 @@ class MutiActivityNew : BaseActivity() {
                     return
                 }
                 mBaseDataDTOMap[dataDTO.mac] = dataDTO
-                if (isTimeOutMap[dataDTO.mac] == false && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
+                if (isTimeOutMap[dataDTO.mac] != true && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                     isTimeOutMap[dataDTO.mac] = true
                     sendMsg(START_TIME, viewBinding, (configBean.interruptTime * 1000).toLong())
                 }
 
                 //第一次按压或吹气才开始计时
-                val startTime = startTimeMap[dataDTO.mac] ?: 0L
-                if (startTime <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)) {
+                if (startTimeMap[dataDTO.mac] ?: 0L <= 0 && (dataDTO.prSum != 0 || dataDTO.qySum != 0)) {
                     startTimeMap[dataDTO.mac] = System.currentTimeMillis()
                 }
                 showView(viewBinding, dataDTO)
+
+                pr(viewBinding, dataDTO)
+                qy(viewBinding, dataDTO)
 
                 //计算循环次数
                 cycle(dataDTO.mac)
@@ -275,8 +279,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun showView(viewBinding: CycleFragmentMultiItemBinding, data: BaseDataDTO) {
-        val preDistance = data.preDistance
-        val isPress = abs(preDistance - data.distance) > 10
+        val isPress = abs(data.preDistance - data.distance) > 10
         val isBlow = data.bpValue > 5
 
         //没有按压 也没有吹气，显示上一次的视图
@@ -287,20 +290,20 @@ class MutiActivityNew : BaseActivity() {
             viewBinding.layoutLung.root.visibility = View.GONE
             viewBinding.layoutPress.root.visibility = View.VISIBLE
             currentShowView = viewBinding.layoutPress.root
-            pr(viewBinding, data)
+
         } else if (isBlow) {
             viewBinding.layoutPress.root.visibility = View.GONE
             viewBinding.layoutScore.root.visibility = View.GONE
             viewBinding.layoutLung.root.visibility = View.VISIBLE
             viewBinding.layoutLung.ivLung.setImageResource(R.mipmap.icon_lung_border)
             currentShowView = viewBinding.layoutLung.root
-            qy(viewBinding, data)
+
         }
     }
 
     private fun cycle(mac: String) {
-        qyEnd(mac)
-        if (isQyMap[mac] == true && isPrMap[mac] == false && isCycleMap[mac] == false) {
+        cycleEnd(mac)
+        if (isQyMap[mac] == true && isPrMap[mac] != true && isCycleMap[mac] != true) {
             isCycleMap[mac] = true
             isQyMap[mac] = false
             isPrMap[mac] = false
@@ -312,11 +315,18 @@ class MutiActivityNew : BaseActivity() {
         }
     }
 
-    private fun qyEnd(mac: String) {
+    /**
+     * 循环结束统计结果
+     */
+    private fun cycleEnd(mac: String) {
         if (isCheck) {
             if (cycleCountMap[mac] == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount) {
-                isCheck = false
+                /**
+                 * 此处避免多次结算循环多次少次 -
+                 * isCheck 只在当前页面不影响
+                 */
                 qyMany(mac)
+                showSingleResult(mac)
             }
         }
     }
@@ -346,28 +356,28 @@ class MutiActivityNew : BaseActivity() {
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime(viewBinding, dataDTO.mac)
             qyMany(dataDTO.mac)
-            var cout = cycleCountMap[dataDTO.mac] ?: 0
+            var cout = cyclePrCountMap[dataDTO.mac] ?: 0
             cout ++
-            cycleCountMap[dataDTO.mac] = cout
+            cyclePrCountMap[dataDTO.mac] = cout
             cycleQyCountMap[dataDTO.mac] = 0
             isPrMap[dataDTO.mac] = true
             isQyMap[dataDTO.mac] = false
             isCycleMap[dataDTO.mac] = false
             //按压位置错误
-            if (errPrPosiMap[dataDTO.mac] != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
-                errPrPosiMap[dataDTO.mac] = dataDTO.err_pr_posi
+            if (err_pr_posi_Map[dataDTO.mac] != dataDTO.err_pr_posi && dataDTO.psrType == 0) {
+                err_pr_posi_Map[dataDTO.mac] = dataDTO.err_pr_posi
                 viewBinding.layoutPress.ivPressAim.visibility = View.VISIBLE
                 sendMsg(INIT_PRESS, viewBinding)
-            } else if (errQrUnbackMap[dataDTO.mac] != dataDTO.err_pr_unback) {
+            } else if (err_pr_unback_Map[dataDTO.mac] != dataDTO.err_pr_unback) {
                 //按压未回弹
-                errQrUnbackMap[dataDTO.mac] = dataDTO.err_pr_unback
+                err_pr_unback_Map[dataDTO.mac] = dataDTO.err_pr_unback
                 viewBinding.layoutPress.pressLayoutView.setUnBack()
             } else {
-                if (errPrLowMap[dataDTO.mac] != dataDTO.err_pr_low) {//按压不足
-                    errPrLowMap[dataDTO.mac] = dataDTO.err_pr_low
+                if (err_pr_low_Map[dataDTO.mac] != dataDTO.err_pr_low) {//按压不足
+                    err_pr_low_Map[dataDTO.mac] = dataDTO.err_pr_low
                     viewBinding.layoutPress.pressLayoutView.setDown()
-                } else if (errPrHighMap[dataDTO.mac] != dataDTO.err_pr_high) {//按压过大
-                    errPrHighMap[dataDTO.mac] = dataDTO.err_pr_high
+                } else if (err_pr_high_Map[dataDTO.mac] != dataDTO.err_pr_high) {//按压过大
+                    err_pr_high_Map[dataDTO.mac] = dataDTO.err_pr_high
                 }
             }
         }
@@ -407,23 +417,24 @@ class MutiActivityNew : BaseActivity() {
             viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
             if (qyValueMap[dataDTO.mac] != dataDTO.qySum) {
                 stopOutTime(viewBinding, dataDTO.mac)
-                var cout = cycleCountMap[dataDTO.mac] ?: 0
+                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
                 cout ++
-                cycleCountMap[dataDTO.mac] = cout
+                cycleQyCountMap[dataDTO.mac] = cout
                 isQyMap[dataDTO.mac] = true
                 isPrMap[dataDTO.mac] = false
 
+                val qyMax = dataDTO.qyMaxValue
                 when {
-                    dataDTO.err_qy_low != errQyLowMap[dataDTO.mac] -> {
-                        errQyLowMap[dataDTO.mac] = dataDTO.err_qy_low
+                    qyMax < configBean.tidalVolume -> {
+                        err_qy_low_Map[dataDTO.mac] = dataDTO.err_qy_low
                         viewBinding.layoutLung.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                     }
-                    dataDTO.err_qy_high != errQyHighMap[dataDTO.mac] -> {
-                        errQyHighMap[dataDTO.mac] = dataDTO.err_qy_high
+                    qyMax in configBean.tidalVolumeEnd..1199 -> {
+                        err_qy_high_Map[dataDTO.mac] = dataDTO.err_qy_high
                         viewBinding.layoutLung.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                     }
-                    dataDTO.err_qy_dead != errQyDeadMap[dataDTO.mac] -> {
-                        errQyDeadMap[dataDTO.mac] = dataDTO.err_qy_dead
+                    qyMax >= 1200 -> {
+                        err_qy_dead_Map[dataDTO.mac] = dataDTO.err_qy_dead
                         viewBinding.layoutLung.ivLung.setImageResource(R.mipmap.icon_wm_lung_heart)
                     }
                     else -> {
@@ -434,8 +445,8 @@ class MutiActivityNew : BaseActivity() {
                 sendMsg(INIT_LUNG, viewBinding)
             }
         } else {
-            if (dataDTO.err_qy_close != errQyCloseMap[dataDTO.mac]) {
-                errQyCloseMap[dataDTO.mac] = dataDTO.err_qy_close
+            if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
+                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
                 stopOutTime(viewBinding, dataDTO.mac)
                 viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
                 isQyAimMap[dataDTO.mac] = true
@@ -488,7 +499,7 @@ class MutiActivityNew : BaseActivity() {
     private fun observeData() {
         StatusLiveData.data.observe(this, Observer {
             it?.let {
-                Log.e(TAG, "prindata: mac: ${it.mac}, distance: ${it.distance}")
+                Log.e(TAG, "printData: mac: ${it.mac}, distance: ${it.distance}")
                 val view = getItemViewByMac(it.mac)
                 if (isStart && hasDoneMap[it.mac] != true)
                     setViewData(view, it)
@@ -563,6 +574,7 @@ class MutiActivityNew : BaseActivity() {
             mTrainingBean?.list?.get(curStudentIndex)?.let {
                 binding.tvModel.text = "${it.count}"
                 binding.tvCycle.text = "${cycleCountMap[it.mac] ?: 0}"
+                binding.tvBattery.power = mBaseDataDTOMap[it.mac]?.electricity ?: 0
             }
             curStudentIndex++
         }
@@ -590,7 +602,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun setQyRate(view: DialChart07View, value: Int) {
-        var pf: Float = 0f
+        var pf = 0f
         if (value > 0) {
             when {
                 value < configBean.tidalFrequency -> {
@@ -711,15 +723,6 @@ class MutiActivityNew : BaseActivity() {
                 mTrainingDTO.name = it.name
         }
 
-        mTrainingDTO.cycleCount = binding.tvCycle.text.toString().trim().toInt()
-        mTrainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
-        mTrainingDTO.prCount = configBean.prCount
-        mTrainingDTO.qyCount = configBean.qyCount
-        mTrainingDTO.pressScore = configBean.pressScore.toFloat()
-        mTrainingDTO.blowScore = configBean.blowScore.toFloat()
-        mTrainingDTO.processScore = configBean.processScore.toFloat()
-        mTrainingDTO.deduction = configBean.deductionScore
-
         mTrainingDTO.check1 = true
         mTrainingDTO.check2 = true
         mTrainingDTO.check3 = true
@@ -731,21 +734,44 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.check9 = true
         mTrainingDTO.check10 = true
 
+        qyMany(mac)
+
+        val cycleCount = cycleCountMap[mac] ?: 0
+        val cyclePrCount = cyclePrCountMap[mac] ?: 0
+        if (cycleCount < configBean.cycles) {
+            val number = configBean.cycles - cycleCount
+            var prLessCount = prLessCountMap[mac] ?: 0
+            if (number > 0 && cyclePrCount > 0) {
+                prLessCount += (number - 1) * configBean.prCount
+                prMany(mac)
+            } else {
+                prLessCount += number * configBean.prCount
+            }
+            prLessCountMap[mac] = prLessCount
+            val qyLessCount = qyLessCountMap[mac] ?: 0
+            qyLessCountMap[mac] = number * configBean.qyCount + qyLessCount
+        }
+
         mTrainingDTO.startTime = startTimeMap[mac] ?: 0
         mTrainingDTO.endTime = endTimeMap[mac] ?: 0
         mTrainingDTO.timeOutTotal = timeOutTotalMap[mac] ?: 0
-        mTrainingDTO.err_pr_high = errPrHighMap[mac] ?: 0
-        mTrainingDTO.err_pr_low = errPrLowMap[mac] ?: 0
-        mTrainingDTO.err_pr_posi = errPrPosiMap[mac] ?: 0
+        mTrainingDTO.err_pr_high = err_pr_high_Map[mac] ?: 0
+        mTrainingDTO.err_pr_low = err_pr_low_Map[mac] ?: 0
+        mTrainingDTO.err_pr_posi = err_pr_posi_Map[mac] ?: 0
+        mTrainingDTO.err_pr_unback = err_pr_unback_Map[mac] ?: 0
         //按压总错误数
         mTrainingDTO.pressErrorCount = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.getPr_err_total() else 0
+
+        mTrainingDTO.err_qy_high = err_qy_high_Map[mac] ?: 0
+        mTrainingDTO.err_qy_low = err_qy_low_Map[mac] ?: 0
+        mTrainingDTO.err_qy_dead = err_qy_dead_Map[mac] ?: 0
+        mTrainingDTO.err_qy_close = err_qy_close_Map[mac] ?: 0
+
         //吹气总错误数
         mTrainingDTO.blowErrorCount = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.getQy_err_total().toFloat() else 0f
-        //超次少次
-        mTrainingDTO.prManyCount = prManyCountMap[mac] ?: 0
-        mTrainingDTO.prLessCount = prLessCountMap[mac] ?: 0
-        mTrainingDTO.qyManyCount = qyManyCountMap[mac] ?: 0
-        mTrainingDTO.qyLessCount = qyLessCountMap[mac] ?: 0
+
+        mTrainingDTO.prSum = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.prSum else 0
+        mTrainingDTO.qySum = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.qySum else 0
 
         mTrainingDTO.pr_depth_sum = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.pr_depth_sum else 0
         mTrainingDTO.pr_time_sum = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.pr_time_sum else 0
@@ -754,6 +780,22 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.pr_seqright_total = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.pr_seqright_total else 0
         mTrainingDTO.qy_serright_total = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.qy_serright_total else 0
         mTrainingDTO.qy_max_volume_sum = if(mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.qy_max_volume_sum else 0
+
+        //超次少次
+        mTrainingDTO.prManyCount = prManyCountMap[mac] ?: 0
+        mTrainingDTO.prLessCount = prLessCountMap[mac] ?: 0
+        mTrainingDTO.qyManyCount = qyManyCountMap[mac] ?: 0
+        mTrainingDTO.qyLessCount = qyLessCountMap[mac] ?: 0
+
+        mTrainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
+        mTrainingDTO.prCount = configBean.prCount
+        mTrainingDTO.qyCount = configBean.qyCount
+        mTrainingDTO.cycles = configBean.cycles
+        mTrainingDTO.pressScore = configBean.pressScore.toFloat()
+        mTrainingDTO.blowScore = configBean.blowScore.toFloat()
+        mTrainingDTO.processScore = configBean.processScore.toFloat()
+        mTrainingDTO.deduction = configBean.deductionScore
+
         TrainResultActivity.start(this, mTrainingDTO)
     }
 
@@ -782,7 +824,8 @@ class MutiActivityNew : BaseActivity() {
     private fun stopAllOutTime() {
         val endTime = System.currentTimeMillis()
         dataList.forEach {
-            if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC)) {
+            //点击停止键，所有为完成都都标记为完成并记录结束时间
+            if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC) && hasDoneMap[it.mac] != true) {
                 endTimeMap[it.mac] = endTime
                 val b = getItemViewByMac(it.mac)
                 b?.layoutPress?.ctTime?.stop()
@@ -793,13 +836,12 @@ class MutiActivityNew : BaseActivity() {
     private fun stopOutTime(viewBinding: CycleFragmentMultiItemBinding, mac: String) {
         var timeOutTotal = timeOutTotalMap[mac] ?: 0
         //暂停超时时间
-        val isTime = isTimeOutMap[mac] ?: false
-        if (isTime) {
+        if (isTimeOutMap[mac] == true) {
             isTimeOutMap[mac] = false
-            viewBinding.layoutPress.ctTime.visibility = View.INVISIBLE
-            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.layoutPress.ctTime.base
-            timeOutTotalMap[mac] = timeOutTotal
             handler.removeCallbacks(counter)
+            viewBinding.layoutPress.ctTime.visibility = View.INVISIBLE
+//            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.layoutPress.ctTime.base
+            timeOutTotalMap[mac] = timeOutTotal
             viewBinding.layoutPress.ctTime.base = SystemClock.elapsedRealtime()
             viewBinding.layoutPress.ctTime.stop()
         }
@@ -820,6 +862,7 @@ class MutiActivityNew : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cycleCountMap.clear()
         counter.let { headTimeHandler.removeCallbacks(it) }
         EventBus.getDefault().unregister(this)
     }

@@ -15,6 +15,7 @@ public class BleDevice implements Parcelable {
     private boolean isLoading;
     private int mCount;
     private int power;
+    private boolean isConnected;
 
     public BleDevice(BluetoothDevice device) {
         mDevice = device;
@@ -137,5 +138,13 @@ public class BleDevice implements Parcelable {
 
     public void setCount(int mCount) {
         this.mCount = mCount;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 }
