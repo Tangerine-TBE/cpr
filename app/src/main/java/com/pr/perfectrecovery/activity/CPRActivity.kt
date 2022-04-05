@@ -207,6 +207,7 @@ class CPRActivity : BaseActivity() {
     private val itemClick =
         OnItemClickListener { adapter, view, position ->
             if (isItemClickable) {
+                viewBinding.tvMsg.visibility = View.INVISIBLE
                 val bleDevice = mDeviceAdapter.getItem(position)
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
                     if (count >= 6) {//处理提示语设备连接过多提示
@@ -408,7 +409,7 @@ class CPRActivity : BaseActivity() {
 
 //                unBind(bleDevice)
                     val newList = mutableListOf<BleDevice>()
-                    for (item in bleList) {
+                    for (item in mDeviceAdapter.data) {
                         if (item.count > bleDevice.count) {
                             item.count --
                         }
