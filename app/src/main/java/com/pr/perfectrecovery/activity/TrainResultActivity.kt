@@ -25,8 +25,10 @@ class TrainResultActivity : BaseActivity() {
     private lateinit var viewBinding: ActivityTrainResultBinding
 
     companion object {
-        fun start(context: Context, trainingDTO: TrainingDTO) {
+        var isMulti = false
+        fun start(context: Context, trainingDTO: TrainingDTO, multi:Boolean? = false) {
             val intent = Intent(context, TrainResultActivity::class.java)
+            isMulti = multi == true
             intent.putExtra(DATADTO, trainingDTO)
             context.startActivity(intent)
         }
@@ -66,7 +68,7 @@ class TrainResultActivity : BaseActivity() {
             //操作时长倒计时
             viewBinding.layoutCheck.tvCountdown.text = TimeUtils.timeParse(trainingDTO.operateTime)
             //流程分数
-            viewBinding.layoutCheck.tvProcess.text = "${trainingDTO.processScore}分"
+            viewBinding.layoutCheck.tvProcess.text = "${if (isMulti) 0 else trainingDTO.processScore}分"
             //按压分数
             viewBinding.layoutCheck.tvPress.text = "${trainingDTO.pressScore}分"
             //扣分
@@ -95,6 +97,7 @@ class TrainResultActivity : BaseActivity() {
             }
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.rating = (scoreTotal / 20.0f)
+            viewBinding.layoutCheck.ratingBar.isEnabled = false
             //总得分
             viewBinding.layoutCheck.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"

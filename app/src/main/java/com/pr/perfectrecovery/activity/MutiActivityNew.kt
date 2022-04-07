@@ -87,6 +87,8 @@ class MutiActivityNew : BaseActivity() {
     private var currentShowView: ConstraintLayout? = null
     private var curStudentIndex = 0
 
+    private var bindingList = mutableListOf<CycleFragmentMultiItemBinding>()
+
     //是否已经结束
     private var isOver = false
 
@@ -238,20 +240,21 @@ class MutiActivityNew : BaseActivity() {
         binding.item4.position2.visibility = View.GONE
         binding.item6.position1.text = "6"
         binding.item6.position2.visibility = View.GONE
+
+        bindingList.add(binding.item1)
+        bindingList.add(binding.item2)
+        bindingList.add(binding.item3)
+        bindingList.add(binding.item4)
+        bindingList.add(binding.item5)
+        bindingList.add(binding.item6)
     }
 
     @Synchronized
     private fun setViewData(viewBinding: CycleFragmentMultiItemBinding?, dataDTO: BaseDataDTO?) {
         viewBinding?.let {
             dataDTO?.let {
-                //判断是否已经完成考试
-                //TODO @chen 条件可能是多个的，不单单判断循环次数
-                if (cycleCountMap[dataDTO.mac] == configBean.cycles) {
-                    hasDoneMap[dataDTO.mac] = true
-                    endTimeMap[dataDTO.mac] = System.currentTimeMillis()
-                    showSingleResult(dataDTO.mac)
-                    return
-                }
+                if (hasDoneMap[dataDTO.mac] == true) return
+
                 mBaseDataDTOMap[dataDTO.mac] = dataDTO
                 if (isTimeOutMap[dataDTO.mac] != true && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                     isTimeOutMap[dataDTO.mac] = true
@@ -320,12 +323,14 @@ class MutiActivityNew : BaseActivity() {
      */
     private fun cycleEnd(mac: String) {
         if (isCheck) {
-            if (cycleCountMap[mac] == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount) {
+            if (cycleCountMap[mac] == (configBean.cycles + 1)) {
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
                  */
                 qyMany(mac)
+                hasDoneMap[mac] = true
+                endTimeMap[mac] = System.currentTimeMillis()
                 showSingleResult(mac)
             }
         }
@@ -368,12 +373,12 @@ class MutiActivityNew : BaseActivity() {
                 err_pr_posi_Map[dataDTO.mac] = dataDTO.err_pr_posi
                 viewBinding.layoutPress.ivPressAim.visibility = View.VISIBLE
                 sendMsg(INIT_PRESS, viewBinding)
-            } else if (err_pr_unback_Map[dataDTO.mac] != dataDTO.err_pr_unback) {
+            } else if (err_pr_unback_Map[dataDTO.mac] ?: 0 != dataDTO.err_pr_unback) {
                 //按压未回弹
                 err_pr_unback_Map[dataDTO.mac] = dataDTO.err_pr_unback
                 viewBinding.layoutPress.pressLayoutView.setUnBack()
             } else {
-                if (err_pr_low_Map[dataDTO.mac] != dataDTO.err_pr_low) {//按压不足
+                if (err_pr_low_Map[dataDTO.mac] ?: 0 != dataDTO.err_pr_low) {//按压不足
                     err_pr_low_Map[dataDTO.mac] = dataDTO.err_pr_low
                     viewBinding.layoutPress.pressLayoutView.setDown()
                 } else if (err_pr_high_Map[dataDTO.mac] != dataDTO.err_pr_high) {//按压过大
@@ -494,6 +499,11 @@ class MutiActivityNew : BaseActivity() {
             else -> {}
         }
         return if (view is CycleFragmentMultiItemBinding) view else null
+    }
+
+    private fun getMacByItemView(binding:CycleFragmentMultiItemBinding):String {
+        val index = bindingList.indexOf(binding)
+        return dataList[index].mac
     }
 
     private fun observeData() {
@@ -664,30 +674,31 @@ class MutiActivityNew : BaseActivity() {
             item.layoutPress.root.visibility = View.GONE
             item.layoutTest.root.visibility = View.GONE
             item.layoutScore.root.visibility = View.VISIBLE
-            val score = countScore()
+            val score = countScore(mac)
             var ratingBar: RatingBar = item.layoutScore.ratingBar
             when (score) {
-                in 0..20 -> {
+                in 0f..20f -> {
                     item.layoutScore.ratingBarRed.visibility = View.VISIBLE
                     item.layoutScore.ratingBar.visibility = View.GONE
                     item.layoutScore.ratingBarYellow.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBarRed
                 }
-                in 21..60 -> {
+                in 21f..60f -> {
                     item.layoutScore.ratingBarYellow.visibility = View.VISIBLE
                     item.layoutScore.ratingBar.visibility = View.GONE
                     item.layoutScore.ratingBarRed.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBarYellow
                 }
-                in 61..100 -> {
+                in 61f..100f -> {
                     item.layoutScore.ratingBar.visibility = View.VISIBLE
                     item.layoutScore.ratingBarRed.visibility = View.GONE
                     item.layoutScore.ratingBarYellow.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBar
                 }
             }
-            item.layoutScore.tvScore.text = "$score"
-            ratingBar.rating = (5.0 * countScore() / 100).toFloat()
+            item.layoutScore.tvScore.text = "${if(score > 0) score else 0}"
+            ratingBar.rating = (5.0 * countScore(mac) / 100).toFloat()
+            ratingBar.isEnabled = false
 
             item.layoutScore.root.setOnClickListener {
                 gotoDetail(mac)
@@ -716,6 +727,11 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun gotoDetail(mac: String) {
+        val mTrainingDTO = getResultBean(mac)
+        TrainResultActivity.start(this, mTrainingDTO, multi = true)
+    }
+
+    private fun getResultBean(mac:String):TrainingDTO{
         val mTrainingDTO = TrainingDTO()
         mTrainingDTO.isCheck = mTrainingBean!!.isCheck
         mTrainingBean?.list?.forEach {
@@ -723,16 +739,16 @@ class MutiActivityNew : BaseActivity() {
                 mTrainingDTO.name = it.name
         }
 
-        mTrainingDTO.check1 = true
-        mTrainingDTO.check2 = true
-        mTrainingDTO.check3 = true
-        mTrainingDTO.check4 = true
-        mTrainingDTO.check5 = true
-        mTrainingDTO.check6 = true
-        mTrainingDTO.check7 = true
-        mTrainingDTO.check8 = true
-        mTrainingDTO.check9 = true
-        mTrainingDTO.check10 = true
+        mTrainingDTO.check1 = false
+        mTrainingDTO.check2 = false
+        mTrainingDTO.check3 = false
+        mTrainingDTO.check4 = false
+        mTrainingDTO.check5 = false
+        mTrainingDTO.check6 = false
+        mTrainingDTO.check7 = false
+        mTrainingDTO.check8 = false
+        mTrainingDTO.check9 = false
+        mTrainingDTO.check10 = false
 
         qyMany(mac)
 
@@ -795,12 +811,19 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.blowScore = configBean.blowScore.toFloat()
         mTrainingDTO.processScore = configBean.processScore.toFloat()
         mTrainingDTO.deduction = configBean.deductionScore
-
-        TrainResultActivity.start(this, mTrainingDTO)
+        return mTrainingDTO
     }
 
-    private fun countScore(): Int {
-        return 80
+    private fun countScore(mac: String): Float {
+        val trainingDTO = getResultBean(mac)
+        var scoreTotal: Float =
+            trainingDTO.getQyScore() + trainingDTO.getPrScore()
+        if (scoreTotal > trainingDTO.getTimeOutScore()) {
+            scoreTotal -= trainingDTO.getTimeOutScore()
+        } else {
+            scoreTotal = 0f
+        }
+        return scoreTotal
     }
 
     private fun initPress(binding: CycleFragmentMultiItemBinding) {
@@ -815,6 +838,16 @@ class MutiActivityNew : BaseActivity() {
 
     private fun startTime(binding: CycleFragmentMultiItemBinding) {
         if (isStart) {
+            val mac = getMacByItemView(binding)
+            var totalTime = timeOutTotalMap[mac] ?: 0
+            binding.layoutPress.ctTime.setOnChronometerTickListener {
+                //SystemClock.elapsedRealtime()系统当前时间
+                //chronometer.getBase()记录计时器开始时的时间
+                if ((SystemClock.elapsedRealtime() - binding.layoutPress.ctTime.base) >= 1000) {
+                    totalTime += 1000
+                    timeOutTotalMap[mac] = totalTime
+                }
+            }
             binding.layoutPress.ctTime.visibility = View.VISIBLE
             binding.layoutPress.ctTime.base = SystemClock.elapsedRealtime()
             binding.layoutPress.ctTime.start()
@@ -834,14 +867,12 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun stopOutTime(viewBinding: CycleFragmentMultiItemBinding, mac: String) {
-        var timeOutTotal = timeOutTotalMap[mac] ?: 0
         //暂停超时时间
         if (isTimeOutMap[mac] == true) {
             isTimeOutMap[mac] = false
             handler.removeCallbacks(counter)
             viewBinding.layoutPress.ctTime.visibility = View.INVISIBLE
 //            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.layoutPress.ctTime.base
-            timeOutTotalMap[mac] = timeOutTotal
             viewBinding.layoutPress.ctTime.base = SystemClock.elapsedRealtime()
             viewBinding.layoutPress.ctTime.stop()
         }
