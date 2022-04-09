@@ -84,6 +84,7 @@ class MutiActivityNew : BaseActivity() {
     private var isCycleMap = mutableMapOf<String, Boolean>()
     private var startTimeMap = mutableMapOf<String, Long>()
     private var endTimeMap = mutableMapOf<String, Long>()
+    private var resultBeanMap = mutableMapOf<String, TrainingDTO>()
     private var currentShowView: ConstraintLayout? = null
     private var curStudentIndex = 0
 
@@ -209,6 +210,7 @@ class MutiActivityNew : BaseActivity() {
             if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC)) {
                 val item = getItemViewByMac(it.mac)
                 initDeviceView(item)
+                cycleCountMap[it.mac] = 0
             }
         }
     }
@@ -254,8 +256,8 @@ class MutiActivityNew : BaseActivity() {
         viewBinding?.let {
             dataDTO?.let {
                 if (hasDoneMap[dataDTO.mac] == true) return
-
                 mBaseDataDTOMap[dataDTO.mac] = dataDTO
+                //中断超时
                 if (isTimeOutMap[dataDTO.mac] != true && dataDTO.distance == dataDTO.preDistance && dataDTO.bpValue <= 0 && dataDTO.prSum > 0) {
                     isTimeOutMap[dataDTO.mac] = true
                     sendMsg(START_TIME, viewBinding, (configBean.interruptTime * 1000).toLong())
@@ -312,9 +314,7 @@ class MutiActivityNew : BaseActivity() {
             isPrMap[mac] = false
             prMany(mac)
             var cycleCount = cycleCountMap[mac] ?: 0
-            cycleCount ++
-            cycleCountMap[mac] = cycleCount
-
+            cycleCountMap[mac] = cycleCount + 1
         }
     }
 
@@ -323,7 +323,7 @@ class MutiActivityNew : BaseActivity() {
      */
     private fun cycleEnd(mac: String) {
         if (isCheck) {
-            if (cycleCountMap[mac] == (configBean.cycles + 1)) {
+            if (cycleCountMap[mac] == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount) {
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
@@ -338,14 +338,14 @@ class MutiActivityNew : BaseActivity() {
 
     private fun prMany(mac: String) {
         if (isCheck) {
-            if (cyclePrCountMap[mac] ?: 0 > configBean.prCount && cyclePrCountMap[mac] ?: 0 > 0) {
+            val cyclePrCount = cyclePrCountMap[mac] ?: 0
+            if (cyclePrCount > configBean.prCount && cyclePrCount > 0) {
                 //按压超次
                 val prManyCount = prManyCountMap[mac] ?: 0
-                prManyCountMap[mac] = cyclePrCountMap[mac] ?: 0 - configBean.prCount + prManyCount
-            } else if (cyclePrCountMap[mac] ?: 0 < configBean.prCount) {
+                prManyCountMap[mac] = cyclePrCount - configBean.prCount + prManyCount
+            } else if (cyclePrCount < configBean.prCount) {
                 //按压少次
                 val prLessCount = prLessCountMap[mac] ?: 0
-                val cyclePrCount = cyclePrCountMap[mac] ?:0
                 prLessCountMap[mac] = configBean.prCount - cyclePrCount  + prLessCount
             }
             cyclePrCountMap[mac] = 0
@@ -356,7 +356,7 @@ class MutiActivityNew : BaseActivity() {
         setRate(viewBinding.layoutPress.chart, dataDTO.pf)
         viewBinding.layoutPress.pressLayoutView.smoothScrollTo(dataDTO.distance, dataDTO)
         //处理是否按压
-        if (dataDTO.prSum != prValueMap[dataDTO.mac]) {
+        if (prValueMap[dataDTO.mac] ?: 0 != dataDTO.prSum) {
             prValueMap[dataDTO.mac] = dataDTO.prSum
             //暂停超时时间 - 判断是否小于初始值
             stopOutTime(viewBinding, dataDTO.mac)
@@ -394,17 +394,17 @@ class MutiActivityNew : BaseActivity() {
 
     private var qyManyCycleMap = mutableMapOf<String, Int>()
     private fun qyMany(mac: String) {
-        if (isCheck && cycleCountMap[mac] != qyManyCycleMap[mac] && cycleQyCountMap[mac] ?: 0 > 0) {
+        val cycleQyCount = cycleQyCountMap[mac] ?: 0
+        if (isCheck && cycleCountMap[mac] != qyManyCycleMap[mac] && cycleQyCount> 0) {
             qyManyCycleMap[mac] = cycleCountMap[mac] ?: 0
-            if (cycleQyCountMap[mac] ?: 0 > configBean.qyCount) {
+            if (cycleQyCount > configBean.qyCount) {
                 //吹气超次
                 val qyManyCount = qyManyCountMap[mac] ?: 0
-                qyManyCountMap[mac] =  cycleQyCountMap[mac] ?: 0 - configBean.qyCount + qyManyCount
+                qyManyCountMap[mac] =  cycleQyCount - configBean.qyCount + qyManyCount
                 Log.e("qyManyCount 吹气超次", "qyManyCount: $qyManyCount")
-            } else if (cycleQyCountMap[mac] ?: 0 < configBean.qyCount) {
+            } else if (cycleQyCount < configBean.qyCount) {
                 //吹气少次
                 val qyLessCount = qyLessCountMap[mac] ?: 0
-                val cycleQyCount = cycleQyCountMap[mac] ?: 0
                 qyLessCountMap[mac] = configBean.qyCount - cycleQyCount + qyLessCount
                 Log.e("qyLessCount 吹气少次", "qyLessCount: $qyLessCount")
             }
@@ -420,7 +420,7 @@ class MutiActivityNew : BaseActivity() {
         //通气道是否打开 0-关闭 1-打开
         if (dataDTO.aisleType == 1) {
             viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
-            if (qyValueMap[dataDTO.mac] != dataDTO.qySum) {
+            if (qyValueMap[dataDTO.mac] ?: 0 != dataDTO.qySum) {
                 stopOutTime(viewBinding, dataDTO.mac)
                 var cout = cycleQyCountMap[dataDTO.mac] ?: 0
                 cout ++
@@ -455,9 +455,9 @@ class MutiActivityNew : BaseActivity() {
                 stopOutTime(viewBinding, dataDTO.mac)
                 viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
                 isQyAimMap[dataDTO.mac] = true
-                var cout = cycleCountMap[dataDTO.mac] ?: 0
+                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
                 cout ++
-                cycleCountMap[dataDTO.mac] = cout
+                cycleQyCountMap[dataDTO.mac] = cout
                 isQyMap[dataDTO.mac] = true
                 isPrMap[dataDTO.mac] = false
                 sendMsg(INIT_LUNG, viewBinding)
@@ -732,6 +732,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun getResultBean(mac:String):TrainingDTO{
+        if (resultBeanMap[mac] != null) return resultBeanMap[mac]!!
         val mTrainingDTO = TrainingDTO()
         mTrainingDTO.isCheck = mTrainingBean!!.isCheck
         mTrainingBean?.list?.forEach {
@@ -749,24 +750,6 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.check8 = false
         mTrainingDTO.check9 = false
         mTrainingDTO.check10 = false
-
-        qyMany(mac)
-
-        val cycleCount = cycleCountMap[mac] ?: 0
-        val cyclePrCount = cyclePrCountMap[mac] ?: 0
-        if (cycleCount < configBean.cycles) {
-            val number = configBean.cycles - cycleCount
-            var prLessCount = prLessCountMap[mac] ?: 0
-            if (number > 0 && cyclePrCount > 0) {
-                prLessCount += (number - 1) * configBean.prCount
-                prMany(mac)
-            } else {
-                prLessCount += number * configBean.prCount
-            }
-            prLessCountMap[mac] = prLessCount
-            val qyLessCount = qyLessCountMap[mac] ?: 0
-            qyLessCountMap[mac] = number * configBean.qyCount + qyLessCount
-        }
 
         mTrainingDTO.startTime = startTimeMap[mac] ?: 0
         mTrainingDTO.endTime = endTimeMap[mac] ?: 0
@@ -811,6 +794,7 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.blowScore = configBean.blowScore.toFloat()
         mTrainingDTO.processScore = configBean.processScore.toFloat()
         mTrainingDTO.deduction = configBean.deductionScore
+        resultBeanMap[mac] = mTrainingDTO
         return mTrainingDTO
     }
 
@@ -862,6 +846,25 @@ class MutiActivityNew : BaseActivity() {
                 endTimeMap[it.mac] = endTime
                 val b = getItemViewByMac(it.mac)
                 b?.layoutPress?.ctTime?.stop()
+
+
+                qyMany(it.mac)
+
+                val cycleCount = cycleCountMap[it.mac] ?: 0
+                val cyclePrCount = cyclePrCountMap[it.mac] ?: 0
+                if (cycleCount < configBean.cycles) {
+                    val number = configBean.cycles - cycleCount
+                    var prLessCount = prLessCountMap[it.mac] ?: 0
+                    if (number > 0 && cyclePrCount > 0) {
+                        prLessCount += (number - 1) * configBean.prCount
+                        prMany(it.mac)
+                    } else {
+                        prLessCount += number * configBean.prCount
+                    }
+                    prLessCountMap[it.mac] = prLessCount
+                    val qyLessCount = qyLessCountMap[it.mac] ?: 0
+                    qyLessCountMap[it.mac] = number * configBean.qyCount + qyLessCount
+                }
             }
         }
     }
