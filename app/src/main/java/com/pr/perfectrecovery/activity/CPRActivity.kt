@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.hardware.usb.UsbManager
 import android.location.LocationManager
 import android.os.*
 import android.provider.Settings
@@ -32,6 +33,10 @@ import com.clj.fastble.data.BleDevice
 import com.clj.fastble.exception.BleException
 import com.clj.fastble.scan.BleScanRuleConfig
 import com.clj.fastble.utils.HexUtil
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
+import com.hoho.android.usbserial.driver.ProbeTable
+import com.hoho.android.usbserial.driver.UsbSerialDriver
+import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.pr.perfectrecovery.BaseApplication
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter
@@ -63,6 +68,18 @@ class CPRActivity : BaseActivity() {
     private var connectList = arrayListOf<BleDevice>()
     private var isInitValueMap = mutableMapOf<String, Boolean>()
 
+    companion object {
+        fun getCustomProber(): UsbSerialProber {
+            val customTable = ProbeTable()
+            customTable.addProduct(
+                0x16d0,
+                0x087e,
+                CdcAcmSerialDriver::class.java
+            ) // e.g. Digispark CDC
+            return UsbSerialProber(customTable)
+        }
+    }
+
     //监听USB连接状态
     var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -72,7 +89,6 @@ class CPRActivity : BaseActivity() {
                 if (connected) {
 //                    Toast.makeText(this@CPRActivity, "USB已连接", Toast.LENGTH_SHORT).show()
 //                    viewBinding.tvMsg.text = "USB已连接"
-                    openTTL()
                 } else {
 //                    viewBinding.tvMsg.text = "USB已断开"
 //                    Toast.makeText(this@CPRActivity, "USB已断开", Toast.LENGTH_SHORT).show()
@@ -86,12 +102,36 @@ class CPRActivity : BaseActivity() {
         viewBinding = ActivityCpractivityBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         EventBus.getDefault().register(this)
+        registerBroadcast()
         initView()
         //初始化蓝牙管理器
         initBluetooth()
         initBle()
-        registerBroadcast()
         ttl()
+        viewBinding.cbBle.isChecked = true
+    }
+
+    private fun refresh() {
+        if (viewBinding.cbUsb.isChecked) {
+            val usbManager = getSystemService(USB_SERVICE) as UsbManager
+            val usbDefaultProber: UsbSerialProber = UsbSerialProber.getDefaultProber()
+            val usbCustomProber: UsbSerialProber = getCustomProber()
+            //        if (usbManager.deviceList.values == null || usbManager.deviceList.values.isEmpty()) {
+            //            viewBinding.ctUsb.isChecked = false
+            //        }
+            for (device in usbManager.deviceList.values) {
+                val driver: UsbSerialDriver = usbDefaultProber.probeDevice(device)
+                //ToastUtils.showShort(driver::class.java.simpleName.replace("SerialDriver", ""))
+                mDeviceAdapter.setList(null)
+                for (port in driver.ports.indices) {
+                    mDeviceAdapter.addData(BleDevice(driver))
+                }
+            }
+            stopRefresh()
+            //listAdapter.notifyDataSetChanged()
+            //        handler.removeCallbacks(runnable)
+            //        handler.postDelayed(runnable, 2000)
+        }
     }
 
     private fun registerBroadcast() {
@@ -117,10 +157,6 @@ class CPRActivity : BaseActivity() {
             startActivity(Intent(this, ConfigActivity::class.java))
         }
 
-        viewBinding.ctUsb.setOnClickListener {
-            openTTL()
-        }
-
         viewBinding.recyclerview.layoutManager = LinearLayoutManager(this)
         // 是否抵用滚动事件监听
         //layoutManager.setChangeSelectInScrolling(false)
@@ -135,26 +171,52 @@ class CPRActivity : BaseActivity() {
         }
 
         viewBinding.progressCircular.setOnClickListener {
-            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            if (!bluetoothAdapter.isEnabled) {
-                Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG).show()
-            } else {
-                if (!isRefresh) {
-                    viewBinding.tvMsg.visibility = View.INVISIBLE
-                    startRefresh()
-                    checkPermissions()
-                    isRefresh = true
-                } else {
-                    isRefresh = false
-                    stopRefresh()
-                    //取消扫描蓝牙设备
-                    BleManager.getInstance().cancelScan()
-                }
-
-            }
+            searchBle()
         }
         viewBinding.recyclerview.adapter = mDeviceAdapter
         mDeviceAdapter.setOnItemClickListener(itemClick)
+
+        viewBinding.cbUsb.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                mDeviceAdapter.setList(null)
+                unBindBluetooth()
+                viewBinding.cbBle.isChecked = !isChecked
+                viewBinding.cbUsb.isChecked = isChecked
+                refresh()
+            }
+        }
+
+        viewBinding.cbBle.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                mDeviceAdapter.setList(null)
+                BaseApplication.driver?.CloseDevice()
+                searchBle()
+                viewBinding.cbUsb.isChecked = !isChecked
+                viewBinding.cbBle.isChecked = isChecked
+            }
+        }
+    }
+
+    private fun searchBle() {
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (!bluetoothAdapter.isEnabled) {
+            Toast.makeText(this, getString(R.string.please_open_blue), Toast.LENGTH_LONG)
+                .show()
+        } else {
+            mDeviceAdapter.setList(null)
+            if (!isRefresh) {
+                viewBinding.tvMsg.visibility = View.INVISIBLE
+                startRefresh()
+                checkPermissions()
+                isRefresh = true
+            } else {
+                isRefresh = false
+                stopRefresh()
+                //取消扫描蓝牙设备
+                BleManager.getInstance().cancelScan()
+            }
+
+        }
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -209,15 +271,19 @@ class CPRActivity : BaseActivity() {
             if (isItemClickable) {
                 viewBinding.tvMsg.visibility = View.INVISIBLE
                 val bleDevice = mDeviceAdapter.getItem(position)
-                if (!BleManager.getInstance().isConnected(bleDevice)) {
-                    if (count >= 6) {//处理提示语设备连接过多提示
-                        viewBinding.tvMsg.text = "当前版本最多同时支持6台模型"
-                        hintHandler.postDelayed(this::setTextNull, 2000)
-                    }
-                    BleManager.getInstance().cancelScan()
-                    connect(bleDevice, position)
+                if (bleDevice.getmUsbSerialDriver() != null) {
+                    openTTL(bleDevice, position)
                 } else {
-                    BleManager.getInstance().disconnect(bleDevice)
+                    if (!BleManager.getInstance().isConnected(bleDevice)) {
+                        if (count >= 6) {//处理提示语设备连接过多提示
+                            viewBinding.tvMsg.text = "当前版本最多同时支持6台模型"
+                            hintHandler.postDelayed(this::setTextNull, 2000)
+                        }
+                        BleManager.getInstance().cancelScan()
+                        connect(bleDevice, position)
+                    } else {
+                        BleManager.getInstance().disconnect(bleDevice)
+                    }
                 }
             }
         }
@@ -234,6 +300,7 @@ class CPRActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        refresh()
 //        showConnectedDevice()
 //        startRefresh()
 //        checkPermissions()
@@ -395,7 +462,6 @@ class CPRActivity : BaseActivity() {
                     if (BleManager.getInstance().isConnected(bleDevice)) {
                         BleManager.getInstance().disconnect(bleDevice)
                     }
-
                     if (count == 0) {
                         EventBus.getDefault()
                             .post(
@@ -411,7 +477,7 @@ class CPRActivity : BaseActivity() {
                     val newList = mutableListOf<BleDevice>()
                     for (item in mDeviceAdapter.data) {
                         if (item.count > bleDevice.count) {
-                            item.count --
+                            item.count--
                         }
                         newList.add(item)
                     }
@@ -598,7 +664,7 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
-                    if (!isOpen) {
+                    if (!BaseApplication.driver?.isConnected!! && characteristic != null) {
                         val formatHexString = HexUtil.formatHexString(
                             characteristic.value,
                             false
@@ -612,16 +678,12 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun sendMessage(formatHexString: String) {
-        if (TextUtils.isEmpty(formatHexString)) {
+        if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 36) {
             return
         }
-        val deviceMAC = "001b${
-            formatHexString.substring(24, 28) + formatHexString.substring(
-                32,
-                36
-            )
-        }"
-
+        Log.e("TAG", "原始数据${formatHexString}")
+        val deviceMAC =
+            "001b${formatHexString.substring(24, 28) + formatHexString.substring(32, 36)}"
         val dataVolatile = dataMap[deviceMAC]
         if (dataVolatile != null) {
             dataDTO = dataVolatile.parseString(formatHexString)
@@ -656,21 +718,12 @@ class CPRActivity : BaseActivity() {
                         115200, 8, 1, 0, 0
                     )//配置串口波特率，函数说明可参照编程手册
                 ) {
-                    Toast.makeText(
-                        this, "串口设置成功!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    ToastUtils.showShort("串口设置成功!")
                 } else {
-                    Toast.makeText(
-                        this, "串口设置失败!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    ToastUtils.showShort("串口设置失败!")
                 }
             } else if (retval == -2) {
-                Toast.makeText(
-                    this, "获取权限失败!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                ToastUtils.showShort("获取权限失败!")
             }
         }
     }
@@ -694,31 +747,28 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private fun openTTL() {
-        if (!isOpen) {
+    private fun openTTL(bleDevice: BleDevice, position: Int) {
+        if (!BaseApplication.driver?.isConnected!!) {
             when (BaseApplication.driver?.ResumeUsbList()) {
                 -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备
-                    Toast.makeText(this, "打开设备失败!", Toast.LENGTH_SHORT).show()
+                    ToastUtils.showShort("打开设备失败!")
                     BaseApplication.driver?.CloseDevice()
-                    isOpen = false
-                    viewBinding.ctUsb.isChecked = false
                 }
                 0 -> {
                     if (!BaseApplication.driver?.UartInit()!!) { //对串口设备进行初始化操作
-                        Toast.makeText(this, "设备初始化失败!", Toast.LENGTH_SHORT).show()
-                        viewBinding.tvMsg.text = "设备初始化失败"
-                        viewBinding.ctUsb.isChecked = false
+                        ToastUtils.showShort("设备初始化失败!")
                         return
                     }
-                    Toast.makeText(this, "打开设备成功!", Toast.LENGTH_SHORT).show()
+                    ToastUtils.showShort("打开设备成功!")
+                    bleDevice.isConnected = true
+                    bleDevice.isLoading = false
+                    bleDevice.count = count
+                    mDeviceAdapter.notifyItemChanged(position, bleDevice)
                     initTTL()
-                    isOpen = true
-                    viewBinding.ctUsb.isChecked = true
                     ReadThread().start() //开启读线程读取串口接收的数据
                 }
                 else -> {
-                    viewBinding.ctUsb.isChecked = false
-                    Toast.makeText(this, "未授权限!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "USB未授权限!", Toast.LENGTH_SHORT).show()
 //                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)
 //                    builder.setIcon(R.mipmap.icon_wm_logo)
 //                    builder.setTitle("未授权限")
@@ -739,9 +789,7 @@ class CPRActivity : BaseActivity() {
             }
         } else {
             //关闭USB TTL
-            isOpen = false
             Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
-            viewBinding.ctUsb.isChecked = false
             try {
                 Thread.sleep(200)
             } catch (e: InterruptedException) {
@@ -752,14 +800,12 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private var isOpen = false
-
     inner class ReadThread : Thread() {
         override fun run() {
             val buffer = ByteArray(64)
             while (true) {
                 val msg = Message.obtain()
-                if (!isOpen) {
+                if (!BaseApplication.driver?.isConnected!!) {
                     break
                 }
                 val length: Int = BaseApplication.driver!!.ReadData(buffer, 64)

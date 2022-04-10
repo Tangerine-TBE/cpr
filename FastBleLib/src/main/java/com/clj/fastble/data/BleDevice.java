@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+
 
 public class BleDevice implements Parcelable {
 
@@ -15,6 +17,12 @@ public class BleDevice implements Parcelable {
     private boolean isLoading;
     private int mCount;
     private int power;
+    //串口名称
+    private UsbSerialDriver mUsbSerialDriver;
+
+    public BleDevice(UsbSerialDriver device) {
+        mUsbSerialDriver = device;
+    }
     private boolean isConnected;
 
     public BleDevice(BluetoothDevice device) {
@@ -62,6 +70,14 @@ public class BleDevice implements Parcelable {
             return new BleDevice[size];
         }
     };
+
+    public UsbSerialDriver getmUsbSerialDriver() {
+        return mUsbSerialDriver;
+    }
+
+    public void setmUsbSerialDriver(UsbSerialDriver mUsbSerialDriver) {
+        this.mUsbSerialDriver = mUsbSerialDriver;
+    }
 
     public String getName() {
         if (mDevice != null) {

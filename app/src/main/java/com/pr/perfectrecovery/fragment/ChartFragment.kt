@@ -67,9 +67,9 @@ class ChartFragment : Fragment() {
 
     private fun initView() {
         //曲线图表
-        val data: LineData = getData(0f)
-        val data1: LineData = getData(0f)
-        val data2: LineData = getData(0f)
+        val data: LineData = getData(0f, false)
+        val data1: LineData = getData(0f, true)
+        val data2: LineData = getData(0f, false)
 //        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
         depth_threshold_low = (configBean.prLow() * 1.4).toInt()   //下限值放大8mm  需要定义变量  上下限阈值要放缩
@@ -139,14 +139,14 @@ class ChartFragment : Fragment() {
     }
 
     private fun setViewData() {
-        viewBinding.textView22.text = "${configBean.depth}cm"
-        viewBinding.tvDepthEnd.text = "${configBean.depthEnd}cm"
-        viewBinding.tvDepthFrequency.text = "${configBean.depthFrequency}cpm"
-        viewBinding.tvDepthFrequencyEnd.text = "${configBean.depthFrequencyEnd}cpm"
-        viewBinding.tvTidalFrequency.text = "${configBean.tidalFrequency}vpm"
-        viewBinding.tvTidalFrequencyEnd.text = "${configBean.tidalFrequencyEnd}vpm"
-        viewBinding.tvTidalVolume.text = "${configBean.tidalVolume}ml"
-        viewBinding.tvTidalVolumeEnd.text = "${configBean.tidalVolumeEnd}ml"
+        viewBinding.textView22.text = "${configBean.depth}"
+        viewBinding.tvDepthEnd.text = "${configBean.depthEnd}"
+        viewBinding.tvDepthFrequency.text = "${configBean.depthFrequency}"
+        viewBinding.tvDepthFrequencyEnd.text = "${configBean.depthFrequencyEnd}"
+        viewBinding.tvTidalFrequency.text = "${configBean.tidalFrequency}"
+        viewBinding.tvTidalFrequencyEnd.text = "${configBean.tidalFrequencyEnd}"
+        viewBinding.tvTidalVolume.text = "${configBean.tidalVolume}"
+        viewBinding.tvTidalVolumeEnd.text = "${configBean.tidalVolumeEnd}"
     }
 
     private fun initLineChart(lineChart: LineChart, lineData: LineData) {
@@ -330,7 +330,7 @@ class ChartFragment : Fragment() {
         viewBinding.tvHeartTotal.text = "/${data.prSum}"
     }
 
-    private fun getData(value: Float): LineData {
+    private fun getData(value: Float,  isBezier: Boolean): LineData {
         val values = ArrayList<Entry>()
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
@@ -350,7 +350,9 @@ class ChartFragment : Fragment() {
         lineDataSet.setDrawCircles(false)
         lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
 //        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        if (isBezier) {
+            lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        }
         val sets = ArrayList<ILineDataSet>()
 //        val d = LineDataSet(values, "")
 //        d.lineWidth = 0f

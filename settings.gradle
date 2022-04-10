@@ -10,3 +10,4 @@ rootProject.name = "cpr"
 include ':app'
 include ':FastBleLib'
 include ':MPChartLib'
+include ':usbSerialForAndroid'

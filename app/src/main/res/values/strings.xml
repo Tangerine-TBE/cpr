@@ -18,6 +18,7 @@
     <string name="gpsNotifyMsg">当前手机扫描蓝牙需要打开定位功能。</string>
     <string name="setting">前往设置</string>
     <string name="cancel">取消</string>
+    <string name="connect_method">连接方式</string>
     <string name="connect_fail">连接失败</string>
     <string name="active_disconnected">蓝牙连接断开了</string>
     <string name="disconnected">连接断开</string>

@@ -19,8 +19,8 @@
 
     <ImageView
             android:id="@+id/iv2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_marginTop="@dimen/dp_10"
             android:src="@mipmap/icon_wm_cpr_bt"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,6 +51,57 @@
             app:layout_constraintTop_toBottomOf="@+id/tvMsg" />
 
     <TextView
+            android:id="@+id/tvDesc2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_6"
+            android:text="@string/connect_method"
+            android:textColor="#3DB38E"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/view"
+            app:layout_constraintStart_toEndOf="@+id/view"
+            app:layout_constraintTop_toTopOf="@+id/view" />
+
+    <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/teal_200"
+            android:button="@drawable/checkbox_bg"
+            android:paddingStart="@dimen/dp_5"
+            android:textSize="16sp"
+            android:text="有线"
+            android:layout_marginStart="@dimen/dp_20"
+            app:layout_constraintStart_toEndOf="@+id/tvDesc2"
+            app:layout_constraintTop_toTopOf="@+id/tvDesc2"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDesc2"
+            android:id="@+id/cbUsb" />
+
+    <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/teal_200"
+            android:button="@drawable/checkbox_bg"
+            android:paddingStart="@dimen/dp_5"
+            android:textSize="16sp"
+            android:checked="true"
+            android:layout_marginStart="@dimen/dp_20"
+            android:text="蓝牙"
+            android:id="@+id/cbBle"
+            app:layout_constraintStart_toEndOf="@+id/cbUsb"
+            app:layout_constraintTop_toTopOf="@+id/cbUsb"
+            app:layout_constraintBottom_toBottomOf="@+id/cbUsb" />
+
+    <View
+            android:id="@+id/view2"
+            android:layout_width="5dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="@dimen/dp_20"
+            android:background="@drawable/border_dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <TextView
             android:id="@+id/tvDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,9 +109,9 @@
             android:text="@string/available_models"
             android:textColor="#3DB38E"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@+id/view"
-            app:layout_constraintStart_toEndOf="@+id/view"
-            app:layout_constraintTop_toTopOf="@+id/view" />
+            app:layout_constraintBottom_toBottomOf="@+id/view2"
+            app:layout_constraintStart_toEndOf="@+id/view2"
+            app:layout_constraintTop_toTopOf="@+id/view2" />
 
     <TextView
             android:id="@+id/tvHint"
@@ -97,7 +148,7 @@
             app:layout_constraintBottom_toTopOf="@+id/bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDesc"
+            app:layout_constraintTop_toBottomOf="@+id/view2"
             tools:listitem="@layout/item_bluetooth" />
 
     <TextView
@@ -111,16 +162,6 @@
             app:layout_constraintBottom_toTopOf="@+id/bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/bottom" />
-
-    <CheckedTextView
-            android:id="@+id/ctUsb"
-            android:layout_width="28dp"
-            android:layout_height="24dp"
-            android:visibility="visible"
-            android:layout_marginEnd="@dimen/dp_20"
-            android:background="@drawable/switch_usb"
-            app:layout_constraintEnd_toStartOf="@+id/progress_circular"
-            app:layout_constraintTop_toTopOf="@+id/progress_circular" />
 
     <include
             android:id="@+id/bottom"

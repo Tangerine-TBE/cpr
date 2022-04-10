@@ -11,452 +11,500 @@
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/dp_40">
+
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView1"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_marginStart="@dimen/dp_32"
+                    android:layout_marginTop="@dimen/dp_30"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    app:cardBackgroundColor="#B322231D"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintEnd_toStartOf="@+id/cardView2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="spread_inside">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    <ImageView
+                            android:id="@+id/ivLung"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:src="@mipmap/icon_wm_chart_lung"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/tvLungCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/color_text_selected"
+                            android:textSize="20sp"
+                            app:layout_constraintEnd_toStartOf="@+id/tvLungTotal"
+                            app:layout_constraintTop_toTopOf="@+id/tvLungTotal" />
+
+                    <TextView
+                            android:id="@+id/tvLungTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/dp_10"
+                            android:text="/0"
+                            android:textColor="#ffffffff"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView2"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_32"
+                    app:cardBackgroundColor="#B322231D"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/cardView1"
+                    app:layout_constraintTop_toTopOf="@+id/cardView1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    <ImageView
+                            android:id="@+id/ivHeart"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@mipmap/icon_wm_chart_heart"
+                            android:layout_marginStart="@dimen/dp_10"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <TextView
+                            android:id="@+id/tvHeartCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/color_text_selected"
+                            android:textSize="20sp"
+                            app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
+                            app:layout_constraintTop_toTopOf="@+id/tvHeartTotal" />
+
+                    <TextView
+                            android:id="@+id/tvHeartTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/dp_10"
+                            android:text="/0"
+                            android:textColor="#ffffffff"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintlayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_20"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView1">
 
-                <androidx.cardview.widget.CardView
-                        android:id="@+id/cardView1"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/dp_44"
-                        android:layout_marginStart="@dimen/dp_32"
-                        android:layout_marginTop="@dimen/dp_30"
-                        android:layout_marginEnd="@dimen/dp_10"
-                        app:cardBackgroundColor="#B322231D"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
-                        app:layout_constraintEnd_toStartOf="@+id/cardView2"
+                <TextView
+                        android:id="@+id/tvTop"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:text="次/分"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="spread_inside">
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                <TextView
+                        android:id="@+id/tvTidalFrequencyEnd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_20"
+                        android:text="8"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTop" />
 
-                        <ImageView
-                                android:id="@+id/ivLung"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="@dimen/dp_10"
-                                android:src="@mipmap/icon_wm_chart_lung"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                                android:id="@+id/tvLungCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="@color/color_text_selected"
-                                android:textSize="20sp"
-                                app:layout_constraintEnd_toStartOf="@+id/tvLungTotal"
-                                app:layout_constraintTop_toTopOf="@+id/tvLungTotal" />
-
-                        <TextView
-                                android:id="@+id/tvLungTotal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="@dimen/dp_10"
-                                android:text="/0"
-                                android:textColor="#ffffffff"
-                                android:textSize="20sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                        android:id="@+id/cardView2"
+                <View
+                        android:id="@+id/view2"
                         android:layout_width="0dp"
-                        android:layout_height="@dimen/dp_44"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequencyEnd"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvTidalFrequencyEnd"
+                        app:layout_constraintTop_toTopOf="@+id/tvTidalFrequencyEnd" />
+
+                <TextView
+                        android:id="@+id/tvTidalFrequency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_20"
+                        android:layout_marginTop="@dimen/dp_28"
+                        android:text="6"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequencyEnd" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="#1A3DB38E"
+                        app:layout_constraintEnd_toEndOf="@+id/view2"
+                        app:layout_constraintTop_toBottomOf="@+id/view2"
+                        app:layout_constraintStart_toStartOf="@+id/view2"
+                        app:layout_constraintBottom_toTopOf="@+id/view8" />
+
+                <View
+                        android:id="@+id/view8"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequency"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvTidalFrequency"
+                        app:layout_constraintTop_toTopOf="@+id/tvTidalFrequency" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/dp_60"
+                    android:layout_marginTop="@dimen/dp_18"
+                    app:layout_constraintBottom_toTopOf="@+id/barChart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/constraintlayout"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintlayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_40"
+                    app:layout_constraintStart_toStartOf="@+id/barChart"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
+
+                <TextView
+                        android:id="@+id/tvTop2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:text="毫升"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                        android:id="@+id/tvTidalVolumeEnd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:text="600"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTop2" />
+
+                <View
+                        android:id="@+id/viewml"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolumeEnd"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvTidalVolumeEnd"
+                        app:layout_constraintTop_toTopOf="@+id/tvTidalVolumeEnd" />
+
+                <TextView
+                        android:id="@+id/tvTidalVolume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:layout_marginTop="@dimen/dp_28"
+                        android:text="400"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="#1A3DB38E"
+                        app:layout_constraintEnd_toEndOf="@+id/viewml"
+                        app:layout_constraintTop_toBottomOf="@+id/viewml"
+                        app:layout_constraintStart_toStartOf="@+id/viewml"
+                        app:layout_constraintBottom_toTopOf="@+id/viewBar" />
+
+                <View
+                        android:id="@+id/viewBar"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolume"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvTidalVolume"
+                        app:layout_constraintTop_toTopOf="@+id/tvTidalVolume" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="65dp"
+                    android:layout_marginTop="@dimen/dp_10"
+                    app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintlayout3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_40"
+                    android:visibility="visible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
+
+                <TextView
+                        android:id="@+id/tvTop3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:text="厘米"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:background="@color/purple_200"
+                        android:layout_marginStart="@dimen/dp_10"
+                        app:layout_constraintStart_toEndOf="@+id/tvTop3"
+                        app:layout_constraintTop_toTopOf="@+id/tvTop3"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvTop3" />
+
+                <TextView
+                        android:id="@+id/tvDepth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:text="0   "
+                        android:textColor="#ffffffff"
+                        android:ems="2"
+                        android:textSize="13sp"
+                        android:gravity="center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTop3" />
+
+                <View
+                        android:id="@+id/view5"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvDepth"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvDepth"
+                        app:layout_constraintTop_toTopOf="@+id/tvDepth" />
+
+                <TextView
+                        android:id="@+id/textView22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:layout_marginTop="@dimen/dp_28"
+                        android:text="5cm"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvDepth" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="#1A3DB38E"
+                        app:layout_constraintEnd_toEndOf="@+id/viewline"
+                        app:layout_constraintTop_toBottomOf="@+id/viewline"
+                        app:layout_constraintStart_toStartOf="@+id/viewline"
+                        app:layout_constraintBottom_toTopOf="@+id/viewcm" />
+
+                <View
+                        android:id="@+id/viewline"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/textView22"
+                        app:layout_constraintTop_toTopOf="@+id/textView22" />
+
+                <TextView
+                        android:id="@+id/tvDepthEnd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:layout_marginTop="@dimen/dp_30"
+                        android:text="6cm"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView22" />
+
+                <View
+                        android:id="@+id/viewcm"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_32"
-                        app:cardBackgroundColor="#B322231D"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvDepthEnd"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/cardView1"
-                        app:layout_constraintTop_toTopOf="@+id/cardView1">
+                        app:layout_constraintStart_toEndOf="@+id/tvDepthEnd"
+                        app:layout_constraintTop_toTopOf="@+id/tvDepthEnd" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                        <ImageView
-                                android:id="@+id/ivHeart"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:src="@mipmap/icon_wm_chart_heart"
-                                android:layout_marginStart="@dimen/dp_10"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent" />
-
-                        <TextView
-                                android:id="@+id/tvHeartCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="@color/color_text_selected"
-                                android:textSize="20sp"
-                                app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
-                                app:layout_constraintTop_toTopOf="@+id/tvHeartTotal" />
-
-                        <TextView
-                                android:id="@+id/tvHeartTotal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="@dimen/dp_10"
-                                android:text="/0"
-                                android:textColor="#ffffffff"
-                                android:textSize="20sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintlayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_40"
-                        app:layout_constraintTop_toBottomOf="@+id/cardView1">
-
-                    <TextView
-                            android:id="@+id/tvTidalFrequencyEnd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:text="8vpm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    <View
-                            android:id="@+id/view2"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequencyEnd"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvTidalFrequencyEnd"
-                            app:layout_constraintTop_toTopOf="@+id/tvTidalFrequencyEnd" />
-
-                    <TextView
-                            android:id="@+id/tvTidalFrequency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_28"
-                            android:text="6vpm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequencyEnd" />
-
-                    <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:background="#1A3DB38E"
-                            app:layout_constraintEnd_toEndOf="@+id/view2"
-                            app:layout_constraintTop_toBottomOf="@+id/view2"
-                            app:layout_constraintStart_toStartOf="@+id/view2"
-                            app:layout_constraintBottom_toTopOf="@+id/view8" />
-
-                    <View
-                            android:id="@+id/view8"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequency"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvTidalFrequency"
-                            app:layout_constraintTop_toTopOf="@+id/tvTidalFrequency" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/lineChart"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="@dimen/dp_60"
-                        android:layout_marginTop="@dimen/dp_18"
-                        app:layout_constraintBottom_toTopOf="@+id/barChart"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/constraintlayout"
-                        app:layout_constraintTop_toBottomOf="@+id/cardView1" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintlayout2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_40"
-                        app:layout_constraintStart_toStartOf="@+id/barChart"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
-
-                    <TextView
-                            android:id="@+id/tvTidalVolumeEnd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:text="600ml"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    <View
-                            android:id="@+id/viewml"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolumeEnd"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvTidalVolumeEnd"
-                            app:layout_constraintTop_toTopOf="@+id/tvTidalVolumeEnd" />
-
-                    <TextView
-                            android:id="@+id/tvTidalVolume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_28"
-                            android:text="400ml"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
-
-                    <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:background="#1A3DB38E"
-                            app:layout_constraintEnd_toEndOf="@+id/viewml"
-                            app:layout_constraintTop_toBottomOf="@+id/viewml"
-                            app:layout_constraintStart_toStartOf="@+id/viewml"
-                            app:layout_constraintBottom_toTopOf="@+id/viewBar" />
-
-                    <View
-                            android:id="@+id/viewBar"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolume"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvTidalVolume"
-                            app:layout_constraintTop_toTopOf="@+id/tvTidalVolume" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/barChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="65dp"
-                        android:layout_marginTop="@dimen/dp_10"
-                        app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintlayout3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_40"
-                        android:visibility="visible"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
-
-                    <TextView
-                            android:id="@+id/tvDepth"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:text="0   "
-                            android:textColor="#ffffffff"
-                            android:ems="2"
-                            android:textSize="13sp"
-                            android:gravity="center"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    <View
-                            android:id="@+id/view5"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_4"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvDepth"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvDepth"
-                            app:layout_constraintTop_toTopOf="@+id/tvDepth" />
-
-                    <TextView
-                            android:id="@+id/textView22"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_28"
-                            android:text="5cm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tvDepth" />
-
-                    <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:background="#1A3DB38E"
-                            app:layout_constraintEnd_toEndOf="@+id/viewline"
-                            app:layout_constraintTop_toBottomOf="@+id/viewline"
-                            app:layout_constraintStart_toStartOf="@+id/viewline"
-                            app:layout_constraintBottom_toTopOf="@+id/viewcm" />
-
-                    <View
-                            android:id="@+id/viewline"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/textView22"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/textView22"
-                            app:layout_constraintTop_toTopOf="@+id/textView22" />
-
-                    <TextView
-                            android:id="@+id/tvDepthEnd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_30"
-                            android:text="6cm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView22" />
-
-                    <View
-                            android:id="@+id/viewcm"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_32"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthEnd"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvDepthEnd"
-                            app:layout_constraintTop_toTopOf="@+id/tvDepthEnd" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/lineChart1"
-                        android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:layout_marginTop="@dimen/dp_32"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/constraintlayout4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dp_50"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
-
-                    <TextView
-                            android:id="@+id/tvDepthFrequencyEnd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:text="120cpm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    <View
-                            android:id="@+id/view3"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequencyEnd"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvDepthFrequencyEnd"
-                            app:layout_constraintTop_toTopOf="@+id/tvDepthFrequencyEnd" />
-
-                    <TextView
-                            android:id="@+id/tvDepthFrequency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_32"
-                            android:layout_marginTop="@dimen/dp_30"
-                            android:text="100cpm"
-                            android:textColor="#ffffffff"
-                            android:textSize="13sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequencyEnd" />
-
-                    <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:background="#1A3DB38E"
-                            app:layout_constraintEnd_toEndOf="@+id/view3"
-                            app:layout_constraintTop_toBottomOf="@+id/view3"
-                            app:layout_constraintStart_toStartOf="@+id/view3"
-                            app:layout_constraintBottom_toTopOf="@+id/viewcpm" />
-
-                    <View
-                            android:id="@+id/viewcpm"
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:background="#1EFFFFFF"
-                            app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequency"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/tvDepthFrequency"
-                            app:layout_constraintTop_toTopOf="@+id/tvDepthFrequency" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/lineChart2"
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="@dimen/dp_75"
-                        android:layout_marginTop="@dimen/dp_28"
-                        app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
-                        app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart1"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="@dimen/dp_32"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintlayout4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_50"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
+
+                <TextView
+                        android:id="@+id/tvTop4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:text="次/分"
+                        android:textColor="#ffffffff"
+                        android:textSize="10sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                        android:id="@+id/tvDepthFrequencyEnd"
+                        android:layout_width="21dp"
+                        android:layout_height="15dp"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:text="120"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTop4" />
+
+                <View
+                        android:id="@+id/view3"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequencyEnd"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvDepthFrequencyEnd"
+                        app:layout_constraintTop_toTopOf="@+id/tvDepthFrequencyEnd" />
+
+                <TextView
+                        android:id="@+id/tvDepthFrequency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_15"
+                        android:layout_marginTop="@dimen/dp_30"
+                        android:text="100"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequencyEnd" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="#1A3DB38E"
+                        app:layout_constraintEnd_toEndOf="@+id/view3"
+                        app:layout_constraintTop_toBottomOf="@+id/view3"
+                        app:layout_constraintStart_toStartOf="@+id/view3"
+                        app:layout_constraintBottom_toTopOf="@+id/viewcpm" />
+
+                <View
+                        android:id="@+id/viewcpm"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:background="#1EFFFFFF"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequency"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvDepthFrequency"
+                        app:layout_constraintTop_toTopOf="@+id/tvDepthFrequency" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart2"
+                    android:layout_width="0dp"
+                    android:layout_height="84dp"
+                    android:layout_marginStart="@dimen/dp_75"
+                    android:layout_marginTop="@dimen/dp_28"
+                    app:layout_constraintBottom_toBottomOf="@+id/constraintlayout4"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

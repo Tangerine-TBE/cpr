@@ -16,6 +16,10 @@ class DeviceBluetoothAdapter :
     override fun convert(holder: BaseViewHolder, item: BleDevice) {
         val viewBinding = ItemBluetoothBinding.bind(holder.itemView)
         viewBinding.tvBluetoothName.text = "完美复苏  " + item.name
+        if (item.getmUsbSerialDriver() != null) {
+            viewBinding.tvBluetoothName.text =
+                "完美复苏串口  ${item.getmUsbSerialDriver()::class.java.simpleName.replace("SerialDriver", "")}"
+        }
         if (item.count > 0) {
             viewBinding.tvBluetoothStatus.text = "${item.count}"
         } else {
@@ -29,7 +33,7 @@ class DeviceBluetoothAdapter :
                 if (item.isLoading) View.VISIBLE else View.INVISIBLE
             viewBinding.loadingDot.visibility = View.INVISIBLE
             viewBinding.battery.visibility = View.VISIBLE
-            viewBinding.battery.power =  item.power
+            viewBinding.battery.power = item.power
         } else {
             viewBinding.loadingDot2.visibility = View.INVISIBLE
             viewBinding.loadingDot.visibility = if (item.isLoading) View.VISIBLE else View.INVISIBLE
