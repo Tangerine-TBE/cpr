@@ -90,11 +90,11 @@ public class BatteryView extends View {
         paint.setStyle(Paint.Style.FILL);
         RectF r2 = new RectF(width / 20.f + strokeWidth + (100 - mPower) / 100.0f * (width - strokeWidth * 2 - width / 20.f), strokeWidth, width - width / 20.f - strokeWidth, height - strokeWidth);
         //根据电池电量决定电池内矩形电量颜色
-        if (mPower < 30) {
-            paint.setColor(Color.RED);
+        if (mPower < 15) {
+            paint.setColor(getContext().getResources().getColor(R.color.red));
         }
-        if (mPower >= 30 && mPower < 50) {
-            paint.setColor(Color.BLUE);
+        if (mPower >= 15 && mPower < 50) {
+            paint.setColor(getContext().getResources().getColor(R.color.color_FDC457));
         }
         if (mPower >= 50) {
             paint.setColor(getContext().getResources().getColor(R.color.color_37B48B));

@@ -37,7 +37,7 @@
             app:layout_constraintTop_toBottomOf="@+id/dashBoard" />
 
     <Chronometer
-            android:id="@+id/ctTime"
+            android:id="@+id/ctPressTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
@@ -55,9 +55,9 @@
             android:layout_height="11dp"
             android:src="@mipmap/icon_wm_aim"
             android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="@+id/ctTime"
-            app:layout_constraintStart_toStartOf="@+id/ctTime"
-            app:layout_constraintTop_toTopOf="@+id/ctTime" />
+            app:layout_constraintEnd_toEndOf="@+id/ctPressTime"
+            app:layout_constraintStart_toStartOf="@+id/ctPressTime"
+            app:layout_constraintTop_toTopOf="@+id/ctPressTime" />
 
     <ImageView
             android:id="@+id/ivPress"

@@ -27,6 +27,8 @@ import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.math.abs
 
 class MutiActivityNew : BaseActivity() {
@@ -677,28 +679,27 @@ class MutiActivityNew : BaseActivity() {
             val score = countScore(mac)
             var ratingBar: RatingBar = item.layoutScore.ratingBar
             when (score) {
-                in 0f..20f -> {
+                in 0f..40f -> {
                     item.layoutScore.ratingBarRed.visibility = View.VISIBLE
                     item.layoutScore.ratingBar.visibility = View.GONE
                     item.layoutScore.ratingBarYellow.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBarRed
                 }
-                in 21f..60f -> {
+                in 40f..80f -> {
                     item.layoutScore.ratingBarYellow.visibility = View.VISIBLE
                     item.layoutScore.ratingBar.visibility = View.GONE
                     item.layoutScore.ratingBarRed.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBarYellow
                 }
-                in 61f..100f -> {
+                in 80f..100f -> {
                     item.layoutScore.ratingBar.visibility = View.VISIBLE
                     item.layoutScore.ratingBarRed.visibility = View.GONE
                     item.layoutScore.ratingBarYellow.visibility = View.GONE
                     ratingBar = item.layoutScore.ratingBar
                 }
             }
-            item.layoutScore.tvScore.text = "${if(score > 0) score else 0}"
+            item.layoutScore.tvScore.text = "${if(score > 0) getNoMoreThanTwoDigits(score) else 0}"
             ratingBar.rating = (5.0 * countScore(mac) / 100).toFloat()
-            ratingBar.isEnabled = false
 
             item.layoutScore.root.setOnClickListener {
                 gotoDetail(mac)
@@ -785,6 +786,7 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.prLessCount = prLessCountMap[mac] ?: 0
         mTrainingDTO.qyManyCount = qyManyCountMap[mac] ?: 0
         mTrainingDTO.qyLessCount = qyLessCountMap[mac] ?: 0
+        mTrainingDTO.cycleCount = cycleCountMap[mac] ?: 0
 
         mTrainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
         mTrainingDTO.prCount = configBean.prCount
@@ -824,17 +826,32 @@ class MutiActivityNew : BaseActivity() {
         if (isStart) {
             val mac = getMacByItemView(binding)
             var totalTime = timeOutTotalMap[mac] ?: 0
-            binding.layoutPress.ctTime.setOnChronometerTickListener {
+            binding.layoutPress.ctPressTime.setOnChronometerTickListener {
                 //SystemClock.elapsedRealtime()系统当前时间
                 //chronometer.getBase()记录计时器开始时的时间
-                if ((SystemClock.elapsedRealtime() - binding.layoutPress.ctTime.base) >= 1000) {
+                if ((SystemClock.elapsedRealtime() - binding.layoutPress.ctPressTime.base) >= 1000) {
                     totalTime += 1000
                     timeOutTotalMap[mac] = totalTime
                 }
             }
-            binding.layoutPress.ctTime.visibility = View.VISIBLE
-            binding.layoutPress.ctTime.base = SystemClock.elapsedRealtime()
-            binding.layoutPress.ctTime.start()
+            binding.layoutLung.ctLungTime.setOnChronometerTickListener {
+                //SystemClock.elapsedRealtime()系统当前时间
+                //chronometer.getBase()记录计时器开始时的时间
+                if ((SystemClock.elapsedRealtime() - binding.layoutLung.ctLungTime.base) >= 1000) {
+                    totalTime += 1000
+                    timeOutTotalMap[mac] = totalTime
+                }
+            }
+            if (isPrMap[mac] == true) {
+                binding.layoutPress.ctPressTime.visibility = View.VISIBLE
+                binding.layoutPress.ctPressTime.base = SystemClock.elapsedRealtime()
+                binding.layoutPress.ctPressTime.start()
+            }
+            else if (isQyMap[mac] == true) {
+                binding.layoutLung.ctLungTime.visibility = View.VISIBLE
+                binding.layoutLung.ctLungTime.base = SystemClock.elapsedRealtime()
+                binding.layoutLung.ctLungTime.start()
+            }
         }
     }
 
@@ -845,7 +862,11 @@ class MutiActivityNew : BaseActivity() {
             if (!TextUtils.equals(it.mac, BaseConstant.FAKE_MAC) && hasDoneMap[it.mac] != true) {
                 endTimeMap[it.mac] = endTime
                 val b = getItemViewByMac(it.mac)
-                b?.layoutPress?.ctTime?.stop()
+                if (isPrMap[it.mac] == true) {
+                    b?.layoutPress?.ctPressTime?.stop()
+                } else if(isQyMap[it.mac] == true) {
+                    b?.layoutLung?.ctLungTime?.stop()
+                }
 
 
                 qyMany(it.mac)
@@ -874,11 +895,23 @@ class MutiActivityNew : BaseActivity() {
         if (isTimeOutMap[mac] == true) {
             isTimeOutMap[mac] = false
             handler.removeCallbacks(counter)
-            viewBinding.layoutPress.ctTime.visibility = View.INVISIBLE
-//            timeOutTotal += SystemClock.elapsedRealtime() - viewBinding.layoutPress.ctTime.base
-            viewBinding.layoutPress.ctTime.base = SystemClock.elapsedRealtime()
-            viewBinding.layoutPress.ctTime.stop()
+            if (isPrMap[mac] == true) {
+                viewBinding.layoutPress.ctPressTime.visibility = View.INVISIBLE
+                viewBinding.layoutPress.ctPressTime.base = SystemClock.elapsedRealtime()
+                viewBinding.layoutPress.ctPressTime.stop()
+            } else if (isQyMap[mac] == true) {
+                viewBinding.layoutLung.ctLungTime.visibility = View.INVISIBLE
+                viewBinding.layoutLung.ctLungTime.base = SystemClock.elapsedRealtime()
+                viewBinding.layoutLung.ctLungTime.stop()
+            }
         }
+    }
+
+    private fun getNoMoreThanTwoDigits(number: Float): String {
+        val format = DecimalFormat("0.#")
+        //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+        format.roundingMode = RoundingMode.HALF_UP
+        return format.format(number)
     }
 
     override fun onResume() {
