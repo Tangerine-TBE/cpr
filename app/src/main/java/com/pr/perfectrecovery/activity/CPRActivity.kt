@@ -311,7 +311,8 @@ class CPRActivity : BaseActivity() {
         BleManager.getInstance()
             .enableLog(true)
             .setReConnectCount(1, 5000)
-            .setConnectOverTime(10000).operateTimeout = 5000
+            .setConnectOverTime(5000)
+            .operateTimeout = 5000
     }
 
     private val REQUEST_CODE_OPEN_GPS = 1
@@ -432,6 +433,7 @@ class CPRActivity : BaseActivity() {
                     viewBinding.tvConnections.text = "设备连接数：${count}"
                     //bind(bleDevice)
                     isItemClickable = true
+                    isRefreshPower = true
                 }
 
                 override fun onDisConnected(
@@ -677,6 +679,7 @@ class CPRActivity : BaseActivity() {
             })
     }
 
+    private var isRefreshPower: Boolean = false
     private fun sendMessage(formatHexString: String) {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 36) {
             return
@@ -693,14 +696,29 @@ class CPRActivity : BaseActivity() {
             dataDTO = mDataVolatile.parseString(formatHexString)
             dataMap[dataDTO.mac] = mDataVolatile
         }
-//        mDeviceAdapter.data.forEach { item ->
-//            if (item.mac == dataDTO.mac) {
-//                item.power = dataDTO.electricity
-//                mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
-//            }
-//        }
+        if (isRefreshPower) {
+            isRefreshPower = false
+            mDeviceAdapter.data.forEach { item ->
+                if (item.mac == dataDTO.mac) {
+                    item.power = dataDTO.electricity
+                    mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
+                }
+            }
+            powerHandler.removeCallbacks(powerRunning)
+            powerHandler.postDelayed(powerRunning, 10000)
+        }
         //发送数据
         StatusLiveData.data.postValue(dataDTO)
+    }
+
+    private val powerHandler = Handler(Looper.getMainLooper())
+    private val powerRunning = Runnable {
+        mDeviceAdapter.data.forEach { item ->
+            if (item.mac == dataDTO.mac) {
+                item.power = dataDTO.electricity
+                mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
+            }
+        }
     }
 
     override fun onDestroy() {

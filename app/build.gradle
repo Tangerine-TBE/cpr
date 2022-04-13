@@ -105,6 +105,8 @@ dependencies {
     implementation project(':FastBleLib')
     //图表
     implementation project(':MPChartLib')
+    //USB
+    implementation project(':usbSerialForAndroid')
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     //串口JAR
     implementation files('libs/CH34xUARTDriver.jar')
