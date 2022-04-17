@@ -97,7 +97,6 @@ class TrainResultActivity : BaseActivity() {
             }
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.rating = (scoreTotal / 20.0f)
-            viewBinding.layoutCheck.ratingBar.isEnabled = false
             //总得分
             viewBinding.layoutCheck.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
