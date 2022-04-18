@@ -18,7 +18,7 @@ object LineChartUtils {
         chart.setNoDataText("")
         // enable touch gestures
         chart.setTouchEnabled(false)
-        chart.setDrawBorders(true)
+        chart.setDrawBorders(false)
         // enable scaling and dragging
         chart.isDragEnabled = true
         chart.setScaleEnabled(true)

@@ -119,13 +119,18 @@ class CPRActivity : BaseActivity() {
             //        if (usbManager.deviceList.values == null || usbManager.deviceList.values.isEmpty()) {
             //            viewBinding.ctUsb.isChecked = false
             //        }
+            var bleDevice: BleDevice? = null
             for (device in usbManager.deviceList.values) {
                 val driver: UsbSerialDriver = usbDefaultProber.probeDevice(device)
                 //ToastUtils.showShort(driver::class.java.simpleName.replace("SerialDriver", ""))
                 mDeviceAdapter.setList(null)
                 for (port in driver.ports.indices) {
-                    mDeviceAdapter.addData(BleDevice(driver))
+                    bleDevice = BleDevice(driver)
+                    mDeviceAdapter.addData(bleDevice)
                 }
+            }
+            if (bleDevice != null) {
+                openTTL(bleDevice, 0)
             }
             stopRefresh()
             //listAdapter.notifyDataSetChanged()
@@ -780,8 +785,8 @@ class CPRActivity : BaseActivity() {
                     ToastUtils.showShort("打开设备成功!")
                     bleDevice.isConnected = true
                     bleDevice.isLoading = false
-                    bleDevice.count = count
                     mDeviceAdapter.notifyItemChanged(position, bleDevice)
+                    mDeviceAdapter.notifyDataSetChanged()
                     initTTL()
                     ReadThread().start() //开启读线程读取串口接收的数据
                 }
@@ -809,6 +814,11 @@ class CPRActivity : BaseActivity() {
             //关闭USB TTL
             Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
             try {
+                ToastUtils.showShort("打开设备成功!")
+                bleDevice.isConnected = false
+                bleDevice.isLoading = false
+                mDeviceAdapter.notifyItemChanged(position, bleDevice)
+                mDeviceAdapter.notifyDataSetChanged()
                 Thread.sleep(200)
             } catch (e: InterruptedException) {
                 e.printStackTrace()

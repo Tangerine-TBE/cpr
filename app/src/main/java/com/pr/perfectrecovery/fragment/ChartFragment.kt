@@ -38,6 +38,7 @@ import kotlin.math.roundToInt
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
     private lateinit var configBean: ConfigBean
+    private val TAG = ChartFragment::class.java.simpleName
 
     companion object {
         fun newInstance() = ChartFragment()
@@ -74,6 +75,8 @@ class ChartFragment : Fragment() {
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
         depth_threshold_low = (configBean.prLow() * 1.4).toInt()   //下限值放大8mm  需要定义变量  上下限阈值要放缩
         depth_threshold_high = (configBean.prHigh() * 1.4).toInt()  //上限值放大8mm
+        depth_Frequency_high = (configBean.depthFrequencyEnd)
+        depth_Frequency_low = (configBean.depthFrequency)
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(
@@ -87,10 +90,10 @@ class ChartFragment : Fragment() {
         StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setData(it)
-                addEntry(data, viewBinding.lineChart, it.cf.toFloat())
+                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf))
                 addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
 //                addEntry(data2, viewBinding.lineChart1, it)
-                addEntry(data2, viewBinding.lineChart2, it.pf.toFloat())
+                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf))
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
                     val qyMax = it.qyMaxValue
@@ -108,11 +111,13 @@ class ChartFragment : Fragment() {
 
         viewBinding.constraintlayout.setOnClickListener {
 //            addEntry(data, viewBinding.lineChart, 0f)
+            val random = (1..20).random()
+            //addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
         }
 
-        viewBinding.constraintlayout3.setOnClickListener {
-            val random = (1..100).random()
-            // addEntry(data, viewBinding.lineChart1, setValue(random))
+        viewBinding.constraintlayout4.setOnClickListener {
+            val random = (1..200).random()
+            //addEntry(data, viewBinding.lineChart2, getFrequencyValue(random))
         }
         setViewData()
     }
@@ -136,6 +141,58 @@ class ChartFragment : Fragment() {
             return 9.5f   // 按压显示到极限高度10
         }
         return 0f
+    }
+
+    /**
+     * 频率算法 0-200
+     */
+    private var depth_Frequency_low = 0
+    private var depth_Frequency_high = 0
+    private fun getFrequencyValue(depth: Int): Float {
+        Log.e("getFrequencyValue depth", "$depth")
+        var value = depth
+        if (depth > 200) {
+            value = 200
+        }
+        val result = when {
+            value <= depth_Frequency_low -> {
+                (6 / depth_Frequency_low.toFloat() * value.toFloat())//  按压不足 显示区域0-2
+            }
+            value in depth_Frequency_low..depth_Frequency_high -> {
+                (3 / (depth_Frequency_high - depth_Frequency_low).toFloat() * (depth.toFloat() - depth_Frequency_low.toFloat()) + 6.0f)//显示区域2-8
+            }
+            value > depth_Frequency_high -> {
+                (1 / ((depth_Frequency_high + 9) - depth_Frequency_high.toFloat()) * (depth.toFloat() - depth_Frequency_high.toFloat()) + 2)// 显示区域8-10
+            }
+            else -> 9.5f
+        }
+        return if (result > 10) 9.9f else result
+    }
+
+    /**
+     * 吹气频率算法 0-200
+     */
+    private var blow_Frequency_low = 0
+    private var blow_Frequency_high = 0
+    private fun getBlowFrequencyValue(depth: Int): Float {
+        var value = depth
+        if (value > 20) {
+            value = 20
+        }
+        Log.e("getFrequencyValue depth", "$value")
+        val result = when {
+            value <= blow_Frequency_low -> {
+                (6 / blow_Frequency_low.toFloat() * value.toFloat())//显示区域0-2
+            }
+            value in blow_Frequency_low..blow_Frequency_high -> {
+                (3 / (blow_Frequency_high - blow_Frequency_low).toFloat() * (depth.toFloat() - blow_Frequency_high.toFloat()) + 6.0f)//显示区域2-8
+            }
+            value > blow_Frequency_high -> {
+                (1 / ((blow_Frequency_high + 9) - blow_Frequency_high.toFloat()) * (depth.toFloat() - blow_Frequency_high.toFloat()) + 6.5f)// 显示区域8-10
+            }
+            else -> 9.9f
+        }
+        return if (result > 10) 9.9f else result
     }
 
     private fun setViewData() {
@@ -167,12 +224,16 @@ class ChartFragment : Fragment() {
         val leftAxis: YAxis = lineChart.axisLeft
         leftAxis.setLabelCount(5, false)
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+        leftAxis.mAxisMinimum = 0f
+        leftAxis.mAxisMaximum = 10f
+        leftAxis.textColor = Color.WHITE
 
         val rightAxis: YAxis = lineChart.axisRight
-        rightAxis.setLabelCount(5, false)
         rightAxis.setDrawGridLines(false)
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
+        lineData.setDrawValues(false)
+        lineData.setValueTextColor(Color.WHITE)
         xAxis.isEnabled = false
         leftAxis.isEnabled = false
         rightAxis.isEnabled = false
@@ -330,7 +391,7 @@ class ChartFragment : Fragment() {
         viewBinding.tvHeartTotal.text = "/${data.prSum}"
     }
 
-    private fun getData(value: Float,  isBezier: Boolean): LineData {
+    private fun getData(value: Float, isBezier: Boolean): LineData {
         val values = ArrayList<Entry>()
 //        values.add(Entry(0f, value.toFloat()))
         // create a dataset and give it a type
@@ -386,6 +447,7 @@ class ChartFragment : Fragment() {
      * @param yValues y值
      */
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
+        Log.e(TAG, "addEntry: $yValues")
         val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
         val entry = Entry(
             entryCount.toFloat(), yValues

@@ -390,6 +390,10 @@ class DataVolatile {
     }
 
     private var qy = 0
+
+    /**
+     * 数据清空
+     */
     fun dataClear() {
         isStart = false
         //电量值：  0-100%
