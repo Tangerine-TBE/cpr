@@ -230,8 +230,10 @@ class CPRActivity : BaseActivity() {
             BaseConstant.EVENT_CPR_START -> {
                 isInitValueMap.clear()
                 bindBluetooth()
+                isStart = true
             }
             BaseConstant.EVENT_CPR_STOP -> {
+                isStart = false
                 unBindBluetooth()
                 //清空当前map数据
                 dataMap.values.forEach { item ->
@@ -249,12 +251,24 @@ class CPRActivity : BaseActivity() {
                 DataVolatile.setModel(event.isCheck)
             }
             BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
-                dataMap.clear()
-                isInitValueMap.clear()
+                deviceCount = 0
+                unBindBluetooth()
+                Log.e("hunger_test_clear", " recieve message" )
                 //清空当前map数据
                 dataMap.values.forEach { item ->
                     item.dataClear()
                 }
+                dataMap.clear()
+                isInitValueMap.clear()
+                Log.e("hunger_test_clear", " clear done" )
+
+            }
+            BaseConstant.EVENT_DO_BIND -> {
+                isInitValueMap.clear()
+                bindBluetooth()
+            }
+            BaseConstant.EVENT_DO_START -> {
+                isStart = true
             }
         }
     }
@@ -647,6 +661,7 @@ class CPRActivity : BaseActivity() {
 
     private val dataMap = mutableMapOf<String, DataVolatile>()
     private var dataDTO = BaseDataDTO()
+    var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
         //蓝牙服务列表
@@ -659,6 +674,10 @@ class CPRActivity : BaseActivity() {
             characteristic.uuid.toString(),
             object : BleNotifyCallback() {
                 override fun onNotifySuccess() {
+                    deviceCount ++
+                    if (deviceCount == bleList.size) {
+                        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CANCEL_DIALOG, "", null))
+                    }
                     runOnUiThread(Runnable {
                         Log.i("CPRActivity", "notify success")
                     })
@@ -685,8 +704,9 @@ class CPRActivity : BaseActivity() {
     }
 
     private var isRefreshPower: Boolean = false
+    private var isStart = false
     private fun sendMessage(formatHexString: String) {
-        if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 36) {
+        if (!isStart || TextUtils.isEmpty(formatHexString) || formatHexString.length < 36) {
             return
         }
         Log.e("TAG", "原始数据${formatHexString}")
@@ -712,7 +732,6 @@ class CPRActivity : BaseActivity() {
             powerHandler.removeCallbacks(powerRunning)
             powerHandler.postDelayed(powerRunning, 10000)
         }
-        //发送数据
         StatusLiveData.data.postValue(dataDTO)
     }
 

@@ -1,5 +1,6 @@
 package com.pr.perfectrecovery.activity
 
+import android.app.ProgressDialog
 import android.os.*
 import android.text.TextUtils
 import android.util.Log
@@ -30,6 +31,7 @@ import org.greenrobot.eventbus.ThreadMode
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.abs
+
 
 class MutiActivityNew : BaseActivity() {
     private lateinit var binding: ActivityMultiNewBinding
@@ -96,9 +98,9 @@ class MutiActivityNew : BaseActivity() {
     private var isOver = false
 
     private val testMac = arrayOf(
+        "001bacd17a75",
         "001bc8c59378",
         "001be814fe78",
-        "001bacd17a75",
         "001bffbd026f"
     )
 
@@ -151,6 +153,19 @@ class MutiActivityNew : BaseActivity() {
         initView()
         initPosition()
         observeData()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_DO_BIND, "", null))
+        showDialog()
+    }
+
+    var progressDialog: ProgressDialog? = null
+    private fun showDialog() {
+        if (progressDialog == null) {
+            progressDialog = ProgressDialog(this@MutiActivityNew)
+            progressDialog?.setTitle("提示")
+            progressDialog?.setMessage("页面初始中，请稍后...")
+        }
+        if (!progressDialog!!.isShowing)
+            progressDialog?.show()
     }
 
     private fun initView() {
@@ -190,6 +205,7 @@ class MutiActivityNew : BaseActivity() {
         )
 
         binding.oprLayout.ivBack.setOnClickListener {
+            Log.e("hunger_test_clear", "ivBack: post message")
             EventBus.getDefault()
                 .post(MessageEventData(BaseConstant.CLEAR_DEVICE_HISTORY_DATA, "", null))
             finish()
@@ -202,7 +218,7 @@ class MutiActivityNew : BaseActivity() {
             }
             isStart = !isStart
             if (isStart) {
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
+                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_DO_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -545,6 +561,11 @@ class MutiActivityNew : BaseActivity() {
                     bind.layoutPress.pressLayoutView.visibility = View.INVISIBLE
                 }
             }
+            BaseConstant.EVENT_CANCEL_DIALOG -> {
+                if (progressDialog != null && progressDialog!!.isShowing) {
+                    progressDialog?.cancel()
+                }
+            }
         }
     }
 
@@ -559,6 +580,7 @@ class MutiActivityNew : BaseActivity() {
             .setTitle("提示")
             .setMessage("确认结束测试并退出？")
             .setPositiveButton("确定") { dialog, _ ->
+                Log.e("hunger_test_clear", "dialog : post message")
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.CLEAR_DEVICE_HISTORY_DATA, "", null))
                 dialog.cancel()
