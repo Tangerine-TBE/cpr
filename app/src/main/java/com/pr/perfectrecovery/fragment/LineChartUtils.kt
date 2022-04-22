@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
+import android.util.Log
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -11,7 +12,7 @@ import com.github.mikephil.charting.data.LineData
 object LineChartUtils {
 
     fun setLineChart(chart: LineChart, lineData: LineData, startNum: Int, endNum: Int) {
-
+        Log.d("LineChartUtils", "startNum: $startNum endNum: $endNum")
         chart.setDrawGridBackground(false)
         // no description text
         chart.description.isEnabled = false
@@ -62,12 +63,14 @@ object LineChartUtils {
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
         leftAxis.mAxisMaximum = 10f
         leftAxis.labelCount = 10
-        leftAxis.isEnabled = false
+        leftAxis.isEnabled = true
         leftAxis.textSize = 12f
         leftAxis.textColor = Color.WHITE
+        leftAxis.gridColor = Color.TRANSPARENT
+        leftAxis.zeroLineColor = Color.TRANSPARENT
         leftAxis.setDrawGridLines(true)
         leftAxis.setValueFormatter { value, axis ->
-            "${value.toInt()}cm"
+            ""//${value.toInt()}
         }
         //左边Y轴添加限制线
         leftAxis.addLimitLine(limitLine)

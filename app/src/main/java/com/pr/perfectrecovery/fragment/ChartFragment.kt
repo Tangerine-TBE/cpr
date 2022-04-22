@@ -106,18 +106,22 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-//            addBarEntry(Random().nextInt(800), 20)
+            addBarEntry(Random().nextInt(800), 20)
+        }
+
+        viewBinding.constraintlayout3.setOnClickListener {
+            addEntry(data2, viewBinding.lineChart1, Random().nextInt(10).toFloat())
         }
 
         viewBinding.constraintlayout.setOnClickListener {
 //            addEntry(data, viewBinding.lineChart, 0f)
             val random = (1..20).random()
-            //addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
+            addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
         }
 
         viewBinding.constraintlayout4.setOnClickListener {
             val random = (1..200).random()
-            //addEntry(data, viewBinding.lineChart2, getFrequencyValue(random))
+            addEntry(data, viewBinding.lineChart2, getFrequencyValue(random))
         }
         setViewData()
     }
@@ -149,23 +153,24 @@ class ChartFragment : Fragment() {
     private var depth_Frequency_low = 0
     private var depth_Frequency_high = 0
     private fun getFrequencyValue(depth: Int): Float {
-        Log.e("getFrequencyValue depth", "$depth")
+        Log.e(TAG, "$depth")
         var value = depth
         if (depth > 200) {
             value = 200
         }
         val result = when {
             value <= depth_Frequency_low -> {
-                (6 / depth_Frequency_low.toFloat() * value.toFloat())//  按压不足 显示区域0-2
+                (3.3f / depth_Frequency_low.toFloat() * value.toFloat())//  按压不足 显示区域0-2
             }
             value in depth_Frequency_low..depth_Frequency_high -> {
-                (3 / (depth_Frequency_high - depth_Frequency_low).toFloat() * (depth.toFloat() - depth_Frequency_low.toFloat()) + 6.0f)//显示区域2-8
+                (6.6f / depth_Frequency_high.toFloat() * value.toFloat())//显示区域3.3-6.6
             }
             value > depth_Frequency_high -> {
-                (1 / ((depth_Frequency_high + 9) - depth_Frequency_high.toFloat()) * (depth.toFloat() - depth_Frequency_high.toFloat()) + 2)// 显示区域8-10
+                (1f / depth_Frequency_high * value.toFloat() + 8.3f)// 显示区域8-10
             }
-            else -> 9.5f
+            else -> 9.8f
         }
+        Log.e(TAG, "$result")
         return if (result > 10) 9.9f else result
     }
 
@@ -215,14 +220,13 @@ class ChartFragment : Fragment() {
         lineChart.setDrawGridBackground(false)
         lineChart.setNoDataText("暂无数据")
         val xAxis: XAxis = lineChart.xAxis
-        xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
         xAxis.granularity = 1f
 //        xAxis.setLabelCount(30, true)
         xAxis.position = XAxisPosition.BOTTOM
 
         val leftAxis: YAxis = lineChart.axisLeft
-        leftAxis.setLabelCount(5, false)
+        leftAxis.setLabelCount(3, false)
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
         leftAxis.mAxisMinimum = 0f
         leftAxis.mAxisMaximum = 10f
@@ -232,10 +236,11 @@ class ChartFragment : Fragment() {
         rightAxis.setDrawGridLines(false)
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
-        lineData.setDrawValues(false)
+        lineData.setDrawValues(true)
+        xAxis.setDrawGridLines(true)
         lineData.setValueTextColor(Color.WHITE)
-        xAxis.isEnabled = false
-        leftAxis.isEnabled = false
+        xAxis.isEnabled = true
+        leftAxis.isEnabled = true
         rightAxis.isEnabled = false
         xAxis.textColor = Color.WHITE
 
@@ -462,7 +467,7 @@ class ChartFragment : Fragment() {
         lineData.notifyDataChanged()
         lineChart.notifyDataSetChanged()
         //把yValues移到指定索引的位置
-        lineChart.moveViewToAnimated(entryCount - 1f, yValues, YAxis.AxisDependency.LEFT, 800)
+        lineChart.moveViewToAnimated(entryCount - 1f, yValues, YAxis.AxisDependency.LEFT, 100)
         lineChart.setVisibleXRangeMaximum(30f)
         //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
         lineChart.moveViewToX((lineData.entryCount - 29).toFloat())
