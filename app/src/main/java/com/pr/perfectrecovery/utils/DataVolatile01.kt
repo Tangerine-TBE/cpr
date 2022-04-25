@@ -217,24 +217,24 @@ class DataVolatile01 {
                  QY_d1 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            18,
-                            20
+                            02,
+                            04
                         )
                     )
                 )
                  QY_d2 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            20,
-                            22
+                            04,
+                            06
                         )
                     )
                 )
                  QY_d3 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            22,
-                            24
+                            06,
+                            08
                         )
                     ),
                 )
@@ -243,24 +243,24 @@ class DataVolatile01 {
                 L_d1 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            12,
-                            14
+                            02,
+                            04
                         )
                     )
                 )
                 L_d2 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            14,
-                            16
+                            04,
+                            06
                         )
                     )
                 )
                 L_d3 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
-                            16,
-                            18
+                            06,
+                            08
                         )
                     )
                 )
