@@ -22,12 +22,12 @@ import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
-import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import kotlin.math.abs
 
 /**
  * 单人模式
@@ -36,7 +36,7 @@ class SingleActivity : BaseActivity() {
     private lateinit var binding: ActivitySingleBinding
     private var counter = Counter()
     private var mTrainingBean: TrainingBean? = null
-
+    private var isShow = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySingleBinding.inflate(layoutInflater)
@@ -96,12 +96,6 @@ class SingleActivity : BaseActivity() {
                 startResult()
             }
         }
-
-        StatusLiveData.data.observe(this, Observer {
-            if (it != null) {
-                binding.tvBattery.power = it.electricity
-            }
-        })
     }
 
     private fun startResult() {
@@ -169,7 +163,10 @@ class SingleActivity : BaseActivity() {
             fragments.add(checkEventFragment!!)
             binding.ctEvent.visibility = View.VISIBLE
             val indexEvent = curItem++
-            binding.ctEvent.setOnClickListener { binding.viewPager.currentItem = indexEvent }
+            binding.ctEvent.setOnClickListener {
+                isShow = false
+                binding.viewPager.currentItem = indexEvent
+            }
             titleBtns.add(binding.ctEvent)
         }
 
@@ -198,6 +195,19 @@ class SingleActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return fragments[position]
+            }
+        }
+
+        StatusLiveData.data.observe(this) {
+            if (it != null) {
+                binding.tvBattery.power = it.electricity
+                if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck == true) {
+                    isShow = true
+                    binding.ctChart.isChecked = true
+                    binding.ctCurve.isChecked = false
+                    binding.ctEvent.isChecked = false
+                    binding.viewPager.currentItem = 1
+                }
             }
         }
 

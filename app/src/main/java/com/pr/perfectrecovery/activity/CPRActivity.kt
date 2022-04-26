@@ -50,7 +50,7 @@ import com.pr.perfectrecovery.databinding.ActivityCpractivityBinding
 import com.pr.perfectrecovery.databinding.ItemBluetoothBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.ConvertUtil
-import com.pr.perfectrecovery.utils.DataVolatile
+import com.pr.perfectrecovery.utils.DataVolatile01
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -148,12 +148,12 @@ class CPRActivity : BaseActivity() {
     private fun initView() {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
-        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
-        DataVolatile.PR_LOW_VALUE = configBean.prLow()
-        DataVolatile.QY_HIGH_VALUE = configBean.tidalVolumeEnd
-        DataVolatile.QY_LOW_VALUE = configBean.tidalVolume
-        DataVolatile.PR_DEFAULT_TIMES = configBean.prCount
-        DataVolatile.QY_DEFAULT_TIMES = configBean.qyCount
+        DataVolatile01.PR_HIGH_VALUE = configBean.prHigh()
+        DataVolatile01.PR_LOW_VALUE = configBean.prLow()
+        DataVolatile01.QY_HIGH_VALUE = configBean.tidalVolumeEnd
+        DataVolatile01.QY_LOW_VALUE = configBean.tidalVolume
+        DataVolatile01.PR_DEFAULT_TIMES = configBean.prCount
+        DataVolatile01.QY_DEFAULT_TIMES = configBean.qyCount
 
         //查看是否有蓝牙权限
         checkPermissions()
@@ -248,7 +248,7 @@ class CPRActivity : BaseActivity() {
             }
             BaseConstant.EVENT_CPR_CHECK -> {
                 Log.e("CPRActivity", "${event.isCheck}")
-                DataVolatile.setModel(event.isCheck)
+                DataVolatile01.setModel(event.isCheck)
             }
             BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
                 deviceCount = 0
@@ -659,7 +659,7 @@ class CPRActivity : BaseActivity() {
         )
     }
 
-    private val dataMap = mutableMapOf<String, DataVolatile>()
+    private val dataMap = mutableMapOf<String, DataVolatile01>()
     private var dataDTO = BaseDataDTO()
     var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
@@ -716,7 +716,7 @@ class CPRActivity : BaseActivity() {
         if (dataVolatile != null) {
             dataDTO = dataVolatile.parseString(formatHexString)
         } else {
-            val mDataVolatile = DataVolatile()
+            val mDataVolatile = DataVolatile01()
             mDataVolatile.initPreDistance(formatHexString, deviceMAC)
             dataDTO = mDataVolatile.parseString(formatHexString)
             dataMap[dataDTO.mac] = mDataVolatile

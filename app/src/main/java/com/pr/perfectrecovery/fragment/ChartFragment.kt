@@ -155,23 +155,17 @@ class ChartFragment : Fragment() {
     private fun getFrequencyValue(depth: Int): Float {
         Log.e(TAG, "$depth")
         var value = depth
-        if (depth > 200) {
-            value = 200
+        if (depth == 0 || depth <= 8) {
+            return 0f                         //    小于8的按压曲线归零
+        } else if (depth <= depth_Frequency_low) {
+            return (3.3f / depth.toFloat() * depth_Frequency_low.toFloat())//  按压不足 显示区域0-6
+        } else if (depth in depth_Frequency_low..depth_Frequency_high) {
+            return (3.3f / (depth.toFloat() - depth_threshold_low) * (depth_Frequency_high - depth_Frequency_low.toFloat()) + 3.3f)    //按压正确 显示区域6-9
+        } else if (depth in depth_Frequency_high..200) {
+            return (3.3f / (depth.toFloat() - depth_Frequency_high.toFloat()) * (200 - depth_Frequency_high.toFloat()) + 6.6f)                  // 按压过大 显示区域9-10
+        } else {
+            return 9.9f   // 按压显示到极限高度10
         }
-        val result = when {
-            value <= depth_Frequency_low -> {
-                (3.3f / depth_Frequency_low.toFloat() * value.toFloat())//  按压不足 显示区域0-2
-            }
-            value in depth_Frequency_low..depth_Frequency_high -> {
-                (6.6f / depth_Frequency_high.toFloat() * value.toFloat())//显示区域3.3-6.6
-            }
-            value > depth_Frequency_high -> {
-                (1f / depth_Frequency_high * value.toFloat() + 8.3f)// 显示区域8-10
-            }
-            else -> 9.8f
-        }
-        Log.e(TAG, "$result")
-        return if (result > 10) 9.9f else result
     }
 
     /**
@@ -237,7 +231,7 @@ class ChartFragment : Fragment() {
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
         lineData.setDrawValues(true)
-        xAxis.setDrawGridLines(true)
+        xAxis.setDrawGridLines(false)
         lineData.setValueTextColor(Color.WHITE)
         xAxis.isEnabled = true
         leftAxis.isEnabled = true
@@ -438,7 +432,7 @@ class ChartFragment : Fragment() {
 //        d.color = Color.argb(0, 0, 0, 0)
 //        d.addEntry(Entry(0f, 99f))
 //        sets.add(d)
-        lineDataSet.addEntry(Entry(0f, 9.5f))
+        lineDataSet.addEntry(Entry(0f, 9.8f))
         lineDataSet.addEntry(Entry(0f, 0f))
         sets.add(lineDataSet)
         // create a data object with the data sets

@@ -22,7 +22,6 @@ import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
-import com.pr.perfectrecovery.utils.DataVolatile
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus

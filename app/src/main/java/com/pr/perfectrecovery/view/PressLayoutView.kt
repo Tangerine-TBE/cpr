@@ -11,7 +11,6 @@ import android.widget.LinearLayout
 import android.widget.Scroller
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.bean.BaseDataDTO
-import com.pr.perfectrecovery.utils.DataVolatile
 import kotlin.math.abs
 
 /**

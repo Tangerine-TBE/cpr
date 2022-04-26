@@ -16,7 +16,6 @@ import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
-import com.pr.perfectrecovery.utils.DataVolatile
 import org.greenrobot.eventbus.EventBus
 
 /**
