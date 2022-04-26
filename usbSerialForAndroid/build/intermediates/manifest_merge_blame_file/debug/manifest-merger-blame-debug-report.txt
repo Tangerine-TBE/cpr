@@ -4,8 +4,8 @@
 4
 5    <uses-sdk
 6        android:minSdkVersion="17"
-6-->E:\workSpace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
+6-->F:\andriod\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
 7        android:targetSdkVersion="30" />
-7-->E:\workSpace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
+7-->F:\andriod\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
 8
 9</manifest>

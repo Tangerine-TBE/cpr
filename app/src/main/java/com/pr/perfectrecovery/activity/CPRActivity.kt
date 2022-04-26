@@ -706,12 +706,13 @@ class CPRActivity : BaseActivity() {
     private var isRefreshPower: Boolean = false
     private var isStart = false
     private fun sendMessage(formatHexString: String) {
-        if (!isStart || TextUtils.isEmpty(formatHexString) || formatHexString.length < 36) {
+        if (!isStart || TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
         }
         Log.e("TAG", "原始数据${formatHexString}")
         val deviceMAC =
-            "001b${formatHexString.substring(24, 28) + formatHexString.substring(32, 36)}"
+            "001b${formatHexString.substring(12)}"
+        Log.e("TAG", "MAC:${deviceMAC}")
         val dataVolatile = dataMap[deviceMAC]
         if (dataVolatile != null) {
             dataDTO = dataVolatile.parseString(formatHexString)

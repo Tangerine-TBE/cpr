@@ -183,6 +183,7 @@ class DataVolatile01 {
                     )
                 )
             )
+            Log.e("TAG11", "${state}")
             if (state and 1 == 1) {
                 BLS_Value = 1
             } else {
@@ -203,12 +204,8 @@ class DataVolatile01 {
             } else {
                 LKS_Value = 0
             }
+
             if (state and 16 == 16) {
-                PSR_Value = 1
-            } else {
-                PSR_Value = 0
-            }
-            if (state and 8 == 8) {
                 work_Mode = 1
             } else {
                 work_Mode = 0
@@ -238,6 +235,9 @@ class DataVolatile01 {
                         )
                     ),
                 )
+                Log.e("TAG11", "判断为吹气状态")
+                QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+                py(QY_Value)
             } else {
                 //按压距离
                 L_d1 = DataFormatUtils.byteArrayToInt(
@@ -264,6 +264,10 @@ class DataVolatile01 {
                         )
                     )
                 )
+                Log.e("TAG11", "判断为按压状态")
+                L_Value = selectValue_P(L_d1, L_d2, L_d3)
+                //清空频率
+                pt(L_Value)
             }
             Log.e("TAG11", "当前的按压值$L_d1  $L_d2  $L_d3")
             Log.e("TAG11", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
@@ -274,17 +278,13 @@ class DataVolatile01 {
             * 2：当有一个值小于5也默认完成一次按压
             * */
 
-            if (work_Mode == 1) {
-                // Log.e("TAG11", "判断为吹气状态")
-                QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
+            /*if (work_Mode == 1) {
+
             } else {
                 //吹气数据
-                //  Log.e("TAG11", "判断为按压状态")
-                L_Value = selectValue_P(L_d1, L_d2, L_d3)
-                //清空频率
-                pt(L_Value)
-            }
-            py(QY_Value)
+
+            }*/
+
             //频率
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // Log.e("TAG9", "按压频率：$pfvalue")
@@ -443,29 +443,29 @@ class DataVolatile01 {
     @Synchronized
     fun initPreDistance(data: String?, macAddress: String) {
         // long value=180;
-        if (data != null && data.length == 40) {
+        if (data != null && data.length == 20) {
             //按压距离
             val L_d1 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
-                        12,
-                        14
+                        2,
+                        4
                     )
                 )
             )
             val L_d2 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
-                        14,
-                        16
+                        4,
+                        6
                     )
                 )
             )
             val L_d3 = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
-                        16,
-                        18
+                        6,
+                        8
                     )
                 )
             )
@@ -769,7 +769,7 @@ class DataVolatile01 {
             /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                  ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
              }*/
-            PR_CYCLE_TIMES = 0
+             PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0
