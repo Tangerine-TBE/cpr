@@ -203,9 +203,9 @@ class DataVolatile01 {
                 TOS_Value = 0
             }
             if (state and 8 == 8) {
-                LKS_Value = 1
+                PSR_Value = 1
             } else {
-                LKS_Value = 0
+                PSR_Value = 0
             }
 
             if (state and 16 == 16) {
