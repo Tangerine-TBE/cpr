@@ -548,9 +548,19 @@ class CycleFragment : Fragment() {
      */
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
-        if (dataDTO.aisleType == 1) {
-            viewBinding.ivAim.visibility = View.INVISIBLE
-            if (qyValue != dataDTO.qySum) {
+        if (qyValue != dataDTO.qySum) {
+            if (dataDTO.err_qy_close != err_qy_close) {
+                err_qy_close = dataDTO.err_qy_close
+                stopOutTime()
+                setPlayVoice(VOICE_MP3_WDKQD)
+                viewBinding.ivAim.visibility = View.VISIBLE
+                isQyAim = true
+                cycleQyCount++
+                isQy = true
+                isPr = false
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
+            } else {
                 stopOutTime()
                 cycleQyCount++
                 isQy = true
@@ -580,19 +590,6 @@ class CycleFragment : Fragment() {
                 //吹气变灰
                 mHandler1.removeCallbacksAndMessages(null)
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
-            }
-        } else {
-            if (dataDTO.err_qy_close != err_qy_close) {
-                err_qy_close = dataDTO.err_qy_close
-                stopOutTime()
-                setPlayVoice(VOICE_MP3_WDKQD)
-                viewBinding.ivAim.visibility = View.VISIBLE
-                isQyAim = true
-                cycleQyCount++
-                isQy = true
-                isPr = false
-                mHandler4.removeCallbacksAndMessages(null)
-                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             }
         }
         qyValue = dataDTO.qySum

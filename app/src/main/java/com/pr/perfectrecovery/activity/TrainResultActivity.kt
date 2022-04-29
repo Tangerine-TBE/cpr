@@ -1,17 +1,31 @@
 package com.pr.perfectrecovery.activity
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.Toast
+import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
 import com.pr.perfectrecovery.utils.TimeUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
+import java.io.File
+import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import kotlin.math.roundToInt
+
 
 /**
  * 训练结果-操作明细 成绩结果
@@ -21,12 +35,14 @@ import kotlin.math.roundToInt
 val DATADTO = "dataDTO"
 val PDF_FLAG = "pdf_flag"
 
-class TrainResultActivity : BaseActivity() {
+class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
+    EasyPermissions.RationaleCallbacks {
     private lateinit var viewBinding: ActivityTrainResultBinding
+    private val TAG = TrainResultActivity::class.java.simpleName
 
     companion object {
         var isMulti = false
-        fun start(context: Context, trainingDTO: TrainingDTO, multi:Boolean? = false) {
+        fun start(context: Context, trainingDTO: TrainingDTO, multi: Boolean? = false) {
             val intent = Intent(context, TrainResultActivity::class.java)
             isMulti = multi == true
             intent.putExtra(DATADTO, trainingDTO)
@@ -51,12 +67,25 @@ class TrainResultActivity : BaseActivity() {
 
     private fun initView() {
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
-        viewBinding.bottom.ivExport.setOnClickListener { }
-        viewBinding.bottom.ivExport.visibility = View.INVISIBLE
+        viewBinding.bottom.ivExport.visibility = View.VISIBLE
     }
 
+    var trainingDTO = TrainingDTO()
     private fun initData() {
-        val trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
+        trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
+        viewBinding.bottom.ivExport.setOnClickListener {
+            val hasStoragePermission = hasStoragePermission()
+            if (hasStoragePermission) {
+                exPortPDF(trainingDTO.name)
+            } else {
+                ToastUtils.showShort("暂未授权文件读写")
+                EasyPermissions.requestPermissions(
+                    this, "获取手机文件读写权限", 123,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            }
+        }
         //判断模式- false 训练  true 考核
         if (trainingDTO.isCheck) {
             viewBinding.layoutCheck.root.visibility = View.VISIBLE
@@ -68,7 +97,8 @@ class TrainResultActivity : BaseActivity() {
             //操作时长倒计时
             viewBinding.layoutCheck.tvCountdown.text = TimeUtils.timeParse(trainingDTO.operateTime)
             //流程分数
-            viewBinding.layoutCheck.tvProcess.text = "${if (isMulti) 0 else trainingDTO.processScore}分"
+            viewBinding.layoutCheck.tvProcess.text =
+                "${if (isMulti) 0 else trainingDTO.processScore}分"
             //按压分数
             viewBinding.layoutCheck.tvPress.text = "${trainingDTO.pressScore}分"
             //扣分
@@ -185,9 +215,6 @@ class TrainResultActivity : BaseActivity() {
         return format.format(number)
     }
 
-    /**
-     * 流程分数
-     */
     private fun processCheck(trainingDTO: TrainingDTO): Float {
         //该页面禁止点击事件
         viewBinding.layoutCheck.check.checkBox1.isClickable = false
@@ -248,6 +275,103 @@ class TrainResultActivity : BaseActivity() {
         return 0f
     }
 
+    private fun hasStoragePermission(): Boolean {
+        return EasyPermissions.hasPermissions(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size)
+        //ToastUtils.showShort("用户授权成功")
+        if (trainingDTO != null) {
+            exPortPDF(trainingDTO.name)
+        }
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size)
+        // (Optional) Check whether the user denied any permissions and checked "NEVER ASK AGAIN."
+        // This will display a dialog directing them to enable the permission in app settings.
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).setTitle("提示").setRationale("是否前往设置中，开启文件读写权限！").build()
+                .show()
+        }
+    }
+
+    override fun onRationaleAccepted(requestCode: Int) {
+
+    }
+
+    override fun onRationaleDenied(requestCode: Int) {
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            val yes = "文件写入已授权"
+            val no = "文件写入未授权"
+            // Do something after user returned from app settings screen, like showing a Toast.
+            Toast.makeText(
+                this,
+                if (hasStoragePermission()) yes else no,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    /**
+     * 导出当前页为PDF
+     */
+    private fun exPortPDF(fileName: String?) {
+        showLoadingDialog()
+        GlobalScope.launch(Dispatchers.IO) {
+            //创建pdf文本
+            val pdfDocument = PdfDocument()
+            //分页
+            val pageInfo = PdfDocument.PageInfo.Builder(
+                viewBinding.root.measuredWidth,
+                viewBinding.root.width * 297 / 210,
+                1
+            ).create()
+            val page = pdfDocument.startPage(pageInfo)
+            viewBinding.root.draw(page.canvas)
+            pdfDocument.finishPage(page)
+            //保存文件路径
+            try {
+                val path =
+                    Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
+                val file = File(path)
+                if (file.exists()) {
+                    file.delete()
+                }
+                pdfDocument.writeTo(FileOutputStream(file))
+            } catch (e: Exception) {
+                ToastUtils.showShort("成绩已导出异常")
+                Log.e(TAG, e.message + "")
+                e.printStackTrace()
+            }
+            withContext(Dispatchers.Main) {
+                pdfDocument.close()
+                ToastUtils.showShort("成绩PDF已导出")
+                hideLoadingDialog()
+            }
+        }
+    }
+
     private val listCheck = mutableListOf<Int>()
     private val onCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
@@ -255,5 +379,4 @@ class TrainResultActivity : BaseActivity() {
                 listCheck.add(buttonView.id)
             }
         }
-
 }

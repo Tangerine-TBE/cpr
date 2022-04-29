@@ -1,14 +1,15 @@
 package com.pr.perfectrecovery.base
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
-import com.pr.perfectrecovery.bean.ConfigBean
-import com.tencent.mmkv.MMKV
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -29,5 +30,23 @@ open class BaseActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = resources.getColor(R.color.theme_color)
         window.navigationBarColor = resources.getColor(R.color.theme_color)
+    }
+
+    private var alertDialog: AlertDialog? = null
+
+    open fun showLoadingDialog() {
+        alertDialog = AlertDialog.Builder(this).create()
+        alertDialog!!.window!!.setBackgroundDrawable(ColorDrawable())
+        alertDialog!!.setCancelable(false)
+        alertDialog!!.setOnKeyListener(DialogInterface.OnKeyListener { dialog, keyCode, event -> keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_BACK })
+        alertDialog!!.show()
+        alertDialog!!.setContentView(R.layout.loading_alert)
+        alertDialog!!.setCanceledOnTouchOutside(false)
+    }
+
+    open fun hideLoadingDialog() {
+        if (null != alertDialog && alertDialog!!.isShowing) {
+            alertDialog!!.dismiss()
+        }
     }
 }
