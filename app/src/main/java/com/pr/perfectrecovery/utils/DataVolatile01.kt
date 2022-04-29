@@ -95,6 +95,9 @@ class DataVolatile01 {
     //按压或吹气模式：1为吹气，0为按压
     private var work_Mode = 0
 
+    //上一次按压或吹气模式：1为吹气，0为按压
+    private var pre_work_Mode = 0
+
     private var L_valueSet = mutableListOf<Int>()
     private var QY_valueSet = mutableListOf<Int>()
     private var QY_valueSet2 = mutableListOf<Int>()
@@ -200,9 +203,9 @@ class DataVolatile01 {
                 TOS_Value = 0
             }
             if (state and 8 == 8) {
-                LKS_Value = 1
+                PSR_Value = 1
             } else {
-                LKS_Value = 0
+                PSR_Value = 0
             }
 
             if (state and 16 == 16) {
@@ -211,6 +214,7 @@ class DataVolatile01 {
                 work_Mode = 0
             }
             if (work_Mode == 1) {
+
                 QY_d1 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
                         "00" + data.substring(
@@ -235,10 +239,14 @@ class DataVolatile01 {
                         )
                     ),
                 )
-                Log.e("TAG11", "判断为吹气状态")
+                Log.e("TAG12", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
                 py(QY_Value)
+                pre_work_Mode=1
             } else {
+                if(pre_work_Mode==1){
+                    QY_Value = selectValue_QY(2, 2, 2)
+                }
                 //按压距离
                 L_d1 = DataFormatUtils.byteArrayToInt(
                     DataFormatUtils.hexStr2Bytes(
@@ -264,13 +272,14 @@ class DataVolatile01 {
                         )
                     )
                 )
-                Log.e("TAG11", "判断为按压状态")
+                Log.e("TAG12", "判断为按压状态")
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
                 //清空频率
                 pt(L_Value)
+                pre_work_Mode=0
             }
-            Log.e("TAG11", "当前的按压值$L_d1  $L_d2  $L_d3")
-            Log.e("TAG11", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
+            Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
+            Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
             //判断是按压还是吹气，执行相应的动作
             /*
             * 吹气状态的判断：
@@ -734,11 +743,13 @@ class DataVolatile01 {
     private var QY_TIMES_TOOLITTLE = 0
 
     private fun ERR_QyTotal(value: Int) {
+        Log.e("TAG12", "判断吹气错误")
         if (MODEL && QY_CYCLE_TIMES > QY_DEFAULT_TIMES) {
             QY_TIMES_TOOMORE++
         } else {
             if (TOS_Value == 0) {
                 ERR_QY_CLOSE++
+                Log.e("TAG12", "吹气通道未打开")
             } else {
                 when {
                     value < QY_LOW_VALUE -> {
@@ -778,7 +789,9 @@ class DataVolatile01 {
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 QY_CYCLE_TIMES++
+
                 ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
+
                 top_flag = 0
                 Qliang = 0
                 if (QY_SUM > 1) {
