@@ -241,11 +241,12 @@ class DataVolatile01 {
                 )
                 Log.e("TAG12", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
-                py(QY_Value)
                 pre_work_Mode=1
             } else {
-                if(pre_work_Mode==1){
-                    QY_Value = selectValue_QY(2, 2, 2)
+                QY_Value = if(pre_work_Mode==1){
+                    selectValue_QY(2, 2, 2)
+                } else {
+                    0
                 }
                 //按压距离
                 L_d1 = DataFormatUtils.byteArrayToInt(
@@ -278,6 +279,7 @@ class DataVolatile01 {
                 pt(L_Value)
                 pre_work_Mode=0
             }
+            py(QY_Value)
             Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
             Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
             //判断是按压还是吹气，执行相应的动作
