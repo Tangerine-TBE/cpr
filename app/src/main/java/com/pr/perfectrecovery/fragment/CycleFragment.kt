@@ -573,7 +573,7 @@ class CycleFragment : Fragment() {
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax in configBean.tidalVolumeEnd..1199 -> {
+                    qyMax in configBean.tidalVolumeEnd..1200 -> {
                         err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)

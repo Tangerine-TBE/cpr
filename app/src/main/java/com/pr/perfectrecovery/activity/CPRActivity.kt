@@ -253,14 +253,14 @@ class CPRActivity : BaseActivity() {
             BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
                 deviceCount = 0
                 unBindBluetooth()
-                Log.e("hunger_test_clear", " recieve message" )
+                Log.e("hunger_test_clear", " recieve message")
                 //清空当前map数据
                 dataMap.values.forEach { item ->
                     item.dataClear()
                 }
                 dataMap.clear()
                 isInitValueMap.clear()
-                Log.e("hunger_test_clear", " clear done" )
+                Log.e("hunger_test_clear", " clear done")
 
             }
             BaseConstant.EVENT_DO_BIND -> {
@@ -674,9 +674,10 @@ class CPRActivity : BaseActivity() {
             characteristic.uuid.toString(),
             object : BleNotifyCallback() {
                 override fun onNotifySuccess() {
-                    deviceCount ++
+                    deviceCount++
                     if (deviceCount == bleList.size) {
-                        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CANCEL_DIALOG, "", null))
+                        EventBus.getDefault()
+                            .post(MessageEventData(BaseConstant.EVENT_CANCEL_DIALOG, "", null))
                     }
                     runOnUiThread(Runnable {
                         Log.i("CPRActivity", "notify success")
