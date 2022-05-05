@@ -113,7 +113,7 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            //addBarEntry(Random().nextInt(800), 10)
+            addBarEntry(Random().nextInt(800), 10)
         }
 
         viewBinding.constraintlayout3.setOnClickListener {
@@ -343,7 +343,7 @@ class ChartFragment : Fragment() {
             xAxis.setLabelCount(3, false)
 
             xAxis.isEnabled = false
-            axisLeft.isEnabled = false
+            axisLeft.isEnabled = true
             axisLeft.setDrawGridLines(true)
             axisLeft.textColor = Color.WHITE
             axisLeft.gridColor = Color.TRANSPARENT

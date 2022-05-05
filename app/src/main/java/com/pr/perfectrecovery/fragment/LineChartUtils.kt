@@ -30,7 +30,8 @@ object LineChartUtils {
         xl.setAvoidFirstLastClipping(true)
         xl.axisMinimum = 0f
         xl.setDrawGridLines(false)
-        xl.isEnabled = false
+        xl.isEnabled = true
+//        xl.axisLineWidth = 1f
         xl.granularity = 0f
         xl.axisLineColor = Color.WHITE
         //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
