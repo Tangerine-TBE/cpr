@@ -442,7 +442,7 @@ class CPRActivity : BaseActivity() {
 //                viewBinding.textView.text = "$count"
                     bleList.add(bleDevice)
                     viewBinding.tvConnections.text = "设备连接数：${count}"
-                    //bind(bleDevice)
+                    bind(bleDevice)
                     isItemClickable = true
                     isRefreshPower = true
                 }
@@ -494,6 +494,7 @@ class CPRActivity : BaseActivity() {
                         }
                         newList.add(item)
                     }
+                    unBind(bleDevice)
                     mDeviceAdapter.remove(bleDevice)
                     newList.remove(bleDevice)
                     bleDevice.isConnected = false
@@ -652,7 +653,7 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun unBind(bleDevice: BleDevice) {
-        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
+        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice) ?: return
         //蓝牙服务列表
         val services = gatt.services
         val bluetoothGattService = services[2]
@@ -730,38 +731,36 @@ class CPRActivity : BaseActivity() {
         }
         //处理连接后电量显示
         if (isRefreshPower) {
-            isRefreshPower = false
             setPower()
-//            powerHandler.removeCallbacks(powerRunning)
-//            powerHandler.postDelayed(powerRunning, 10000)
+            powerHandler.removeCallbacks(powerRunning)
+            powerHandler.postDelayed(powerRunning, 10000)
         }
         if (isStart) {
             StatusLiveData.data.postValue(dataDTO)
         }
     }
 
-//    private val powerHandler = Handler(Looper.getMainLooper())
-//    private val powerRunning = Runnable {
-//        setPower()
-//    }
+    private val powerHandler = Handler(Looper.getMainLooper())
+    private val powerRunning = Runnable {
+        setPower()
+    }
 
     /**
      * 设置列表电量
      */
     private fun setPower() {
         val dataList = mutableListOf<BleDevice>()
-        dataMap.keys.forEachIndexed { position, s ->
-            if (s == dataDTO.mac) {
-                mDeviceAdapter.data.forEachIndexed { index, item ->
-                    if (item.isConnected && index == position) {
-                        item.power = dataDTO.electricity
-                        mDeviceAdapter.notifyItemChanged(index, item)
-                        dataList.add(item)
-                    }
-                }
+        mDeviceAdapter.data.forEachIndexed { index, item ->
+            if (item.isConnected) {
+                isRefreshPower = false
+                Log.e("sendMessage", "电量值：${dataDTO.electricity}")
+                item.power = dataDTO.electricity
+                mDeviceAdapter.notifyItemChanged(index, item)
+                dataList.add(item)
             }
         }
-        // mDeviceAdapter.setList(dataList)
+        mDeviceAdapter.notifyDataSetChanged()
+//        mDeviceAdapter.setList(dedupList(dataList))
     }
 
     override fun onDestroy() {
