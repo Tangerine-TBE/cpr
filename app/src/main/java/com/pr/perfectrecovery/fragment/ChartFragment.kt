@@ -344,7 +344,7 @@ class ChartFragment : Fragment() {
 
             xAxis.isEnabled = false
             axisLeft.isEnabled = false
-            axisLeft.setDrawGridLines(false)
+            axisLeft.setDrawGridLines(true)
             axisLeft.textColor = Color.WHITE
             axisLeft.gridColor = Color.TRANSPARENT
             axisLeft.labelCount = 3

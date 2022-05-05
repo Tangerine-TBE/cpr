@@ -137,7 +137,7 @@
                         android:layout_marginStart="5dp"
                         android:text="次/分"
                         android:textColor="#ffffffff"
-                        android:textSize="10sp"
+                        android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -240,7 +240,7 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:text="毫升"
                         android:textColor="#ffffffff"
-                        android:textSize="10sp"
+                        android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -351,7 +351,7 @@
 
                 <View
                         android:layout_width="0dp"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/purple_200"
                         android:layout_marginStart="@dimen/dp_20"
                         android:layout_marginEnd="@dimen/dp_10"
@@ -367,7 +367,7 @@
                         android:layout_height="wrap_content"
                         android:text="厘米\n0"
                         android:textColor="#ffffffff"
-                        android:textSize="10sp"
+                        android:textSize="13sp"
                         android:gravity="center"
                         android:layout_marginStart="5dp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -472,7 +472,7 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:text="次/分"
                         android:textColor="#ffffffff"
-                        android:textSize="10sp"
+                        android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
