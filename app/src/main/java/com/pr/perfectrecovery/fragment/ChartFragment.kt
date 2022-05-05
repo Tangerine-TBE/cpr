@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
@@ -112,17 +113,17 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            //addBarEntry(Random().nextInt(800), 20)
+            //addBarEntry(Random().nextInt(800), 10)
         }
 
         viewBinding.constraintlayout3.setOnClickListener {
-            // addEntry(data2, viewBinding.lineChart1, Random().nextInt(10).toFloat())
+            addEntry(data2, viewBinding.lineChart1, Random().nextInt(10).toFloat())
         }
 
         viewBinding.constraintlayout.setOnClickListener {
 //            addEntry(data, viewBinding.lineChart, 0f)
             val random = (1..20).random()
-            addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
+            //addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
         }
 
         viewBinding.constraintlayout4.setOnClickListener {
@@ -240,6 +241,8 @@ class ChartFragment : Fragment() {
         lineChart.description.isEnabled = false
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
+        lineChart.setDrawBorders(false)
+        lineChart.setBorderWidth(0f)
         lineChart.setDrawGridBackground(false)
         lineChart.setNoDataText("暂无数据")
         val xAxis: XAxis = lineChart.xAxis
@@ -259,13 +262,47 @@ class ChartFragment : Fragment() {
         rightAxis.setDrawGridLines(false)
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
-        lineData.setDrawValues(true)
+        lineData.setDrawValues(false)
         xAxis.setDrawGridLines(false)
         lineData.setValueTextColor(Color.WHITE)
-        xAxis.isEnabled = true
+        xAxis.isEnabled = false
         leftAxis.isEnabled = true
+        leftAxis.gridColor = Color.TRANSPARENT
+        leftAxis.zeroLineColor = Color.TRANSPARENT
+        leftAxis.setDrawGridLines(true)
+        leftAxis.setValueFormatter { value, axis ->
+            ""//${value.toInt()}
+        }
         rightAxis.isEnabled = false
         xAxis.textColor = Color.WHITE
+
+        //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
+        val limitLine = LimitLine(3.3f)
+        //设置限制线的宽
+        limitLine.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine.label = ""
+        limitLine.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine.enableDashedLine(10f, 10f, 0f)
+
+        val limitLine2 = LimitLine(6.6f)
+        //设置限制线的宽
+        limitLine2.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine2.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine2.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine2.label = ""
+        limitLine2.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine2.enableDashedLine(10f, 10f, 0f)
+        //左边Y轴添加限制线
+        leftAxis.addLimitLine(limitLine)
+        leftAxis.addLimitLine(limitLine2)
 
         val l = lineChart.legend
         l.isEnabled = false
@@ -283,14 +320,13 @@ class ChartFragment : Fragment() {
         viewBinding.barChart.apply {
             setDrawBorders(false) //显示边界
             setDrawBarShadow(false) //设置每个直方图阴影为false
-            setDrawValueAboveBar(true) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+            setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
             description.isEnabled = false //设置描述文字不显示，默认显示
             setDrawGridBackground(false) //设置不显示网格
             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
             setTouchEnabled(false)
-
             // if more than 60 entries are displayed in the chart, no values will be
             // drawn
 
@@ -305,13 +341,19 @@ class ChartFragment : Fragment() {
                 mAxisMinimum = 0f
             }
             xAxis.setLabelCount(3, false)
+
             xAxis.isEnabled = false
-            axisLeft.isEnabled = true
+            axisLeft.isEnabled = false
+            axisLeft.setDrawGridLines(false)
             axisLeft.textColor = Color.WHITE
+            axisLeft.gridColor = Color.TRANSPARENT
             axisLeft.labelCount = 3
             axisLeft.axisMaxLabels = 3
             axisLeft.mAxisMaximum = 10f
             axisRight.isEnabled = false
+            axisLeft.setValueFormatter { value, axis ->
+                ""//${value.toInt()}
+            }
             setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
             isScaleXEnabled = false                             //支持x轴缩放
             isScaleYEnabled = false

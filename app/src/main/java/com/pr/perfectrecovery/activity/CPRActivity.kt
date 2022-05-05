@@ -56,6 +56,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -395,15 +396,6 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private fun showConnectedDevice() {
-        val deviceList = BleManager.getInstance().allConnectedDevice
-        bleList = deviceList
-        if (bleList.size > 0) {
-            viewBinding.tvMsg.text = ""
-        }
-        mDeviceAdapter.setList(deviceList)
-    }
-
     private var isItemClickable = true
     private var count = 0
     private fun connect(bleDevice: BleDevice, position: Int) {
@@ -508,10 +500,23 @@ class CPRActivity : BaseActivity() {
                     bleDevice.isLoading = false
                     bleDevice.count = 0
                     newList.add(bleDevice)
-                    mDeviceAdapter.setList(newList)
+                    mDeviceAdapter.setList(dedupList(newList))
                     isItemClickable = true
                 }
             })
+    }
+
+    /**
+     * 去重
+     */
+    private fun dedupList(list: MutableList<BleDevice>?): MutableList<BleDevice>? {
+        val set = LinkedHashSet<BleDevice>()
+        if (list != null) {
+            set.addAll(list)
+            list.clear()
+            list.addAll(set)
+        }
+        return list
     }
 
     private fun initBle() {
@@ -557,7 +562,7 @@ class CPRActivity : BaseActivity() {
                 //已连接的蓝牙添加进来
                 val deviceList = BleManager.getInstance().allConnectedDevice
                 mDeviceAdapter.data.clear()
-                mDeviceAdapter.setList(deviceList)
+                mDeviceAdapter.setList(dedupList(deviceList))
             }
 
             override fun onLeScan(bleDevice: BleDevice) {

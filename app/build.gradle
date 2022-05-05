@@ -6,13 +6,13 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('E:\\workSpace\\perfect-recovery\\pr.jks')
+            storeFile file('/pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'
         }
         release {
-            storeFile file('E:\\workSpace\\perfect-recovery\\pr.jks')
+            storeFile file('/pr.jks')
             storePassword 'pr123456'
             keyAlias 'pr'
             keyPassword 'pr123456'
@@ -70,7 +70,6 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation project(path: ':usbSerialForAndroid')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

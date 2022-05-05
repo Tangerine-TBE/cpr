@@ -29,4 +29,11 @@
 
     <string name="searching_for_available_models">正在搜索可用的模型</string>
     <string name="available_models">可用的模型如下:</string>
+
+    <!--    getManager-->
+    <string name="authorize_msg">点击前往授权</string>
+    <string name="authorize_title_msg">缺少必要权限</string>
+    <string name="file_manger_msg">Android 11 需要授予所有文件的管理权限</string>
+    <string name="modify_permission_msg">应用不能正常运行，需要在设置里手动开启访问储存权限</string>
+
 </resources>

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/clCheck"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/theme_color">
@@ -206,11 +207,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_20"
-                android:isIndicator="true"
+                android:isIndicator="false"
                 android:numStars="5"
                 android:rating="0"
                 android:stepSize="0.5"
-                android:progress="100"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -452,8 +452,7 @@
             layout="@layout/layout_check_event"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tv6"
-            tools:layout_editor_absoluteX="0dp" />
-
+            android:paddingBottom="@dimen/dp_10"
+            app:layout_constraintTop_toBottomOf="@+id/tv6" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

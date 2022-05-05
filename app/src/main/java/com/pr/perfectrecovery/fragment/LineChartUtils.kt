@@ -31,7 +31,7 @@ object LineChartUtils {
         xl.axisMinimum = 0f
         xl.setDrawGridLines(false)
         xl.isEnabled = false
-        xl.granularity = 1f
+        xl.granularity = 0f
         xl.axisLineColor = Color.WHITE
         //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
         val limitLine = LimitLine(startNum.toFloat())
@@ -67,7 +67,7 @@ object LineChartUtils {
         leftAxis.textSize = 12f
         leftAxis.textColor = Color.WHITE
         leftAxis.gridColor = Color.TRANSPARENT
-        leftAxis.zeroLineColor = Color.TRANSPARENT
+//        leftAxis.zeroLineColor = Color.TRANSPARENT
         leftAxis.setDrawGridLines(true)
         leftAxis.setValueFormatter { value, axis ->
             ""//${value.toInt()}

@@ -1,16 +1,21 @@
 package com.pr.perfectrecovery.activity
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.pdf.PdfDocument
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
+import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
@@ -71,6 +76,38 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     var trainingDTO = TrainingDTO()
+    var perms = arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    private fun initPermissions() {
+        EasyPermissions.requestPermissions(
+            this, "获取手机文件读写权限", 123,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    private fun getManager() {
+        val alertDialog: AlertDialog //生成一个对话框 可跳转设置里手动开启权限
+        val builder: AlertDialog.Builder =
+            AlertDialog.Builder(this, R.style.DialogStyle) //嫌麻烦，样式可设为null
+        builder.setPositiveButton(getString(R.string.authorize_msg), null)
+        builder.setTitle(getString(R.string.authorize_title_msg))
+        builder.setMessage(getString(R.string.file_manger_msg))
+        builder.setCancelable(false)
+        alertDialog = builder.create()
+        alertDialog.show()
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { v ->
+            alertDialog.dismiss() //去获取文件管理
+            val intent: Intent =
+                Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.data = Uri.parse("package:$packageName")
+            startActivityForResult(intent, 0x99)
+        }
+    }
+
     private fun initData() {
         trainingDTO = intent.getSerializableExtra(DATADTO) as TrainingDTO
         viewBinding.bottom.ivExport.setOnClickListener {
@@ -79,11 +116,18 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 exPortPDF(trainingDTO.name)
             } else {
                 ToastUtils.showShort("暂未授权文件读写")
-                EasyPermissions.requestPermissions(
-                    this, "获取手机文件读写权限", 123,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
+                if (EasyPermissions.hasPermissions(
+                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                ) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {//判断当前手机系统版本
+                        if (Environment.isExternalStorageManager()) initPermissions()
+                        else getManager()
+                    } else initPermissions()
+                } else {
+
+                }
             }
         }
         //判断模式- false 训练  true 考核
@@ -338,22 +382,30 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
      */
     private fun exPortPDF(fileName: String?) {
         showLoadingDialog()
+        val path =
+            Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
         GlobalScope.launch(Dispatchers.IO) {
             //创建pdf文本
             val pdfDocument = PdfDocument()
             //分页
             val pageInfo = PdfDocument.PageInfo.Builder(
                 viewBinding.root.measuredWidth,
-                viewBinding.root.width * 297 / 210,
+                viewBinding.root.measuredHeight,
                 1
             ).create()
-            val page = pdfDocument.startPage(pageInfo)
-            viewBinding.root.draw(page.canvas)
-            pdfDocument.finishPage(page)
+
+            if (trainingDTO.isCheck) {
+                val page = pdfDocument.startPage(pageInfo)
+                viewBinding.layoutCheck.clCheck.draw(page.canvas)
+                pdfDocument.finishPage(page)
+            }
+
+            val page2 = pdfDocument.startPage(pageInfo)
+            viewBinding.clResult.draw(page2.canvas)
+            pdfDocument.finishPage(page2)
+
             //保存文件路径
             try {
-                val path =
-                    Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
                 val file = File(path)
                 if (file.exists()) {
                     file.delete()
@@ -366,7 +418,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             }
             withContext(Dispatchers.Main) {
                 pdfDocument.close()
-                ToastUtils.showShort("成绩PDF已导出")
+                ToastUtils.showShort("PDF成绩文件存放位置：${path}")
                 hideLoadingDialog()
             }
         }
