@@ -712,12 +712,12 @@ class CPRActivity : BaseActivity() {
     private var isRefreshPower: Boolean = false
     private var isStart = false
     private fun sendMessage(formatHexString: String) {
-        if (!isStart || TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
+        if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
         }
-        Log.e("TAG", "原始数据${formatHexString}")
         val deviceMAC =
             "001b${formatHexString.substring(12)}"
+        Log.e("TAG", "原始数据${formatHexString}")
         Log.e("TAG", "MAC:${deviceMAC}")
         val dataVolatile = dataMap[deviceMAC]
         if (dataVolatile != null) {
@@ -728,28 +728,40 @@ class CPRActivity : BaseActivity() {
             dataDTO = mDataVolatile.parseString(formatHexString)
             dataMap[dataDTO.mac] = mDataVolatile
         }
+        //处理连接后电量显示
         if (isRefreshPower) {
             isRefreshPower = false
-            mDeviceAdapter.data.forEach { item ->
-                if (item.mac == dataDTO.mac) {
-                    item.power = dataDTO.electricity
-                    mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
-                }
-            }
-            powerHandler.removeCallbacks(powerRunning)
-            powerHandler.postDelayed(powerRunning, 10000)
+            setPower()
+//            powerHandler.removeCallbacks(powerRunning)
+//            powerHandler.postDelayed(powerRunning, 10000)
         }
-        StatusLiveData.data.postValue(dataDTO)
+        if (isStart) {
+            StatusLiveData.data.postValue(dataDTO)
+        }
     }
 
-    private val powerHandler = Handler(Looper.getMainLooper())
-    private val powerRunning = Runnable {
-        mDeviceAdapter.data.forEach { item ->
-            if (item.mac == dataDTO.mac) {
-                item.power = dataDTO.electricity
-                mDeviceAdapter.notifyItemChanged(mDeviceAdapter.getItemPosition(item), item)
+//    private val powerHandler = Handler(Looper.getMainLooper())
+//    private val powerRunning = Runnable {
+//        setPower()
+//    }
+
+    /**
+     * 设置列表电量
+     */
+    private fun setPower() {
+        val dataList = mutableListOf<BleDevice>()
+        dataMap.keys.forEachIndexed { position, s ->
+            if (s == dataDTO.mac) {
+                mDeviceAdapter.data.forEachIndexed { index, item ->
+                    if (item.isConnected && index == position) {
+                        item.power = dataDTO.electricity
+                        mDeviceAdapter.notifyItemChanged(index, item)
+                        dataList.add(item)
+                    }
+                }
             }
         }
+        // mDeviceAdapter.setList(dataList)
     }
 
     override fun onDestroy() {

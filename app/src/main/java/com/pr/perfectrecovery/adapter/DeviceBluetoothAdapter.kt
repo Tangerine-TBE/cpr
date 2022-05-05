@@ -18,13 +18,18 @@ class DeviceBluetoothAdapter :
         viewBinding.tvBluetoothName.text = "完美复苏  " + item.name
         if (item.getmUsbSerialDriver() != null) {
             viewBinding.tvBluetoothName.text =
-                "完美复苏串口  ${item.getmUsbSerialDriver()::class.java.simpleName.replace("SerialDriver", "")}"
+                "完美复苏串口  ${
+                    item.getmUsbSerialDriver()::class.java.simpleName.replace(
+                        "SerialDriver",
+                        ""
+                    )
+                }"
         }
-        if (item.count > 0) {
-            viewBinding.tvBluetoothStatus.text = "${item.count}"
-        } else {
-            viewBinding.tvBluetoothStatus.text = ""
-        }
+//        if (item.count > 0) {
+//            viewBinding.tvBluetoothStatus.text = "${item.count}"
+//        } else {
+//            viewBinding.tvBluetoothStatus.text = ""
+//        }
         //判断蓝牙是否链接
         if (item.isConnected) {//该蓝牙已连接
             viewBinding.tvBluetoothName.setTextColor(context.resources.getColor(R.color.color_37B48B))
@@ -34,7 +39,9 @@ class DeviceBluetoothAdapter :
             viewBinding.loadingDot.visibility = View.INVISIBLE
             viewBinding.battery.visibility = View.VISIBLE
             viewBinding.battery.power = item.power
+            viewBinding.tvBluetoothStatus.text = "${holder.adapterPosition + 1}"
         } else {
+            viewBinding.tvBluetoothStatus.text = ""
             viewBinding.loadingDot2.visibility = View.INVISIBLE
             viewBinding.loadingDot.visibility = if (item.isLoading) View.VISIBLE else View.INVISIBLE
             viewBinding.root.setBackgroundColor(context.resources.getColor(R.color.theme_color))
