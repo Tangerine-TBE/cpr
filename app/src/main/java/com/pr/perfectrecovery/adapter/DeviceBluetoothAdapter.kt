@@ -37,8 +37,10 @@ class DeviceBluetoothAdapter :
             viewBinding.loadingDot2.visibility =
                 if (item.isLoading) View.VISIBLE else View.INVISIBLE
             viewBinding.loadingDot.visibility = View.INVISIBLE
-            viewBinding.battery.visibility = View.VISIBLE
-            viewBinding.battery.power = item.power
+            if (item.power > 0) {
+                viewBinding.battery.visibility = View.VISIBLE
+                viewBinding.battery.power = item.power
+            }
             viewBinding.tvBluetoothStatus.text = "${holder.adapterPosition + 1}"
         } else {
             viewBinding.tvBluetoothStatus.text = ""

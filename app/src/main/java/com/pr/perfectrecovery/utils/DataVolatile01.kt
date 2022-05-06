@@ -33,7 +33,7 @@ class DataVolatile01 {
 
 
     //电量值：  0-100%
-    private var VI_Value = 0
+    var VI_Value = 0
 
     //距离值：  30-150
     private var L_Value = 0

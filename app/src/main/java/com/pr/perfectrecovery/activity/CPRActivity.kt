@@ -275,6 +275,7 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun bindBluetooth() {
+        unBindBluetooth()
         bleList.forEach {
             bind(it)
         }
@@ -753,9 +754,17 @@ class CPRActivity : BaseActivity() {
         mDeviceAdapter.data.forEachIndexed { index, item ->
             if (item.isConnected) {
                 isRefreshPower = false
-                Log.e("sendMessage", "电量值：${dataDTO.electricity}")
-                item.power = dataDTO.electricity
-                mDeviceAdapter.notifyItemChanged(index, item)
+                dataMap.keys.forEach {
+                    if (it == dataDTO.mac) {
+                        Log.e("sendMessage", "电量值：${dataDTO.electricity}")
+                        val dataVolatile01 = dataMap["${dataDTO.mac}"]
+                        if (dataVolatile01 != null) {
+                            item.power = dataVolatile01.VI_Value
+                        }
+                        mDeviceAdapter.notifyItemChanged(index, item)
+                        return@forEach
+                    }
+                }
                 dataList.add(item)
             }
         }
