@@ -155,7 +155,7 @@ class CPRActivity : BaseActivity() {
         DataVolatile01.QY_LOW_VALUE = configBean.tidalVolume
         DataVolatile01.PR_DEFAULT_TIMES = configBean.prCount
         DataVolatile01.QY_DEFAULT_TIMES = configBean.qyCount
-
+        //searchBle()
         //查看是否有蓝牙权限
         checkPermissions()
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
@@ -435,10 +435,15 @@ class CPRActivity : BaseActivity() {
                     bleDevice.isConnected = true
                     bleDevice.isLoading = false
                     bleDevice.count = count
+                    //添加已连接蓝牙
                     if (mDeviceAdapter.data.size == 0) {
                         mDeviceAdapter.addData(bleDevice)
                     } else {
-                        mDeviceAdapter.addData(count - 1, bleDevice)
+                        if (count - 1 <= mDeviceAdapter.data.size) {
+                            mDeviceAdapter.addData(count - 1, bleDevice)
+                        } else {
+                            mDeviceAdapter.addData(bleDevice)
+                        }
                     }
 //                viewBinding.textView.text = "$count"
                     bleList.add(bleDevice)
@@ -730,20 +735,23 @@ class CPRActivity : BaseActivity() {
             dataDTO = mDataVolatile.parseString(formatHexString)
             dataMap[dataDTO.mac] = mDataVolatile
         }
-        //处理连接后电量显示
-        if (isRefreshPower) {
-            setPower()
-            powerHandler.removeCallbacks(powerRunning)
-            powerHandler.postDelayed(powerRunning, 10000)
-        }
         if (isStart) {
             StatusLiveData.data.postValue(dataDTO)
+        }
+        //处理连接后电量显示
+        if (isRefreshPower) {
+            powerHandler.removeCallbacks(powerRunning)
+            powerHandler.postDelayed(powerRunning, 10000)
+            Handler().postDelayed(this::setPower, 500)
         }
     }
 
     private val powerHandler = Handler(Looper.getMainLooper())
     private val powerRunning = Runnable {
         setPower()
+        powerHandler.postDelayed({
+            setPower()
+        }, 10000)
     }
 
     /**
@@ -753,23 +761,24 @@ class CPRActivity : BaseActivity() {
         val dataList = mutableListOf<BleDevice>()
         mDeviceAdapter.data.forEachIndexed { index, item ->
             if (item.isConnected) {
-                isRefreshPower = false
+                //将mac字符串转换一下去掉 冒号 ：
+                val replaceMac = item.mac.replace(":", "").toLowerCase()
+                Log.e("sendMessage", "ble MAC：${replaceMac}")
                 dataMap.keys.forEach {
-                    if (it == dataDTO.mac) {
-                        Log.e("sendMessage", "电量值：${dataDTO.electricity}")
-                        val dataVolatile01 = dataMap["${dataDTO.mac}"]
-                        if (dataVolatile01 != null) {
-                            item.power = dataVolatile01.VI_Value
-                        }
-                        mDeviceAdapter.notifyItemChanged(index, item)
-                        return@forEach
+                    val dataItme = dataMap[it]
+                    if (dataItme != null && replaceMac == dataItme.deviceMAC) {
+                        Log.e("sendMessage", "MAC：${dataItme.deviceMAC}")
+                        Log.e("sendMessage", "电量值：${dataItme.VI_Value}")
+                        item.power = dataItme.VI_Value
+//                        return@forEach
                     }
                 }
-                dataList.add(item)
+                mDeviceAdapter.notifyItemChanged(index, item)
             }
+            dataList.add(item)
         }
-        mDeviceAdapter.notifyDataSetChanged()
-//        mDeviceAdapter.setList(dedupList(dataList))
+        isRefreshPower = false
+        mDeviceAdapter.setList(dataList)
     }
 
     override fun onDestroy() {

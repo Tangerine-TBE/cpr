@@ -105,7 +105,7 @@ class DataVolatile01 {
     private var pt_valueSet = mutableListOf<Int>()
     private var py_valueSet = mutableListOf<Int>()
 
-    private var deviceMAC: String? = null
+    var deviceMAC: String? = null
     private var QY_RUN_FLAG = 0
 
     /**
