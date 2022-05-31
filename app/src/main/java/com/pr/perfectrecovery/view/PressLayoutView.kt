@@ -131,7 +131,7 @@ class PressLayoutView : LinearLayout {
 
     private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
         val number = abs(dataDTO.preDistance - value)
-        val depthSegment = dataDTO.PR_HIGH_VALUE / 10
+        val depthSegment = dataDTO.PR_HIGH_VALUE / 8
         if (number < 10) {
             return 0
         }
@@ -160,7 +160,7 @@ class PressLayoutView : LinearLayout {
             number < dataDTO.PR_LOW_VALUE -> {
                 8
             }
-            number in (dataDTO.PR_LOW_VALUE + 5)..(dataDTO.PR_HIGH_VALUE + 5) -> {
+            number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE) -> {
                 9
             }
             number > dataDTO.PR_HIGH_VALUE -> {

@@ -186,7 +186,7 @@ class DataVolatile01 {
                     )
                 )
             )
-            Log.e("TAG11", "${state}")
+            //Log.e("TAG11", "${state}")
             if (state and 1 == 1) {
                 BLS_Value = 1
             } else {
@@ -703,19 +703,21 @@ class DataVolatile01 {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
             ERR_PR_TOOMORE++
         } else {
+            val value = abs(preDistance - l)
+            Log.e("TAG11", "value ：${PR_LOW_VALUE * 1.4}")
+            Log.e("TAG11", "preDistance: $value")
             if (PSR_Value == 0) {
                 ERR_PR_POSI++
                 Log.e("TAG11", "按压位置错误")
             } else {
-                val value = abs(preDistance - l)
-                if (value < PR_LOW_VALUE * 1.4) {
+                if (value > PR_LOW_VALUE) {
                     ERR_PR_LOW++
-                    Log.e("TAG11", "$PR_LOW_VALUE")
+                    Log.e("TAG11", "PR_LOW_VALUE ：$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-                } else if (value > PR_HIGH_VALUE * 1.4) {
+                } else if (value > PR_HIGH_VALUE) {
                     ERR_PR_HIGH++
-                    Log.e("TAG11", "$PR_HIGH_VALUE")
+                    Log.e("TAG11", "ERR_PR_HIGH ： $PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
                     Log.e("TAG11", "$value")
                 }
