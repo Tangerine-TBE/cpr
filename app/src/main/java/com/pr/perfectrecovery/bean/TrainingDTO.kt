@@ -156,13 +156,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      * 按压分数
-     * 正确按压次数 * 按压设定分数 / 按压设定总数
+     * 正确按压次数 * 按压设定分数 / 按压设定总数 - 超次扣分
      */
     fun getPrScore(): Float {
         var value = 0f
         if (prSum > 0 && (prSum - pressErrorCount) > 0) {
-            value =
-                (prSum - pressErrorCount.toFloat()) * pressScore / (prCount * cycles).toFloat() - getPrManyScore()
+            value = (prSum - pressErrorCount) * pressScore / (prCount * cycles).toFloat() - getPrManyScore()
         }
         return if (value > 0) value else 0.0f
     }

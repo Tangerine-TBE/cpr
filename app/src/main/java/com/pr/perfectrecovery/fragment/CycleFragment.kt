@@ -27,10 +27,6 @@ import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import kotlin.math.abs
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-private const val ARG_PARAM3 = "param3"
-
 /**
  * CPR按压页
  */
@@ -64,6 +60,11 @@ class CycleFragment : Fragment() {
     //按压总数统计
 
     companion object {
+
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
+        private const val ARG_PARAM3 = "param3"
+
         fun newInstance(isTS: Boolean, isYY: Boolean, isCheck: Boolean) = CycleFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_PARAM1, isTS)
@@ -349,7 +350,11 @@ class CycleFragment : Fragment() {
     //当前是否为按压模式-吹气模式
     private var cyclePrCount = 0
     private var cycleQyCount = 0
+
+    //是否按压
     private var isPr = false
+
+    //是否吹气
     private var isQy = false
     private var isQyAim = false
 
@@ -573,7 +578,7 @@ class CycleFragment : Fragment() {
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_yello)
                         setPlayVoice(VOICE_MP3_CQBZ)
                     }
-                    qyMax in configBean.tidalVolumeEnd..1200 -> {
+                    qyMax in configBean.tidalVolumeEnd..1199 -> {
                         err_qy_high = dataDTO.err_qy_high
                         viewBinding.ivLung.setImageResource(R.mipmap.icon_wm_lung_red)
                         setPlayVoice(VOICE_MP3_CQGD)

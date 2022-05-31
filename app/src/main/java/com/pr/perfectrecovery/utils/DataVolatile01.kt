@@ -241,9 +241,9 @@ class DataVolatile01 {
                 )
                 Log.e("TAG12", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
-                pre_work_Mode=1
+                pre_work_Mode = 1
             } else {
-                QY_Value = if(pre_work_Mode==1){
+                QY_Value = if (pre_work_Mode == 1) {
                     selectValue_QY(2, 2, 2)
                 } else {
                     0
@@ -277,7 +277,7 @@ class DataVolatile01 {
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
                 //清空频率
                 pt(L_Value)
-                pre_work_Mode=0
+                pre_work_Mode = 0
             }
             py(QY_Value)
             Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
@@ -402,6 +402,7 @@ class DataVolatile01 {
 
     private var qy = 0
     fun dataClear() {
+        MODEL = false
         isStart = false
         //电量值：  0-100%
         VI_Value = 0
@@ -782,7 +783,7 @@ class DataVolatile01 {
             /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                  ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
              }*/
-             PR_CYCLE_TIMES = 0
+            PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0

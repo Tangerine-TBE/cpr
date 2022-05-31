@@ -20,10 +20,7 @@ import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
 import com.pr.perfectrecovery.utils.TimeUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
@@ -126,7 +123,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                         else getManager()
                     } else initPermissions()
                 } else {
-
+                    initPermissions()
                 }
             }
         }
@@ -380,6 +377,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     /**
      * 导出当前页为PDF
      */
+    @OptIn(DelicateCoroutinesApi::class)
     private fun exPortPDF(fileName: String?) {
         showLoadingDialog()
         val path =

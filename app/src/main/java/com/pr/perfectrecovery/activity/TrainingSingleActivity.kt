@@ -66,8 +66,8 @@ class TrainingSingleActivity : BaseActivity() {
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
                     mTrainingBean.isCheck = true
-                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
-                    messageEventData.isCheck = true
+                    val messageEventData =
+                        MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null, true)
                     EventBus.getDefault().post(messageEventData)
                     //考核模式  禁止使用语音和提示音
                     binding.single.switchBeat.isChecked = false
@@ -77,8 +77,8 @@ class TrainingSingleActivity : BaseActivity() {
                 }
                 //练习模式
                 R.id.cbTraining -> {
-                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
-                    messageEventData.isCheck = false
+                    val messageEventData =
+                        MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null, false)
                     EventBus.getDefault().post(messageEventData)
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -89,7 +89,9 @@ class TrainingSingleActivity : BaseActivity() {
                 }
             }
         }
-
+        val messageEventData =
+            MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null, false)
+        EventBus.getDefault().post(messageEventData)
         binding.bottom.ivStart.setOnClickListener {
             val name = binding.single.etName.text.toString()
             if (TextUtils.isEmpty(name)) {

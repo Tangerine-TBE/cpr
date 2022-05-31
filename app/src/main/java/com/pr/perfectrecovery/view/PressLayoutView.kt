@@ -131,35 +131,36 @@ class PressLayoutView : LinearLayout {
 
     private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
         val number = abs(dataDTO.preDistance - value)
+        val depthSegment = dataDTO.PR_HIGH_VALUE / 10
         if (number < 10) {
             return 0
         }
         return when {
-            number < dataDTO.PR_LOW_VALUE - 20 -> {
+            number < depthSegment -> {
                 1
             }
-            number < dataDTO.PR_LOW_VALUE - 17 -> {
+            number < depthSegment * 2 -> {
                 2
             }
-            number < dataDTO.PR_LOW_VALUE - 14 -> {
+            number < depthSegment * 3 -> {
                 3
             }
-            number < dataDTO.PR_LOW_VALUE - 11 -> {
+            number < depthSegment * 4 -> {
                 4
             }
-            number < dataDTO.PR_LOW_VALUE - 8 -> {
+            number < depthSegment * 5 -> {
                 5
             }
-            number < dataDTO.PR_LOW_VALUE - 5 -> {
+            number < depthSegment * 6 -> {
                 6
             }
-            number < dataDTO.PR_LOW_VALUE - 2 -> {
+            number < depthSegment * 7 -> {
                 7
             }
             number < dataDTO.PR_LOW_VALUE -> {
                 8
             }
-            number <= dataDTO.PR_HIGH_VALUE -> {
+            number in (dataDTO.PR_LOW_VALUE + 5)..(dataDTO.PR_HIGH_VALUE + 5) -> {
                 9
             }
             number > dataDTO.PR_HIGH_VALUE -> {

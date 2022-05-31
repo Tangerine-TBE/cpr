@@ -15,12 +15,14 @@ import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemClickListener
@@ -57,6 +59,7 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import kotlin.collections.LinkedHashSet
+import kotlin.system.exitProcess
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -172,6 +175,7 @@ class CPRActivity : BaseActivity() {
             val intent = Intent(this, TrainingSingleActivity::class.java)
             connectList.clear()
             connectList.addAll(bleList)
+            connectList.distinctBy { listOf(it.mac, it.mac) }
             intent.putParcelableArrayListExtra(BaseConstant.CONNECT_BLE_DEVICES, connectList)
             startActivity(intent)
         }
@@ -517,12 +521,7 @@ class CPRActivity : BaseActivity() {
      * 去重
      */
     private fun dedupList(list: MutableList<BleDevice>?): MutableList<BleDevice>? {
-        val set = LinkedHashSet<BleDevice>()
-        if (list != null) {
-            set.addAll(list)
-            list.clear()
-            list.addAll(set)
-        }
+        list?.distinctBy { listOf(it.mac, it.mac) }
         return list
     }
 
@@ -809,19 +808,22 @@ class CPRActivity : BaseActivity() {
     private fun ttl() {
         if (!BaseApplication.driver?.UsbFeatureSupported()!!) // 判断系统是否支持USB HOST
         {
-            val dialog: androidx.appcompat.app.AlertDialog =
-                androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("您的手机不支持USB HOST，请更换其他手机再试！")
-                    .setPositiveButton(
-                        "确认"
-                    ) { arg0, arg1 ->
-                        {
-                            //exitProcess(0)
-                        }
-                    }.create()
-            dialog.setCanceledOnTouchOutside(false)
+            val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
+            dialog.setCancelable(true)
+            dialog.setTitle("提示")
+            dialog.setMessage("您的手机不支持USB HOST，请更换其他手机再试！")
+            dialog.setButton(
+                androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "确定"
+            ) { dialog, which -> }
             dialog.show()
+            val lp = dialog.window!!.attributes
+//设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
+            //设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
+            lp.width = ScreenUtils.getScreenWidth() * 9 / 10
+//这里设置居中
+            //这里设置居中
+            lp.gravity = Gravity.CENTER
+            dialog.window!!.attributes = lp
         }
     }
 
