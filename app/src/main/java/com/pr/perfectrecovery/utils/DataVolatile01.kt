@@ -704,13 +704,13 @@ class DataVolatile01 {
             ERR_PR_TOOMORE++
         } else {
             val value = abs(preDistance - l)
-            Log.e("TAG11", "value ：${PR_LOW_VALUE * 1.4}")
+            Log.e("TAG11", "value ：${PR_LOW_VALUE}")
             Log.e("TAG11", "preDistance: $value")
             if (PSR_Value == 0) {
                 ERR_PR_POSI++
                 Log.e("TAG11", "按压位置错误")
             } else {
-                if (value > PR_LOW_VALUE) {
+                if (value < PR_LOW_VALUE) {
                     ERR_PR_LOW++
                     Log.e("TAG11", "PR_LOW_VALUE ：$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")

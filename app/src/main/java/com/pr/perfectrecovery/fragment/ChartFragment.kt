@@ -73,8 +73,8 @@ class ChartFragment : Fragment() {
         val data2: LineData = getData(0f, false)
 //        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
-        depth_threshold_low = (configBean.prLow() * 1.4).toInt()   //下限值放大8mm  需要定义变量  上下限阈值要放缩
-        depth_threshold_high = (configBean.prHigh() * 1.4).toInt()  //上限值放大8mm
+        depth_threshold_low = configBean.prLow()  //下限值放大8mm  需要定义变量  上下限阈值要放缩
+        depth_threshold_high = configBean.prHigh()  //上限值放大8mm
         depth_Frequency_high = (configBean.depthFrequencyEnd)
         depth_Frequency_low = (configBean.depthFrequency)
         blow_Frequency_low = configBean.tidalFrequency
