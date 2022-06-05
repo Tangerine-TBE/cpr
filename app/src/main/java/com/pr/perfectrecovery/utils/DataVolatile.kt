@@ -529,13 +529,15 @@ class DataVolatile {
             //  PR_DOTTIMSE_NUMBER+=3
             if (L_d2 >= L_d3) {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
-                    low_flag = 0
+                    low_flag = 0    //
                     if (UNBACK_FLAG == 1) {
-                        ERR_PR_UNBACK++
-                        UNBACK_FLAG = 0
-                        Log.e("TAG12", "按压未回弹")
-                        ERR_FLAG = 1;
-
+                        if(PR_CYCLE_TIMES< PR_DEFAULT_TIMES){
+                            ERR_PR_UNBACK++
+                        }else{
+                            UNBACK_FLAG = 0
+                            Log.e("TAG12", "按压未回弹")
+                            ERR_FLAG = 1;
+                        }
                     }
                 }
                 value = L_d3
@@ -766,7 +768,7 @@ class DataVolatile {
  * */
     private fun selectValue_QY(QY_d1: Int, QY_d2: Int, QY_d3: Int): Int {
         var value = 0
-        if (QY_d1 > 5 || QY_d2 > 5 || QY_d3 > 5) {
+        if (QY_d1 > 8 || QY_d2 > 8 || QY_d3 > 8) {
             top_flag = 1
             Qliang = (QY_d1 + QY_d2 + QY_d3) * 30
             QY_VOLUME_SUM += Qliang
