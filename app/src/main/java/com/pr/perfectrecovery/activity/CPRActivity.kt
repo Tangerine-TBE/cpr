@@ -251,10 +251,6 @@ class CPRActivity : BaseActivity() {
                     item.dataClear()
                 }
             }
-            BaseConstant.EVENT_CPR_CHECK -> {
-                Log.e("CPRActivity", "${event.isCheck}")
-                DataVolatile01.setModel(event.isCheck)
-            }
             BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
                 deviceCount = 0
                 unBindBluetooth()

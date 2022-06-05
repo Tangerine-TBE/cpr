@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.view
 
 import android.content.Context
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Scroller
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.bean.BaseDataDTO
+import java.util.logging.Handler
 import kotlin.math.abs
 
 /**
@@ -19,6 +21,11 @@ import kotlin.math.abs
  */
 class PressLayoutView : LinearLayout {
     private var scroller: Scroller? = null
+    private val mHandler = object : android.os.Handler(Looper.getMainLooper()) {}
+
+    private val runnable = Runnable {
+        ctBottomError?.isChecked = false
+    }
 
     constructor(context: Context) : super(context) {
         initView(context)
@@ -61,6 +68,7 @@ class PressLayoutView : LinearLayout {
     private var viewLayout: View? = null
     private var viewCenter: View? = null
     private var viewPress: View? = null
+    private var ctBottomError : CheckedTextView? = null
     private var viewTop: CheckedTextView? = null
     private var viewBottom: CheckedTextView? = null
     private var linearLayout: LinearLayout? = null
@@ -74,6 +82,7 @@ class PressLayoutView : LinearLayout {
         viewTop = findViewById(R.id.viewTop)
         viewBottom = findViewById(R.id.viewBottom)
         viewCenter = findViewById(R.id.viewCenter)
+        ctBottomError = findViewById(R.id.ctBottomError)
         viewPress = findViewById(R.id.viewPress)
         linearLayout = findViewById(R.id.linearLayout)
         ivArrowUp = findViewById(R.id.ivArrowUp)
@@ -102,10 +111,15 @@ class PressLayoutView : LinearLayout {
         scroller!!.startScroll(linearLayout!!.scrollX, scrollY, 0, -newY - scrollY)
         if (destY == 9) { //正确的按压
             viewBottom!!.isChecked = true
+//            ctBottomError?.isChecked = false
             Log.e("smoothScrollTo", "按压正确")
             viewPress!!.visibility = INVISIBLE
             ivArrowUp!!.visibility = INVISIBLE
             ivArrowDown!!.visibility = INVISIBLE
+        } else if(destY > 9){
+            ctBottomError?.isChecked = true
+            mHandler.removeCallbacks(runnable)
+            mHandler.postDelayed(runnable,100)
         }
         invalidate()
     }

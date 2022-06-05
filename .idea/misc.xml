@@ -7,8 +7,14 @@
         <entry key="..\:/andriod/perfect-recovery/app/src/main/res/layout/chart_fragment.xml" value="0.1" />
         <entry key="..\:/andriod/perfect-recovery/app/src/main/res/layout/layout_check_result.xml" value="0.33" />
         <entry key="..\:/andriod/perfect-recovery/app/src/main/res/layout/layout_top.xml" value="0.16354166666666667" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/border_1dp.xml" value="0.241" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/border_1dp_bg.xml" value="0.241" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/border_dp.xml" value="0.241" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/checkbox_bg.xml" value="0.1655" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/checkbox_selector.xml" value="0.241" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/edit_text_bg.xml" value="0.2405" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/press_bg.xml" value="0.241" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/press_error_bg.xml" value="0.241" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/drawable/usb.xml" value="0.2095" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_cpr_list.xml" value="0.36564102564102563" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_cpractivity.xml" value="0.36564102564102563" />
@@ -17,6 +23,7 @@
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_single.xml" value="0.25" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_statistical.xml" value="0.36564102564102563" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_train_result.xml" value="0.37135416666666665" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_train_result_exprot.xml" value="0.278515625" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/activity_trian.xml" value="0.2752895752895753" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/chart_fragment.xml" value="0.33" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment.xml" value="0.25" />

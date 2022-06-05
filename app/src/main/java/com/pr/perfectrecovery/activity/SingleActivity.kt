@@ -21,6 +21,7 @@ import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile01
 import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -43,6 +44,7 @@ class SingleActivity : BaseActivity() {
         EventBus.getDefault().register(this)
 //        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
+        mTrainingBean?.isCheck?.let { DataVolatile01.setModel(it) }
         initView()
         initViewPager()
     }

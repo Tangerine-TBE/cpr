@@ -113,8 +113,10 @@ class CycleFragment : Fragment() {
                 viewBinding.tvPress8.text = "按压位置：${it.psrType}"
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
                 viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}" +
-                        "\n 按压超次：${it.ERR_PR_TOOMORE}   \n本页按压超次：${prManyCount}" +
-                        "\n 吹气超次：${it.QY_TIMES_TOOMORE} \n本页吹气超次：${qyManyCount}"
+                        "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
+                        "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
+                        "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
+                        "\n吹气超次：${it.QY_TIMES_TOOMORE} "
             }
         }
 
@@ -272,7 +274,7 @@ class CycleFragment : Fragment() {
         //超次少次
         trainingDTO.prManyCount = prManyCount
         trainingDTO.prLessCount = prLessCount
-        trainingDTO.qyManyCount = qyManyCount
+        trainingDTO.qyManyCount = mBaseDataDTO?.ERR_PR_TOOMORE!!
         trainingDTO.qyLessCount = qyLessCount
 
         trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
