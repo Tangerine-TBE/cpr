@@ -272,9 +272,9 @@ class CycleFragment : Fragment() {
         }
 
         //超次少次
-        trainingDTO.prManyCount = prManyCount
+        trainingDTO.prManyCount = mBaseDataDTO?.ERR_PR_TOOMORE!!
         trainingDTO.prLessCount = prLessCount
-        trainingDTO.qyManyCount = mBaseDataDTO?.ERR_PR_TOOMORE!!
+        trainingDTO.qyManyCount = qyManyCount
         trainingDTO.qyLessCount = qyLessCount
 
         trainingDTO.timeTotal = (configBean.operationTime * 1000).toLong()
