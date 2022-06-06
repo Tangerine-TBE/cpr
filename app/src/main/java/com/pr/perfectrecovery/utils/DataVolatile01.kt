@@ -539,7 +539,9 @@ class DataVolatile01 {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
-                        ERR_PR_UNBACK++
+                        if(PR_CYCLE_TIMES > PR_DEFAULT_TIMES){
+                            ERR_PR_UNBACK++
+                        }
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
                         ERR_FLAG = 1;
