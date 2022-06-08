@@ -523,7 +523,6 @@ class DataVolatile {
         } else {
             QY_CYCLE_TIMES = 0
         }
-
         // int low_flag=0;
         if (L_d1 >= L_d2) {
             //  PR_DOTTIMSE_NUMBER+=3
@@ -531,7 +530,15 @@ class DataVolatile {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
-                        ERR_PR_UNBACK++
+                        if(MODEL){
+                            if(PR_CYCLE_TIMES< PR_DEFAULT_TIMES){
+                                ERR_PR_UNBACK++
+                            }else{
+                                ERR_PR_TOOMORE++
+                            }
+                        }else{
+                            ERR_PR_TOOMORE++
+                        }
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
                         ERR_FLAG = 1;
@@ -597,7 +604,6 @@ class DataVolatile {
             }*/
                 if (low_flag == 0) {
                     low_flag = 1
-
                     PR_SUM++
                     PR_CYCLE_TIMES++
                     // Log.e("TAG5", "$PR_SUM")
@@ -693,6 +699,7 @@ class DataVolatile {
 
     private fun Err_PrTotal(l: Int) {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
+            //ERR_PR_TOOMORE = (PR_CYCLE_TIMES - PR_DEFAULT_TIMES);
             ERR_PR_TOOMORE++
         } else {
             if (PSR_Value == 0) {
@@ -706,7 +713,7 @@ class DataVolatile {
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
                 } else if (value > PR_HIGH_VALUE * 1.4) {
-                    ERR_PR_HIGH++
+         A           ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
                     Log.e("TAG11", "$value")
@@ -738,7 +745,7 @@ class DataVolatile {
     private var QY_TIMES_TOOLITTLE = 0
 
     private fun ERR_QyTotal(value: Int) {
-        if (MODEL && QY_CYCLE_TIMES > QY_DEFAULT_TIMES) {
+        if (MODEL && (QY_CYCLE_TIMES > QY_DEFAULT_TIMES)) {
             QY_TIMES_TOOMORE++
         } else {
             if (TOS_Value == 0) {
