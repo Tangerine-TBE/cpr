@@ -25,9 +25,44 @@ class DataVolatile01 {
         //操作模式false-训练 true-考核模式
         var MODEL: Boolean = false
 
-        fun setModel(model: Boolean) {
-            MODEL = model
-            Log.e("CPRActivity", "MODEL =  $MODEL")
+        //按压错误-按压未回弹
+        private var ERR_PR_UNBACK = 0
+
+        //按压错误-按压不足
+        private var ERR_PR_LOW = 0
+
+        //按压错误-按压过大
+        private var ERR_PR_HIGH = 0
+
+        //按压错误-按压位置错误
+        private var ERR_PR_POSI = 0
+
+        //按压超次
+        private var ERR_PR_TOOMORE = 0
+
+        //按压少次
+        private var ERR_PR_TOOLITTLE = 0
+
+        //单次按压循环的次数
+        private var PR_CYCLE_TIMES = 0
+
+        /**
+         * 清空错误书
+         */
+        fun clearErrorData() {
+            ERR_PR_UNBACK = 0
+
+            ERR_PR_LOW = 0
+
+            ERR_PR_HIGH = 0
+
+            ERR_PR_POSI = 0
+
+            ERR_PR_TOOMORE = 0
+
+            ERR_PR_TOOLITTLE = 0
+
+            PR_CYCLE_TIMES = 0
         }
     }
 
@@ -370,6 +405,8 @@ class DataVolatile01 {
 
         dataDTO.QY_TIMES_TOOMORE = QY_TIMES_TOOMORE
         dataDTO.ERR_PR_TOOMORE = ERR_PR_TOOMORE
+        dataDTO.model = MODEL
+        dataDTO.PR_CYCLE_TIMES = PR_CYCLE_TIMES
 
         dataDTO.L_d1 = L_d1
         dataDTO.L_d2 = L_d2
@@ -402,7 +439,7 @@ class DataVolatile01 {
 
     private var qy = 0
     fun dataClear() {
-        MODEL = false
+        //MODEL = false
         isStart = false
         //电量值：  0-100%
         VI_Value = 0
@@ -435,8 +472,8 @@ class DataVolatile01 {
         QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
         PR_SEQRIGHT_TOTAL = 0 //按压频率正常的次数
         QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
-        QY_TIMES_TOOMORE = 0
-        ERR_PR_TOOMORE = 0
+//        QY_TIMES_TOOMORE = 0
+//        ERR_PR_TOOMORE = 0
         PR_CYCLE_TIMES = 0
         L_valueSet.clear()
         QY_valueSet.clear()
@@ -539,12 +576,18 @@ class DataVolatile01 {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
-                        if(PR_CYCLE_TIMES > PR_DEFAULT_TIMES){
+                        if (MODEL) {
+                            if (PR_CYCLE_TIMES < PR_DEFAULT_TIMES) {
+                                ERR_PR_UNBACK++
+                            } else {
+                                ERR_PR_TOOMORE++
+                            }
+                        } else {
                             ERR_PR_UNBACK++
                         }
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
-                        ERR_FLAG = 1;
+                        ERR_FLAG = 1
 
                     }
                 }
@@ -618,13 +661,13 @@ class DataVolatile01 {
                             Err_PrTotal(L_d1)
                         }
                     } else {
-                        ERR_FLAG = 0;
+                        ERR_FLAG = 0
                     }
-                    PR_RUN_FLAG = 1;
+                    PR_RUN_FLAG = 1
                     //Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                     if (PR_SUM > 1) {
                         if (L_valueSet.size > 30) {
-                            PF_Value = 0;
+                            PF_Value = 0
                             L_valueSet.clear()
                         } else {
                             if (MIN_FLAG == 1) {
@@ -637,7 +680,7 @@ class DataVolatile01 {
                             if (PF_Value in 100..120) {
                                 PR_SEQRIGHT_TOTAL++
                             }
-                            PR_DOTTIMSE_NUMBER = 0;
+                            PR_DOTTIMSE_NUMBER = 0
                             index = 0
                             L_valueSet.clear()
                         }
@@ -679,27 +722,6 @@ class DataVolatile01 {
         L_compare = value
         return value
     }
-
-    //按压错误-按压未回弹
-    private var ERR_PR_UNBACK = 0
-
-    //按压错误-按压不足
-    private var ERR_PR_LOW = 0
-
-    //按压错误-按压过大
-    private var ERR_PR_HIGH = 0
-
-    //按压错误-按压位置错误
-    private var ERR_PR_POSI = 0
-
-    //按压超次
-    private var ERR_PR_TOOMORE = 0
-
-    //按压少次
-    private var ERR_PR_TOOLITTLE = 0
-
-    //单次按压循环的次数
-    private var PR_CYCLE_TIMES = 0
 
     private fun Err_PrTotal(l: Int) {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {

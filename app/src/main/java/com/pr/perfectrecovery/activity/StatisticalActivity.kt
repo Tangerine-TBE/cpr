@@ -147,7 +147,7 @@ class StatisticalActivity : BaseActivity() {
         override fun convert(holder: BaseViewHolder, item: TrainingDTO) {
             holder.setText(R.id.tvName, if (!TextUtils.isEmpty(item.name)) item.name else "无名")
                 .setText(R.id.tvModel, if (item.isCheck) "考核" else "训练")
-                .setText(R.id.tvTime, TimeUtils.stampToDate(System.currentTimeMillis()))
+                .setText(R.id.tvTime, TimeUtils.stampToDate(item.endTime))
             val cbCheck = holder.getView<CheckBox>(R.id.cbCheck)
             if (item.isCheck) {
                 holder.setText(R.id.tvResult, "${item.score}分")

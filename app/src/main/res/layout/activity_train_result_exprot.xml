@@ -38,7 +38,7 @@
             android:layout_marginTop="@dimen/dp_10"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvScoreSetting"
-            tools:layout_editor_absoluteX="-152dp"
+            tools:layout_editor_absoluteX="10dp"
             app:layout_constraintVertical_bias="0.0">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -312,21 +312,21 @@
                 android:id="@+id/checkBox1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:layout_marginTop="@dimen/dp_10"
                 android:checked="false"
                 android:text="检查环境"
+                android:layout_marginStart="@dimen/dp_6"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_14"
-                app:layout_constraintStart_toStartOf="@+id/tvPressScore"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox2"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv6" />
 
         <CheckBox
                 android:id="@+id/checkBox2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="检查意识"
@@ -341,7 +341,6 @@
                 android:id="@+id/checkBox3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="检查呼吸"
@@ -355,7 +354,6 @@
                 android:id="@+id/checkBox4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="检查脉搏"
@@ -363,20 +361,19 @@
                 android:textSize="@dimen/text_14"
                 app:layout_constraintEnd_toStartOf="@+id/checkBox5"
                 app:layout_constraintStart_toEndOf="@+id/checkBox3"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/checkBox3" />
 
         <CheckBox
                 android:id="@+id/checkBox5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="检查体位"
                 app:layout_constraintStart_toEndOf="@+id/checkBox4"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_14"
+                android:layout_marginEnd="@dimen/dp_6"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/checkBox4" />
 
@@ -384,24 +381,26 @@
                 android:id="@+id/checkBox6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="清理口腔"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_14"
+                android:layout_marginTop="@dimen/dp_10"
+                app:layout_constraintStart_toStartOf="@+id/checkBox1"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox7"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox1" />
 
         <CheckBox
                 android:id="@+id/checkBox7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="拨打120"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_14"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox8"
                 app:layout_constraintStart_toEndOf="@+id/checkBox6"
                 app:layout_constraintTop_toTopOf="@+id/checkBox6" />
 
@@ -409,17 +408,154 @@
                 android:id="@+id/checkBox8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:button="@drawable/checkbox_selector"
                 android:checked="false"
                 android:text="寻求帮助"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_14"
-                app:layout_constraintEnd_toEndOf="@+id/checkBox6"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox9"
                 app:layout_constraintStart_toEndOf="@+id/checkBox7"
                 app:layout_constraintTop_toTopOf="@+id/checkBox7" />
 
+        <CheckBox
+                android:id="@+id/checkBox9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/checkbox_selector"
+                android:checked="false"
+                android:text="体外除颤"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_14"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox10"
+                app:layout_constraintTop_toTopOf="@+id/checkBox8"
+                app:layout_constraintStart_toEndOf="@+id/checkBox8" />
 
+        <CheckBox
+                android:id="@+id/checkBox10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/checkbox_selector"
+                android:checked="false"
+                android:text="完成评估"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_14"
+                android:layout_marginEnd="@dimen/dp_6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/checkBox9"
+                app:layout_constraintStart_toEndOf="@+id/checkBox9" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="@drawable/border_1dp_bg"
+                android:layout_marginTop="@dimen/dp_6"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox6"
+                android:id="@+id/constraintLayout7">
+
+            <View
+                    android:id="@+id/view3"
+                    android:layout_width="3dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="@dimen/dp_10"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_13"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/dp_6"
+                    android:text="操作细节"
+                    app:layout_constraintStart_toStartOf="@+id/view3"
+                    app:layout_constraintTop_toTopOf="@+id/view3"
+                    app:layout_constraintBottom_toBottomOf="@+id/view3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+                android:id="@+id/iv1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dp_48"
+                android:layout_marginTop="@dimen/dp_5"
+                android:src="@mipmap/icon_wm_chart_heart_red"
+                app:layout_constraintEnd_toStartOf="@+id/tvCycleCount"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout7" />
+
+        <TextView
+                android:id="@+id/tvCycleCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/progressbar_circle"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv1"
+                app:layout_constraintBottom_toBottomOf="@+id/iv1" />
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_48"
+                android:src="@mipmap/icon_wm_chart_lung_red"
+                app:layout_constraintStart_toEndOf="@+id/tvCycleCount"
+                app:layout_constraintTop_toTopOf="@+id/iv1"
+                android:id="@+id/imageView6" />
+
+        <TextView
+                android:id="@+id/tvLungCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(错误/总数)"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/iv1"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/iv1" />
+
+        <TextView
+                android:id="@+id/tvPrCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(错误/总数)"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/dp_10"
+                app:layout_constraintStart_toEndOf="@+id/tvLungCount"
+                app:layout_constraintTop_toTopOf="@+id/tvLungCount" />
+
+        <TextView
+                android:id="@+id/tvHeartCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(错误/总数)"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/dp_10"
+                app:layout_constraintStart_toEndOf="@+id/tvCycleCount"
+                app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+
+        <TextView
+                android:id="@+id/tvQyCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(错误/总数)"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginStart="@dimen/dp_10"
+                app:layout_constraintStart_toEndOf="@+id/tvHeartCount"
+                app:layout_constraintTop_toTopOf="@+id/tvHeartCount" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

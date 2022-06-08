@@ -119,7 +119,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 按压平均次数/分 = 按压总深度/按压总次数
      */
     fun getPressAverageDepth(): Int {
-        return if (prSum > 0 && pr_depth_sum > 0) ((pr_depth_sum.toFloat() / prSum.toFloat()) / 1.4).roundToInt() else 0
+        return if (prSum > 0 && pr_depth_sum > 0) ((pr_depth_sum.toFloat() / prSum.toFloat()) / 1.1).roundToInt() else 0
     }
 
     /**
@@ -161,7 +161,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     fun getPrScore(): Float {
         var value = 0f
         if (prSum > 0 && (prSum - pressErrorCount) > 0) {
-            value = (prSum - pressErrorCount) * pressScore / (prCount * cycles).toFloat() - getPrManyScore()
+            value =
+                (prSum - pressErrorCount) * pressScore / (prCount * cycles).toFloat() - getPrManyScore()
         }
         return if (value > 0) value else 0.0f
     }

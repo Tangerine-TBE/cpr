@@ -22,6 +22,7 @@ import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile01
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -80,6 +81,9 @@ class CycleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        cycleCount = 0
+        //初始化
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         viewBinding = CycleFragmentBinding.inflate(layoutInflater)
         return viewBinding.root
     }
@@ -106,17 +110,18 @@ class CycleFragment : Fragment() {
             if (it != null) {
                 setViewDate(it)
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
-                viewBinding.tvPress4.text = "气压值：${it.bpValue}"
                 viewBinding.tvPress5.text = "按压频率：${it.pf}"
                 viewBinding.tvPress6.text = "吹气频率：${it.cf}"
                 viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
                 viewBinding.tvPress8.text = "按压位置：${it.psrType}"
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
-                viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}" +
-                        "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
-                        "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
-                        "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
-                        "\n吹气超次：${it.QY_TIMES_TOOMORE} "
+                viewBinding.tvPress10.text =
+                    "模式：${it.model}\n" +
+                            "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
+                            "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
+                            "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
+                            "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
+                            "\n吹气超次：${it.QY_TIMES_TOOMORE} 气压值：${it.bpValue}"
             }
         }
 
@@ -207,6 +212,8 @@ class CycleFragment : Fragment() {
 
     fun start() {
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
+        DataVolatile01.clearErrorData()
+        cycleCount = 0
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
@@ -272,7 +279,7 @@ class CycleFragment : Fragment() {
         }
 
         //超次少次
-        trainingDTO.prManyCount = mBaseDataDTO?.ERR_PR_TOOMORE!!
+        trainingDTO.prManyCount = prManyCount
         trainingDTO.prLessCount = prLessCount
         trainingDTO.qyManyCount = qyManyCount
         trainingDTO.qyLessCount = qyLessCount

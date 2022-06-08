@@ -530,13 +530,13 @@ class DataVolatile {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
-                        if(MODEL){
-                            if(PR_CYCLE_TIMES< PR_DEFAULT_TIMES){
+                        if (MODEL) {
+                            if (PR_CYCLE_TIMES < PR_DEFAULT_TIMES) {
                                 ERR_PR_UNBACK++
-                            }else{
+                            } else {
                                 ERR_PR_TOOMORE++
                             }
-                        }else{
+                        } else {
                             ERR_PR_TOOMORE++
                         }
                         UNBACK_FLAG = 0
@@ -713,7 +713,7 @@ class DataVolatile {
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
                 } else if (value > PR_HIGH_VALUE * 1.4) {
-         A           ERR_PR_HIGH++
+                    ERR_PR_HIGH++
                     Log.e("TAG11", "$PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
                     Log.e("TAG11", "$value")

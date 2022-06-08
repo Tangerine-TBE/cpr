@@ -44,7 +44,6 @@ class SingleActivity : BaseActivity() {
         EventBus.getDefault().register(this)
 //        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
-        mTrainingBean?.isCheck?.let { DataVolatile01.setModel(it) }
         initView()
         initViewPager()
     }
@@ -70,6 +69,7 @@ class SingleActivity : BaseActivity() {
             isStart = !isStart
             if (isStart) {
 //                DataVolatile.isStart = true
+                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment?.start()
@@ -131,7 +131,7 @@ class SingleActivity : BaseActivity() {
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public fun onEvent(event: MessageEventData) {
+    fun onEvent(event: MessageEventData) {
         when (event.code) {
             BaseConstant.EVENT_SINGLE_DATA_CYCLE -> {
                 //循环次数

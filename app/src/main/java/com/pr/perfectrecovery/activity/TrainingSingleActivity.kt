@@ -67,7 +67,7 @@ class TrainingSingleActivity : BaseActivity() {
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
                     mTrainingBean.isCheck = true
-                    DataVolatile01.setModel(true)
+                    DataVolatile01.MODEL = true
                     //考核模式  禁止使用语音和提示音
                     binding.single.switchBeat.isChecked = false
                     binding.single.switchVoice.isChecked = false
@@ -76,7 +76,7 @@ class TrainingSingleActivity : BaseActivity() {
                 }
                 //练习模式
                 R.id.cbTraining -> {
-                    DataVolatile01.setModel(false)
+                    DataVolatile01.MODEL = false
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
                     mTrainingBean.isCheck = false
@@ -86,7 +86,6 @@ class TrainingSingleActivity : BaseActivity() {
                 }
             }
         }
-        DataVolatile01.setModel(false)
         binding.bottom.ivStart.setOnClickListener {
             val name = binding.single.etName.text.toString()
             if (TextUtils.isEmpty(name)) {
