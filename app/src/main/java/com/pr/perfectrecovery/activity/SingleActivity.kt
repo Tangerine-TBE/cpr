@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.TrainingBean
 import com.pr.perfectrecovery.base.BaseActivity
@@ -44,6 +45,8 @@ class SingleActivity : BaseActivity() {
         EventBus.getDefault().register(this)
 //        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
+        //开始时清空残留数据
+        DataVolatile01.clearErrorData()
         initView()
         initViewPager()
     }

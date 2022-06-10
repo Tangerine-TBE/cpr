@@ -81,7 +81,6 @@ class CycleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        cycleCount = 0
         //初始化
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         viewBinding = CycleFragmentBinding.inflate(layoutInflater)
@@ -121,7 +120,7 @@ class CycleFragment : Fragment() {
                             "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
                             "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
                             "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
-                            "\n吹气超次：${it.QY_TIMES_TOOMORE} 气压值：${it.bpValue}"
+                            "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
             }
         }
 
@@ -211,9 +210,18 @@ class CycleFragment : Fragment() {
     }
 
     fun start() {
+        //开始时清空残留数据
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
         DataVolatile01.clearErrorData()
         cycleCount = 0
+        //更新循环次数
+        EventBus.getDefault().post(
+            MessageEventData(
+                BaseConstant.EVENT_SINGLE_DATA_CYCLE,
+                "$cycleCount",
+                null
+            )
+        )
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
@@ -299,6 +307,8 @@ class CycleFragment : Fragment() {
             mMediaPlayer?.reset()
             mMediaPlayer = null
         }
+        //开始时清空残留数据
+        DataVolatile01.clearErrorData()
         return trainingDTO
     }
 
@@ -401,9 +411,6 @@ class CycleFragment : Fragment() {
                     qyRate = dataDTO.bpValue
                 }
             }
-            //计算循环次数
-            cycle(dataDTO)
-
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -470,7 +477,11 @@ class CycleFragment : Fragment() {
      */
     private fun cycleEnd() {
         if (isCheck) {
-            if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
+            if (cycleCount > configBean.cycles || (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount)) {
+                //当前循环大于时默认等于设置循环数
+                if (cycleCount > configBean.cycles) {
+                    cycleCount = configBean.cycles
+                }
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
@@ -605,6 +616,8 @@ class CycleFragment : Fragment() {
                 mHandler1.removeCallbacksAndMessages(null)
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
             }
+            //计算循环次数
+            cycle(dataDTO)
         }
         qyValue = dataDTO.qySum
         //吹气频率
