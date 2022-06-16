@@ -537,7 +537,7 @@ class DataVolatile {
                                 ERR_PR_TOOMORE++
                             }
                         } else {
-                            ERR_PR_TOOMORE++
+                            ERR_PR_UNBACK++
                         }
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
@@ -661,7 +661,7 @@ class DataVolatile {
             if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                 // PR_DOTTIMSE_NUMBER+=3
                 Log.e("TAG7", "初始位置$preDistance")
-                if (abs(preDistance - L_d2) < 12) {
+                if (abs(preDistance - L_d2) < 8) {
                     UNBACK_FLAG = 0
                     Log.e("TAG7", "回到初始位置，复位未回弹$L_d2")
                     low_flag = 0
