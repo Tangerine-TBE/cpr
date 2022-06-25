@@ -13,6 +13,8 @@
     <string name="layout_continue">继续</string>
 
     <string name="please_open_blue">请先打开蓝牙</string>
+    <string name="press_result_number"><b>(<font color="#FC7574">%1d</font>/<font>%2d)</font></b></string>
+    <string name="press_result_desc"><b>(<font color="#FC7574">错误</font><font>/总数)</font></b></string>
 
     <string name="notifyTitle">提示</string>
     <string name="gpsNotifyMsg">当前手机扫描蓝牙需要打开定位功能。</string>

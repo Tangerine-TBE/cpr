@@ -108,19 +108,19 @@ class CycleFragment : Fragment() {
         StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
-                viewBinding.tvPress3.text = "距离值：${it.distance}"
-                viewBinding.tvPress5.text = "按压频率：${it.pf}"
-                viewBinding.tvPress6.text = "吹气频率：${it.cf}"
-                viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
-                viewBinding.tvPress8.text = "按压位置：${it.psrType}"
-                viewBinding.tvPress9.text = "初始值：${it.preDistance}"
-                viewBinding.tvPress10.text =
-                    "模式：${it.model}\n" +
-                            "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
-                            "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
-                            "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
-                            "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
-                            "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
+//                viewBinding.tvPress3.text = "距离值：${it.distance}"
+//                viewBinding.tvPress5.text = "按压频率：${it.pf}"
+//                viewBinding.tvPress6.text = "吹气频率：${it.cf}"
+//                viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
+//                viewBinding.tvPress8.text = "按压位置：${it.psrType}"
+//                viewBinding.tvPress9.text = "初始值：${it.preDistance}"
+//                viewBinding.tvPress10.text =
+//                    "模式：${it.model}\n" +
+//                            "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
+//                            "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
+//                            "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
+//                            "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
+//                            "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
             }
         }
 
@@ -237,6 +237,20 @@ class CycleFragment : Fragment() {
     }
 
     fun stop(): TrainingDTO {
+        mHandler.removeCallbacksAndMessages(null)
+        mHandler1.removeCallbacksAndMessages(null)
+        mHandler2.removeCallbacksAndMessages(null)
+        mHandler3.removeCallbacksAndMessages(null)
+        mHandler4.removeCallbacksAndMessages(null)
+        mHandler5.removeCallbacksAndMessages(null)
+        mHandler6.removeCallbacksAndMessages(null)
+        viewBinding.ctTime.stop()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
+        if (mMediaPlayer != null) {
+            mMediaPlayer!!.stop()
+            mMediaPlayer?.release()
+            mMediaPlayer = null
+        }
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
@@ -301,14 +315,6 @@ class CycleFragment : Fragment() {
         trainingDTO.processScore = configBean.processScore.toFloat()
         trainingDTO.deduction = configBean.deductionScore
         mHandler.removeCallbacks(counter)
-        viewBinding.ctTime.stop()
-        if (mMediaPlayer != null) {
-            mMediaPlayer?.stop()
-            mMediaPlayer?.reset()
-            mMediaPlayer = null
-        }
-        //开始时清空残留数据
-        DataVolatile01.clearErrorData()
         return trainingDTO
     }
 

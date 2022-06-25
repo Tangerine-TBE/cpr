@@ -3,6 +3,7 @@ package com.pr.perfectrecovery.activity
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.CheckBox
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.litepal.LitePal
+import org.litepal.extension.deleteAll
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 /**
  * 统计管理
@@ -88,7 +92,7 @@ class StatisticalActivity : BaseActivity() {
                     item.isCheckBox = false
                     selectList.remove(item)
                 }
-                mAdapter.data[position] = item
+                mAdapter.setData(position, item)
             } else {
                 TrainResultActivity.start(this, item, true)
             }
@@ -96,16 +100,13 @@ class StatisticalActivity : BaseActivity() {
 
         //删除选中数据
         binding.top.tvDel.setOnClickListener {
-            val ids = arrayOf("")
             if (selectList.size > 0) {
                 selectList.forEachIndexed { index, item ->
-                    ids[index] = "${item.id}"
+                    LitePal.delete(TrainingDTO::class.java, item.id)
                     mDataList.remove(item)
-                    mAdapter.remove(item)
                 }
-                LitePal.deleteAll(TrainingDTO::class.java, *ids)
                 selectList.clear()
-                mAdapter.notifyDataSetChanged()
+                mAdapter.setList(mDataList)
             }
         }
     }
@@ -142,6 +143,19 @@ class StatisticalActivity : BaseActivity() {
             }
         }
 
+    /**
+     * 对入参保留最多两位小数(舍弃末尾的0)，如:
+     * 3.345->3.34
+     * 3.40->3.4
+     * 3.0->3
+     */
+    private fun getNoMoreThanTwoDigits(number: Float): String {
+        val format = DecimalFormat("0.#")
+        //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+        format.roundingMode = RoundingMode.HALF_UP
+        return format.format(number)
+    }
+
     private val mAdapter = object :
         BaseQuickAdapter<TrainingDTO, BaseViewHolder>(R.layout.item_statistical) {
         override fun convert(holder: BaseViewHolder, item: TrainingDTO) {
@@ -150,7 +164,7 @@ class StatisticalActivity : BaseActivity() {
                 .setText(R.id.tvTime, TimeUtils.stampToDate(item.endTime))
             val cbCheck = holder.getView<CheckBox>(R.id.cbCheck)
             if (item.isCheck) {
-                holder.setText(R.id.tvResult, "${item.score}分")
+                holder.setText(R.id.tvResult, getNoMoreThanTwoDigits(item.getScoreTotal()) + "分")
             } else {
                 holder.setText(R.id.tvResult, "--")
             }

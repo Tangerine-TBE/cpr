@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.text.Html
 import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
@@ -159,13 +160,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
-            var scoreTotal: Float =
-                trainingDTO.getQyScore() + trainingDTO.getPrScore() + processCheck(trainingDTO)
-            if (scoreTotal > trainingDTO.getTimeOutScore()) {
-                scoreTotal -= trainingDTO.getTimeOutScore()
-            } else {
-                scoreTotal = 0.0f
-            }
+            val scoreTotal: Float = trainingDTO.getScoreTotal()
             //分数星星配置
             viewBinding.layoutCheck.ratingBar.rating = (scoreTotal / 20.0f)
             //总得分
@@ -184,6 +179,113 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.tvBlowBoutCount.text = "${trainingDTO.qyManyCount}次"
             //吹气少次
             viewBinding.tvBlowSmallCount.text = "${trainingDTO.qyLessCount}次"
+
+            /*-------------------------------start 导出PDF------------------------------*/
+            viewBinding.layoutExport.tvScoreSetting.text = "分数设定：  " +
+                    "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
+                    "  按压${trainingDTO.pressScore}分" +
+                    "  中断${trainingDTO.deduction}分" +
+                    "  通气${trainingDTO.blowScore}分"
+
+            viewBinding.layoutExport.tvName.text = "学员姓名：   ${trainingDTO.name}"
+            viewBinding.layoutExport.tvTime.text =
+                "操作时间：${TimeUtils.stampToDate(trainingDTO.startTime)}"
+            viewBinding.layoutExport.tvOperationTime.text =
+                "操作时长： ${TimeUtils.timeParse(trainingDTO.operateTime)}"
+            viewBinding.layoutExport.tvCycle.text = "循环次数：  ${trainingDTO.cycleCount}"
+            viewBinding.layoutExport.tvModel.text =
+                if (trainingDTO.isCheck) "操作模式： 考核" else "操作模式： 训练"
+            viewBinding.layoutExport.tvCycleSetting.text =
+                "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
+
+            //按压得分
+            viewBinding.layoutExport.tvPressScore.text =
+                "按压得分： ${getNoMoreThanTwoDigits(trainingDTO.getPrScore())}"
+            //中断扣分
+            viewBinding.layoutExport.tvInterruptScore.text =
+                "中断扣分： ${getNoMoreThanTwoDigits(trainingDTO.getTimeOutScore())}"
+            //通气得分
+            viewBinding.layoutExport.tvVentilationScore.text =
+                "通气得分： ${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
+            //流程分数
+            viewBinding.layoutExport.tvProcessScore2.text = "流程分数： ${processCheck(trainingDTO)}"
+            //分数星星配置
+            viewBinding.layoutExport.ratingBar.rating = (scoreTotal / 20.0f)
+            //总得分
+            viewBinding.layoutExport.tvScore.text =
+                "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
+
+            viewBinding.layoutExport.checkBox1.isChecked = trainingDTO.check1
+            viewBinding.layoutExport.checkBox2.isChecked = trainingDTO.check2
+            viewBinding.layoutExport.checkBox3.isChecked = trainingDTO.check3
+            viewBinding.layoutExport.checkBox4.isChecked = trainingDTO.check4
+            viewBinding.layoutExport.checkBox5.isChecked = trainingDTO.check5
+            viewBinding.layoutExport.checkBox6.isChecked = trainingDTO.check6
+            viewBinding.layoutExport.checkBox7.isChecked = trainingDTO.check7
+            viewBinding.layoutExport.checkBox8.isChecked = trainingDTO.check8
+            viewBinding.layoutExport.checkBox9.isChecked = trainingDTO.check9
+            viewBinding.layoutExport.checkBox10.isChecked = trainingDTO.check10
+
+            viewBinding.layoutExport.tvCycleCount1.text = "${trainingDTO.cycleCount}"
+
+            viewBinding.layoutExport.tvPrCount1.text =
+                Html.fromHtml("<b>(<font color=\"#FC7574\">${trainingDTO.pressErrorCount}</font>/<font>${trainingDTO.prSum})</font></b>")
+
+            viewBinding.layoutExport.tvQyCount1.text =
+                Html.fromHtml("<b>(<font color=\"#FC7574\">${trainingDTO.blowErrorCount.toInt()}</font>/<font>${trainingDTO.qySum})</font></b>")
+            //按压超次
+            viewBinding.layoutExport.tvOutBoutCount1.text = "按压超次：${trainingDTO.prManyCount}次"
+            //按压少次
+            viewBinding.layoutExport.tvSmallBoutCount1.text = "按压少次：${trainingDTO.prLessCount}次"
+            //吹气多次
+            viewBinding.layoutExport.tvBlowBoutCount1.text = "通气过大：${trainingDTO.qyManyCount}次"
+            //吹气少次
+            viewBinding.layoutExport.tvBlowSmallCount1.text = "通气少次：${trainingDTO.qyLessCount}次"
+            //按压位置错误
+            viewBinding.layoutExport.tvLocation1.text = "位置错误：${trainingDTO.err_pr_posi}次"
+            //按压过大
+            viewBinding.layoutExport.tvPressBig1.text = "按压过大：${trainingDTO.err_pr_high}次"
+            //按压不足
+            viewBinding.layoutExport.tvInsufficient1.text = "按压不足：${trainingDTO.err_pr_low}次"
+            //按压未回弹
+            viewBinding.layoutExport.tvRebound1.text = "回弹不足：${trainingDTO.err_pr_unback}次"
+            //按压超时统计时间
+            viewBinding.layoutExport.tvPressTime.text =
+                "${TimeUtils.timeParse(trainingDTO.timeOutTotal)}"
+            //平均每分钟按压次数
+            viewBinding.layoutExport.tvAverageCount1.text =
+                "平均按压频率：${trainingDTO.getPressAverageTimes()}次/分"
+            //按压频率合格率
+            viewBinding.layoutExport.tvClock11.text = "${trainingDTO.getPressRate()}%"
+            //回弹合格率
+            viewBinding.layoutExport.tvPressPercentage1.text = "${trainingDTO.getReboundRate()}%"
+            //按压深度合格率
+            viewBinding.layoutExport.tvPressEnd1.text = "${trainingDTO.getDepthRate()}%"
+            //按压平均深度
+            viewBinding.layoutExport.tvPressBottom1.text =
+                "平均按压深度：${trainingDTO.getPressAverageDepth()}mm"
+            //整体按压百分比
+            viewBinding.layoutExport.tvPressCenter1.text = "按压比：${trainingDTO.getPressTime()}%"
+            //吹气错误
+            viewBinding.layoutExport.tvAirway1.text = "气道错误：${trainingDTO.err_qy_close}次"
+            //吹气不足
+            viewBinding.layoutExport.tvCInsufficient1.text = "通气不足：${trainingDTO.err_qy_low}次"
+            //吹气过大
+            viewBinding.layoutExport.tvBLowBig1.text = "通气过大：${trainingDTO.err_qy_high}次"
+            //吹气进胃
+            viewBinding.layoutExport.tvIntoStomach1.text = "通气进胃：${trainingDTO.err_qy_dead}次"
+            //平均吹气每分钟次数
+            viewBinding.layoutExport.tvBlowAverageCount1.text =
+                "平均通气频率：${trainingDTO.getBlowAverage()}次/分"
+            //吹气频率百分比
+            viewBinding.layoutExport.tvClock21.text = "${trainingDTO.getBlowRate()}%"
+            //通气合格率
+            viewBinding.layoutExport.tvBlow1.text = "${trainingDTO.getBlowAmount()}%"
+            //吹气平均值
+            viewBinding.layoutExport.tvBlowEnd.text =
+                "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
+
+            /*-------------------------------end 导出PDF------------------------------*/
         } else {
             viewBinding.gruops.visibility = View.VISIBLE
             viewBinding.tvTrainName.text = trainingDTO.name
@@ -239,8 +341,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
         //吹气平均值
         viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
-
-        trainingDTO.save()
     }
 
     /**
@@ -299,6 +399,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.layoutCheck.check.checkBox10.setOnCheckedChangeListener(
             onCheckedChangeListener
         )
+
         viewBinding.layoutCheck.check.checkBox1.isChecked = trainingDTO.check1
         viewBinding.layoutCheck.check.checkBox2.isChecked = trainingDTO.check2
         viewBinding.layoutCheck.check.checkBox3.isChecked = trainingDTO.check3
@@ -382,26 +483,19 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         showLoadingDialog()
         val path =
             Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
+        //创建pdf文本
+        val pdfDocument = PdfDocument()
+        //分页
+        val pageInfo = PdfDocument.PageInfo.Builder(
+            viewBinding.root.measuredWidth,
+            viewBinding.root.measuredHeight,
+            1
+        ).create()
+
+        val page2 = pdfDocument.startPage(pageInfo)
+        viewBinding.layoutExport.clExportContent.draw(page2.canvas)
+        pdfDocument.finishPage(page2)
         GlobalScope.launch(Dispatchers.IO) {
-            //创建pdf文本
-            val pdfDocument = PdfDocument()
-            //分页
-            val pageInfo = PdfDocument.PageInfo.Builder(
-                viewBinding.root.measuredWidth,
-                viewBinding.root.measuredHeight,
-                1
-            ).create()
-
-            if (trainingDTO.isCheck) {
-                val page = pdfDocument.startPage(pageInfo)
-                viewBinding.layoutCheck.clCheck.draw(page.canvas)
-                pdfDocument.finishPage(page)
-            }
-
-            val page2 = pdfDocument.startPage(pageInfo)
-            viewBinding.clResult.draw(page2.canvas)
-            pdfDocument.finishPage(page2)
-
             //保存文件路径
             try {
                 val file = File(path)

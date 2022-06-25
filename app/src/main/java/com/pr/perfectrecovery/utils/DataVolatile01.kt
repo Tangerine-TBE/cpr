@@ -790,6 +790,7 @@ class DataVolatile01 {
         } else {
             val value = abs(preDistance - l)
             Log.e("TAG11", "value ：${PR_LOW_VALUE}")
+            Log.e("TAG11", "value HIGH ：${PR_HIGH_VALUE}")
             Log.e("TAG11", "preDistance: $value")
             if (PSR_Value == 0) {
                 ERR_PR_POSI++

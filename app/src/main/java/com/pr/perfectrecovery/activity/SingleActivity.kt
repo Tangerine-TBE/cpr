@@ -104,6 +104,8 @@ class SingleActivity : BaseActivity() {
 
     private fun startResult() {
         val mTrainingDTO = cycleFragment?.stop()
+        //开始时清空残留数据
+        DataVolatile01.clearErrorData()
         binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
         binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
         counter.let { mHandler.removeCallbacks(it) }
@@ -128,6 +130,7 @@ class SingleActivity : BaseActivity() {
         }
 
         if (mTrainingDTO != null) {
+            mTrainingDTO.save()
             TrainResultActivity.start(this, mTrainingDTO)
         }
         finish()

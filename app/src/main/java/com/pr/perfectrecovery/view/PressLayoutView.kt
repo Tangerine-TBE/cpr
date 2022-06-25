@@ -106,7 +106,6 @@ class PressLayoutView : LinearLayout {
         viewPress!!.visibility = VISIBLE
         ivArrowUp!!.visibility = INVISIBLE
         ivArrowDown!!.visibility = INVISIBLE
-        viewPress!!.visibility = VISIBLE
         viewTop!!.isChecked = false
         viewBottom!!.isChecked = false
         if (destY == 0) {
@@ -124,6 +123,7 @@ class PressLayoutView : LinearLayout {
             mHandler.removeCallbacks(runnable2)
             mHandler.postDelayed(runnable2, 250)
         } else if (destY > 9) {
+            ctBottomError?.visibility = View.INVISIBLE
             ctBottomError?.isChecked = true
             mHandler.removeCallbacks(runnable)
             mHandler.postDelayed(runnable, 250)
@@ -163,25 +163,25 @@ class PressLayoutView : LinearLayout {
             number < depthSegment -> {
                 1
             }
-            number < depthSegment.toFloat() * 2.0 -> {
+            number < depthSegment * 2 -> {
                 2
             }
-            number < depthSegment.toFloat() * 3.0 -> {
+            number < depthSegment * 3 -> {
                 3
             }
-            number < depthSegment.toFloat() * 4.0 -> {
+            number < depthSegment * 4 -> {
                 4
             }
-            number < depthSegment.toFloat() * 5.0 -> {
+            number < depthSegment * 5 -> {
                 5
             }
-            number < depthSegment.toFloat() * 6.0 -> {
+            number < depthSegment * 6 -> {
                 6
             }
-            number < depthSegment.toFloat() * 7.0 -> {
+            number < depthSegment * 7 -> {
                 7
             }
-            number < depthSegment.toFloat() * 8.0 -> {
+            number < depthSegment * 8 -> {
                 8
             }
             number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE) -> {

@@ -2,6 +2,9 @@ package com.pr.perfectrecovery.bean
 
 import org.litepal.crud.LitePalSupport
 import java.io.Serializable
+import java.math.RoundingMode
+import java.nio.channels.FileLock
+import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
@@ -33,9 +36,10 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var err_qy_high: Int = 0//吹气过大错误数
     var err_qy_dead: Int = 0//吹气进胃错误数
 
+    //设置的数据
     var prCount: Int = 0 //按压次数比例
     var qyCount: Int = 0 //吹气次数比例
-    var cycles: Int = 0//循环次数
+    var cycles: Int = 0//设置的循环次数
     var processScore: Float = 0f//流程分数
     var pressScore: Float = 0f//按压分数
     var deduction: Float = 0f//扣分
@@ -79,6 +83,70 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var check10 = false
 
     var isCheckBox = false
+
+    /**
+     * 对入参保留最多两位小数(舍弃末尾的0)，如:
+     * 3.345->3.34
+     * 3.40->3.4
+     * 3.0->3
+     */
+    private fun getNoMoreThanTwoDigits(number: Float): String {
+        val format = DecimalFormat("0.#")
+        //未保留小数的舍弃规则，RoundingMode.FLOOR表示直接舍弃。
+        format.roundingMode = RoundingMode.HALF_UP
+        return format.format(number)
+    }
+
+    /**
+     * 获取总得分
+     */
+    fun getScoreTotal(): Float {
+        var scoreTotal: Float = getQyScore() + getPrScore() + getCheckSize()
+        if (scoreTotal > getTimeOutScore()) {
+            scoreTotal -= getTimeOutScore()
+        } else {
+            scoreTotal = 0.0f
+        }
+        return scoreTotal
+    }
+
+    private fun getCheckSize(): Float {
+        val listCheck = mutableListOf<Boolean>()
+        if (check1) {
+            listCheck.add(check1)
+        }
+        if (check2) {
+            listCheck.add(check2)
+        }
+        if (check3) {
+            listCheck.add(check3)
+        }
+        if (check4) {
+            listCheck.add(check4)
+        }
+        if (check5) {
+            listCheck.add(check5)
+        }
+        if (check6) {
+            listCheck.add(check6)
+        }
+        if (check7) {
+            listCheck.add(check7)
+        }
+        if (check8) {
+            listCheck.add(check8)
+        }
+        if (check9) {
+            listCheck.add(check9)
+        }
+        if (check10) {
+            listCheck.add(check10)
+        }
+        return if (processScore > 0 && listCheck.size > 0)
+            ((processScore / 10) * listCheck.size)
+        else
+            0.0f
+    }
 
     /**
      * 按压频率合格率
