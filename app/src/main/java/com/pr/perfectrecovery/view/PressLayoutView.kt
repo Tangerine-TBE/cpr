@@ -107,7 +107,7 @@ class PressLayoutView : LinearLayout {
         ivArrowUp!!.visibility = INVISIBLE
         ivArrowDown!!.visibility = INVISIBLE
         viewTop!!.isChecked = false
-        viewBottom!!.isChecked = false
+//        viewBottom!!.isChecked = false
         if (destY == 0) {
             viewTop!!.isChecked = true
         }
@@ -121,7 +121,7 @@ class PressLayoutView : LinearLayout {
             ivArrowUp!!.visibility = INVISIBLE
             ivArrowDown!!.visibility = INVISIBLE
             mHandler.removeCallbacks(runnable2)
-            mHandler.postDelayed(runnable2, 250)
+            mHandler.postDelayed(runnable2, 150)
         } else if (destY > 9) {
             ctBottomError?.visibility = View.INVISIBLE
             ctBottomError?.isChecked = true
