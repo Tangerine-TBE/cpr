@@ -350,7 +350,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.layoutExport.tvModel.text =
                 if (trainingDTO.isCheck) "操作模式： 考核" else "操作模式： 训练"
             viewBinding.layoutExport.tvCycleSetting.text =
-                "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
+                "循环定义： ${trainingDTO.prCount}:${trainingDTO.qyCount}"
 
             //按压得分
             viewBinding.layoutExport.tvPressScore1.text =
@@ -409,7 +409,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             //按压少次
             viewBinding.layoutExport.tvSmallBoutCount1.text = "按压少次：${trainingDTO.prLessCount}次"
             //吹气多次
-            viewBinding.layoutExport.tvBlowBoutCount1.text = "通气过大：${trainingDTO.qyManyCount}次"
+            viewBinding.layoutExport.tvBlowBoutCount1.text = "通气超次：${trainingDTO.qyManyCount}次"
             //吹气少次
             viewBinding.layoutExport.tvBlowSmallCount1.text = "通气少次：${trainingDTO.qyLessCount}次"
             //按压位置错误
