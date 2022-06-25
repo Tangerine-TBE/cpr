@@ -68,12 +68,11 @@ class StatisticalActivity : BaseActivity() {
 
         binding.top.tvRight.setOnClickListener {
             isDel = !isDel
+            selectList.clear()
             if (isDel) {
                 binding.top.tvRight.text = "取消"
                 binding.top.tvDel.visibility = View.VISIBLE
-                selectList.clear()
             } else {
-                selectList.clear()
                 binding.top.tvRight.text = "管理"
                 binding.top.tvDel.visibility = View.INVISIBLE
             }
@@ -168,6 +167,19 @@ class StatisticalActivity : BaseActivity() {
             } else {
                 holder.setText(R.id.tvResult, "--")
             }
+            cbCheck.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isDel) {
+                    cbCheck.isChecked = isChecked
+                    if (isChecked) {
+                        selectList.add(item)
+                        item.isCheckBox = true
+                    } else {
+                        item.isCheckBox = false
+                        selectList.remove(item)
+                    }
+                }
+            }
+
             if (isDel) {
                 cbCheck.visibility = View.VISIBLE
             } else {

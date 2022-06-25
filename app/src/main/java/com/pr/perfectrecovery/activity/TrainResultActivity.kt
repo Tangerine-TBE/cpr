@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
@@ -130,7 +131,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             }
         }
         val scoreTotal: Float = trainingDTO.getScoreTotal()
-        val scoreStar = scoreTotal / 20.0f
+        var scoreStar = scoreTotal / 20.0f
         /*-------------------------------start 导出PDF------------------------------*/
         setExportData(scoreStar, scoreTotal, trainingDTO.isCheck)
         /*-------------------------------end 导出PDF------------------------------*/
@@ -166,22 +167,26 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
-            //分数星星配置
-            viewBinding.layoutCheck.ratingBar.rating = scoreStar
+            viewBinding.layoutCheck.ratingBar.visibility = View.INVISIBLE
+            viewBinding.layoutCheck.ratingBar2.visibility = View.INVISIBLE
+            viewBinding.layoutCheck.ratingBar3.visibility = View.INVISIBLE
             when {
-                scoreStar < 60 -> {
-                    viewBinding.layoutCheck.ratingBar.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars_red)
+                scoreTotal < 60 -> {
+                    viewBinding.layoutCheck.ratingBar.visibility = View.VISIBLE
                 }
-                scoreStar in 60.0..80.0 -> {
-                    viewBinding.layoutCheck.ratingBar.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars_yellow)
+                scoreTotal in 60.0..80.0 -> {
+                    viewBinding.layoutCheck.ratingBar2.visibility = View.VISIBLE
                 }
                 else -> {
-                    viewBinding.layoutCheck.ratingBar.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars)
+                    viewBinding.layoutCheck.ratingBar3.visibility = View.VISIBLE
                 }
             }
+
+            //分数星星配置
+            viewBinding.layoutCheck.ratingBar.rating = scoreStar
+            viewBinding.layoutCheck.ratingBar2.rating = scoreStar
+            viewBinding.layoutCheck.ratingBar3.rating = scoreStar
+
             //总得分
             viewBinding.layoutCheck.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
@@ -358,22 +363,25 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "通气得分： ${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutExport.tvProcessScore2.text = "流程分数： ${processCheck(trainingDTO)}"
-            //分数星星配置
-            viewBinding.layoutExport.ratingBar1.rating = scoreStar
+            viewBinding.layoutExport.ratingBar1.visibility = View.INVISIBLE
+            viewBinding.layoutExport.ratingBar2.visibility = View.INVISIBLE
+            viewBinding.layoutExport.ratingBar3.visibility = View.INVISIBLE
             when {
-                scoreStar < 60 -> {
-                    viewBinding.layoutExport.ratingBar1.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars_red)
+                scoreTotal < 60 -> {
+                    viewBinding.layoutExport.ratingBar1.visibility = View.VISIBLE
                 }
-                scoreStar in 60.0..80.0 -> {
-                    viewBinding.layoutExport.ratingBar1.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars_yellow)
+                scoreTotal in 60.0..80.0 -> {
+                    viewBinding.layoutExport.ratingBar2.visibility = View.VISIBLE
                 }
                 else -> {
-                    viewBinding.layoutExport.ratingBar1.progressDrawable =
-                        resources.getDrawable(R.drawable.ratingstars)
+                    viewBinding.layoutExport.ratingBar3.visibility = View.VISIBLE
                 }
             }
+
+            //分数星星配置
+            viewBinding.layoutExport.ratingBar1.rating = scoreStar
+            viewBinding.layoutExport.ratingBar2.rating = scoreStar
+            viewBinding.layoutExport.ratingBar3.rating = scoreStar
             //总得分
             viewBinding.layoutExport.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
