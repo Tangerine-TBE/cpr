@@ -48,7 +48,6 @@ class StatisticalActivity : BaseActivity() {
 
     private fun initView() {
         binding.top.tvRight.text = "管理"
-        binding.top.tvRight.setOnClickListener { }
         binding.bottom.root.setBackgroundColor(Color.parseColor("#22231D"))
         binding.bottom.ivBack.setOnClickListener { finish() }
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
@@ -72,6 +71,7 @@ class StatisticalActivity : BaseActivity() {
             if (isDel) {
                 binding.top.tvRight.text = "取消"
                 binding.top.tvDel.visibility = View.VISIBLE
+                selectList.clear()
             } else {
                 selectList.clear()
                 binding.top.tvRight.text = "管理"

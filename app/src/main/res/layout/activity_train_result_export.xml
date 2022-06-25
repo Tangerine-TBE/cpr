@@ -15,7 +15,7 @@
             android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="完美复苏CPR操作报告"
+            android:text="@string/export_title"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -198,258 +198,265 @@
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/dp_2"
-                android:paddingBottom="@dimen/dp_2"
-                android:background="@drawable/border_1dp_bg"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout5"
                 android:id="@+id/constraintLayout6"
-                tools:layout_editor_absoluteX="0dp">
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout5">
 
-            <View
-                    android:id="@+id/view2"
-                    android:layout_width="3dp"
-                    android:layout_height="12dp"
-                    android:layout_marginStart="@dimen/dp_10"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:background="@color/black"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/dp_2"
+                    android:paddingBottom="@dimen/dp_2"
+                    android:background="@drawable/border_1dp_bg"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/clCheck">
+
+                <View
+                        android:id="@+id/view2"
+                        android:layout_width="3dp"
+                        android:layout_height="12dp"
+                        android:layout_marginStart="@dimen/dp_10"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:background="@color/black"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_13"
+                        android:textStyle="bold"
+                        android:layout_marginStart="@dimen/dp_6"
+                        android:text="CPR成绩"
+                        app:layout_constraintStart_toStartOf="@+id/view2"
+                        app:layout_constraintTop_toTopOf="@+id/view2"
+                        app:layout_constraintBottom_toBottomOf="@+id/view2" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <RatingBar
+                    android:id="@+id/ratingBar1"
+                    style="@style/foodRatingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:isIndicator="true"
+                    android:numStars="5"
+                    android:rating="0"
+                    android:stepSize="0.5"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@+id/clCheck" />
+
+            <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/color_37B48B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/ratingBar1"
+                    app:layout_constraintStart_toStartOf="@+id/ratingBar1"
+                    app:layout_constraintTop_toBottomOf="@+id/ratingBar1" />
 
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_13"
+                    android:layout_marginStart="@dimen/dp_4"
+                    android:text="分"
+                    android:textColor="@color/color_text_normal"
+                    android:textSize="12sp"
                     android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvScore"
+                    app:layout_constraintStart_toEndOf="@+id/tvScore"
+                    android:id="@+id/textView12" />
+
+            <TextView
+                    android:id="@+id/tvPressScore1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:text="按压得分"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvScore" />
+
+            <TextView
+                    android:id="@+id/tvInterruptScore1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_12"
+                    android:text="中断扣分"
+                    android:textColor="@color/color_text_selected"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvScore" />
+
+            <TextView
+                    android:id="@+id/tvVentilationScore1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_12"
+                    android:text="通气得分"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvScore" />
+
+            <TextView
+                    android:id="@+id/tvProcessScore2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="流程得分"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPressScore1"
+                    app:layout_constraintStart_toStartOf="@+id/tvPressScore1" />
+
+            <CheckBox
+                    android:id="@+id/checkBox1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="检查环境"
                     android:layout_marginStart="@dimen/dp_6"
-                    android:text="CPR成绩"
-                    app:layout_constraintStart_toStartOf="@+id/view2"
-                    app:layout_constraintTop_toTopOf="@+id/view2"
-                    app:layout_constraintBottom_toBottomOf="@+id/view2" />
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvProcessScore2" />
 
+            <CheckBox
+                    android:id="@+id/checkBox2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="检查意识"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox3"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox1"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox1"
+                    app:layout_constraintBottom_toBottomOf="@+id/checkBox1" />
+
+            <CheckBox
+                    android:id="@+id/checkBox3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="检查呼吸"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox2"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox2"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox4" />
+
+            <CheckBox
+                    android:id="@+id/checkBox4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="检查脉搏"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox5"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox3"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox3" />
+
+            <CheckBox
+                    android:id="@+id/checkBox5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="检查体位"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox4"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:layout_marginEnd="@dimen/dp_6"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox4" />
+
+            <CheckBox
+                    android:id="@+id/checkBox6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="清理口腔"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:layout_marginStart="@dimen/dp_5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox7"
+                    app:layout_constraintTop_toBottomOf="@+id/checkBox1" />
+
+            <CheckBox
+                    android:id="@+id/checkBox7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="拨打120"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox8"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox6"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox6" />
+
+            <CheckBox
+                    android:id="@+id/checkBox8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="寻求帮助"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox9"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox7"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox7" />
+
+            <CheckBox
+                    android:id="@+id/checkBox9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="体外除颤"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintEnd_toStartOf="@+id/checkBox10"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox8"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox8" />
+
+            <CheckBox
+                    android:id="@+id/checkBox10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox_selector"
+                    android:checked="false"
+                    android:text="完成评估"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:layout_marginEnd="@dimen/dp_6"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/checkBox9"
+                    app:layout_constraintStart_toEndOf="@+id/checkBox9" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <RatingBar
-                android:id="@+id/ratingBar"
-                style="@style/foodRatingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:isIndicator="false"
-                android:numStars="5"
-                android:rating="0"
-                android:stepSize="0.5"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout6" />
-
-        <TextView
-                android:id="@+id/tvScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="@color/color_37B48B"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="@+id/ratingBar"
-                app:layout_constraintStart_toStartOf="@+id/ratingBar"
-                app:layout_constraintTop_toBottomOf="@+id/ratingBar" />
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_4"
-                android:text="分"
-                android:textColor="@color/color_text_normal"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/tvScore"
-                app:layout_constraintStart_toEndOf="@+id/tvScore"
-                android:id="@+id/textView12" />
-
-        <TextView
-                android:id="@+id/tvPressScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_10"
-                android:text="按压得分"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvScore" />
-
-        <TextView
-                android:id="@+id/tvInterruptScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_12"
-                android:text="中断扣分"
-                android:textColor="@color/color_text_selected"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvScore" />
-
-        <TextView
-                android:id="@+id/tvVentilationScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_12"
-                android:text="通气得分"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:layout_marginEnd="@dimen/dp_10"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvScore" />
-
-        <TextView
-                android:id="@+id/tvProcessScore2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="流程得分"
-                android:textColor="@color/black"
-                android:layout_marginTop="@dimen/dp_4"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                app:layout_constraintTop_toBottomOf="@+id/tvPressScore"
-                app:layout_constraintStart_toStartOf="@+id/tvPressScore" />
-
-        <CheckBox
-                android:id="@+id/checkBox1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="检查环境"
-                android:layout_marginStart="@dimen/dp_6"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox2"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvProcessScore2" />
-
-        <CheckBox
-                android:id="@+id/checkBox2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="检查意识"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox3"
-                app:layout_constraintTop_toTopOf="@+id/checkBox1"
-                app:layout_constraintStart_toEndOf="@+id/checkBox1"
-                app:layout_constraintBottom_toBottomOf="@+id/checkBox1" />
-
-        <CheckBox
-                android:id="@+id/checkBox3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="检查呼吸"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintStart_toEndOf="@+id/checkBox2"
-                app:layout_constraintTop_toTopOf="@+id/checkBox2"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox4" />
-
-        <CheckBox
-                android:id="@+id/checkBox4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="检查脉搏"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox5"
-                app:layout_constraintStart_toEndOf="@+id/checkBox3"
-                app:layout_constraintTop_toTopOf="@+id/checkBox3" />
-
-        <CheckBox
-                android:id="@+id/checkBox5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="检查体位"
-                app:layout_constraintStart_toEndOf="@+id/checkBox4"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                android:layout_marginEnd="@dimen/dp_6"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/checkBox4" />
-
-        <CheckBox
-                android:id="@+id/checkBox6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="清理口腔"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                android:layout_marginStart="@dimen/dp_5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox7"
-                app:layout_constraintTop_toBottomOf="@+id/checkBox1" />
-
-        <CheckBox
-                android:id="@+id/checkBox7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="拨打120"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox8"
-                app:layout_constraintStart_toEndOf="@+id/checkBox6"
-                app:layout_constraintTop_toTopOf="@+id/checkBox6" />
-
-        <CheckBox
-                android:id="@+id/checkBox8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="寻求帮助"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox9"
-                app:layout_constraintStart_toEndOf="@+id/checkBox7"
-                app:layout_constraintTop_toTopOf="@+id/checkBox7" />
-
-        <CheckBox
-                android:id="@+id/checkBox9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="体外除颤"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                app:layout_constraintEnd_toStartOf="@+id/checkBox10"
-                app:layout_constraintTop_toTopOf="@+id/checkBox8"
-                app:layout_constraintStart_toEndOf="@+id/checkBox8" />
-
-        <CheckBox
-                android:id="@+id/checkBox10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/checkbox_selector"
-                android:checked="false"
-                android:text="完成评估"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_12"
-                android:layout_marginEnd="@dimen/dp_6"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/checkBox9"
-                app:layout_constraintStart_toEndOf="@+id/checkBox9" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -458,7 +465,7 @@
                 android:paddingBottom="@dimen/dp_2"
                 android:background="@drawable/border_1dp_bg"
                 android:layout_marginTop="@dimen/dp_2"
-                app:layout_constraintTop_toBottomOf="@+id/checkBox6"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout6"
                 android:id="@+id/constraintLayout7">
 
             <View
@@ -489,7 +496,7 @@
                 android:id="@+id/iv1"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginEnd="@dimen/dp_60"
+                android:layout_marginEnd="@dimen/dp_75"
                 android:src="@mipmap/icon_wm_chart_heart_red"
                 app:layout_constraintEnd_toStartOf="@+id/tvCycleCount1"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout7" />

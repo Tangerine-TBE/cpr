@@ -16,6 +16,8 @@
     <string name="press_result_number"><b>(<font color="#FC7574">%1d</font>/<font>%2d)</font></b></string>
     <string name="press_result_desc"><b>(<font color="#FC7574">错误</font><font>/总数)</font></b></string>
 
+    <string name="export_title"><b><font color="#FC7574">完美</font><font color="#3DB38E">复苏</font></b>CPR操作报告</string>
+
     <string name="notifyTitle">提示</string>
     <string name="gpsNotifyMsg">当前手机扫描蓝牙需要打开定位功能。</string>
     <string name="setting">前往设置</string>

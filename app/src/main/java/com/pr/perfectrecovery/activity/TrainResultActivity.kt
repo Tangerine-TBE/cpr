@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
@@ -111,7 +112,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.bottom.ivExport.setOnClickListener {
             val hasStoragePermission = hasStoragePermission()
             if (hasStoragePermission) {
-                exPortPDF(trainingDTO.name)
+                exPortPDF(trainingDTO.name, trainingDTO.isCheck)
             } else {
                 ToastUtils.showShort("暂未授权文件读写")
                 if (EasyPermissions.hasPermissions(
@@ -128,6 +129,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             }
         }
+        val scoreTotal: Float = trainingDTO.getScoreTotal()
+        val scoreStar = scoreTotal / 20.0f
+        /*-------------------------------start 导出PDF------------------------------*/
+        setExportData(scoreStar, scoreTotal, trainingDTO.isCheck)
+        /*-------------------------------end 导出PDF------------------------------*/
         //判断模式- false 训练  true 考核
         if (trainingDTO.isCheck) {
             viewBinding.layoutCheck.root.visibility = View.VISIBLE
@@ -160,9 +166,22 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutCheck.tvProcessScore2.text = "${processCheck(trainingDTO)}"
-            val scoreTotal: Float = trainingDTO.getScoreTotal()
             //分数星星配置
-            viewBinding.layoutCheck.ratingBar.rating = (scoreTotal / 20.0f)
+            viewBinding.layoutCheck.ratingBar.rating = scoreStar
+            when {
+                scoreStar < 60 -> {
+                    viewBinding.layoutCheck.ratingBar.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars_red)
+                }
+                scoreStar in 60.0..80.0 -> {
+                    viewBinding.layoutCheck.ratingBar.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars_yellow)
+                }
+                else -> {
+                    viewBinding.layoutCheck.ratingBar.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars)
+                }
+            }
             //总得分
             viewBinding.layoutCheck.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
@@ -179,8 +198,138 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.tvBlowBoutCount.text = "${trainingDTO.qyManyCount}次"
             //吹气少次
             viewBinding.tvBlowSmallCount.text = "${trainingDTO.qyLessCount}次"
+        } else {
+            viewBinding.gruops.visibility = View.VISIBLE
+            viewBinding.tvTrainName.text = trainingDTO.name
+            viewBinding.tvTime.text = TimeUtils.formatDate(trainingDTO.operateTime)
+        }
 
-            /*-------------------------------start 导出PDF------------------------------*/
+        //循环次数
+        viewBinding.tvCycleCount.text = "${trainingDTO.cycleCount}"
+
+        //按压错误数
+        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
+        //按压总数
+        viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
+        //按压位置错误
+        viewBinding.tvLocation.text = "${trainingDTO.err_pr_posi}"
+        //按压不足
+        viewBinding.tvInsufficient.text = "${trainingDTO.err_pr_low}"
+        //按压过大
+        viewBinding.tvPressBig.text = "${trainingDTO.err_pr_high}"
+        //按压未回弹
+        viewBinding.tvRebound.text = "${trainingDTO.err_pr_unback}"
+        //按压超时统计时间
+        viewBinding.tvPressTime.text = "${TimeUtils.timeParse(trainingDTO.timeOutTotal)}"
+        //平均每分钟按压次数
+        viewBinding.tvAverageCount.text = "平均：${trainingDTO.getPressAverageTimes()}次/分"
+        //按压频率合格率
+        viewBinding.tvClock1.text = "${trainingDTO.getPressRate()}%"
+        //回弹合格率
+        viewBinding.tvPressPercentage.text = "${trainingDTO.getReboundRate()}%"
+        //按压深度合格率
+        viewBinding.tvPressEnd.text = "${trainingDTO.getDepthRate()}%"
+        //按压平均深度
+        viewBinding.tvPressBottom.text = "平均：${trainingDTO.getPressAverageDepth()}mm"
+        //整体按压百分比
+        viewBinding.tvPressCenter.text = "${trainingDTO.getPressTime()}%"
+        //吹气错误数
+        viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount.toInt()}"
+        //吹气总数
+        viewBinding.tvHeartTotal.text = "/${trainingDTO.qySum}"
+        //吹气错误
+        viewBinding.tvAirway.text = "${trainingDTO.err_qy_close}"
+        //吹气不足
+        viewBinding.tvCInsufficient.text = "${trainingDTO.err_qy_low}"
+        //吹气过大
+        viewBinding.tvBLowBig.text = "${trainingDTO.err_qy_high}"
+        //吹气进胃
+        viewBinding.tvIntoStomach.text = "${trainingDTO.err_qy_dead}"
+        //平均吹气每分钟次数
+        viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
+        //吹气频率百分比
+        viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}%"
+        //通气合格率
+        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
+        //吹气平均值
+        viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
+    }
+
+    private fun setExportData(scoreStar: Float, scoreTotal: Float, check: Boolean) {
+
+        if (!check) {
+            viewBinding.layoutExportNoCheck.tvScoreSetting.text = "分数设定：  " +
+                    "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
+                    "  按压${trainingDTO.pressScore}分" +
+                    "  中断${trainingDTO.deduction}分" +
+                    "  通气${trainingDTO.blowScore}分"
+
+            viewBinding.layoutExportNoCheck.tvName.text = "学员姓名：   ${trainingDTO.name}"
+            viewBinding.layoutExportNoCheck.tvTime.text =
+                "操作时间：${TimeUtils.stampToDate(trainingDTO.startTime)}"
+            viewBinding.layoutExportNoCheck.tvOperationTime.text =
+                "操作时长： ${TimeUtils.timeParse(trainingDTO.operateTime)}"
+            viewBinding.layoutExportNoCheck.tvCycle.text = "循环次数：  ${trainingDTO.cycleCount}"
+            viewBinding.layoutExportNoCheck.tvModel.text =
+                if (trainingDTO.isCheck) "操作模式： 考核" else "操作模式： 训练"
+            viewBinding.layoutExportNoCheck.tvCycleSetting.text =
+                "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
+
+            viewBinding.layoutExportNoCheck.tvCycleCount1.text = "${trainingDTO.cycleCount}"
+
+            viewBinding.layoutExportNoCheck.tvPrCount1.text =
+                Html.fromHtml("<b>(<font color=\"#FC7574\">${trainingDTO.pressErrorCount}</font>/<font>${trainingDTO.prSum})</font></b>")
+
+            viewBinding.layoutExportNoCheck.tvQyCount1.text =
+                Html.fromHtml("<b>(<font color=\"#FC7574\">${trainingDTO.blowErrorCount.toInt()}</font>/<font>${trainingDTO.qySum})</font></b>")
+            //按压位置错误
+            viewBinding.layoutExportNoCheck.tvLocation1.text = "位置错误：${trainingDTO.err_pr_posi}次"
+            //按压过大
+            viewBinding.layoutExportNoCheck.tvPressBig1.text = "按压过大：${trainingDTO.err_pr_high}次"
+            //按压不足
+            viewBinding.layoutExportNoCheck.tvInsufficient1.text = "按压不足：${trainingDTO.err_pr_low}次"
+            //按压未回弹
+            viewBinding.layoutExportNoCheck.tvRebound1.text = "回弹不足：${trainingDTO.err_pr_unback}次"
+            //按压超时统计时间
+            viewBinding.layoutExportNoCheck.tvPressTime.text =
+                "${TimeUtils.timeParse(trainingDTO.timeOutTotal)}"
+            //平均每分钟按压次数
+            viewBinding.layoutExportNoCheck.tvAverageCount1.text =
+                "平均按压频率：${trainingDTO.getPressAverageTimes()}次/分"
+            //按压频率合格率
+            viewBinding.layoutExportNoCheck.tvClock11.text = "${trainingDTO.getPressRate()}%"
+            //回弹合格率
+            viewBinding.layoutExportNoCheck.tvPressPercentage1.text =
+                "${trainingDTO.getReboundRate()}%"
+            //按压深度合格率
+            viewBinding.layoutExportNoCheck.tvPressEnd1.text = "${trainingDTO.getDepthRate()}%"
+            //按压平均深度
+            viewBinding.layoutExportNoCheck.tvPressBottom1.text =
+                "平均按压深度：${trainingDTO.getPressAverageDepth()}mm"
+            //整体按压百分比
+            viewBinding.layoutExportNoCheck.tvPressCenter1.text =
+                "按压比：${trainingDTO.getPressTime()}%"
+            //吹气错误
+            viewBinding.layoutExportNoCheck.tvAirway1.text = "气道错误：${trainingDTO.err_qy_close}次"
+            //吹气不足
+            viewBinding.layoutExportNoCheck.tvCInsufficient1.text =
+                "通气不足：${trainingDTO.err_qy_low}次"
+            //吹气过大
+            viewBinding.layoutExportNoCheck.tvBLowBig1.text = "通气过大：${trainingDTO.err_qy_high}次"
+            //吹气进胃
+            viewBinding.layoutExportNoCheck.tvIntoStomach1.text = "通气进胃：${trainingDTO.err_qy_dead}次"
+            //平均吹气每分钟次数
+            viewBinding.layoutExportNoCheck.tvBlowAverageCount1.text =
+                "平均通气频率：${trainingDTO.getBlowAverage()}次/分"
+            //吹气频率百分比
+            viewBinding.layoutExportNoCheck.tvClock21.text = "${trainingDTO.getBlowRate()}%"
+            //通气合格率
+            viewBinding.layoutExportNoCheck.tvBlow1.text = "${trainingDTO.getBlowAmount()}%"
+            //吹气平均值
+            viewBinding.layoutExportNoCheck.tvBlowEnd.text =
+                "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
+        } else {
+
             viewBinding.layoutExport.tvScoreSetting.text = "分数设定：  " +
                     "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
                     "  按压${trainingDTO.pressScore}分" +
@@ -199,18 +348,32 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
 
             //按压得分
-            viewBinding.layoutExport.tvPressScore.text =
+            viewBinding.layoutExport.tvPressScore1.text =
                 "按压得分： ${getNoMoreThanTwoDigits(trainingDTO.getPrScore())}"
             //中断扣分
-            viewBinding.layoutExport.tvInterruptScore.text =
+            viewBinding.layoutExport.tvInterruptScore1.text =
                 "中断扣分： ${getNoMoreThanTwoDigits(trainingDTO.getTimeOutScore())}"
             //通气得分
-            viewBinding.layoutExport.tvVentilationScore.text =
+            viewBinding.layoutExport.tvVentilationScore1.text =
                 "通气得分： ${getNoMoreThanTwoDigits(trainingDTO.getQyScore())}"
             //流程分数
             viewBinding.layoutExport.tvProcessScore2.text = "流程分数： ${processCheck(trainingDTO)}"
             //分数星星配置
-            viewBinding.layoutExport.ratingBar.rating = (scoreTotal / 20.0f)
+            viewBinding.layoutExport.ratingBar1.rating = scoreStar
+            when {
+                scoreStar < 60 -> {
+                    viewBinding.layoutExport.ratingBar1.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars_red)
+                }
+                scoreStar in 60.0..80.0 -> {
+                    viewBinding.layoutExport.ratingBar1.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars_yellow)
+                }
+                else -> {
+                    viewBinding.layoutExport.ratingBar1.progressDrawable =
+                        resources.getDrawable(R.drawable.ratingstars)
+                }
+            }
             //总得分
             viewBinding.layoutExport.tvScore.text =
                 "${if (scoreTotal > 0) getNoMoreThanTwoDigits(scoreTotal) else 0.0}"
@@ -284,63 +447,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             //吹气平均值
             viewBinding.layoutExport.tvBlowEnd.text =
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
-
-            /*-------------------------------end 导出PDF------------------------------*/
-        } else {
-            viewBinding.gruops.visibility = View.VISIBLE
-            viewBinding.tvTrainName.text = trainingDTO.name
-            viewBinding.tvTime.text = TimeUtils.formatDate(trainingDTO.operateTime)
         }
-
-        //循环次数
-        viewBinding.tvCycleCount.text = "${trainingDTO.cycleCount}"
-
-        //按压错误数
-        viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
-        //按压总数
-        viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
-        //按压位置错误
-        viewBinding.tvLocation.text = "${trainingDTO.err_pr_posi}"
-        //按压不足
-        viewBinding.tvInsufficient.text = "${trainingDTO.err_pr_low}"
-        //按压过大
-        viewBinding.tvPressBig.text = "${trainingDTO.err_pr_high}"
-        //按压未回弹
-        viewBinding.tvRebound.text = "${trainingDTO.err_pr_unback}"
-        //按压超时统计时间
-        viewBinding.tvPressTime.text = "${TimeUtils.timeParse(trainingDTO.timeOutTotal)}"
-        //平均每分钟按压次数
-        viewBinding.tvAverageCount.text = "平均：${trainingDTO.getPressAverageTimes()}次/分"
-        //按压频率合格率
-        viewBinding.tvClock1.text = "${trainingDTO.getPressRate()}%"
-        //回弹合格率
-        viewBinding.tvPressPercentage.text = "${trainingDTO.getReboundRate()}%"
-        //按压深度合格率
-        viewBinding.tvPressEnd.text = "${trainingDTO.getDepthRate()}%"
-        //按压平均深度
-        viewBinding.tvPressBottom.text = "平均：${trainingDTO.getPressAverageDepth()}mm"
-        //整体按压百分比
-        viewBinding.tvPressCenter.text = "${trainingDTO.getPressTime()}%"
-        //吹气错误数
-        viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount.toInt()}"
-        //吹气总数
-        viewBinding.tvHeartTotal.text = "/${trainingDTO.qySum}"
-        //吹气错误
-        viewBinding.tvAirway.text = "${trainingDTO.err_qy_close}"
-        //吹气不足
-        viewBinding.tvCInsufficient.text = "${trainingDTO.err_qy_low}"
-        //吹气过大
-        viewBinding.tvBLowBig.text = "${trainingDTO.err_qy_high}"
-        //吹气进胃
-        viewBinding.tvIntoStomach.text = "${trainingDTO.err_qy_dead}"
-        //平均吹气每分钟次数
-        viewBinding.tvBlowAverageCount.text = "平均：${trainingDTO.getBlowAverage()}次/分"
-        //吹气频率百分比
-        viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}%"
-        //通气合格率
-        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
-        //吹气平均值
-        viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
     }
 
     /**
@@ -439,7 +546,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size)
         //ToastUtils.showShort("用户授权成功")
         if (trainingDTO != null) {
-            exPortPDF(trainingDTO.name)
+            exPortPDF(trainingDTO.name, trainingDTO.isCheck)
         }
     }
 
@@ -479,7 +586,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
      * 导出当前页为PDF
      */
     @OptIn(DelicateCoroutinesApi::class)
-    private fun exPortPDF(fileName: String?) {
+    private fun exPortPDF(fileName: String?, isCheck: Boolean) {
         showLoadingDialog()
         val path =
             Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
@@ -493,7 +600,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         ).create()
 
         val page2 = pdfDocument.startPage(pageInfo)
-        viewBinding.layoutExport.clExportContent.draw(page2.canvas)
+        if (isCheck) {
+            viewBinding.layoutExport.clExportContent.draw(page2.canvas)
+        } else {
+            viewBinding.layoutExportNoCheck.clExportContent.draw(page2.canvas)
+        }
         pdfDocument.finishPage(page2)
         GlobalScope.launch(Dispatchers.IO) {
             //保存文件路径

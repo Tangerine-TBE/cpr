@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/cl_export_Content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_10"
+        android:background="@color/white">
+
+    <TextView
+            android:id="@+id/tvTrain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:text="@string/export_title"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+            android:id="@+id/tvScoreSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="分数设定： "
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="@dimen/dp_2"
+            app:layout_constraintTop_toBottomOf="@+id/tvTrain" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dp_10"
+            android:background="@drawable/border_1dp"
+            android:layout_marginTop="@dimen/dp_5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvScoreSetting"
+            tools:layout_editor_absoluteX="4dp"
+            app:layout_constraintVertical_bias="0.0">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/dp_2"
+                android:paddingBottom="@dimen/dp_2"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/border_1dp_bg"
+                android:id="@+id/constraintLayout4">
+
+            <View
+                    android:id="@+id/view"
+                    android:layout_width="3dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="@dimen/dp_10"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_13"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/dp_6"
+                    android:text="基本信息"
+                    app:layout_constraintStart_toStartOf="@+id/view"
+                    app:layout_constraintTop_toTopOf="@+id/view"
+                    app:layout_constraintBottom_toBottomOf="@+id/view" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@drawable/border_1dp"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout4">
+
+            <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tvTime"
+                    android:text="学员姓名："
+                    app:layout_constraintVertical_bias="0.333" />
+
+            <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text="操作时间："
+                    app:layout_constraintStart_toEndOf="@+id/tvName" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout1">
+
+            <TextView
+                    android:id="@+id/tvCycle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tvOperationTime"
+                    android:text="循环次数：" />
+
+            <TextView
+                    android:id="@+id/tvOperationTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text="操作时长："
+                    app:layout_constraintStart_toEndOf="@+id/tvCycle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@drawable/border_1dp"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
+                android:id="@+id/constraintLayout5">
+
+            <TextView
+                    android:id="@+id/tvModel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tvCycleSetting"
+                    android:text="操作模式：" />
+
+            <TextView
+                    android:id="@+id/tvCycleSetting"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text=""
+                    app:layout_constraintStart_toEndOf="@+id/tvModel" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+                android:id="@+id/view10"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:background="#909090"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout4"
+                app:layout_constraintBottom_toBottomOf="@+id/constraintLayout5"
+                app:layout_constraintEnd_toEndOf="@+id/constraintLayout2"
+                app:layout_constraintStart_toStartOf="@+id/constraintLayout2" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/dp_2"
+                android:paddingBottom="@dimen/dp_2"
+                android:background="@drawable/border_1dp_bg"
+                android:layout_marginTop="@dimen/dp_2"
+                app:layout_constraintTop_toBottomOf="@+id/view10"
+                android:id="@+id/constraintLayout7">
+
+            <View
+                    android:id="@+id/view3"
+                    android:layout_width="3dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="@dimen/dp_10"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_13"
+                    android:textStyle="bold"
+                    android:layout_marginStart="@dimen/dp_6"
+                    android:text="操作细节"
+                    app:layout_constraintStart_toStartOf="@+id/view3"
+                    app:layout_constraintTop_toTopOf="@+id/view3"
+                    app:layout_constraintBottom_toBottomOf="@+id/view3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+                android:id="@+id/iv1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="@dimen/dp_75"
+                android:layout_marginTop="@dimen/dp_10"
+                android:src="@mipmap/icon_wm_chart_heart_red"
+                app:layout_constraintEnd_toStartOf="@+id/tvCycleCount1"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout7" />
+
+        <TextView
+                android:id="@+id/tvCycleCount1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/progressbar_circle"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv1"
+                app:layout_constraintBottom_toBottomOf="@+id/iv1" />
+
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="@dimen/dp_60"
+                android:src="@mipmap/icon_wm_chart_lung_red"
+                app:layout_constraintStart_toEndOf="@+id/tvCycleCount1"
+                app:layout_constraintTop_toTopOf="@+id/iv1"
+                android:id="@+id/imageView6" />
+
+        <TextView
+                android:id="@+id/tvLungCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="@string/press_result_desc"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/iv1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/iv1" />
+
+        <TextView
+                android:id="@+id/tvPrCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/press_result_number"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:layout_marginStart="@dimen/dp_10"
+                app:layout_constraintStart_toEndOf="@+id/tvLungCount1"
+                app:layout_constraintTop_toTopOf="@+id/tvLungCount1" />
+
+        <TextView
+                android:id="@+id/tvHeartCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="@string/press_result_desc"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/tvCycleCount1"
+                app:layout_constraintTop_toBottomOf="@+id/tvCycleCount1" />
+
+        <TextView
+                android:id="@+id/tvQyCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/press_result_number"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:layout_marginStart="@dimen/dp_10"
+                app:layout_constraintStart_toEndOf="@+id/tvHeartCount1"
+                app:layout_constraintTop_toTopOf="@+id/tvHeartCount1" />
+
+        <TextView
+                android:id="@+id/tvLocation1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="位置错误：0次"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textColor="@color/color_text_selected"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvLungCount1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/tvPrCount1" />
+
+        <TextView
+                android:id="@+id/tvInsufficient1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="按压不足：0次"
+                android:textColor="@color/color_text_selected"
+                android:textSize="12sp"
+                android:layout_marginTop="@dimen/dp_6"
+                app:layout_constraintStart_toStartOf="@+id/tvLocation1"
+                app:layout_constraintTop_toBottomOf="@+id/tvLocation1" />
+
+        <TextView
+                android:id="@+id/tvPressBig1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="按压过大：0次"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textColor="@color/color_text_selected"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvInsufficient1"
+                app:layout_constraintStart_toStartOf="@+id/tvInsufficient1" />
+
+        <TextView
+                android:id="@+id/tvRebound1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="回弹不足：0次"
+                android:textColor="@color/color_text_selected"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvPressBig1"
+                app:layout_constraintStart_toStartOf="@+id/tvPressBig1" />
+
+        <TextView
+                android:id="@+id/tvAirway1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="气道错误：0次"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textColor="@color/color_text_selected"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvHeartCount1"
+                app:layout_constraintStart_toStartOf="@+id/tvHeartCount1"
+                app:layout_constraintEnd_toEndOf="@+id/tvQyCount1" />
+
+        <TextView
+                android:id="@+id/tvCInsufficient1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通气不足：0次"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textColor="@color/color_text_selected"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/tvAirway1"
+                app:layout_constraintTop_toBottomOf="@+id/tvAirway1" />
+
+        <TextView
+                android:id="@+id/tvBLowBig1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通气过大：0次"
+                android:textColor="@color/color_text_selected"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvCInsufficient1"
+                app:layout_constraintStart_toStartOf="@+id/tvCInsufficient1" />
+
+        <TextView
+                android:id="@+id/tvIntoStomach1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通气进胃：0次"
+                android:textColor="@color/color_text_selected"
+                android:layout_marginTop="@dimen/dp_6"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/tvBLowBig1"
+                app:layout_constraintStart_toStartOf="@+id/tvBLowBig1" />
+
+        <TextView
+                android:id="@+id/tvAverageCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="平均按压频率：0次/分"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tvRebound1"
+                app:layout_constraintTop_toBottomOf="@+id/tvRebound1"
+                app:layout_constraintEnd_toEndOf="@+id/tvRebound1" />
+
+        <TextView
+                android:id="@+id/tvBlowAverageCount1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="平均通气频率：0次/分"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tvBLowBig1"
+                app:layout_constraintEnd_toEndOf="@+id/tvIntoStomach1"
+                app:layout_constraintTop_toTopOf="@+id/tvAverageCount1" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                app:layout_constraintTop_toBottomOf="@+id/tvAverageCount1"
+                android:id="@+id/constraintLayout8">
+
+            <TextView
+                    android:id="@+id/tvClock11"
+                    android:layout_width="100dp"
+                    android:layout_height="@dimen/dp_26"
+                    android:layout_marginStart="@dimen/dp_40"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:background="@mipmap/icon_wm_bp_2"
+                    android:gravity="center_horizontal"
+                    android:textColor="#ffffffff"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@+id/tvClock21"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvClock21"
+                    android:layout_width="100dp"
+                    android:layout_height="@dimen/dp_26"
+                    android:layout_marginEnd="@dimen/dp_40"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:background="@mipmap/icon_wm_bp_2"
+                    android:gravity="center_horizontal"
+                    android:textColor="#ffffffff"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/tvClock11"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_12"
+                    app:layout_constraintEnd_toEndOf="@+id/tvClock11"
+                    app:layout_constraintStart_toStartOf="@+id/tvClock11"
+                    app:layout_constraintTop_toTopOf="@+id/tvClock11">
+
+                <TextView
+                        android:id="@+id/tv101"
+                        android:layout_width="6dp"
+                        android:layout_height="13dp"
+                        android:text="t="
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                <TextView
+                        android:id="@+id/tvPressTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_4"
+                        android:textColor="@color/color_text_selected"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toEndOf="@+id/tv101"
+                        app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                    android:id="@+id/tvPressPercentage1"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:background="@color/color_37B48B"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvClock11"
+                    app:layout_constraintStart_toStartOf="@+id/tvClock11"
+                    app:layout_constraintTop_toBottomOf="@+id/tvClock11" />
+
+            <View
+                    android:id="@+id/view4"
+                    android:layout_width="@dimen/dp_44"
+                    android:layout_height="@dimen/dp_35"
+                    android:background="@color/color_text_normal"
+                    app:layout_constraintEnd_toEndOf="@+id/tvPressPercentage1"
+                    app:layout_constraintStart_toStartOf="@+id/tvPressPercentage1"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPressPercentage1" />
+
+            <TextView
+                    android:id="@+id/tvPressEnd1"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_37B48B"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvClock11"
+                    app:layout_constraintStart_toStartOf="@+id/tvClock11"
+                    app:layout_constraintTop_toBottomOf="@+id/view4"
+                    app:layout_constraintHorizontal_bias="0.45" />
+
+            <TextView
+                    android:id="@+id/tvPressBottom1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="平均：0mm"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/tvPressEnd1"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPressEnd1"
+                    app:layout_constraintEnd_toEndOf="@+id/tvPressEnd1" />
+
+            <TextView
+                    android:id="@+id/tvPressCenter1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvPressBottom1"
+                    app:layout_constraintEnd_toStartOf="@+id/tvClock21"
+                    app:layout_constraintStart_toEndOf="@+id/tvClock11"
+                    app:drawableTopCompat="@mipmap/icon_wm_score"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvBlow2"
+                    android:layout_width="80dp"
+                    android:layout_height="60dp"
+                    android:background="@mipmap/icon_wm_lung_green"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvClock21"
+                    app:layout_constraintStart_toStartOf="@+id/tvClock21"
+                    app:layout_constraintTop_toBottomOf="@+id/tvClock21" />
+
+            <TextView
+                    android:id="@+id/tvBlow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="0%"
+                    android:layout_marginTop="@dimen/dp_12"
+                    android:textSize="@dimen/text_12"
+                    app:layout_constraintStart_toStartOf="@+id/tvBlow2"
+                    app:layout_constraintEnd_toEndOf="@+id/tvBlow2"
+                    app:layout_constraintTop_toTopOf="@+id/tvBlow2" />
+
+            <TextView
+                    android:id="@+id/tvBlowEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="平均：0ml"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvBlow2"
+                    app:layout_constraintStart_toStartOf="@+id/tvBlow2"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPressEnd1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+                android:id="@+id/textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="导师签名：____________"
+                android:textSize="@dimen/text_12"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout8"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/textView14" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="学员签名：____________"
+                android:textSize="@dimen/text_12"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textview"
+                android:id="@+id/textView14"
+                app:layout_constraintTop_toTopOf="@+id/textview" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
