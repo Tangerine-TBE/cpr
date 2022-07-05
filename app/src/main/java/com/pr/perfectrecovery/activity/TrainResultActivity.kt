@@ -37,8 +37,6 @@ import java.text.DecimalFormat
  * Time 2022年2月8日22:14:36
  * author lrz
  */
-val DATADTO = "dataDTO"
-val PDF_FLAG = "pdf_flag"
 
 class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     EasyPermissions.RationaleCallbacks {
@@ -46,6 +44,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     private val TAG = TrainResultActivity::class.java.simpleName
 
     companion object {
+        val DATADTO = "dataDTO"
+        val PDF_FLAG = "pdf_flag"
         var isMulti = false
         fun start(context: Context, trainingDTO: TrainingDTO, multi: Boolean? = false) {
             val intent = Intent(context, TrainResultActivity::class.java)
@@ -277,8 +277,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.layoutExportNoCheck.tvCycle.text = "循环次数：  ${trainingDTO.cycleCount}"
             viewBinding.layoutExportNoCheck.tvModel.text =
                 if (trainingDTO.isCheck) "操作模式： 考核" else "操作模式： 训练"
-            viewBinding.layoutExportNoCheck.tvCycleSetting.text =
-                "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
+//            viewBinding.layoutExportNoCheck.tvCycleSetting.text =
+//                "循环定义：   ${trainingDTO.prCount}:${trainingDTO.qyCount}"
 
             viewBinding.layoutExportNoCheck.tvCycleCount1.text = "${trainingDTO.cycleCount}"
 
