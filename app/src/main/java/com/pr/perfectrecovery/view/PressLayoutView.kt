@@ -100,7 +100,7 @@ class PressLayoutView : LinearLayout {
         //距离值：  30-150
         var destY = destY
         destY = getNumber(destY, dataDTO)
-        val height = height - (viewPress!!.height + 10)
+        val height = height - (viewPress!!.height + 40)
         newY = abs(height.toFloat() / 10 * destY).toInt()
 
         viewPress!!.visibility = VISIBLE
@@ -123,7 +123,8 @@ class PressLayoutView : LinearLayout {
             mHandler.removeCallbacks(runnable2)
             mHandler.postDelayed(runnable2, 150)
         } else if (destY > 9) {
-            ctBottomError?.visibility = View.INVISIBLE
+            Log.e("smoothScrollTo", "按压过大")
+            ctBottomError?.visibility = View.VISIBLE
             ctBottomError?.isChecked = true
             mHandler.removeCallbacks(runnable)
             mHandler.postDelayed(runnable, 250)
@@ -159,41 +160,29 @@ class PressLayoutView : LinearLayout {
         if (number < 10) {
             return 0
         }
-        return when {
-            number < depthSegment -> {
-                1
-            }
-            number < depthSegment * 2 -> {
-                2
-            }
-            number < depthSegment * 3 -> {
-                3
-            }
-            number < depthSegment * 4 -> {
-                4
-            }
-            number < depthSegment * 5 -> {
-                5
-            }
-            number < depthSegment * 6 -> {
-                6
-            }
-            number < depthSegment * 7 -> {
-                7
-            }
-            number < depthSegment * 8 -> {
-                8
-            }
-            number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE) -> {
-                9
-            }
-            number > dataDTO.PR_HIGH_VALUE -> {
-                10
-            }
-            else -> {
-                0
-            }
+        if (number < depthSegment) {
+            return 1
+        } else if (number < depthSegment * 2) {
+            return 2
+        } else if (number < depthSegment * 3) {
+            return 3
+        } else if (number < depthSegment * 4) {
+            return 4
+        } else if (number < depthSegment * 5) {
+            return 5
+        } else if (number < depthSegment * 6) {
+            return 6
+        } else if (number < depthSegment * 7) {
+            return 7
+        } else if (number < depthSegment * 8 || number < dataDTO.PR_LOW_VALUE) {
+            return 8
+        } else if (number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE)) {
+            return 9
+        } else if (number > dataDTO.PR_HIGH_VALUE) {
+            return 10
         }
+        Log.e("depth", "depthSegment return = 0: $number")
+        return 0
     }
 
     private var mScrollerCallBack: ScrollerCallBack? = null

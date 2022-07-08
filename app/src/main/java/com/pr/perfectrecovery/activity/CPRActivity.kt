@@ -181,6 +181,7 @@ class CPRActivity : BaseActivity() {
         }
 
         viewBinding.progressCircular.setOnClickListener {
+            BaseApplication.driver?.ResumeUsbList()
             searchBle()
         }
         viewBinding.recyclerview.adapter = mDeviceAdapter
@@ -823,8 +824,8 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private fun openTTL(bleDevice: BleDevice, position: Int) {
-        if (!BaseApplication.driver?.isConnected!!) {
+    private fun openTTL(bleDevice: BleDevice?, position: Int) {
+        if (BaseApplication.driver?.isConnected!!) {
             when (BaseApplication.driver?.ResumeUsbList()) {
                 -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备
                     ToastUtils.showShort("打开设备失败!")
@@ -836,8 +837,8 @@ class CPRActivity : BaseActivity() {
                         return
                     }
                     ToastUtils.showShort("打开设备成功!")
-                    bleDevice.isConnected = true
-                    bleDevice.isLoading = false
+                    bleDevice?.isConnected = true
+                    bleDevice?.isLoading = false
                     mDeviceAdapter.notifyItemChanged(position, bleDevice)
                     mDeviceAdapter.notifyDataSetChanged()
                     initTTL()
@@ -868,8 +869,8 @@ class CPRActivity : BaseActivity() {
             Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
             try {
                 ToastUtils.showShort("打开设备成功!")
-                bleDevice.isConnected = false
-                bleDevice.isLoading = false
+                bleDevice?.isConnected = false
+                bleDevice?.isLoading = false
                 mDeviceAdapter.notifyItemChanged(position, bleDevice)
                 mDeviceAdapter.notifyDataSetChanged()
                 Thread.sleep(200)
