@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -28,10 +29,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.clj.fastble.BleManager
-import com.clj.fastble.callback.BleGattCallback
-import com.clj.fastble.callback.BleNotifyCallback
-import com.clj.fastble.callback.BleScanCallback
-import com.clj.fastble.callback.BleWriteCallback
+import com.clj.fastble.callback.*
 import com.clj.fastble.data.BleDevice
 import com.clj.fastble.exception.BleException
 import com.clj.fastble.scan.BleScanRuleConfig
@@ -59,6 +57,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -145,7 +144,7 @@ class CPRActivity : BaseActivity() {
     private fun registerBroadcast() {
         val filter = IntentFilter()
         filter.addAction("android.hardware.usb.action.USB_STATE")
-        registerReceiver(broadcastReceiver, filter)
+        registerReceiver( broadcastReceiver, filter)
     }
 
     private fun initView() {
@@ -207,24 +206,69 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    private fun bleWrite(bleDevice: BleDevice, mac: String) {
+    /**
+     * 读取蓝牙写入
+     */
+    private fun bleRead(bleDevice: BleDevice) {
+        BleManager.getInstance().read(
+            bleDevice,
+            characteristic?.service?.uuid.toString(),
+            characteristic?.uuid.toString(),
+            object : BleReadCallback() {
+                override fun onReadSuccess(data: ByteArray) {
+                    val formatHexString = HexUtil.formatHexString(data, true)
+                    if (!TextUtils.isEmpty(formatHexString)
+                        && formatHexString.substring(formatHexString.length - 2) == "01"
+                    ) {
+                        //连接成功
+                        Log.e("bleConnect", "onReadSuccess: 成功")
+                    } else {
+                        //连接失败
+                        Log.e("bleConnect", "onReadSuccess: 失败")
+                    }
+                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
+                }
+
+                override fun onReadFailure(exception: BleException) {
+                    //runOnUiThread { addText(txt, exception.toString()) }
+                    //连接异常 == 失败
+                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
+                }
+            })
+    }
+
+    /**
+     * 写入蓝牙
+     * code 03 开始 04 结束
+     */
+    private val OPEN = "03"
+    private val END = "04"
+    private fun bleWrite(bleDevice: BleDevice, code: String?) {
+        if (TextUtils.isEmpty(bleDevice.mac)) {
+            return
+        }
+        var mac = bleDevice.mac.replace(":", "").lowercase(Locale.getDefault())
+        mac = mac.substring(mac.length - 4)
+        //拼接发送
+        if (!TextUtils.isEmpty(code)) {
+            mac += code
+        }
+        //监听当前蓝牙是否写入
+        bleRead(bleDevice)
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
-        //蓝牙服务列表
-        val services = gatt.services
-        val bluetoothGattService = services[2]
-        val characteristic = bluetoothGattService.characteristics[1]
+        //HexUtil.hexStringToBytes(mac)
         BleManager.getInstance().write(
             bleDevice,
-            characteristic.service.uuid.toString(),
-            characteristic.uuid.toString(),
+            characteristic?.service?.uuid.toString(),
+            characteristic?.uuid.toString(),
             HexUtil.hexStringToBytes(mac),
             object : BleWriteCallback() {
                 override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
-
+                    Log.e("bleConnect", "onWriteSuccess: ")
                 }
 
                 override fun onWriteFailure(exception: BleException) {
-
+                    Log.e("bleConnect", "onWriteFailure: ")
                 }
             })
     }
@@ -247,7 +291,6 @@ class CPRActivity : BaseActivity() {
                 //取消扫描蓝牙设备
                 BleManager.getInstance().cancelScan()
             }
-
         }
     }
 
@@ -258,8 +301,10 @@ class CPRActivity : BaseActivity() {
                 isInitValueMap.clear()
                 bindBluetooth()
                 isStart = true
+                //bleWrite(null, OPEN)
             }
             BaseConstant.EVENT_CPR_STOP -> {
+                //bleWrite(null, END)
                 isStart = false
                 unBindBluetooth()
                 //清空当前map数据
@@ -470,7 +515,11 @@ class CPRActivity : BaseActivity() {
 //                viewBinding.textView.text = "$count"
                     bleList.add(bleDevice)
                     viewBinding.tvConnections.text = "设备连接数：${count}"
-                    bind(bleDevice)
+                    if (mBleDevice == null) {
+                        bind(bleDevice)
+                    } else {
+                        bleWrite(bleDevice, "")
+                    }
                     isItemClickable = true
                     isRefreshPower = true
                 }
@@ -686,23 +735,27 @@ class CPRActivity : BaseActivity() {
             characteristic.service.uuid.toString(),
             characteristic.uuid.toString()
         )
+        mBleDevice = null
     }
 
     private val dataMap = mutableMapOf<String, DataVolatile01>()
     private var dataDTO = BaseDataDTO()
+    private var characteristic: BluetoothGattCharacteristic? = null
+    private var mBleDevice: BleDevice? = null
     var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
         //蓝牙服务列表
         val services = gatt.services
         val bluetoothGattService = services[2]
-        val characteristic = bluetoothGattService.characteristics[1]
+        characteristic = bluetoothGattService.characteristics[1]
         BleManager.getInstance().notify(
             bleDevice,
-            characteristic.service.uuid.toString(),
-            characteristic.uuid.toString(),
+            characteristic?.service?.uuid.toString(),
+            characteristic?.uuid.toString(),
             object : BleNotifyCallback() {
                 override fun onNotifySuccess() {
+                    mBleDevice = bleDevice
                     deviceCount++
                     if (deviceCount == bleList.size) {
                         EventBus.getDefault()
@@ -722,7 +775,7 @@ class CPRActivity : BaseActivity() {
                 override fun onCharacteristicChanged(data: ByteArray) {
                     if (!BaseApplication.driver?.isConnected!! && characteristic != null) {
                         val formatHexString = HexUtil.formatHexString(
-                            characteristic.value,
+                            characteristic?.value,
                             false
                         )
                         runOnUiThread { Log.e("CPRActivity", formatHexString) }
