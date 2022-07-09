@@ -31,6 +31,7 @@ import com.clj.fastble.BleManager
 import com.clj.fastble.callback.BleGattCallback
 import com.clj.fastble.callback.BleNotifyCallback
 import com.clj.fastble.callback.BleScanCallback
+import com.clj.fastble.callback.BleWriteCallback
 import com.clj.fastble.data.BleDevice
 import com.clj.fastble.exception.BleException
 import com.clj.fastble.scan.BleScanRuleConfig
@@ -58,8 +59,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
-import kotlin.collections.LinkedHashSet
-import kotlin.system.exitProcess
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -206,6 +205,28 @@ class CPRActivity : BaseActivity() {
                 viewBinding.cbBle.isChecked = isChecked
             }
         }
+    }
+
+    private fun bleWrite(bleDevice: BleDevice, mac: String) {
+        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
+        //蓝牙服务列表
+        val services = gatt.services
+        val bluetoothGattService = services[2]
+        val characteristic = bluetoothGattService.characteristics[1]
+        BleManager.getInstance().write(
+            bleDevice,
+            characteristic.service.uuid.toString(),
+            characteristic.uuid.toString(),
+            HexUtil.hexStringToBytes(mac),
+            object : BleWriteCallback() {
+                override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
+
+                }
+
+                override fun onWriteFailure(exception: BleException) {
+
+                }
+            })
     }
 
     private fun searchBle() {
