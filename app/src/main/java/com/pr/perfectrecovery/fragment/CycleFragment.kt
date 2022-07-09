@@ -108,6 +108,7 @@ class CycleFragment : Fragment() {
         StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
+                Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
 //                viewBinding.tvPress3.text = "距离值：${it.distance}"
 //                viewBinding.tvPress5.text = "按压频率：${it.pf}"
 //                viewBinding.tvPress6.text = "吹气频率：${it.cf}"

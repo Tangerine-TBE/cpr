@@ -160,7 +160,7 @@ class PressLayoutView2 : LinearLayout {
             number < depthSegment.toFloat() * 7.0 -> {
                 7
             }
-            number < depthSegment.toFloat() * 8.0 -> {
+            number < depthSegment.toFloat() * 8.0 || number < dataDTO.PR_LOW_VALUE -> {
                 8
             }
             number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE) -> {
