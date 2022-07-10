@@ -101,7 +101,7 @@ class CycleFragment : Fragment() {
 //        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
 //        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
-        StatusLiveData.data.observe(requireActivity()) {
+       /* StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
@@ -115,7 +115,7 @@ class CycleFragment : Fragment() {
                         "\n 按压超次：${it.ERR_PR_TOOMORE}   \n本页按压超次：${prManyCount}" +
                         "\n 吹气超次：${it.QY_TIMES_TOOMORE} \n本页吹气超次：${qyManyCount}"
             }
-        }
+        }*/
 
         val dataDTO = BaseDataDTO()
         viewBinding.chartQy.setOnClickListener {

@@ -165,16 +165,8 @@ class DataVolatile01 {
         QY_valueSet2.clear()
         return sum
     }
-
-    /**
-     * 解析蓝发送的数据
-     *
-     * @param data
-     */
-
     @Synchronized
-    fun parseString(data: String?): BaseDataDTO {
-        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+    fun baseDataDecode(data: String?): BaseDataDTO{
         if (data != null && data.length == 20) {
             deviceMAC = "001b${data.substring(12, 20)}"
             //模型状态需先判断
@@ -278,26 +270,8 @@ class DataVolatile01 {
                 pt(L_Value)
                 pre_work_Mode=0
             }
-            Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
-            Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
-            //判断是按压还是吹气，执行相应的动作
-            /*
-            * 吹气状态的判断：
-            * 1：当三个值均为0，代表完成一次按压；
-            * 2：当有一个值小于5也默认完成一次按压
-            * */
-
-            /*if (work_Mode == 1) {
-
-            } else {
-                //吹气数据
-
-            }*/
-
-            //频率
-            // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
-            // Log.e("TAG9", "按压频率：$pfvalue")
-            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
+         /*   Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
+            Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")*/
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
@@ -306,8 +280,6 @@ class DataVolatile01 {
                     )
                 )
             )
-
-
         }
         val stringBuffer = StringBuffer()
         stringBuffer.append("电量值：").append(VI_Value)
@@ -374,6 +346,21 @@ class DataVolatile01 {
         dataDTO.L_d3 = L_d3
 
         return dataDTO
+    }
+
+    @Synchronized
+    fun parseString(data: String?): BaseDataDTO {
+        //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+        var index=1;
+        if(data!=null&&data.length==120){
+           for (index=1; index<7; index++) {
+                var oneData= ""+data.substring(20 * (index - 1), 20 * index)
+                baseDataDecode(oneData)
+
+           }
+        }else if(data!=null&&data.length==20){
+            baseDataDecode(data)
+        }
     }
 
     /**
