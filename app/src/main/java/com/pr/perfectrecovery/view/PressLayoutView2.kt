@@ -131,35 +131,39 @@ class PressLayoutView2 : LinearLayout {
 
     private fun getNumber(value: Int, dataDTO: BaseDataDTO): Int {
         val number = abs(dataDTO.preDistance - value)
+        val depthSegment = dataDTO.PR_LOW_VALUE / 8
+        Log.e("depth", "depthSegment: $depthSegment")
+        Log.e("depth", "number: $number")
+        Log.e("depth", "${dataDTO.PR_LOW_VALUE}/${dataDTO.PR_HIGH_VALUE}")
         if (number < 10) {
             return 0
         }
         return when {
-            number < dataDTO.PR_LOW_VALUE - 20 -> {
+            number < depthSegment -> {
                 1
             }
-            number < dataDTO.PR_LOW_VALUE - 17 -> {
+            number < depthSegment.toFloat() * 2.0 -> {
                 2
             }
-            number < dataDTO.PR_LOW_VALUE - 14 -> {
+            number < depthSegment.toFloat() * 3.0 -> {
                 3
             }
-            number < dataDTO.PR_LOW_VALUE - 11 -> {
+            number < depthSegment.toFloat() * 4.0 -> {
                 4
             }
-            number < dataDTO.PR_LOW_VALUE - 8 -> {
+            number < depthSegment.toFloat() * 5.0 -> {
                 5
             }
-            number < dataDTO.PR_LOW_VALUE - 5 -> {
+            number < depthSegment.toFloat() * 6.0 -> {
                 6
             }
-            number < dataDTO.PR_LOW_VALUE - 2 -> {
+            number < depthSegment.toFloat() * 7.0 -> {
                 7
             }
-            number < dataDTO.PR_LOW_VALUE -> {
+            number < depthSegment.toFloat() * 8.0 || number < dataDTO.PR_LOW_VALUE -> {
                 8
             }
-            number <= dataDTO.PR_HIGH_VALUE -> {
+            number in (dataDTO.PR_LOW_VALUE)..(dataDTO.PR_HIGH_VALUE) -> {
                 9
             }
             number > dataDTO.PR_HIGH_VALUE -> {

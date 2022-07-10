@@ -22,14 +22,11 @@ import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.CycleFragmentBinding
 import com.pr.perfectrecovery.fragment.viewmodel.CycleViewModel
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile01
 import com.pr.perfectrecovery.view.DialChart07View
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import kotlin.math.abs
-
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-private const val ARG_PARAM3 = "param3"
 
 /**
  * CPR按压页
@@ -64,6 +61,11 @@ class CycleFragment : Fragment() {
     //按压总数统计
 
     companion object {
+
+        private const val ARG_PARAM1 = "param1"
+        private const val ARG_PARAM2 = "param2"
+        private const val ARG_PARAM3 = "param3"
+
         fun newInstance(isTS: Boolean, isYY: Boolean, isCheck: Boolean) = CycleFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(ARG_PARAM1, isTS)
@@ -79,6 +81,8 @@ class CycleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //初始化
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         viewBinding = CycleFragmentBinding.inflate(layoutInflater)
         return viewBinding.root
     }
@@ -104,16 +108,20 @@ class CycleFragment : Fragment() {
        /* StatusLiveData.data.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
+                Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
-                viewBinding.tvPress4.text = "气压值：${it.bpValue}"
                 viewBinding.tvPress5.text = "按压频率：${it.pf}"
                 viewBinding.tvPress6.text = "吹气频率：${it.cf}"
                 viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
                 viewBinding.tvPress8.text = "按压位置：${it.psrType}"
                 viewBinding.tvPress9.text = "初始值：${it.preDistance}"
-                viewBinding.tvPress10.text = "按压深度：${abs(it.preDistance - it.distance)}" +
-                        "\n 按压超次：${it.ERR_PR_TOOMORE}   \n本页按压超次：${prManyCount}" +
-                        "\n 吹气超次：${it.QY_TIMES_TOOMORE} \n本页吹气超次：${qyManyCount}"
+                viewBinding.tvPress10.text =
+                    "模式：${it.model}\n" +
+                            "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
+                            "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
+                            "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
+                            "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
+                            "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
             }
         }*/
 
@@ -203,7 +211,18 @@ class CycleFragment : Fragment() {
     }
 
     fun start() {
+        //开始时清空残留数据
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
+        DataVolatile01.clearErrorData()
+        cycleCount = 0
+        //更新循环次数
+        EventBus.getDefault().post(
+            MessageEventData(
+                BaseConstant.EVENT_SINGLE_DATA_CYCLE,
+                "$cycleCount",
+                null
+            )
+        )
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
@@ -219,6 +238,21 @@ class CycleFragment : Fragment() {
     }
 
     fun stop(): TrainingDTO {
+        mHandler.removeCallbacksAndMessages(null)
+        mHandler1.removeCallbacksAndMessages(null)
+        mHandler2.removeCallbacksAndMessages(null)
+        mHandler3.removeCallbacksAndMessages(null)
+        mHandler4.removeCallbacksAndMessages(null)
+        mHandler5.removeCallbacksAndMessages(null)
+        mHandler6.removeCallbacksAndMessages(null)
+        viewBinding.ctTime.stop()
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer!!.stop()
+            mMediaPlayer?.release()
+            mMediaPlayer = null
+        }
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
@@ -283,12 +317,6 @@ class CycleFragment : Fragment() {
         trainingDTO.processScore = configBean.processScore.toFloat()
         trainingDTO.deduction = configBean.deductionScore
         mHandler.removeCallbacks(counter)
-        viewBinding.ctTime.stop()
-        if (mMediaPlayer != null) {
-            mMediaPlayer?.stop()
-            mMediaPlayer?.reset()
-            mMediaPlayer = null
-        }
         return trainingDTO
     }
 
@@ -349,7 +377,11 @@ class CycleFragment : Fragment() {
     //当前是否为按压模式-吹气模式
     private var cyclePrCount = 0
     private var cycleQyCount = 0
+
+    //是否按压
     private var isPr = false
+
+    //是否吹气
     private var isQy = false
     private var isQyAim = false
 
@@ -387,9 +419,6 @@ class CycleFragment : Fragment() {
                     qyRate = dataDTO.bpValue
                 }
             }
-            //计算循环次数
-            cycle(dataDTO)
-
             //更新循环次数
             if (prValue != dataDTO.prSum && isTimeing) {
                 isTimeing = false
@@ -456,7 +485,11 @@ class CycleFragment : Fragment() {
      */
     private fun cycleEnd() {
         if (isCheck) {
-            if (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount) {
+            if (cycleCount > configBean.cycles || (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount)) {
+                //当前循环大于时默认等于设置循环数
+                if (cycleCount > configBean.cycles) {
+                    cycleCount = configBean.cycles
+                }
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
@@ -548,9 +581,19 @@ class CycleFragment : Fragment() {
      */
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
-        if (dataDTO.aisleType == 1) {
-            viewBinding.ivAim.visibility = View.INVISIBLE
-            if (qyValue != dataDTO.qySum) {
+        if (qyValue != dataDTO.qySum) {
+            if (dataDTO.err_qy_close != err_qy_close) {
+                err_qy_close = dataDTO.err_qy_close
+                stopOutTime()
+                setPlayVoice(VOICE_MP3_WDKQD)
+                viewBinding.ivAim.visibility = View.VISIBLE
+                isQyAim = true
+                cycleQyCount++
+                isQy = true
+                isPr = false
+                mHandler4.removeCallbacksAndMessages(null)
+                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
+            } else {
                 stopOutTime()
                 cycleQyCount++
                 isQy = true
@@ -581,19 +624,8 @@ class CycleFragment : Fragment() {
                 mHandler1.removeCallbacksAndMessages(null)
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
             }
-        } else {
-            if (dataDTO.err_qy_close != err_qy_close) {
-                err_qy_close = dataDTO.err_qy_close
-                stopOutTime()
-                setPlayVoice(VOICE_MP3_WDKQD)
-                viewBinding.ivAim.visibility = View.VISIBLE
-                isQyAim = true
-                cycleQyCount++
-                isQy = true
-                isPr = false
-                mHandler4.removeCallbacksAndMessages(null)
-                mHandler4.postDelayed(this::setQyAimVisibility, 2000)
-            }
+            //计算循环次数
+            cycle(dataDTO)
         }
         qyValue = dataDTO.qySum
         //吹气频率

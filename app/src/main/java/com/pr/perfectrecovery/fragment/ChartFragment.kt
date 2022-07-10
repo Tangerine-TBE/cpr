@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
@@ -30,7 +31,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
-import kotlin.math.roundToInt
 
 /**
  * 曲线
@@ -73,10 +73,15 @@ class ChartFragment : Fragment() {
         val data2: LineData = getData(0f, false)
 //        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
-        depth_threshold_low = (configBean.prLow() * 1.4).toInt()   //下限值放大8mm  需要定义变量  上下限阈值要放缩
-        depth_threshold_high = (configBean.prHigh() * 1.4).toInt()  //上限值放大8mm
+        depth_threshold_low = configBean.prLow()  //下限值放大8mm  需要定义变量  上下限阈值要放缩
+        depth_threshold_high = configBean.prHigh()  //上限值放大8mm
         depth_Frequency_high = (configBean.depthFrequencyEnd)
         depth_Frequency_low = (configBean.depthFrequency)
+        blow_Frequency_low = configBean.tidalFrequency
+        blow_Frequency_high = configBean.tidalFrequencyEnd
+        //气量值
+        bar_low = configBean.tidalVolume
+        bar_high = configBean.tidalVolumeEnd
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(
@@ -97,7 +102,9 @@ class ChartFragment : Fragment() {
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
                     val qyMax = it.qyMaxValue
-                    addBarEntry(it.qyValueSum, qyMax)
+                    Log.e(TAG, "getBarValue qyMax = $qyMax")
+                    Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
+                    addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
                 } else {
                     addBarEntry(0, 0)
                 }
@@ -106,7 +113,7 @@ class ChartFragment : Fragment() {
 
         initBarChart()
         viewBinding.constraintlayout2.setOnClickListener {
-            addBarEntry(Random().nextInt(800), 20)
+            addBarEntry(Random().nextInt(800), 10)
         }
 
         viewBinding.constraintlayout3.setOnClickListener {
@@ -116,14 +123,31 @@ class ChartFragment : Fragment() {
         viewBinding.constraintlayout.setOnClickListener {
 //            addEntry(data, viewBinding.lineChart, 0f)
             val random = (1..20).random()
-            addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
+            //addEntry(data2, viewBinding.lineChart, getBlowFrequencyValue(random))
         }
 
         viewBinding.constraintlayout4.setOnClickListener {
             val random = (1..200).random()
-            addEntry(data, viewBinding.lineChart2, getFrequencyValue(random))
+            //addEntry(data, viewBinding.lineChart2, getFrequencyValue(random))
         }
         setViewData()
+    }
+
+    private var bar_low = 0
+    private var bar_high = 0
+    private fun getBarValue(mValue: Int): Float {
+        return when {
+            mValue < bar_low -> {
+                3f * mValue.toFloat() / bar_low.toFloat()
+            }
+            mValue in bar_low..bar_high -> {
+                3f * (mValue.toFloat() - bar_low.toFloat()) / (bar_high.toFloat() - bar_low.toFloat()) + 3
+            }
+            mValue > 1200 -> {
+                3f * (mValue.toFloat() - bar_high.toFloat()) / (1200f - bar_low.toFloat()) + 6
+            }
+            else -> 9.9f
+        }
     }
 
     private var depth_threshold_low = 0
@@ -155,16 +179,22 @@ class ChartFragment : Fragment() {
     private fun getFrequencyValue(depth: Int): Float {
         Log.e(TAG, "$depth")
         var value = depth
-        if (depth == 0 || depth <= 8) {
-            return 0f                         //    小于8的按压曲线归零
-        } else if (depth <= depth_Frequency_low) {
-            return (3.3f / depth.toFloat() * depth_Frequency_low.toFloat())//  按压不足 显示区域0-6
-        } else if (depth in depth_Frequency_low..depth_Frequency_high) {
-            return (3.3f / (depth.toFloat() - depth_threshold_low) * (depth_Frequency_high - depth_Frequency_low.toFloat()) + 3.3f)    //按压正确 显示区域6-9
-        } else if (depth in depth_Frequency_high..200) {
-            return (3.3f / (depth.toFloat() - depth_Frequency_high.toFloat()) * (200 - depth_Frequency_high.toFloat()) + 6.6f)                  // 按压过大 显示区域9-10
-        } else {
-            return 9.9f   // 按压显示到极限高度10
+        if (depth > 200) {
+            value = 200
+        }
+        return when {
+            value <= depth_Frequency_low -> {
+                (3.3f * value.toFloat() / depth_Frequency_low.toFloat())//  按压不足 显示区域0-6
+            }
+            value in depth_Frequency_low..depth_Frequency_high -> {
+                (3.3f * (value.toFloat() - depth_Frequency_low) / (depth_Frequency_high - depth_Frequency_low.toFloat()) + 3.3f)    //按压正确 显示区域6-9
+            }
+            value in depth_Frequency_high..200 -> {
+                (3.3f * (value.toFloat() - depth_Frequency_high.toFloat()) / (200 - depth_Frequency_high.toFloat()) + 6.6f)                  // 按压过大 显示区域9-10
+            }
+            else -> {
+                9.9f   // 按压显示到极限高度10
+            }
         }
     }
 
@@ -175,23 +205,23 @@ class ChartFragment : Fragment() {
     private var blow_Frequency_high = 0
     private fun getBlowFrequencyValue(depth: Int): Float {
         var value = depth
-        if (value > 20) {
+        if (depth > 20) {
             value = 20
         }
-        Log.e("getFrequencyValue depth", "$value")
-        val result = when {
+        return when {
             value <= blow_Frequency_low -> {
-                (6 / blow_Frequency_low.toFloat() * value.toFloat())//显示区域0-2
+                (3.3f * value.toFloat() / blow_Frequency_low.toFloat())//  按压不足 显示区域0-6
             }
             value in blow_Frequency_low..blow_Frequency_high -> {
-                (3 / (blow_Frequency_high - blow_Frequency_low).toFloat() * (depth.toFloat() - blow_Frequency_high.toFloat()) + 6.0f)//显示区域2-8
+                (3.3f * (value.toFloat() - blow_Frequency_low) / (blow_Frequency_high - blow_Frequency_low.toFloat()) + 3.3f)    //按压正确 显示区域6-9
             }
-            value > blow_Frequency_high -> {
-                (1 / ((blow_Frequency_high + 9) - blow_Frequency_high.toFloat()) * (depth.toFloat() - blow_Frequency_high.toFloat()) + 6.5f)// 显示区域8-10
+            value in blow_Frequency_high..20 -> {
+                (3.3f * (value.toFloat() - blow_Frequency_high.toFloat()) / (20 - blow_Frequency_high.toFloat()) + 6.6f)                  // 按压过大 显示区域9-10
             }
-            else -> 9.9f
+            else -> {
+                9.9f   // 按压显示到极限高度10
+            }
         }
-        return if (result > 10) 9.9f else result
     }
 
     private fun setViewData() {
@@ -211,6 +241,8 @@ class ChartFragment : Fragment() {
         lineChart.description.isEnabled = false
         lineChart.setTouchEnabled(false)
         lineChart.setPinchZoom(false)
+        lineChart.setDrawBorders(false)
+        lineChart.setBorderWidth(0f)
         lineChart.setDrawGridBackground(false)
         lineChart.setNoDataText("暂无数据")
         val xAxis: XAxis = lineChart.xAxis
@@ -230,13 +262,47 @@ class ChartFragment : Fragment() {
         rightAxis.setDrawGridLines(false)
         rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
 
-        lineData.setDrawValues(true)
+        lineData.setDrawValues(false)
         xAxis.setDrawGridLines(false)
         lineData.setValueTextColor(Color.WHITE)
-        xAxis.isEnabled = true
+        xAxis.isEnabled = false
         leftAxis.isEnabled = true
+        leftAxis.gridColor = Color.TRANSPARENT
+        leftAxis.zeroLineColor = Color.TRANSPARENT
+        leftAxis.setDrawGridLines(true)
+        leftAxis.setValueFormatter { value, axis ->
+            ""//${value.toInt()}
+        }
         rightAxis.isEnabled = false
         xAxis.textColor = Color.WHITE
+
+        //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
+        val limitLine = LimitLine(3.3f)
+        //设置限制线的宽
+        limitLine.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine.label = ""
+        limitLine.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine.enableDashedLine(10f, 10f, 0f)
+
+        val limitLine2 = LimitLine(6.6f)
+        //设置限制线的宽
+        limitLine2.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine2.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine2.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine2.label = ""
+        limitLine2.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine2.enableDashedLine(10f, 10f, 0f)
+        //左边Y轴添加限制线
+        leftAxis.addLimitLine(limitLine)
+        leftAxis.addLimitLine(limitLine2)
 
         val l = lineChart.legend
         l.isEnabled = false
@@ -254,13 +320,16 @@ class ChartFragment : Fragment() {
         viewBinding.barChart.apply {
             setDrawBorders(false) //显示边界
             setDrawBarShadow(false) //设置每个直方图阴影为false
-            setDrawValueAboveBar(true) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+            setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
             description.isEnabled = false //设置描述文字不显示，默认显示
             setDrawGridBackground(false) //设置不显示网格
             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(true) //设置是否可以缩放
             setTouchEnabled(false)
+            // if more than 60 entries are displayed in the chart, no values will be
+            // drawn
+
             isHighlightFullBarEnabled = false
 //            scaleX = 1.5f
             //x轴设置
@@ -271,16 +340,22 @@ class ChartFragment : Fragment() {
                 granularity = 1f // only intervals of 1 day
                 mAxisMinimum = 0f
             }
-            xAxis.setLabelCount(12, false)
+            xAxis.setLabelCount(3, false)
+
             xAxis.isEnabled = false
-            axisLeft.isEnabled = false
+            axisLeft.isEnabled = true
+            axisLeft.setDrawGridLines(true)
             axisLeft.textColor = Color.WHITE
-            axisLeft.labelCount = 4
-            axisLeft.axisMaxLabels = 4
-            axisLeft.mAxisMaximum = 1200f
+            axisLeft.gridColor = Color.TRANSPARENT
+            axisLeft.labelCount = 3
+            axisLeft.axisMaxLabels = 3
+            axisLeft.mAxisMaximum = 10f
             axisRight.isEnabled = false
+            axisLeft.setValueFormatter { value, axis ->
+                ""//${value.toInt()}
+            }
             setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
-            isScaleXEnabled = true                             //支持x轴缩放
+            isScaleXEnabled = false                             //支持x轴缩放
             isScaleYEnabled = false
 
             // if more than 60 entries are displayed in the chart, no values will be
@@ -297,7 +372,7 @@ class ChartFragment : Fragment() {
             )
             mBarDataSet!!.colors = colors
             val barData = BarData(dataSets)
-            barData.addEntry(BarEntry(0f, 3.8f), 0)
+            barData.addEntry(BarEntry(0f, 9.9f), 0)
             data = barData
 //            data.barWidth = 0.3f
 //            addBarEntry(0, 100)
@@ -317,32 +392,19 @@ class ChartFragment : Fragment() {
             if (barData != null) {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 if (value2 > 0) {
+                    data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
                     when {
-                        value2 <= configBean.tidalVolume -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 1.0f), 0)
-                        }
-                        value2 <= configBean.tidalVolumeEnd -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 2.2f), 0)
-                        }
-                        value2 > configBean.tidalVolumeEnd -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 3.4f), 0)
-                        }
-                        else -> {
-                            data.addEntry(BarEntry(entryCount.toFloat(), 3.6f), 0)
-                        }
-                    }
-                    when {
-                        value2 < configBean.tidalVolume -> {
+                        value2 < 3 -> {
                             colors.add(
                                 ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                             )
                         }
-                        value2 <= configBean.tidalVolumeEnd -> {
+                        value2 in 3..6 -> {
                             colors.add(
                                 ContextCompat.getColor(requireContext(), R.color.color_37B48B)
                             )
                         }
-                        value2 > configBean.tidalVolumeEnd -> {
+                        value2 > 6 -> {
                             colors.add(
                                 ContextCompat.getColor(
                                     requireContext(),
@@ -370,7 +432,7 @@ class ChartFragment : Fragment() {
                 setVisibleXRangeMaximum(12f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
                 moveViewToX(barData.entryCount.toFloat() - 12)
-                //            moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
+                //moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
 //                val mMatrix = Matrix()
 //                mMatrix.postScale(1.5f, 1f)
 //                viewPortHandler.refresh(mMatrix, this, false)

@@ -6,8 +6,10 @@ object BaseConstant {
 
     //学员信息
     const val TRAINING_BEAN = "TRAINING_BEAN"
+
     //连接的蓝牙设备数据
     const val CONNECT_BLE_DEVICES = "CONNECT_BLE_DEVICES"
+
     //配置
     val MMKV_WM_CONFIGURATION: String = "mmkv_wm_configuration"
 
@@ -24,14 +26,12 @@ object BaseConstant {
     val EVENT_CPR_TIMEING = 10007
     val EVENT_CPR_CLEAR = 10008
     val EVENT_SINGLE_END = 10009
+
     //假的蓝牙地址
     val FAKE_MAC = "FAKE_MAC"
     val CLEAR_DEVICE_HISTORY_DATA = 10010
     val DEVICE_DISCONNECTED = 10011
-    val EVENT_CPR_CHECK = 10012
     val EVENT_DO_BIND = 10013
     val EVENT_DO_START = 10014
     val EVENT_CANCEL_DIALOG = 10015
-
-
 }

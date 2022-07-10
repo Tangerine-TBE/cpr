@@ -71,7 +71,7 @@ public class DialChart07View extends GraphicalView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         //super.onSizeChanged(w, h, oldw, oldh);
-        chart180.setChartRange(w, (float) h);
+        chart180.setChartRange(w, 800);
     }
 
     public void chartRender180() {

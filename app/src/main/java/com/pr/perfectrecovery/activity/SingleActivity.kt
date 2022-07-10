@@ -22,6 +22,7 @@ import com.pr.perfectrecovery.fragment.ChartFragment
 import com.pr.perfectrecovery.fragment.CheckEventFragment
 import com.pr.perfectrecovery.fragment.CycleFragment
 import com.pr.perfectrecovery.livedata.StatusLiveData
+import com.pr.perfectrecovery.utils.DataVolatile01
 import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
@@ -44,6 +45,8 @@ class SingleActivity : BaseActivity() {
         EventBus.getDefault().register(this)
 //        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
+        //开始时清空残留数据
+        DataVolatile01.clearErrorData()
         initView()
         initViewPager()
     }
@@ -69,6 +72,7 @@ class SingleActivity : BaseActivity() {
             isStart = !isStart
             if (isStart) {
 //                DataVolatile.isStart = true
+                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
                 cycleFragment?.start()
@@ -100,6 +104,8 @@ class SingleActivity : BaseActivity() {
 
     private fun startResult() {
         val mTrainingDTO = cycleFragment?.stop()
+        //开始时清空残留数据
+        DataVolatile01.clearErrorData()
         binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
         binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
         counter.let { mHandler.removeCallbacks(it) }
@@ -124,13 +130,14 @@ class SingleActivity : BaseActivity() {
         }
 
         if (mTrainingDTO != null) {
+            mTrainingDTO.save()
             TrainResultActivity.start(this, mTrainingDTO)
         }
         finish()
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public fun onEvent(event: MessageEventData) {
+    fun onEvent(event: MessageEventData) {
         when (event.code) {
             BaseConstant.EVENT_SINGLE_DATA_CYCLE -> {
                 //循环次数

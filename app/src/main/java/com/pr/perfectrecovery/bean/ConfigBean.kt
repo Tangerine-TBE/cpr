@@ -27,11 +27,11 @@ data class ConfigBean(
 ) : Serializable {
     //按压比列计算
     fun prHigh(): Int {
-        return depthEnd * 10
+        return (depthEnd * 10 * 1.2).toInt()
     }
 
     fun prLow(): Int {
-        return if (depth > 0) (depth * 10) else 0
+        return if (depth > 0) (depth * 10 * 1.2).toInt() else 0
     }
 
     //吹气配置计算比列

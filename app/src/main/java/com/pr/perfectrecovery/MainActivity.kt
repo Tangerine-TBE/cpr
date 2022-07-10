@@ -1,16 +1,19 @@
 package com.pr.perfectrecovery
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.pr.perfectrecovery.activity.CPRActivity
 import com.pr.perfectrecovery.activity.ConfigActivity
 import com.pr.perfectrecovery.activity.StatisticalActivity
@@ -116,12 +119,24 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showExit() {
-        val dialog = AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this).create()
+        dialog.setCancelable(true)
         dialog.setMessage("是否退出")
-        dialog.setPositiveButton("退出") { dialog, which -> exitProcess(0) }
-        dialog.setNegativeButton("取消") { dialog, which -> dialog.dismiss() }
-        dialog.create()
+        dialog.setButton(
+            AlertDialog.BUTTON_NEGATIVE, "取消"
+        ) { dialog, which -> dialog.dismiss() }
+        dialog.setButton(
+            AlertDialog.BUTTON_POSITIVE, "确定"
+        ) { dialog, which -> exitProcess(0) }
         dialog.show()
+        val lp = dialog.window!!.attributes
+//设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
+        //设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
+        lp.width = ScreenUtils.getScreenWidth() * 9 / 10
+//这里设置居中
+        //这里设置居中
+        lp.gravity = Gravity.CENTER
+        dialog.window!!.attributes = lp
     }
 }
 

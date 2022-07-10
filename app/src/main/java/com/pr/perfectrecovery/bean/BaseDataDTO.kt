@@ -57,7 +57,9 @@ data class BaseDataDTO(
     var qy_max_volume_sum: Int = 0,//吹气每次最值大总和
     var pr_seqright_total: Int = 0, //按压频率正常的次数
     var qy_serright_total: Int = 0,//吹气频率正确的次数
-    var qyMaxValue: Int = 0//吹气最大值
+    var qyMaxValue: Int = 0,//吹气最大值
+    var model: Boolean = false,//模式
+    var PR_CYCLE_TIMES: Int = 0
 ) {
     var L_d1 = 0
     var L_d2 = 0

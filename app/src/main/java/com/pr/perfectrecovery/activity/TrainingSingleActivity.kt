@@ -16,6 +16,7 @@ import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.MessageEventData
 import com.pr.perfectrecovery.databinding.ActivityTrianBinding
+import com.pr.perfectrecovery.utils.DataVolatile01
 import org.greenrobot.eventbus.EventBus
 
 /**
@@ -66,9 +67,7 @@ class TrainingSingleActivity : BaseActivity() {
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.white))
                     mTrainingBean.isCheck = true
-                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
-                    messageEventData.isCheck = true
-                    EventBus.getDefault().post(messageEventData)
+                    DataVolatile01.MODEL = true
                     //考核模式  禁止使用语音和提示音
                     binding.single.switchBeat.isChecked = false
                     binding.single.switchVoice.isChecked = false
@@ -77,9 +76,7 @@ class TrainingSingleActivity : BaseActivity() {
                 }
                 //练习模式
                 R.id.cbTraining -> {
-                    val messageEventData = MessageEventData(BaseConstant.EVENT_CPR_CHECK, "", null)
-                    messageEventData.isCheck = false
-                    EventBus.getDefault().post(messageEventData)
+                    DataVolatile01.MODEL = false
                     binding.single.cbCheck.setTextColor(resources.getColor(R.color.white))
                     binding.single.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
                     mTrainingBean.isCheck = false
@@ -89,7 +86,7 @@ class TrainingSingleActivity : BaseActivity() {
                 }
             }
         }
-
+        DataVolatile01.MODEL = false
         binding.bottom.ivStart.setOnClickListener {
             val name = binding.single.etName.text.toString()
             if (TextUtils.isEmpty(name)) {
@@ -100,6 +97,8 @@ class TrainingSingleActivity : BaseActivity() {
                 mTrainingBean.name = name
                 mTrainingBean.isBeat = binding.single.switchBeat.isChecked
                 mTrainingBean.isVoice = binding.single.switchVoice.isChecked
+                //开始时清空残留数据
+                DataVolatile01.clearErrorData()
                 val intent = Intent(this, SingleActivity::class.java)
                 intent.putExtra(BaseConstant.TRAINING_BEAN, mTrainingBean)
                 startActivity(intent)

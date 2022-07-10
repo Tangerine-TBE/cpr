@@ -13,6 +13,10 @@
     <string name="layout_continue">继续</string>
 
     <string name="please_open_blue">请先打开蓝牙</string>
+    <string name="press_result_number"><b>(<font color="#FC7574">%1d</font>/<font>%2d)</font></b></string>
+    <string name="press_result_desc"><b>(<font color="#FC7574">错误</font><font>/总数)</font></b></string>
+
+    <string name="export_title"><b><font color="#FC7574">完美</font><font color="#3DB38E">复苏</font></b>CPR操作报告</string>
 
     <string name="notifyTitle">提示</string>
     <string name="gpsNotifyMsg">当前手机扫描蓝牙需要打开定位功能。</string>
@@ -29,4 +33,11 @@
 
     <string name="searching_for_available_models">正在搜索可用的模型</string>
     <string name="available_models">可用的模型如下:</string>
+
+    <!--    getManager-->
+    <string name="authorize_msg">点击前往授权</string>
+    <string name="authorize_title_msg">缺少必要权限</string>
+    <string name="file_manger_msg">Android 11 需要授予所有文件的管理权限</string>
+    <string name="modify_permission_msg">应用不能正常运行，需要在设置里手动开启访问储存权限</string>
+
 </resources>

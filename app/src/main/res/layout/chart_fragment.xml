@@ -127,7 +127,7 @@
                     android:id="@+id/constraintlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_24"
                     app:layout_constraintTop_toBottomOf="@+id/cardView1">
 
                 <TextView
@@ -146,6 +146,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginTop="@dimen/dp_10"
                         android:text="8"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
@@ -159,6 +160,7 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequencyEnd"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvTidalFrequencyEnd"
@@ -169,16 +171,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginTop="@dimen/dp_28"
+                        android:layout_marginTop="@dimen/dp_14"
                         android:text="6"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequencyEnd" />
 
+                <TextView
+                        android:id="@+id/tvZero"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginTop="@dimen/dp_12"
+                        android:text="0"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequency" />
+
                 <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:visibility="invisible"
                         android:background="#1A3DB38E"
                         app:layout_constraintEnd_toEndOf="@+id/view2"
                         app:layout_constraintTop_toBottomOf="@+id/view2"
@@ -192,6 +207,7 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvTidalFrequency"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvTidalFrequency"
@@ -202,9 +218,9 @@
             <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChart"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_marginStart="@dimen/dp_18"
-                    android:layout_marginTop="@dimen/dp_10"
+                    android:layout_height="120dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="@dimen/dp_12"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/constraintlayout"
                     app:layout_constraintTop_toBottomOf="@+id/cardView1" />
@@ -213,7 +229,7 @@
                     android:id="@+id/constraintlayout2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_40"
+                    android:layout_marginTop="@dimen/dp_20"
                     app:layout_constraintStart_toStartOf="@+id/barChart"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout">
 
@@ -233,6 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_10"
                         android:text="600"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
@@ -246,6 +263,7 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolumeEnd"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvTidalVolumeEnd"
@@ -256,16 +274,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="@dimen/dp_28"
+                        android:layout_marginTop="@dimen/dp_10"
                         android:text="400"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
 
+                <TextView
+                        android:id="@+id/tvVolumeStart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:text="0"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvTidalVolume"
+                        app:layout_constraintEnd_toEndOf="@+id/tvTidalVolume" />
+
                 <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:visibility="invisible"
                         android:background="#1A3DB38E"
                         app:layout_constraintEnd_toEndOf="@+id/viewml"
                         app:layout_constraintTop_toBottomOf="@+id/viewml"
@@ -279,40 +311,40 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvTidalVolume"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvTidalVolume"
                         app:layout_constraintTop_toTopOf="@+id/tvTidalVolume" />
 
+                <View
+                        android:layout_width="1dp"
+                        android:layout_height="0dp"
+                        android:background="@color/purple_200"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginStart="@dimen/dp_2"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintVertical_bias="0.0"
+                        app:layout_constraintStart_toEndOf="@+id/tvTidalVolumeEnd" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/barChart"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="@dimen/dp_10"
-                    app:layout_constraintBottom_toTopOf="@+id/constraintlayout3"
+                    android:layout_height="130dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="@dimen/dp_14"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout" />
-
-            <TextView
-                    android:id="@+id/tvTop3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:text="厘米"
-                    android:textColor="#ffffffff"
-                    android:textSize="10sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/constraintlayout3" />
+                    app:layout_constraintTop_toBottomOf="@+id/constraintlayout"
+                    app:layout_constraintBottom_toBottomOf="@+id/constraintlayout2" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintlayout3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
+                    android:layout_marginTop="8dp"
                     android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout2">
@@ -323,6 +355,7 @@
                         android:background="@color/purple_200"
                         android:layout_marginStart="@dimen/dp_20"
                         android:layout_marginEnd="@dimen/dp_10"
+                        android:visibility="invisible"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvDepth"
                         app:layout_constraintTop_toTopOf="@+id/tvDepth"
@@ -332,11 +365,11 @@
                         android:id="@+id/tvDepth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="厘米\n0"
                         android:textColor="#ffffffff"
-                        android:textSize="13sp"
+                        android:textSize="10sp"
                         android:gravity="center"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="5dp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
@@ -347,7 +380,7 @@
                         android:layout_marginStart="@dimen/dp_4"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
-                        android:visibility="gone"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvDepth"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvDepth"
@@ -357,8 +390,8 @@
                         android:id="@+id/textView22"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="50dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="44dp"
                         android:text="5"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
@@ -369,10 +402,12 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:background="#1A3DB38E"
+                        android:visibility="invisible"
+                        android:layout_marginStart="@dimen/dp_16"
                         app:layout_constraintEnd_toEndOf="@+id/viewline"
                         app:layout_constraintTop_toBottomOf="@+id/viewline"
-                        app:layout_constraintStart_toStartOf="@+id/viewline"
-                        app:layout_constraintBottom_toTopOf="@+id/viewcm" />
+                        app:layout_constraintBottom_toTopOf="@+id/viewcm"
+                        app:layout_constraintStart_toEndOf="@+id/textView22" />
 
                 <View
                         android:id="@+id/viewline"
@@ -381,6 +416,7 @@
                         android:layout_marginStart="@dimen/dp_20"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/textView22"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/textView22"
@@ -390,8 +426,8 @@
                         android:id="@+id/tvDepthEnd"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="@dimen/dp_20"
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginTop="@dimen/dp_16"
                         android:text="6"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
@@ -405,6 +441,7 @@
                         android:layout_marginStart="@dimen/dp_20"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvDepthEnd"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvDepthEnd"
@@ -416,7 +453,8 @@
                     android:id="@+id/lineChart1"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    android:layout_marginTop="@dimen/dp_24"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="@dimen/dp_6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
 
@@ -424,7 +462,7 @@
                     android:id="@+id/constraintlayout4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_50"
+                    android:layout_marginTop="@dimen/dp_35"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout3">
 
                 <TextView
@@ -443,6 +481,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_10"
                         android:text="120"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
@@ -456,6 +495,7 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequencyEnd"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvDepthFrequencyEnd"
@@ -466,16 +506,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_marginTop="@dimen/dp_14"
                         android:text="100"
                         android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequencyEnd" />
 
+                <TextView
+                        android:id="@+id/tvDepthFrequencyZero"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:text="0"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequency"
+                        app:layout_constraintEnd_toEndOf="@+id/tvDepthFrequency" />
+
                 <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:visibility="invisible"
                         android:background="#1A3DB38E"
                         app:layout_constraintEnd_toEndOf="@+id/view3"
                         app:layout_constraintTop_toBottomOf="@+id/view3"
@@ -489,6 +543,7 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="@dimen/dp_10"
                         android:background="#1EFFFFFF"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/tvDepthFrequency"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/tvDepthFrequency"
@@ -500,8 +555,8 @@
                     android:id="@+id/lineChart2"
                     android:layout_width="0dp"
                     android:layout_height="120dp"
-                    android:layout_marginStart="@dimen/dp_24"
-                    android:layout_marginTop="@dimen/dp_30"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="@dimen/dp_20"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />

@@ -13,6 +13,8 @@
             android:layout_marginStart="@dimen/dp_6"
             android:button="@drawable/checkbox_selector"
             android:visibility="invisible"
+            android:textColor="@color/tran"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -22,7 +24,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_10"
-            android:text="姓名"
             android:textColor="#ffffffff"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

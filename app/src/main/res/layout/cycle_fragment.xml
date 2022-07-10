@@ -10,17 +10,18 @@
     <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-
             <com.pr.perfectrecovery.view.DialChart07View
                     android:id="@+id/chart"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintHeight_percent="0.52"
                     android:visibility="invisible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -29,8 +30,9 @@
             <com.pr.perfectrecovery.view.DialChart07View
                     android:id="@+id/chartQy"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="0dp"
                     android:visibility="invisible"
+                    app:layout_constraintHeight_percent="0.5"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintlayout2" />
@@ -90,16 +92,6 @@
                     android:textColor="@color/white"
                     app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
                     app:layout_constraintTop_toTopOf="@+id/ivPress" />
-
-            <TextView
-                    android:id="@+id/tv_press4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="36dp"
-                    android:textColor="@color/white"
-                    app:layout_constraintStart_toEndOf="@+id/pressLayoutView"
-                    app:layout_constraintTop_toTopOf="@+id/ivLung" />
 
             <TextView
                     android:id="@+id/tv_press5"
@@ -197,7 +189,7 @@
                     android:id="@+id/pressLayoutView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_10"
                     android:visibility="invisible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -207,7 +199,7 @@
                     android:id="@+id/dashBoard2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_38"
+                    android:layout_marginTop="@dimen/dp_15"
                     android:src="@mipmap/icon_wm_bp_1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -228,7 +220,7 @@
                     android:id="@+id/ivLung"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_24"
+                    android:layout_marginTop="@dimen/dp_15"
                     android:src="@mipmap/icon_wm_lung"
                     app:layout_constraintEnd_toEndOf="@+id/dashBoard2"
                     app:layout_constraintStart_toStartOf="@+id/dashBoard2"
