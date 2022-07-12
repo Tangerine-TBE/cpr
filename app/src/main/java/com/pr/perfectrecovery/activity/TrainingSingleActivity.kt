@@ -98,7 +98,7 @@ class TrainingSingleActivity : BaseActivity() {
                 mTrainingBean.isBeat = binding.single.switchBeat.isChecked
                 mTrainingBean.isVoice = binding.single.switchVoice.isChecked
                 //开始时清空残留数据
-                DataVolatile01.clearErrorData()
+//                DataVolatile01.clearErrorData()
                 val intent = Intent(this, SingleActivity::class.java)
                 intent.putExtra(BaseConstant.TRAINING_BEAN, mTrainingBean)
                 startActivity(intent)

@@ -213,7 +213,7 @@ class CycleFragment : Fragment() {
     fun start() {
         //开始时清空残留数据
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
-        DataVolatile01.clearErrorData()
+//        DataVolatile01.clearErrorData()
         cycleCount = 0
         //更新循环次数
         EventBus.getDefault().post(

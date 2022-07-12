@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.utils
 
 import android.util.Log
+import com.google.gson.Gson
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import kotlin.math.abs
 
@@ -33,7 +34,7 @@ class DataVolatile01 {
 
 
     //电量值：  0-100%
-    private var VI_Value = 0
+    var VI_Value = 0
 
     //距离值：  30-150
     private var L_Value = 0
@@ -105,7 +106,7 @@ class DataVolatile01 {
     private var pt_valueSet = mutableListOf<Int>()
     private var py_valueSet = mutableListOf<Int>()
 
-    private var deviceMAC: String? = null
+    var deviceMAC: String? = null
     private var QY_RUN_FLAG = 0
 
     /**
@@ -165,8 +166,9 @@ class DataVolatile01 {
         QY_valueSet2.clear()
         return sum
     }
+
     @Synchronized
-    fun baseDataDecode(data: String?): BaseDataDTO{
+    fun baseDataDecode(data: String?): BaseDataDTO {
         if (data != null && data.length == 20) {
             deviceMAC = "001b${data.substring(12, 20)}"
             //模型状态需先判断
@@ -234,9 +236,9 @@ class DataVolatile01 {
                 Log.e("TAG12", "判断为吹气状态")
                 QY_Value = selectValue_QY(QY_d1, QY_d2, QY_d3)
                 py(QY_Value)
-                pre_work_Mode=1
+                pre_work_Mode = 1
             } else {
-                if(pre_work_Mode==1){
+                if (pre_work_Mode == 1) {
                     QY_Value = selectValue_QY(2, 2, 2)
                 }
                 //按压距离
@@ -268,10 +270,10 @@ class DataVolatile01 {
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
                 //清空频率
                 pt(L_Value)
-                pre_work_Mode=0
+                pre_work_Mode = 0
             }
-         /*   Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
-            Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")*/
+            /*   Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
+               Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")*/
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
@@ -344,23 +346,23 @@ class DataVolatile01 {
         dataDTO.L_d1 = L_d1
         dataDTO.L_d2 = L_d2
         dataDTO.L_d3 = L_d3
-
         return dataDTO
     }
 
     @Synchronized
-    fun parseString(data: String?): BaseDataDTO {
+    fun parseString(data: String?): ArrayList<BaseDataDTO> {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        var index=1;
-        if(data!=null&&data.length==120){
-           for (index=1; index<7; index++) {
-                var oneData= ""+data.substring(20 * (index - 1), 20 * index)
-                baseDataDecode(oneData)
-
-           }
-        }else if(data!=null&&data.length==20){
-            baseDataDecode(data)
+        val listData = arrayListOf<BaseDataDTO>()
+        if (data != null && data.length >= 120) {
+            for (index in 1..6) {
+                val oneData = "" + data.substring(20 * (index), 20 * index)
+                listData.add(baseDataDecode(oneData))
+            }
+        } else if (data != null && data.length == 20) {
+            listData.add(baseDataDecode(data))
         }
+        Log.e("GSON", Gson().toJson(listData))
+        return listData
     }
 
     /**
@@ -767,7 +769,7 @@ class DataVolatile01 {
             /* if((PR_CYCLE_TIMES<PR_DEFAULT_TIMES)&&(PR_CYCLE_TIMES>0)){
                  ERR_PR_TOOLITTLE+=(30-PR_CYCLE_TIMES)
              }*/
-             PR_CYCLE_TIMES = 0
+            PR_CYCLE_TIMES = 0
         }
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0

@@ -46,7 +46,7 @@ class SingleActivity : BaseActivity() {
 //        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
         //开始时清空残留数据
-        DataVolatile01.clearErrorData()
+        //DataVolatile01.clearErrorData()
         initView()
         initViewPager()
     }
@@ -70,12 +70,13 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
+            cycleFragment?.start()
             if (isStart) {
 //                DataVolatile.isStart = true
                 EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
-                cycleFragment?.start()
+//                cycleFragment?.start()
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -105,7 +106,7 @@ class SingleActivity : BaseActivity() {
     private fun startResult() {
         val mTrainingDTO = cycleFragment?.stop()
         //开始时清空残留数据
-        DataVolatile01.clearErrorData()
+//        DataVolatile01.clearErrorData()
         binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
         binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
         counter.let { mHandler.removeCallbacks(it) }
@@ -207,14 +208,14 @@ class SingleActivity : BaseActivity() {
 
         StatusLiveData.data.observe(this) {
             if (it != null) {
-                binding.tvBattery.power = it.electricity
-                if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck == true) {
-                    isShow = true
-                    binding.ctChart.isChecked = true
-                    binding.ctCurve.isChecked = false
-                    binding.ctEvent.isChecked = false
-                    binding.viewPager.currentItem = 1
-                }
+//                binding.tvBattery.power = it.electricity
+//                if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck == true) {
+//                    isShow = true
+//                    binding.ctChart.isChecked = true
+//                    binding.ctCurve.isChecked = false
+//                    binding.ctEvent.isChecked = false
+//                    binding.viewPager.currentItem = 1
+//                }
             }
         }
 

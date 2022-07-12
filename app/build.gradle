@@ -77,7 +77,7 @@ dependencies {
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.1'
 //    implementation 'com.github.AAChartModel:AAChartCore-Kotlin:-SNAPSHOT'
-
+    implementation 'com.google.code.gson:gson:2.9.0'
     // For Java
     implementation 'androidx.work:work-runtime:2.7.1'
     // For Kotlin

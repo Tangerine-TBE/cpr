@@ -93,22 +93,22 @@ class ChartFragment : Fragment() {
 //        initLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
         StatusLiveData.data.observe(requireActivity()) {
-            if (it != null) {
-                setData(it)
-                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf))
-                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
-//                addEntry(data2, viewBinding.lineChart1, it)
-                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf))
-                if (qyValue != it.qySum) {
-                    qyValue = it.qySum
-                    val qyMax = it.qyMaxValue
-                    Log.e(TAG, "getBarValue qyMax = $qyMax")
-                    Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
-                    addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
-                } else {
-                    addBarEntry(0, 0)
-                }
-            }
+//            if (it != null) {
+//                setData(it)
+//                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf))
+//                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
+////                addEntry(data2, viewBinding.lineChart1, it)
+//                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf))
+//                if (qyValue != it.qySum) {
+//                    qyValue = it.qySum
+//                    val qyMax = it.qyMaxValue
+//                    Log.e(TAG, "getBarValue qyMax = $qyMax")
+//                    Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
+//                    addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
+//                } else {
+//                    addBarEntry(0, 0)
+//                }
+//            }
         }
 
         initBarChart()

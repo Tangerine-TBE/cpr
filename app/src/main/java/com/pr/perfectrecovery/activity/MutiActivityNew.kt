@@ -535,12 +535,12 @@ class MutiActivityNew : BaseActivity() {
 
     private fun observeData() {
         StatusLiveData.data.observe(this, Observer {
-            it?.let {
-                Log.e("hunger_test", "printData: mac: ${it.mac}, distance: ${it.distance}")
-                val view = getItemViewByMac(it.mac)
-                if (isStart && hasDoneMap[it.mac] != true)
-                    setViewData(view, it)
-            }
+//            it?.let {
+//                Log.e("hunger_test", "printData: mac: ${it.mac}, distance: ${it.distance}")
+//                val view = getItemViewByMac(it.mac)
+//                if (isStart && hasDoneMap[it.mac] != true)
+//                    setViewData(view, it)
+//            }
         })
     }
 

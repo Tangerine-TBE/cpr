@@ -144,7 +144,7 @@ class CPRActivity : BaseActivity() {
     private fun registerBroadcast() {
         val filter = IntentFilter()
         filter.addAction("android.hardware.usb.action.USB_STATE")
-        registerReceiver( broadcastReceiver, filter)
+        registerReceiver(broadcastReceiver, filter)
     }
 
     private fun initView() {
@@ -179,8 +179,10 @@ class CPRActivity : BaseActivity() {
         }
 
         viewBinding.progressCircular.setOnClickListener {
-            BaseApplication.driver?.ResumeUsbList()
+//            BaseApplication.driver?.ResumeUsbList()
             searchBle()
+//            val data = "FE 36 38 3A 2E 23 29 51 47 3F FE 5E 3B 6B 32 03 A0 97 E1 74 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+//            sendMessage(data)
         }
         viewBinding.recyclerview.adapter = mDeviceAdapter
         mDeviceAdapter.setOnItemClickListener(itemClick)
@@ -243,16 +245,20 @@ class CPRActivity : BaseActivity() {
      */
     private val OPEN = "03"
     private val END = "04"
+    private val CONNECT_SUCCESS = "01"
+    private val CONNECT_FAIL = "02"
     private fun bleWrite(bleDevice: BleDevice, code: String?) {
         if (TextUtils.isEmpty(bleDevice.mac)) {
             return
         }
         var mac = bleDevice.mac.replace(":", "").lowercase(Locale.getDefault())
-        mac = mac.substring(mac.length - 4)
+        mac = "FEFA" + mac.substring(mac.length - 8, mac.length)
+
         //拼接发送
         if (!TextUtils.isEmpty(code)) {
             mac += code
         }
+        Log.e("bleConnect", "bleWrite: $mac")
         //监听当前蓝牙是否写入
         bleRead(bleDevice)
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
@@ -301,10 +307,10 @@ class CPRActivity : BaseActivity() {
                 isInitValueMap.clear()
                 bindBluetooth()
                 isStart = true
-                //bleWrite(null, OPEN)
+                bleWrite(mBleDevice!!, OPEN)
             }
             BaseConstant.EVENT_CPR_STOP -> {
-                //bleWrite(null, END)
+                bleWrite(mBleDevice!!, END)
                 isStart = false
                 unBindBluetooth()
                 //清空当前map数据
@@ -739,7 +745,7 @@ class CPRActivity : BaseActivity() {
     }
 
     private val dataMap = mutableMapOf<String, DataVolatile01>()
-    private var dataDTO = BaseDataDTO()
+    private var dataDTO = arrayListOf<BaseDataDTO>()
     private var characteristic: BluetoothGattCharacteristic? = null
     private var mBleDevice: BleDevice? = null
     var deviceCount = 0
@@ -803,9 +809,11 @@ class CPRActivity : BaseActivity() {
             val mDataVolatile = DataVolatile01()
             mDataVolatile.initPreDistance(formatHexString, deviceMAC)
             dataDTO = mDataVolatile.parseString(formatHexString)
-            dataMap[dataDTO.mac] = mDataVolatile
+            //dataMap[dataDTO.mac] = mDataVolatile
         }
+        Log.e("TAG", "原始数据${dataDTO.size}")
         if (isStart) {
+            //数据解析
             StatusLiveData.data.postValue(dataDTO)
         }
         //处理连接后电量显示
