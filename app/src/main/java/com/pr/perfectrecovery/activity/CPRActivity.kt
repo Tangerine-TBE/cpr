@@ -246,39 +246,64 @@ class CPRActivity : BaseActivity() {
     private val CONNECT_SUCCESS = "01"
     private val CONNECT_FAIL = "02"
     private fun bleWrite(bleDevice: BleDevice, code: String?) {
+        if(mBleDevice == null){
+            ToastUtils.showShort("未连接蓝牙，请重新连接。")
+        }
         if (TextUtils.isEmpty(bleDevice.mac)) {
             return
         }
         var mac = bleDevice.mac.replace(":", "").lowercase(Locale.getDefault())
         mac = "fefa" + mac.substring(mac.length - 8, mac.length)
-
         //拼接发送
         if (!TextUtils.isEmpty(code)) {
             mac += code
         }
         Log.e("bleConnect", "bleWrite: $mac")
-        Log.e("bleConnect", "hexStringToBytes: ${HexUtil.hexStringToBytes(mac)}")
-
+        Log.e("bleConnect", "hexStringToBytes: ${HexUtil.hexStringToBytes(mac).toString()}")
         //监听当前蓝牙是否写入
         //bleRead(bleDevice)
-        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
+        val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
         val services = gatt.services
         val bluetoothGattService = services[2]
         val characteristic = bluetoothGattService.characteristics[0]
         BleManager.getInstance().write(
-            bleDevice,
+            mBleDevice,
             characteristic?.service?.uuid.toString(),
             characteristic?.uuid.toString(),
             HexUtil.hexStringToBytes(mac),
             object : BleWriteCallback() {
                 override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
                     Log.e("bleConnect", "onWriteSuccess: current${current}-  total $total")
+                    //setBleDevice(bleDevice)
+                    Handler().postDelayed({searchBle() }, 3000)
                 }
 
                 override fun onWriteFailure(exception: BleException) {
                     Log.e("bleConnect", "onWriteFailure: " + exception.description)
                 }
             })
+    }
+
+    private fun setBleDevice(bleDevice: BleDevice) {
+        count++
+        //处理已连接的设备靠前
+        mDeviceAdapter.remove(bleDevice)
+        bleDevice.isConnected = true
+        bleDevice.isLoading = false
+        bleDevice.count = count
+        //添加已连接蓝牙
+        if (mDeviceAdapter.data.size == 0) {
+            mDeviceAdapter.addData(bleDevice)
+        } else {
+            if (count - 1 <= mDeviceAdapter.data.size) {
+                mDeviceAdapter.addData(count - 1, bleDevice)
+            } else {
+                mDeviceAdapter.addData(bleDevice)
+            }
+        }
+        //                viewBinding.textView.text = "$count"
+        bleList.add(bleDevice)
+        viewBinding.tvConnections.text = "设备连接数：${count}"
     }
 
     private fun searchBle() {
@@ -309,12 +334,16 @@ class CPRActivity : BaseActivity() {
                 isInitValueMap.clear()
 //                bindBluetooth()
                 isStart = true
-                bleWrite(mBleDevice!!, OPEN)
+                if (mBleDevice != null) {
+                    bleWrite(mBleDevice!!, OPEN)
+                }
+            }
+            BaseConstant.EVENT_CPR_BLE_CLOSE -> {
+                if (mBleDevice != null) {
+                    bleWrite(mBleDevice!!, END)
+                }
             }
             BaseConstant.EVENT_CPR_STOP -> {
-//                if (mBleDevice != null) {
-//                    bleWrite(mBleDevice!!, END)
-//                }
                 isStart = false
                 //unBindBluetooth()
                 //清空当前map数据
@@ -378,7 +407,12 @@ class CPRActivity : BaseActivity() {
                             hintHandler.postDelayed(this::setTextNull, 2000)
                         }
                         BleManager.getInstance().cancelScan()
-                        connect(bleDevice, position)
+                        val bleBluetooth = BleManager.getInstance().getBleBluetooth(bleDevice)
+                        if(mBleDevice != null){
+                            bleWrite(bleDevice, "")
+                        } else {
+                            connect(bleDevice, position)
+                        }
                     } else {
                         BleManager.getInstance().disconnect(bleDevice)
                     }
@@ -526,11 +560,7 @@ class CPRActivity : BaseActivity() {
 //                viewBinding.textView.text = "$count"
                     bleList.add(bleDevice)
                     viewBinding.tvConnections.text = "设备连接数：${count}"
-                    if (mBleDevice == null) {
-                        bind(bleDevice)
-                    } else {
-                        bleWrite(bleDevice, "")
-                    }
+                    bind(bleDevice)
                     mBleDevice = bleDevice
                     isItemClickable = true
                     isRefreshPower = true
@@ -752,7 +782,6 @@ class CPRActivity : BaseActivity() {
     }
 
     private val dataMap = mutableMapOf<String, DataVolatile01>()
-    private var dataDTO = arrayListOf<BaseDataDTO>()
     private var mBleDevice: BleDevice? = null
     var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
@@ -800,36 +829,36 @@ class CPRActivity : BaseActivity() {
 
     private var isRefreshPower: Boolean = false
     private var isStart = false
+    private val mDataVolatile = DataVolatile01()
+
+    @Synchronized
     private fun sendMessage(formatHexString: String) {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
         }
-        val deviceMAC =
-            "001b${formatHexString.substring(12, 20)}"
-        Log.e("TAG", "原始数据${formatHexString}")
-        Log.e("TAG", "MAC:${deviceMAC}")
-        val dataVolatile = dataMap[deviceMAC]
-        if (dataVolatile != null) {
-            dataDTO = dataVolatile.parseString(formatHexString)
-        } else {
-            val mDataVolatile = DataVolatile01()
-            mDataVolatile.initPreDistance(formatHexString, deviceMAC)
-            dataDTO = mDataVolatile.parseString(formatHexString)
-            //dataMap[dataDTO.mac] = mDataVolatile
+        val dataDTO = mDataVolatile.parseString(formatHexString)
+        dataDTO.forEach { item ->
+            if ("001b00000000" != item.mac) {
+                val dataVolatile = dataMap[item.mac]
+                if (dataVolatile == null) {
+                    mDataVolatile.initPreDistance(formatHexString, item.mac)
+                    dataMap[item.mac] = mDataVolatile
+                }
+                Log.e("TAG", "原始数据${dataDTO.size}")
+                Log.e("TAG", "原始数据${GsonUtils.toJson(dataDTO)}")
+                if (isStart) {
+                    //数据解析
+                    //StatusLiveData.data.postValue(dataDTO)
+                    StatusLiveData.dataSingle.postValue(item)
+                }
+            }
         }
-        Log.e("TAG", "原始数据${dataDTO.size}")
-        Log.e("TAG", "原始数据${GsonUtils.toJson(dataDTO)}")
-        if (isStart) {
-            //数据解析
-//            StatusLiveData.data.postValue(dataDTO)
-            StatusLiveData.dataSingle.postValue(dataDTO[0])
-        }
-        //处理连接后电量显示
-        if (isRefreshPower) {
-            powerHandler.removeCallbacks(powerRunning)
-            powerHandler.postDelayed(powerRunning, 10000)
-            Handler().postDelayed(this::setPower, 500)
-        }
+            //处理连接后电量显示
+            if (isRefreshPower) {
+                powerHandler.removeCallbacks(powerRunning)
+                powerHandler.postDelayed(powerRunning, 10000)
+                Handler().postDelayed(this::setPower, 500)
+            }
     }
 
     private val powerHandler = Handler(Looper.getMainLooper())
@@ -869,6 +898,7 @@ class CPRActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
+        unBindBluetooth()
         BleManager.getInstance().disconnectAllDevice()
         BleManager.getInstance().destroy()
     }
@@ -996,5 +1026,4 @@ class CPRActivity : BaseActivity() {
         BleManager.getInstance().disconnectAllDevice()
         BleManager.getInstance().destroy()
     }
-
 }

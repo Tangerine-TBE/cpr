@@ -105,7 +105,7 @@ class CycleFragment : Fragment() {
 //        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
 //        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
-       StatusLiveData.dataSingle.observe(requireActivity()) {
+        StatusLiveData.dataSingle.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
@@ -711,6 +711,8 @@ class CycleFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_BLE_CLOSE, "", null))
+
         StatusLiveData.data.value = null
         if (mMediaPlayer != null) {
             mMediaPlayer!!.stop()

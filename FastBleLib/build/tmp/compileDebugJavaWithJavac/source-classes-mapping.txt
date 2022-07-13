@@ -1,5 +1,5 @@
-com/clj/fastble/utils/HexUtil.java
- com.clj.fastble.utils.HexUtil
+com/clj/fastble/callback/BleScanCallback.java
+ com.clj.fastble.callback.BleScanCallback
 com/clj/fastble/callback/BleIndicateCallback.java
  com.clj.fastble.callback.BleIndicateCallback
 com/clj/fastble/data/BleWriteState.java
@@ -64,6 +64,17 @@ com/clj/fastble/bluetooth/MultipleBluetoothController.java
 com/clj/fastble/bluetooth/BleConnector.java
  com.clj.fastble.bluetooth.BleConnector
  com.clj.fastble.bluetooth.BleConnector$1
+com/clj/fastble/data/BleDevice.java
+ com.clj.fastble.data.BleDevice
+ com.clj.fastble.data.BleDevice$1
+com/clj/fastble/exception/TimeoutException.java
+ com.clj.fastble.exception.TimeoutException
+com/clj/fastble/exception/OtherException.java
+ com.clj.fastble.exception.OtherException
+com/clj/fastble/callback/BleScanPresenterImp.java
+ com.clj.fastble.callback.BleScanPresenterImp
+com/clj/fastble/utils/HexUtil.java
+ com.clj.fastble.utils.HexUtil
 com/clj/fastble/scan/BleScanPresenter.java
  com.clj.fastble.scan.BleScanPresenter
  com.clj.fastble.scan.BleScanPresenter$1
@@ -73,14 +84,3 @@ com/clj/fastble/scan/BleScanPresenter.java
  com.clj.fastble.scan.BleScanPresenter$5
  com.clj.fastble.scan.BleScanPresenter$6
  com.clj.fastble.scan.BleScanPresenter$ScanHandler
-com/clj/fastble/exception/TimeoutException.java
- com.clj.fastble.exception.TimeoutException
-com/clj/fastble/exception/OtherException.java
- com.clj.fastble.exception.OtherException
-com/clj/fastble/callback/BleScanPresenterImp.java
- com.clj.fastble.callback.BleScanPresenterImp
-com/clj/fastble/data/BleDevice.java
- com.clj.fastble.data.BleDevice
- com.clj.fastble.data.BleDevice$1
-com/clj/fastble/callback/BleScanCallback.java
- com.clj.fastble.callback.BleScanCallback

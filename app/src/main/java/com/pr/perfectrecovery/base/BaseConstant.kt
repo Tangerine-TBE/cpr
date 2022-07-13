@@ -34,4 +34,5 @@ object BaseConstant {
     val EVENT_DO_BIND = 10013
     val EVENT_DO_START = 10014
     val EVENT_CANCEL_DIALOG = 10015
+    val EVENT_CPR_BLE_CLOSE = 10016
 }

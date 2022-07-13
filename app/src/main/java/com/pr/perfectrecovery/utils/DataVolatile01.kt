@@ -157,7 +157,6 @@ class DataVolatile01 {
     /**
      * 获取吹气值和
      */
-
     fun qyValue(): Int {
         var sum = 0
         for (i in QY_valueSet2.indices) {
@@ -362,7 +361,7 @@ class DataVolatile01 {
         } else if (data != null && data.length == 20) {
             listData.add(baseDataDecode(data))
         }
-        Log.e("GSON", Gson().toJson(listData))
+        //Log.e("GSON", Gson().toJson(listData))
         return listData
     }
 
