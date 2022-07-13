@@ -69,6 +69,35 @@ public class ConvertUtil {
         return stringBuilder.toString();
     }
 
+    /*
+     * 16进制字符串转字节数组
+     */
+    public static byte[] hexString2Bytes(String hex) {
+        if ((hex == null) || (hex.equals(""))) {
+            return null;
+        } else if (hex.length() % 2 != 0) {
+            return null;
+        } else {
+            hex = hex.toUpperCase();
+            int len = hex.length() / 2;
+            byte[] b = new byte[len];
+            char[] hc = hex.toCharArray();
+            for (int i = 0; i < len; i++) {
+                int p = 2 * i;
+                b[i] = (byte) (charToByte(hc[p]) << 4 | charToByte(hc[p + 1]));
+            }
+            return b;
+        }
+
+    }
+
+    /*
+     * 字符转换为字节
+     */
+    private static byte charToByte(char c) {
+        return (byte) "0123456789ABCDEF".indexOf(c);
+    }
+
     /**
      * 16进制字符串转换为Byte值
      *
@@ -87,6 +116,16 @@ public class ConvertUtil {
         }
         return ret;
     }
+
+    public static byte[] StringToByteArray(String str) {
+        String[] str_ary = str.split(" ");
+        int n = str_ary.length;
+        byte[] bt_ary = new byte[n];
+        for (int i = 0; i < n; i++)
+            bt_ary[i] = (byte) Integer.parseInt(str_ary[i], 16);
+        return bt_ary;
+    }
+
 
     /**
      * 字符串转换成十六进制字符串

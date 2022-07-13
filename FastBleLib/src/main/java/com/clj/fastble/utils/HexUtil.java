@@ -93,7 +93,6 @@ public class HexUtil {
         return digit;
     }
 
-
     public static byte[] hexStringToBytes(String hexString) {
         if (hexString == null || hexString.equals("")) {
             return null;

@@ -105,7 +105,7 @@ class CycleFragment : Fragment() {
 //        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
 //        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
-       /* StatusLiveData.data.observe(requireActivity()) {
+       StatusLiveData.dataSingle.observe(requireActivity()) {
             if (it != null) {
                 setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
@@ -123,7 +123,7 @@ class CycleFragment : Fragment() {
                             "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
                             "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
             }
-        }*/
+        }
 
         val dataDTO = BaseDataDTO()
         viewBinding.chartQy.setOnClickListener {

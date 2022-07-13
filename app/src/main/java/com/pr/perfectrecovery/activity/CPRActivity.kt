@@ -181,8 +181,6 @@ class CPRActivity : BaseActivity() {
         viewBinding.progressCircular.setOnClickListener {
 //            BaseApplication.driver?.ResumeUsbList()
             searchBle()
-//            val data = "FE 36 38 3A 2E 23 29 51 47 3F FE 5E 3B 6B 32 03 A0 97 E1 74 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-//            sendMessage(data)
         }
         viewBinding.recyclerview.adapter = mDeviceAdapter
         mDeviceAdapter.setOnItemClickListener(itemClick)
@@ -212,31 +210,31 @@ class CPRActivity : BaseActivity() {
      * 读取蓝牙写入
      */
     private fun bleRead(bleDevice: BleDevice) {
-        BleManager.getInstance().read(
-            bleDevice,
-            characteristic?.service?.uuid.toString(),
-            characteristic?.uuid.toString(),
-            object : BleReadCallback() {
-                override fun onReadSuccess(data: ByteArray) {
-                    val formatHexString = HexUtil.formatHexString(data, true)
-                    if (!TextUtils.isEmpty(formatHexString)
-                        && formatHexString.substring(formatHexString.length - 2) == "01"
-                    ) {
-                        //连接成功
-                        Log.e("bleConnect", "onReadSuccess: 成功")
-                    } else {
-                        //连接失败
-                        Log.e("bleConnect", "onReadSuccess: 失败")
-                    }
-                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
-                }
-
-                override fun onReadFailure(exception: BleException) {
-                    //runOnUiThread { addText(txt, exception.toString()) }
-                    //连接异常 == 失败
-                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
-                }
-            })
+//        BleManager.getInstance().read(
+//            bleDevice,
+//            characteristic?.service?.uuid.toString(),
+//            characteristic?.uuid.toString(),
+//            object : BleReadCallback() {
+//                override fun onReadSuccess(data: ByteArray) {
+//                    val formatHexString = HexUtil.formatHexString(data, true)
+//                    if (!TextUtils.isEmpty(formatHexString)
+//                        && formatHexString.substring(formatHexString.length - 2) == "01"
+//                    ) {
+//                        //连接成功
+//                        Log.e("bleConnect", "onReadSuccess: 成功")
+//                    } else {
+//                        //连接失败
+//                        Log.e("bleConnect", "onReadSuccess: 失败")
+//                    }
+//                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
+//                }
+//
+//                override fun onReadFailure(exception: BleException) {
+//                    //runOnUiThread { addText(txt, exception.toString()) }
+//                    //连接异常 == 失败
+//                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
+//                }
+//            })
     }
 
     /**
@@ -252,17 +250,21 @@ class CPRActivity : BaseActivity() {
             return
         }
         var mac = bleDevice.mac.replace(":", "").lowercase(Locale.getDefault())
-        mac = "FEFA" + mac.substring(mac.length - 8, mac.length)
+        mac = "fefa" + mac.substring(mac.length - 8, mac.length)
 
         //拼接发送
         if (!TextUtils.isEmpty(code)) {
             mac += code
         }
         Log.e("bleConnect", "bleWrite: $mac")
+        Log.e("bleConnect", "hexStringToBytes: ${HexUtil.hexStringToBytes(mac)}")
+
         //监听当前蓝牙是否写入
-        bleRead(bleDevice)
+        //bleRead(bleDevice)
         val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
-        //HexUtil.hexStringToBytes(mac)
+        val services = gatt.services
+        val bluetoothGattService = services[2]
+        val characteristic = bluetoothGattService.characteristics[0]
         BleManager.getInstance().write(
             bleDevice,
             characteristic?.service?.uuid.toString(),
@@ -270,11 +272,11 @@ class CPRActivity : BaseActivity() {
             HexUtil.hexStringToBytes(mac),
             object : BleWriteCallback() {
                 override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
-                    Log.e("bleConnect", "onWriteSuccess: ")
+                    Log.e("bleConnect", "onWriteSuccess: current${current}-  total $total")
                 }
 
                 override fun onWriteFailure(exception: BleException) {
-                    Log.e("bleConnect", "onWriteFailure: ")
+                    Log.e("bleConnect", "onWriteFailure: " + exception.description)
                 }
             })
     }
@@ -305,14 +307,16 @@ class CPRActivity : BaseActivity() {
         when (event.code) {
             BaseConstant.EVENT_CPR_START -> {
                 isInitValueMap.clear()
-                bindBluetooth()
+//                bindBluetooth()
                 isStart = true
                 bleWrite(mBleDevice!!, OPEN)
             }
             BaseConstant.EVENT_CPR_STOP -> {
-                bleWrite(mBleDevice!!, END)
+//                if (mBleDevice != null) {
+//                    bleWrite(mBleDevice!!, END)
+//                }
                 isStart = false
-                unBindBluetooth()
+                //unBindBluetooth()
                 //清空当前map数据
                 dataMap.values.forEach { item ->
                     item.dataClear()
@@ -490,6 +494,7 @@ class CPRActivity : BaseActivity() {
                     mDeviceAdapter.remove(bleDevice)
                     mDeviceAdapter.addData(position, bleDevice)
                     isItemClickable = true
+                    mBleDevice = null
                     if (exception.code == BleException.ERROR_CODE_TIMEOUT) {
                         viewBinding.tvMsg.text = "连接超时，请重新连接"
                     } else {
@@ -526,6 +531,7 @@ class CPRActivity : BaseActivity() {
                     } else {
                         bleWrite(bleDevice, "")
                     }
+                    mBleDevice = bleDevice
                     isItemClickable = true
                     isRefreshPower = true
                 }
@@ -537,6 +543,7 @@ class CPRActivity : BaseActivity() {
                     status: Int
                 ) {
                     count--
+                    mBleDevice = null
                     bleList.remove(bleDevice)
                     if (isActiveDisConnected) {
                         ToastUtils.showLong(bleDevice.name + getString(R.string.active_disconnected))
@@ -741,12 +748,11 @@ class CPRActivity : BaseActivity() {
             characteristic.service.uuid.toString(),
             characteristic.uuid.toString()
         )
-        mBleDevice = null
+//        mBleDevice = null
     }
 
     private val dataMap = mutableMapOf<String, DataVolatile01>()
     private var dataDTO = arrayListOf<BaseDataDTO>()
-    private var characteristic: BluetoothGattCharacteristic? = null
     private var mBleDevice: BleDevice? = null
     var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
@@ -754,7 +760,7 @@ class CPRActivity : BaseActivity() {
         //蓝牙服务列表
         val services = gatt.services
         val bluetoothGattService = services[2]
-        characteristic = bluetoothGattService.characteristics[1]
+        val characteristic = bluetoothGattService.characteristics[1]
         BleManager.getInstance().notify(
             bleDevice,
             characteristic?.service?.uuid.toString(),
@@ -785,7 +791,7 @@ class CPRActivity : BaseActivity() {
                             false
                         )
                         runOnUiThread { Log.e("CPRActivity", formatHexString) }
-                        Log.e("TAG9", "原始数据${formatHexString}")
+                        Log.e("CPRActivity", "原始数据${formatHexString}")
                         sendMessage(formatHexString)
                     }
                 }
@@ -799,7 +805,7 @@ class CPRActivity : BaseActivity() {
             return
         }
         val deviceMAC =
-            "001b${formatHexString.substring(12)}"
+            "001b${formatHexString.substring(12, 20)}"
         Log.e("TAG", "原始数据${formatHexString}")
         Log.e("TAG", "MAC:${deviceMAC}")
         val dataVolatile = dataMap[deviceMAC]
@@ -812,9 +818,11 @@ class CPRActivity : BaseActivity() {
             //dataMap[dataDTO.mac] = mDataVolatile
         }
         Log.e("TAG", "原始数据${dataDTO.size}")
+        Log.e("TAG", "原始数据${GsonUtils.toJson(dataDTO)}")
         if (isStart) {
             //数据解析
-            StatusLiveData.data.postValue(dataDTO)
+//            StatusLiveData.data.postValue(dataDTO)
+            StatusLiveData.dataSingle.postValue(dataDTO[0])
         }
         //处理连接后电量显示
         if (isRefreshPower) {
@@ -845,8 +853,7 @@ class CPRActivity : BaseActivity() {
                 dataMap.keys.forEach {
                     val dataItme = dataMap[it]
                     if (dataItme != null && replaceMac == dataItme.deviceMAC) {
-                        Log.e("sendMessage", "MAC：${dataItme.deviceMAC}")
-                        Log.e("sendMessage", "电量值：${dataItme.VI_Value}")
+                        Log.e("sendMessage", "MAC：${dataItme.deviceMAC}  电量值：${dataItme.VI_Value}")
                         item.power = dataItme.VI_Value
 //                        return@forEach
                     }
@@ -948,7 +955,7 @@ class CPRActivity : BaseActivity() {
             }
         } else {
             //关闭USB TTL
-            Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
             try {
                 ToastUtils.showShort("打开设备成功!")
                 bleDevice?.isConnected = false
@@ -966,13 +973,13 @@ class CPRActivity : BaseActivity() {
 
     inner class ReadThread : Thread() {
         override fun run() {
-            val buffer = ByteArray(64)
+            val buffer = ByteArray(60)
             while (true) {
                 val msg = Message.obtain()
                 if (!BaseApplication.driver?.isConnected!!) {
                     break
                 }
-                val length: Int = BaseApplication.driver!!.ReadData(buffer, 64)
+                val length: Int = BaseApplication.driver!!.ReadData(buffer, 60)
                 if (length > 0) {
                     runOnUiThread {
                         val formatHexString = ConvertUtil.toHexString(buffer, length)

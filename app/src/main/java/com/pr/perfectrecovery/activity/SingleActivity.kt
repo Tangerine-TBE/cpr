@@ -70,10 +70,10 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
+//            EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
             cycleFragment?.start()
             if (isStart) {
 //                DataVolatile.isStart = true
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
 //                cycleFragment?.start()
