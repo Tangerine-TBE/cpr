@@ -434,7 +434,7 @@ class DataVolatile01 {
 * 获取初始位置，每次连接成功后调用一次初始化方法
 * */
 
-    var preDistance: Long = 180
+    var preDistance: Long = 150
 
     var preDistanceMap = mutableMapOf<String, Long>()
 
