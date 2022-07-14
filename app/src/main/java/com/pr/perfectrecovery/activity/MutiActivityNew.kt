@@ -340,7 +340,7 @@ class MutiActivityNew : BaseActivity() {
             isQyMap[mac] = false
             isPrMap[mac] = false
             prMany(mac)
-            var cycleCount = cycleCountMap[mac] ?: 0
+            val cycleCount = cycleCountMap[mac] ?: 0
             cycleCountMap[mac] = cycleCount + 1
         }
     }

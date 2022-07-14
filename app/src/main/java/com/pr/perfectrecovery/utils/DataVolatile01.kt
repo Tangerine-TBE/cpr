@@ -352,10 +352,17 @@ class DataVolatile01 {
     @Synchronized
     fun parseString(data: String?): ArrayList<BaseDataDTO> {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
+        val newDataVolatile = DataVolatile01()
         val listData = arrayListOf<BaseDataDTO>()
         if (data != null && data.length >= 120) {
             for (index in 1..6) {
                 val oneData = "" + data.substring(20 * (index - 1), 20 * index)
+//                val deviceMAC =
+//                    "001b${oneData.substring(12)}"
+//                val isInit = preDistanceMap[deviceMAC]
+//                if (isInit == null) {
+//                    initPreDistance(oneData, deviceMAC)
+//                }
                 listData.add(baseDataDecode(oneData))
             }
         } else if (data != null && data.length == 20) {
@@ -430,12 +437,11 @@ class DataVolatile01 {
         py_valueSet.clear()
         pt_valueSet.clear()
     }
+
     /*
-* 获取初始位置，每次连接成功后调用一次初始化方法
-* */
-
-    var preDistance: Long = 150
-
+    * 获取初始位置，每次连接成功后调用一次初始化方法
+    * */
+    var preDistance: Long = 180
     var preDistanceMap = mutableMapOf<String, Long>()
 
     @Synchronized

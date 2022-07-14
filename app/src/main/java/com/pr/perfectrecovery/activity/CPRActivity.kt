@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -210,31 +209,36 @@ class CPRActivity : BaseActivity() {
      * 读取蓝牙写入
      */
     private fun bleRead(bleDevice: BleDevice) {
-//        BleManager.getInstance().read(
-//            bleDevice,
-//            characteristic?.service?.uuid.toString(),
-//            characteristic?.uuid.toString(),
-//            object : BleReadCallback() {
-//                override fun onReadSuccess(data: ByteArray) {
-//                    val formatHexString = HexUtil.formatHexString(data, true)
-//                    if (!TextUtils.isEmpty(formatHexString)
-//                        && formatHexString.substring(formatHexString.length - 2) == "01"
-//                    ) {
-//                        //连接成功
-//                        Log.e("bleConnect", "onReadSuccess: 成功")
-//                    } else {
-//                        //连接失败
-//                        Log.e("bleConnect", "onReadSuccess: 失败")
-//                    }
-//                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
-//                }
-//
-//                override fun onReadFailure(exception: BleException) {
-//                    //runOnUiThread { addText(txt, exception.toString()) }
-//                    //连接异常 == 失败
-//                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
-//                }
-//            })
+        val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
+        val services = gatt.services
+        val bluetoothGattService = services[0]
+        val characteristic = bluetoothGattService.characteristics[0]
+        BleManager.getInstance().read(
+            bleDevice,
+            characteristic?.service?.uuid.toString(),
+            characteristic?.uuid.toString(),
+            object : BleReadCallback() {
+                override fun onReadSuccess(data: ByteArray) {
+                    val formatHexString = HexUtil.formatHexString(data)
+                    Log.e("bleConnect", "onReadSuccess: $formatHexString")
+                    if (!TextUtils.isEmpty(formatHexString)
+                        && formatHexString.substring(formatHexString.length - 2) == "01"
+                    ) {
+                        //连接成功
+                        Log.e("bleConnect", "onReadSuccess: 成功")
+                    } else {
+                        //连接失败
+                        Log.e("bleConnect", "onReadSuccess: 失败")
+                    }
+                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
+                }
+
+                override fun onReadFailure(exception: BleException) {
+                    //runOnUiThread { addText(txt, exception.toString()) }
+                    //连接异常 == 失败
+                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
+                }
+            })
     }
 
     /**
@@ -261,7 +265,6 @@ class CPRActivity : BaseActivity() {
         Log.e("bleConnect", "bleWrite: $mac")
         Log.e("bleConnect", "hexStringToBytes: ${HexUtil.hexStringToBytes(mac).toString()}")
         //监听当前蓝牙是否写入
-        //bleRead(bleDevice)
         val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
         val services = gatt.services
         val bluetoothGattService = services[2]
@@ -275,7 +278,8 @@ class CPRActivity : BaseActivity() {
                 override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
                     Log.e("bleConnect", "onWriteSuccess: current${current}-  total $total")
                     setBleDevice(bleDevice)
-                    Handler().postDelayed({ searchBle() }, 3000)
+                    //Handler().postDelayed({ searchBle() }, 3000)
+                    bleRead(mBleDevice!!)
                 }
 
                 override fun onWriteFailure(exception: BleException) {
@@ -303,7 +307,7 @@ class CPRActivity : BaseActivity() {
         }
         //                viewBinding.textView.text = "$count"
         bleList.add(bleDevice)
-        viewBinding.tvConnections.text = "设备连接数：${count}"
+        viewBinding.tvConnections.text = "设备连接数：${bleList.size}"
     }
 
     private fun searchBle() {
@@ -341,6 +345,10 @@ class CPRActivity : BaseActivity() {
             BaseConstant.EVENT_CPR_BLE_CLOSE -> {
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, END)
+                }
+                //清空当前map数据
+                dataMap.values.forEach { item ->
+                    item.dataClear()
                 }
             }
             BaseConstant.EVENT_CPR_STOP -> {
@@ -833,28 +841,36 @@ class CPRActivity : BaseActivity() {
 
     private var isRefreshPower: Boolean = false
     private var isStart = false
-    private val mDataVolatile = DataVolatile01()
     private var deviceCount: Int = 0
+    private var mBaseDataDTO = BaseDataDTO()
 
     @Synchronized
     private fun sendMessage(formatHexString: String) {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
         }
+        val mDataVolatile = DataVolatile01()
         val dataDTO = mDataVolatile.parseString(formatHexString)
         Log.e("TAG", "原始数据${String}")
         Log.e("TAG", "解析GSON：${GsonUtils.toJson(dataDTO)}")
-        dataDTO.forEach { item ->
+        dataDTO.forEachIndexed { index, item ->
             if ("001b00000000" != item.mac) {
                 val dataVolatile = dataMap[item.mac]
+                val params = formatHexString.subSequence(
+                    20 * index,
+                    20 * (index + 1)
+                ).toString()
                 if (dataVolatile == null) {
                     val newDataVolatile = DataVolatile01()
-                    newDataVolatile.initPreDistance(formatHexString, item.mac)
+                    newDataVolatile.initPreDistance(params, item.mac)
                     dataMap[item.mac] = newDataVolatile
+                    mBaseDataDTO = newDataVolatile.baseDataDecode(params)
+                } else {
+                    mBaseDataDTO = dataVolatile.baseDataDecode(params)
                 }
                 if (isStart) {
 //                    StatusLiveData.data.postValue(dataDTO)
-                    StatusLiveData.dataSingle.postValue(item)
+                    StatusLiveData.dataSingle.postValue(mBaseDataDTO)
                 }
             }
         }
