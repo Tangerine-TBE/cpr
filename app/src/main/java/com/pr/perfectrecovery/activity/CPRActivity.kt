@@ -346,33 +346,23 @@ class CPRActivity : BaseActivity() {
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, END)
                 }
-                //清空当前map数据
-                dataMap.values.forEach { item ->
-                    item.dataClear()
-                }
             }
             BaseConstant.EVENT_CPR_STOP -> {
                 isStart = false
                 //unBindBluetooth()
                 //清空当前map数据
-                dataMap.values.forEach { item ->
-                    item.dataClear()
-                }
+                clearMap()
             }
             BaseConstant.EVENT_CPR_CLEAR -> {
                 //清空当前map数据
-                dataMap.values.forEach { item ->
-                    item.dataClear()
-                }
+                clearMap()
             }
             BaseConstant.CLEAR_DEVICE_HISTORY_DATA -> {
                 deviceCount = 0
                 unBindBluetooth()
                 Log.e("hunger_test_clear", " recieve message")
                 //清空当前map数据
-                dataMap.values.forEach { item ->
-                    item.dataClear()
-                }
+                clearMap()
                 dataMap.clear()
                 isInitValueMap.clear()
                 Log.e("hunger_test_clear", " clear done")
@@ -388,6 +378,13 @@ class CPRActivity : BaseActivity() {
                     bleWrite(mBleDevice!!, OPEN)
                 }
             }
+        }
+    }
+
+    private fun clearMap() {
+        dataMap.values.forEach { item ->
+            item.dataClear()
+            dataMap.remove(item.deviceMAC)
         }
     }
 
