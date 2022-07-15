@@ -346,6 +346,7 @@ class CPRActivity : BaseActivity() {
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, END)
                 }
+                clearMap()
             }
             BaseConstant.EVENT_CPR_STOP -> {
                 isStart = false
