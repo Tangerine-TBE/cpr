@@ -307,7 +307,16 @@ class CPRActivity : BaseActivity() {
         }
         //                viewBinding.textView.text = "$count"
         bleList.add(bleDevice)
+        bleList = removeDuplicate()
         viewBinding.tvConnections.text = "设备连接数：${bleList.size}"
+    }
+
+    fun removeDuplicate(): MutableList<BleDevice> {
+        val set: MutableSet<BleDevice> = LinkedHashSet<BleDevice>()
+        set.addAll(bleList)
+        bleList.clear()
+        bleList.addAll(set)
+        return bleList
     }
 
     private fun searchBle() {
@@ -868,6 +877,7 @@ class CPRActivity : BaseActivity() {
                 }
                 if (isStart) {
 //                    StatusLiveData.data.postValue(dataDTO)
+                    Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
                     StatusLiveData.dataSingle.postValue(mBaseDataDTO)
                 }
             }

@@ -190,9 +190,7 @@ class MutiActivityNew : BaseActivity() {
             }
             dataList.add(item)
         }
-
         initDeviceView()
-
         val timeDrawable =
             if (mTrainingBean?.isCheck == true) resources.getDrawable(R.mipmap.icon_wm_countdown) else resources.getDrawable(
                 R.mipmap.icon_wm_time
