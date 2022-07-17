@@ -56,6 +56,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -382,7 +383,8 @@ class CPRActivity : BaseActivity() {
                 isInitValueMap.clear()
                 bindBluetooth()
             }
-            BaseConstant.EVENT_DO_START -> {
+            BaseConstant.EVENT_DO_MULTI_START -> {
+                isMulti = true
                 isStart = true
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, OPEN)
@@ -848,6 +850,7 @@ class CPRActivity : BaseActivity() {
 
     private var isRefreshPower: Boolean = false
     private var isStart = false
+    private var isMulti = false
     private var deviceCount: Int = 0
     private var mBaseDataDTO = BaseDataDTO()
 
@@ -860,6 +863,7 @@ class CPRActivity : BaseActivity() {
         val dataDTO = mDataVolatile.parseString(formatHexString)
         Log.e("TAG", "原始数据${String}")
         Log.e("TAG", "解析GSON：${GsonUtils.toJson(dataDTO)}")
+        data.clear()
         dataDTO.forEachIndexed { index, item ->
             if ("001b00000000" != item.mac) {
                 val dataVolatile = dataMap[item.mac]
@@ -876,11 +880,19 @@ class CPRActivity : BaseActivity() {
                     mBaseDataDTO = dataVolatile.baseDataDecode(params)
                 }
                 if (isStart) {
+                    if (isMulti){
+                        data.add(mBaseDataDTO)
+                    } else {
 //                    StatusLiveData.data.postValue(dataDTO)
                     Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
-                    StatusLiveData.dataSingle.postValue(mBaseDataDTO)
+                        StatusLiveData.dataSingle.postValue(mBaseDataDTO)
+                    }
                 }
             }
+        }
+        if (isStart && isMulti) {
+            Log.e("hunger_test_post_multi", data.toString())
+            StatusLiveData.data.postValue(data)
         }
         //处理连接后电量显示
         if (isRefreshPower) {
@@ -889,6 +901,7 @@ class CPRActivity : BaseActivity() {
             Handler().postDelayed(this::setPower, 500)
         }
     }
+    val data = ArrayList<BaseDataDTO>()
 
     private val powerHandler = Handler(Looper.getMainLooper())
     private val powerRunning = Runnable {

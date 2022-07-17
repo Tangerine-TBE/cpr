@@ -179,6 +179,7 @@ class MutiActivityNew : BaseActivity() {
                 val bean = mTrainingBean?.list?.get(i)
 //                item.mac = testMac[i]
                 item.mac = bean?.mac.toString()
+                Log.e("hunger_test_init", bean?.mac.toString() )
                 item.isStart = false
                 item.distance = 0
                 item.bpValue = 0
@@ -216,7 +217,7 @@ class MutiActivityNew : BaseActivity() {
             }
             isStart = !isStart
             if (isStart) {
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_DO_START, "", null))
+                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_DO_MULTI_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -532,12 +533,14 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun observeData() {
-        StatusLiveData.dataSingle.observe(this, Observer {
-            it?.let {
-                Log.e("hunger_test", "printData: mac: ${it.mac}, distance: ${it.distance}")
-                val view = getItemViewByMac(it.mac)
-                if (isStart && hasDoneMap[it.mac] != true)
-                    setViewData(view, it)
+        StatusLiveData.data.observe(this, Observer {
+            it.forEach { item ->
+                Log.e("hunger_test_receive", it.toString())
+                item.let {
+                    val view = getItemViewByMac(item.mac)
+                    if (isStart && hasDoneMap[item.mac] != true)
+                        setViewData(view, item)
+                }
             }
         })
     }
