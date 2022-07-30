@@ -880,12 +880,12 @@ class CPRActivity : BaseActivity() {
                     mBaseDataDTO = dataVolatile.baseDataDecode(params)
                 }
                 if (isStart) {
-                    if (isMulti){
+                    if (isMulti) {
                         data.add(mBaseDataDTO)
                     } else {
 //                    StatusLiveData.data.postValue(dataDTO)
-                    Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
-                        StatusLiveData.dataSingle.postValue(mBaseDataDTO)
+                        Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
+                        StatusLiveData.dataSingle.value = mBaseDataDTO
                     }
                 }
             }
@@ -901,6 +901,7 @@ class CPRActivity : BaseActivity() {
             Handler().postDelayed(this::setPower, 500)
         }
     }
+
     val data = ArrayList<BaseDataDTO>()
 
     private val powerHandler = Handler(Looper.getMainLooper())

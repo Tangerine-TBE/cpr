@@ -761,7 +761,7 @@
                             android:layout_marginTop="@dimen/dp_16"
                             android:background="@mipmap/icon_wm_lung_green"
                             android:gravity="center"
-                            android:paddingBottom="@dimen/dp_26"
+                            android:paddingBottom="@dimen/dp_28"
                             android:textColor="#ffffffff"
                             android:textSize="13sp"
                             app:layout_constraintEnd_toEndOf="@+id/tvClock2"

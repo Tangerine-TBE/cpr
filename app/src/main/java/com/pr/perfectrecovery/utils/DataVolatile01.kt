@@ -354,9 +354,9 @@ class DataVolatile01 {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
         val newDataVolatile = DataVolatile01()
         val listData = arrayListOf<BaseDataDTO>()
-        val num=data.length/20
+        val num = data?.length?.div(20)
         if (data != null && data.length >= 20) {
-            for (index in 1..num) {
+            for (index in 1..num!!) {
                 val oneData = "" + data.substring(20 * (index - 1), 20 * index)
 //                val deviceMAC =
 //                    "001b${oneData.substring(12)}"
