@@ -128,6 +128,7 @@ class CPRActivity : BaseActivity() {
                 mDeviceAdapter.setList(null)
                 for (port in driver.ports.indices) {
                     bleDevice = BleDevice(driver)
+                    mDeviceAdapter.remove(bleDevice)
                     mDeviceAdapter.addData(bleDevice)
                 }
             }
@@ -625,8 +626,6 @@ class CPRActivity : BaseActivity() {
                                 )
                             )
                     }
-
-//                unBind(bleDevice)
                     val newList = mutableListOf<BleDevice>()
                     for (item in mDeviceAdapter.data) {
                         if (item.count > bleDevice.count) {
@@ -642,6 +641,7 @@ class CPRActivity : BaseActivity() {
                     bleDevice.count = 0
                     newList.add(bleDevice)
                     mDeviceAdapter.setList(dedupList(newList))
+//                    refresh()
                     isItemClickable = true
                 }
             })
