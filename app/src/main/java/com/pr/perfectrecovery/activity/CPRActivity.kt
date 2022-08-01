@@ -362,6 +362,9 @@ class CPRActivity : BaseActivity() {
             BaseConstant.EVENT_CPR_STOP -> {
                 isStart = false
                 //unBindBluetooth()
+                if (mBleDevice != null) {
+                    bleWrite(mBleDevice!!, END)
+                }
                 //清空当前map数据
                 clearMap()
             }
@@ -387,6 +390,8 @@ class CPRActivity : BaseActivity() {
             BaseConstant.EVENT_DO_MULTI_START -> {
                 isMulti = true
                 isStart = true
+                countParse = 0
+                countParse2 = 0
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, OPEN)
                 }
@@ -806,7 +811,7 @@ class CPRActivity : BaseActivity() {
 
     //    var deviceCount = 0
     private fun bind(bleDevice: BleDevice?) {
-        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice)
+        val gatt = BleManager.getInstance().getBluetoothGatt(bleDevice) ?: return
         //蓝牙服务列表
         val services = gatt.services
         val bluetoothGattService = services[2]
@@ -854,6 +859,9 @@ class CPRActivity : BaseActivity() {
     private var deviceCount: Int = 0
     private var mBaseDataDTO = BaseDataDTO()
 
+    private var countParse = 0
+    private var countParse2 = 0
+
     @Synchronized
     private fun sendMessage(formatHexString: String) {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
@@ -861,10 +869,12 @@ class CPRActivity : BaseActivity() {
         }
         val mDataVolatile = DataVolatile01()
         val dataDTO = mDataVolatile.parseString(formatHexString)
-        Log.e("TAG", "原始数据${String}")
-        Log.e("TAG", "解析GSON：${GsonUtils.toJson(dataDTO)}")
         data.clear()
+        countParse += dataDTO.size
         dataDTO.forEachIndexed { index, item ->
+            Log.e("forEachIndexed", "GSON：${GsonUtils.toJson(item)}")
+            countParse2++
+            Log.e("countParse", "countParse：${countParse} ==== countParse2：${countParse2} ")
             if ("001b00000000" != item.mac) {
                 val dataVolatile = dataMap[item.mac]
                 val params = formatHexString.subSequence(
@@ -892,7 +902,7 @@ class CPRActivity : BaseActivity() {
         }
         if (isStart && isMulti) {
             Log.e("hunger_test_post_multi", data.toString())
-            StatusLiveData.data.postValue(data)
+            StatusLiveData.data.value = data
         }
         //处理连接后电量显示
         if (isRefreshPower) {

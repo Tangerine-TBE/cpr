@@ -42,7 +42,6 @@ class CycleFragment : Fragment() {
     private var isStart = false
     private var isTimeing = true
     private var configBean = ConfigBean()
-    private var baseDataDTO: BaseDataDTO? = null
 
     //按压少次
     private var prLessCount: Int = 0
@@ -108,8 +107,7 @@ class CycleFragment : Fragment() {
         //按压通气比列
         StatusLiveData.dataSingle.observe(requireActivity()) {
             if (it != null) {
-                baseDataDTO = it
-                setViewDate(baseDataDTO)
+                setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
                 viewBinding.tvPress5.text = "按压频率：${it.pf}"
@@ -215,7 +213,7 @@ class CycleFragment : Fragment() {
     fun start() {
         //开始时清空残留数据
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
-//        DataVolatile01.clearErrorData()
+        DataVolatile01.clearErrorData()
         cycleCount = 0
         //更新循环次数
         EventBus.getDefault().post(

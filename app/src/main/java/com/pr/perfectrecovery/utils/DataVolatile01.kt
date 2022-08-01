@@ -1,7 +1,6 @@
 package com.pr.perfectrecovery.utils
 
 import android.util.Log
-import com.google.gson.Gson
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import kotlin.math.abs
 
@@ -26,89 +25,202 @@ class DataVolatile01 {
         //操作模式false-训练 true-考核模式
         var MODEL: Boolean = false
 
-        fun setModel(model: Boolean) {
-            MODEL = model
-            Log.e("CPRActivity", "MODEL =  $MODEL")
+        //按压错误-按压未回弹
+        private var ERR_PR_UNBACK = 0
+
+        //按压错误-按压不足
+        private var ERR_PR_LOW = 0
+
+        //按压错误-按压过大
+        private var ERR_PR_HIGH = 0
+
+        //按压错误-按压位置错误
+        private var ERR_PR_POSI = 0
+
+        //按压超次
+        private var ERR_PR_TOOMORE = 0
+
+        //按压少次
+        private var ERR_PR_TOOLITTLE = 0
+
+        //单次按压循环的次数
+        private var PR_CYCLE_TIMES = 0
+
+        //吹气错误-气压不足
+        private var ERR_QY_LOW = 0
+
+        //吹气错误-气压过大
+        private var ERR_QY_HIGH = 0
+
+        //吹气错误-气压进胃
+        private var ERR_QY_DEAD = 0
+
+        //单次循环吹气次数
+        private var QY_CYCLE_TIMES = 0
+
+        //吹气超次
+        private var QY_TIMES_TOOMORE = 0
+
+        //吹气少次
+        private var QY_TIMES_TOOLITTLE = 0
+
+        //吹气错误-气道未打开错误
+        private var ERR_QY_CLOSE = 0
+
+        //距离值：  30-150
+        private var L_Value = 0
+
+        //气压值：  0-2000ml
+        private var QY_Value = 0
+
+        //蓝牙连接状态：   0-断开 1-连接
+        private var BLS_Value = 0
+
+        //USB连接状态: 0-断开 1-连接
+        private var ULS_Value = 0
+
+        //通道打开状态 0-关闭 1-打开
+        private var TOS_Value = 0
+
+        //连接方式  0-蓝牙 1-连接USB
+        private var LKS_Value = 0
+
+        //按压位置正确  0-错误  1-正确
+        private var PSR_Value = 0
+
+        //工作方式：00——休眠   01——工作    02——待机
+        private var WS_Value = 0
+
+        //按压频率：0-200
+        private var PF_Value = 0
+
+        //吹气频率：0-200
+        private var CF_Value = 0
+
+        //按压次数
+        private var PR_SUM = 0
+
+        //吹气次数
+        private var QY_SUM = 0
+
+        //吹气上升或下降标志位
+        private var top_flag = 0
+
+        //按压上升或下降标志位
+        private var low_flag = 0
+
+        private var Qliang = 0
+
+        private val dataDTO = BaseDataDTO()
+        private var L_d1 = 0
+        private var L_d2 = 0
+        private var L_d3 = 0
+
+        private var QY_d1 = 0
+        private var QY_d2 = 0
+        private var QY_d3 = 0
+
+
+        //是否开始数据传输
+        private var isStart = false
+
+        //按压或吹气模式：1为吹气，0为按压
+        private var work_Mode = 0
+
+        //上一次按压或吹气模式：1为吹气，0为按压
+        private var pre_work_Mode = 0
+
+        private var L_valueSet = mutableListOf<Int>()
+        private var QY_valueSet = mutableListOf<Int>()
+        private var QY_valueSet2 = mutableListOf<Int>()
+        private var QY_valueSet3 = mutableListOf<Int>()
+        private var pt_valueSet = mutableListOf<Int>()
+        private var py_valueSet = mutableListOf<Int>()
+
+        private var UNBACK_FLAG = 0
+        private var ERR_FLAG = 0
+        private var PR_DOTTIMSE_NUMBER = 0
+        private var PR_RUN_FLAG = 0
+        private var MIN_FLAG = 0;
+
+        private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
+        private var PR_TIME_SUM = 0    // 按压时间总和（ms）
+        private var QY_VOLUME_SUM = 0  //吹气量总和
+        private var QY_MAX_VOLUME_SUM = 0 //每次吹气峰值总和
+        private var QY_TIME_SUM = 0     //吹气时间总和
+        private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
+        private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+        private var L_compare = 0;//距离参考值，记录上次的有效值
+
+        private var QY_RUN_FLAG = 0
+
+        /**
+         * 清空错误书
+         */
+        fun clearErrorData() {
+            ERR_PR_UNBACK = 0
+
+            ERR_PR_LOW = 0
+
+            ERR_PR_HIGH = 0
+
+            ERR_PR_POSI = 0
+
+            ERR_PR_TOOMORE = 0
+
+            ERR_PR_TOOLITTLE = 0
+
+            PR_CYCLE_TIMES = 0
+
+            QY_TIMES_TOOMORE = 0
+
+            ERR_QY_LOW = 0
+
+            ERR_QY_HIGH = 0
+
+            ERR_QY_DEAD = 0
+
+            QY_CYCLE_TIMES = 0
+
+            QY_TIMES_TOOLITTLE = 0
+
+            ERR_QY_CLOSE = 0
+
+            //MODEL = false
+//            isStart = false
+            //距离值：  30-150
+            L_Value = 0
+            //气压值：  0-2000ml
+            QY_Value = 0
+            //蓝牙连接状态：   0-断开 1-连接
+            BLS_Value = 0
+            //按压频率：0-200
+            PF_Value = 0
+            //吹气频率：0-200
+            CF_Value = 0
+            //按压次数
+            PR_SUM = 0
+            //吹气次数
+            QY_SUM = 0
+            PR_DEPTH_SUM = 0  //按压深度总和(mm)
+            PR_TIME_SUM = 0    // 按压时间总和（ms）
+            QY_VOLUME_SUM = 0  //吹气量总和
+            QY_TIME_SUM = 0     //吹气时间总和
+            QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
+            PR_SEQRIGHT_TOTAL = 0 //按压频率正常的次数
+            QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
+            PR_CYCLE_TIMES = 0
+            L_valueSet.clear()
+            QY_valueSet.clear()
+            QY_valueSet2.clear()
+            py_valueSet.clear()
+            pt_valueSet.clear()
         }
     }
 
-
+    var deviceMAC: String? = null
     //电量值：  0-100%
     var VI_Value = 0
-
-    //距离值：  30-150
-    private var L_Value = 0
-
-    //气压值：  0-2000ml
-    private var QY_Value = 0
-
-    //蓝牙连接状态：   0-断开 1-连接
-    private var BLS_Value = 0
-
-    //USB连接状态: 0-断开 1-连接
-    private var ULS_Value = 0
-
-    //通道打开状态 0-关闭 1-打开
-    private var TOS_Value = 0
-
-    //连接方式  0-蓝牙 1-连接USB
-    private var LKS_Value = 0
-
-    //按压位置正确  0-错误  1-正确
-    private var PSR_Value = 0
-
-    //工作方式：00——休眠   01——工作    02——待机
-    private var WS_Value = 0
-
-    //按压频率：0-200
-    private var PF_Value = 0
-
-    //吹气频率：0-200
-    private var CF_Value = 0
-
-    //按压次数
-    private var PR_SUM = 0
-
-    //吹气次数
-    private var QY_SUM = 0
-
-    //吹气上升或下降标志位
-    private var top_flag = 0
-
-    //按压上升或下降标志位
-    private var low_flag = 0
-
-    private var Qliang = 0
-
-    private val dataDTO = BaseDataDTO()
-    private var L_d1 = 0
-    private var L_d2 = 0
-    private var L_d3 = 0
-
-    private var QY_d1 = 0
-    private var QY_d2 = 0
-    private var QY_d3 = 0
-
-
-    //是否开始数据传输
-    private var isStart = false
-
-    //按压或吹气模式：1为吹气，0为按压
-    private var work_Mode = 0
-
-    //上一次按压或吹气模式：1为吹气，0为按压
-    private var pre_work_Mode = 0
-
-    private var L_valueSet = mutableListOf<Int>()
-    private var QY_valueSet = mutableListOf<Int>()
-    private var QY_valueSet2 = mutableListOf<Int>()
-    private var QY_valueSet3 = mutableListOf<Int>()
-    private var pt_valueSet = mutableListOf<Int>()
-    private var py_valueSet = mutableListOf<Int>()
-
-    var deviceMAC: String? = null
-    private var QY_RUN_FLAG = 0
-
     /**
      * array 数据列表
      * isClear 清除数据集合
@@ -157,6 +269,7 @@ class DataVolatile01 {
     /**
      * 获取吹气值和
      */
+
     fun qyValue(): Int {
         var sum = 0
         for (i in QY_valueSet2.indices) {
@@ -165,6 +278,12 @@ class DataVolatile01 {
         QY_valueSet2.clear()
         return sum
     }
+
+    /**
+     * 解析蓝发送的数据
+     *
+     * @param data
+     */
 
     @Synchronized
     fun baseDataDecode(data: String?): BaseDataDTO {
@@ -238,8 +357,10 @@ class DataVolatile01 {
                 py(QY_Value)
                 pre_work_Mode = 1
             } else {
-                if (pre_work_Mode == 1) {
-                    QY_Value = selectValue_QY(2, 2, 2)
+                QY_Value = if (pre_work_Mode == 1) {
+                    selectValue_QY(2, 2, 2)
+                } else {
+                    0
                 }
                 //按压距离
                 L_d1 = DataFormatUtils.byteArrayToInt(
@@ -282,6 +403,8 @@ class DataVolatile01 {
                     )
                 )
             )
+
+
         }
         val stringBuffer = StringBuffer()
         stringBuffer.append("电量值：").append(VI_Value)
@@ -342,28 +465,24 @@ class DataVolatile01 {
 
         dataDTO.QY_TIMES_TOOMORE = QY_TIMES_TOOMORE
         dataDTO.ERR_PR_TOOMORE = ERR_PR_TOOMORE
+        dataDTO.model = MODEL
+        dataDTO.PR_CYCLE_TIMES = PR_CYCLE_TIMES
 
         dataDTO.L_d1 = L_d1
         dataDTO.L_d2 = L_d2
         dataDTO.L_d3 = L_d3
+
         return dataDTO
     }
 
     @Synchronized
     fun parseString(data: String?): ArrayList<BaseDataDTO> {
         //System.out.print(DataFormatUtils.getCrc16(DataFormatUtils.hexStr2Bytes(data)));
-        val newDataVolatile = DataVolatile01()
         val listData = arrayListOf<BaseDataDTO>()
         val num = data?.length?.div(20)
-        if (data != null && data.length >= 20) {
+        if (data != null && data.length > 20) {
             for (index in 1..num!!) {
                 val oneData = "" + data.substring(20 * (index - 1), 20 * index)
-//                val deviceMAC =
-//                    "001b${oneData.substring(12)}"
-//                val isInit = preDistanceMap[deviceMAC]
-//                if (isInit == null) {
-//                    initPreDistance(oneData, deviceMAC)
-//                }
                 listData.add(baseDataDecode(oneData))
             }
         } else if (data != null && data.length == 20) {
@@ -483,21 +602,6 @@ class DataVolatile01 {
         }
     }
 
-    private var UNBACK_FLAG = 0
-    private var ERR_FLAG = 0
-    private var PR_DOTTIMSE_NUMBER = 0
-    private var PR_RUN_FLAG = 0
-    private var MIN_FLAG = 0;
-
-    private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
-    private var PR_TIME_SUM = 0    // 按压时间总和（ms）
-    private var QY_VOLUME_SUM = 0  //吹气量总和
-    private var QY_MAX_VOLUME_SUM = 0 //每次吹气峰值总和
-    private var QY_TIME_SUM = 0     //吹气时间总和
-    private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
-    private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
-    private var L_compare = 0;//距离参考值，记录上次的有效值
-
     /*
     * 根据按压三次相邻的距离值找到有效值。
     * */
@@ -532,10 +636,18 @@ class DataVolatile01 {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     low_flag = 0
                     if (UNBACK_FLAG == 1) {
-                        ERR_PR_UNBACK++
+                        if (MODEL) {
+                            if (PR_CYCLE_TIMES < PR_DEFAULT_TIMES) {
+                                ERR_PR_UNBACK++
+                            } else {
+                                ERR_PR_TOOMORE++
+                            }
+                        } else {
+                            ERR_PR_UNBACK++
+                        }
                         UNBACK_FLAG = 0
                         Log.e("TAG12", "按压未回弹")
-                        ERR_FLAG = 1;
+                        ERR_FLAG = 1
 
                     }
                 }
@@ -609,13 +721,13 @@ class DataVolatile01 {
                             Err_PrTotal(L_d1)
                         }
                     } else {
-                        ERR_FLAG = 0;
+                        ERR_FLAG = 0
                     }
-                    PR_RUN_FLAG = 1;
+                    PR_RUN_FLAG = 1
                     //Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                     if (PR_SUM > 1) {
                         if (L_valueSet.size > 30) {
-                            PF_Value = 0;
+                            PF_Value = 0
                             L_valueSet.clear()
                         } else {
                             if (MIN_FLAG == 1) {
@@ -628,7 +740,7 @@ class DataVolatile01 {
                             if (PF_Value in 100..120) {
                                 PR_SEQRIGHT_TOTAL++
                             }
-                            PR_DOTTIMSE_NUMBER = 0;
+                            PR_DOTTIMSE_NUMBER = 0
                             index = 0
                             L_valueSet.clear()
                         }
@@ -671,27 +783,6 @@ class DataVolatile01 {
         return value
     }
 
-    //按压错误-按压未回弹
-    private var ERR_PR_UNBACK = 0
-
-    //按压错误-按压不足
-    private var ERR_PR_LOW = 0
-
-    //按压错误-按压过大
-    private var ERR_PR_HIGH = 0
-
-    //按压错误-按压位置错误
-    private var ERR_PR_POSI = 0
-
-    //按压超次
-    private var ERR_PR_TOOMORE = 0
-
-    //按压少次
-    private var ERR_PR_TOOLITTLE = 0
-
-    //单次按压循环的次数
-    private var PR_CYCLE_TIMES = 0
-
     private fun Err_PrTotal(l: Int) {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
             ERR_PR_TOOMORE++
@@ -716,27 +807,6 @@ class DataVolatile01 {
             }
         }
     }
-
-    //吹气错误-气压不足
-    private var ERR_QY_LOW = 0
-
-    //吹气错误-气压过大
-    private var ERR_QY_HIGH = 0
-
-    //吹气错误-气压进胃
-    private var ERR_QY_DEAD = 0
-
-    //吹气错误-气道未打开错误
-    private var ERR_QY_CLOSE = 0
-
-    //单次循环吹气次数
-    private var QY_CYCLE_TIMES = 0
-
-    //吹气超次
-    private var QY_TIMES_TOOMORE = 0
-
-    //吹气少次
-    private var QY_TIMES_TOOLITTLE = 0
 
     private fun ERR_QyTotal(value: Int) {
         Log.e("TAG12", "判断吹气错误")

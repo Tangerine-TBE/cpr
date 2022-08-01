@@ -179,7 +179,7 @@ class MutiActivityNew : BaseActivity() {
                 val bean = mTrainingBean?.list?.get(i)
 //                item.mac = testMac[i]
                 item.mac = bean?.mac.toString()
-                Log.e("hunger_test_init", bean?.mac.toString() )
+                Log.e("hunger_test_init", bean?.mac.toString())
                 item.isStart = false
                 item.distance = 0
                 item.bpValue = 0
@@ -217,7 +217,8 @@ class MutiActivityNew : BaseActivity() {
             }
             isStart = !isStart
             if (isStart) {
-                EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_DO_MULTI_START, "", null))
+                EventBus.getDefault()
+                    .post(MessageEventData(BaseConstant.EVENT_DO_MULTI_START, "", null))
                 binding.oprLayout.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.oprLayout.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))
@@ -276,7 +277,6 @@ class MutiActivityNew : BaseActivity() {
         bindingList.add(binding.item5)
         bindingList.add(binding.item6)
     }
-
 
     private fun setViewData(viewBinding: CycleFragmentMultiItemBinding?, dataDTO: BaseDataDTO?) {
         viewBinding?.let {
@@ -412,6 +412,7 @@ class MutiActivityNew : BaseActivity() {
                 }
             }
         }
+        Log.e("getPr_err_total", "${dataDTO.getPr_err_total()}")
         //按压错误数统计
         viewBinding.layoutPress.tvPress.text = "${dataDTO.getPr_err_total()}"
         //按压总数
@@ -539,7 +540,9 @@ class MutiActivityNew : BaseActivity() {
                 item.let {
                     val view = getItemViewByMac(item.mac)
                     if (isStart && hasDoneMap[item.mac] != true)
-                        setViewData(view, item)
+                        synchronized(Unit) {
+                            setViewData(view, item)
+                        }
                 }
             }
         })
@@ -679,7 +682,7 @@ class MutiActivityNew : BaseActivity() {
 
     private fun sendMsg(type: Int, binding: CycleFragmentMultiItemBinding, delayTime: Long = 2000) {
         handler.removeMessages(type, binding)
-        var msg = Message()
+        val msg = Message()
         msg.what = type
         msg.obj = binding
         handler.sendMessageDelayed(msg, delayTime)
