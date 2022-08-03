@@ -8,15 +8,22 @@ import com.tencent.mmkv.MMKV
 import org.litepal.LitePal
 
 class BaseApplication : Application() {
+
     // 需要将CH34x的驱动类写在APP类下面，使得帮助类的生命周期与整个应用程序的生命周期是相同的
     companion object {
+        var mInstance: BaseApplication? = null
         var driver: CH34xUARTDriver? = null
+        fun instance(): BaseApplication? {
+            return mInstance
+        }
     }
+
 
     private val ACTION_USB_PERMISSION = "cn.wch.wchusbdriver.USB_PERMISSION"
 
     override fun onCreate() {
         super.onCreate()
+        mInstance = this
         MMKV.initialize(this)
         LitePal.initialize(this)
         //Multidex.install(this);

@@ -247,7 +247,7 @@ class CycleFragment : Fragment() {
         mHandler6.removeCallbacksAndMessages(null)
         viewBinding.ctTime.stop()
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
-
+        StatusLiveData.dataSingle.value = null
         if (mMediaPlayer != null) {
             mMediaPlayer!!.stop()
             mMediaPlayer?.release()

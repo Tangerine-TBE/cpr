@@ -43,10 +43,9 @@ class SingleActivity : BaseActivity() {
         binding = ActivitySingleBinding.inflate(layoutInflater)
         setContentView(binding.root)
         EventBus.getDefault().register(this)
-//        DataVolatile.dataClear()
         mTrainingBean = intent.getSerializableExtra(BaseConstant.TRAINING_BEAN) as TrainingBean
-        //开始时清空残留数据
         DataVolatile01.clearErrorData()
+        //开始时清空残留数据
         initView()
         initViewPager()
     }
@@ -106,7 +105,6 @@ class SingleActivity : BaseActivity() {
     private fun startResult() {
         val mTrainingDTO = cycleFragment?.stop()
         //开始时清空残留数据
-        DataVolatile01.clearErrorData()
         binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
         binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)
         counter.let { mHandler.removeCallbacks(it) }

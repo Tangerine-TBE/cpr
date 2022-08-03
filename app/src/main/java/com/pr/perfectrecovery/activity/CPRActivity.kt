@@ -51,6 +51,7 @@ import com.pr.perfectrecovery.databinding.ItemBluetoothBinding
 import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.ConvertUtil
 import com.pr.perfectrecovery.utils.DataVolatile01
+import com.pr.perfectrecovery.utils.FileUtils
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -358,6 +359,7 @@ class CPRActivity : BaseActivity() {
                     bleWrite(mBleDevice!!, END)
                 }
                 clearMap()
+                FileUtils.saveThrowableMessage(sb.toString())
             }
             BaseConstant.EVENT_CPR_STOP -> {
                 isStart = false
@@ -397,6 +399,11 @@ class CPRActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sb = StringBuffer()
     }
 
     private fun clearMap() {
@@ -840,13 +847,18 @@ class CPRActivity : BaseActivity() {
                 }
 
                 override fun onCharacteristicChanged(data: ByteArray) {
+                    /*         val formatHexString = HexUtil.formatHexString(
+                                 characteristic.value,
+                                 false
+                             )*/
+                    val formatHexString = HexUtil.formatHexString(
+                        data,
+                        false
+                    )
+                    sb.append(formatHexString)
+                    sb.append("\n")
                     if (!BaseApplication.driver?.isConnected!! && characteristic != null) {
-                        val formatHexString = HexUtil.formatHexString(
-                            characteristic?.value,
-                            false
-                        )
                         runOnUiThread { Log.e("CPRActivity", formatHexString) }
-                        Log.e("CPRActivity", "原始数据${formatHexString}")
                         sendMessage(formatHexString)
                     }
                 }
@@ -861,6 +873,7 @@ class CPRActivity : BaseActivity() {
 
     private var countParse = 0
     private var countParse2 = 0
+    private var sb = StringBuffer()
 
     @Synchronized
     private fun sendMessage(formatHexString: String) {

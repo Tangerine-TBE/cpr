@@ -219,8 +219,10 @@ class DataVolatile01 {
     }
 
     var deviceMAC: String? = null
+
     //电量值：  0-100%
     var VI_Value = 0
+
     /**
      * array 数据列表
      * isClear 清除数据集合
@@ -851,13 +853,10 @@ class DataVolatile01 {
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0
             if (top_flag == 1) {
-
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 QY_CYCLE_TIMES++
-
                 ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
-
                 top_flag = 0
                 Qliang = 0
                 if (QY_SUM > 1) {
