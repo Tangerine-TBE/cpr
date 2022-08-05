@@ -206,6 +206,100 @@ class CPRActivity : BaseActivity() {
                 viewBinding.cbBle.isChecked = isChecked
             }
         }
+
+        initDataView()
+        handler.postDelayed(runnable, 3000)
+    }
+
+    private val handler = object : Handler(Looper.getMainLooper()) {}
+    private var index = 0
+    private val runnable = object : Runnable {
+        override fun run() {
+            if (index >= dataLists.size) {
+                index = 0
+            }
+            val data = dataLists[index]
+            sendMessage(data)
+            index++
+            handler.postDelayed(this, 100)
+        }
+    }
+
+    private val dataLists = mutableListOf<String>()
+    private fun initDataView() {
+        dataLists.add("fe8e8e8c492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8f908a49a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe908f8a492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8f8f9049a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8f9092492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe918f9349a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe908f90492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8d8f8d49a324beb877")
+        dataLists.add("fe8e8e8f492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8f908e49a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe908f93492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe90918e49a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8f8f8a492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe928f8f49a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8d8e90492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8d8f8c49a324beb877")
+        dataLists.add("fe8f8f8f492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8f8f8e49a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8c9290492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8e909049a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8d8c90492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe8f929149a324beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8f8c90492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe918f8d49a324beb877")
+        dataLists.add("fe8f8f8c492324beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe908c9049ab24beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe8c8b8b492b24beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe87878249ab24beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe79664f492b24beb877")
+        dataLists.add("fe37323e49ab24beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe507085492b24beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe908c8f49a324beb877")
+        dataLists.add("fe919084492b24beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe80766249ab24beb877")
+        dataLists.add("fe463741492b24beb877")
+        dataLists.add("fe9696963389df661501")
+        dataLists.add("fe556c7e49ab24beb877")
+        dataLists.add("fe9696963309df661501")
+        dataLists.add("fe9696963389df661501")
     }
 
     /**
@@ -868,8 +962,8 @@ class CPRActivity : BaseActivity() {
     private var isMulti = false
     private var deviceCount: Int = 0
     private var sb = StringBuffer()
+    private var dataDTO = BaseDataDTO()
 
-    @Synchronized
     private fun sendMessage(formatHexString: String) {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
@@ -878,7 +972,7 @@ class CPRActivity : BaseActivity() {
         val num = formatHexString.length.div(20)
         if (formatHexString.length > 20) {
             for (index in 1..num) {
-                val oneData = "" + formatHexString.substring(20 * (index - 1), 20 * index)
+                val oneData = formatHexString.substring(20 * (index - 1), 20 * index)
                 setData(oneData)
             }
         } else if (formatHexString.length == 20) {
@@ -893,28 +987,23 @@ class CPRActivity : BaseActivity() {
         }
     }
 
+    @Synchronized
     private fun setData(data: String) {
-        val mDataVolatile = DataVolatile01()
-        val item = mDataVolatile.baseDataDecode(data)
-        val dataVolatile = dataMap[item.mac]
-        if (dataVolatile == null) {
-            val newDataVolatile = DataVolatile01()
-            newDataVolatile.initPreDistance(data, item.mac)
-            dataMap[item.mac] = newDataVolatile
-        }
+        val deviceMAC =
+            "001b${data.substring(12)}"
+        val dataVolatile = dataMap[deviceMAC]
         if (dataVolatile != null) {
-            val mBaseDataDTO = dataVolatile.baseDataDecode(data)
-            if (isStart) {
-                if (isMulti) {
-                    //data.add(mBaseDataDTO)
-                    StatusLiveData.dataSingle.value = mBaseDataDTO
-                } else {
-                    Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
-                    StatusLiveData.dataSingle.value = mBaseDataDTO
-                }
-            }
+            dataDTO = dataVolatile.baseDataDecode(data)
+        } else {
+            val newDataVolatile = DataVolatile01()
+            newDataVolatile.initPreDistance(data, deviceMAC)
+            dataDTO = newDataVolatile.baseDataDecode(data)
+            dataMap[dataDTO.mac] = newDataVolatile
         }
-
+        Log.e("setData", GsonUtils.toJson(dataDTO))
+        if (isStart) {
+            StatusLiveData.dataSingle.value = dataDTO
+        }
     }
 
     val data = ArrayList<BaseDataDTO>()

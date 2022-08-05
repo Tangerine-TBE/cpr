@@ -286,8 +286,6 @@ class DataVolatile01 {
      *
      * @param data
      */
-
-    @Synchronized
     fun baseDataDecode(data: String?): BaseDataDTO {
         if (data != null && data.length == 20) {
             deviceMAC = "001b${data.substring(12, 20)}"
