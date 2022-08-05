@@ -206,100 +206,6 @@ class CPRActivity : BaseActivity() {
                 viewBinding.cbBle.isChecked = isChecked
             }
         }
-
-        initDataView()
-        handler.postDelayed(runnable, 3000)
-    }
-
-    private val handler = object : Handler(Looper.getMainLooper()) {}
-    private var index = 0
-    private val runnable = object : Runnable {
-        override fun run() {
-            if (index >= dataLists.size) {
-                index = 0
-            }
-            val data = dataLists[index]
-            sendMessage(data)
-            index++
-            handler.postDelayed(this, 100)
-        }
-    }
-
-    private val dataLists = mutableListOf<String>()
-    private fun initDataView() {
-        dataLists.add("fe8e8e8c492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8f908a49a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe908f8a492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8f8f9049a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8f9092492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe918f9349a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe908f90492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8d8f8d49a324beb877")
-        dataLists.add("fe8e8e8f492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8f908e49a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe908f93492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe90918e49a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8f8f8a492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe928f8f49a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8d8e90492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8d8f8c49a324beb877")
-        dataLists.add("fe8f8f8f492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8f8f8e49a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8c9290492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8e909049a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8d8c90492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe8f929149a324beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8f8c90492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe918f8d49a324beb877")
-        dataLists.add("fe8f8f8c492324beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe908c9049ab24beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe8c8b8b492b24beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe87878249ab24beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe79664f492b24beb877")
-        dataLists.add("fe37323e49ab24beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe507085492b24beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe908c8f49a324beb877")
-        dataLists.add("fe919084492b24beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe80766249ab24beb877")
-        dataLists.add("fe463741492b24beb877")
-        dataLists.add("fe9696963389df661501")
-        dataLists.add("fe556c7e49ab24beb877")
-        dataLists.add("fe9696963309df661501")
-        dataLists.add("fe9696963389df661501")
     }
 
     /**
@@ -905,7 +811,6 @@ class CPRActivity : BaseActivity() {
 //        mBleDevice = null
     }
 
-    private val dataMap = mutableMapOf<String, DataVolatile01>()
     private var mBleDevice: BleDevice? = null
 
     //    var deviceCount = 0
@@ -963,28 +868,29 @@ class CPRActivity : BaseActivity() {
     private var deviceCount: Int = 0
     private var sb = StringBuffer()
     private var dataDTO = BaseDataDTO()
+    private val dataMap = mutableMapOf<String, DataVolatile01>()
 
     private fun sendMessage(formatHexString: String) {
-        if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
+        if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 20) {
             return
         }
         data.clear()
         val num = formatHexString.length.div(20)
         if (formatHexString.length > 20) {
-            for (index in 1..num) {
-                val oneData = formatHexString.substring(20 * (index - 1), 20 * index)
-                setData(oneData)
-            }
+//            for (index in 1..num) {
+//                val oneData = formatHexString.substring(20 * (index - 1), 20 * index)
+//                setData(oneData)
+//            }
         } else if (formatHexString.length == 20) {
             setData(formatHexString)
         }
 
         //处理连接后电量显示
-        if (isRefreshPower) {
-            powerHandler.removeCallbacks(powerRunning)
-            powerHandler.postDelayed(powerRunning, 10000)
-            Handler().postDelayed(this::setPower, 500)
-        }
+//        if (isRefreshPower) {
+//            powerHandler.removeCallbacks(powerRunning)
+//            powerHandler.postDelayed(powerRunning, 10000)
+//            Handler().postDelayed(this::setPower, 500)
+//        }
     }
 
     @Synchronized
@@ -997,8 +903,7 @@ class CPRActivity : BaseActivity() {
         } else {
             val newDataVolatile = DataVolatile01()
             newDataVolatile.initPreDistance(data, deviceMAC)
-            dataDTO = newDataVolatile.baseDataDecode(data)
-            dataMap[dataDTO.mac] = newDataVolatile
+            dataMap[deviceMAC] = newDataVolatile
         }
         Log.e("setData", GsonUtils.toJson(dataDTO))
         if (isStart) {

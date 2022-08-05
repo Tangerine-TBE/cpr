@@ -25,198 +25,196 @@ class DataVolatile01 {
         //操作模式false-训练 true-考核模式
         var MODEL: Boolean = false
 
-        //按压错误-按压未回弹
-        private var ERR_PR_UNBACK = 0
-
-        //按压错误-按压不足
-        private var ERR_PR_LOW = 0
-
-        //按压错误-按压过大
-        private var ERR_PR_HIGH = 0
-
-        //按压错误-按压位置错误
-        private var ERR_PR_POSI = 0
-
-        //按压超次
-        private var ERR_PR_TOOMORE = 0
-
-        //按压少次
-        private var ERR_PR_TOOLITTLE = 0
-
-        //单次按压循环的次数
-        private var PR_CYCLE_TIMES = 0
-
-        //吹气错误-气压不足
-        private var ERR_QY_LOW = 0
-
-        //吹气错误-气压过大
-        private var ERR_QY_HIGH = 0
-
-        //吹气错误-气压进胃
-        private var ERR_QY_DEAD = 0
-
-        //单次循环吹气次数
-        private var QY_CYCLE_TIMES = 0
-
-        //吹气超次
-        private var QY_TIMES_TOOMORE = 0
-
-        //吹气少次
-        private var QY_TIMES_TOOLITTLE = 0
-
-        //吹气错误-气道未打开错误
-        private var ERR_QY_CLOSE = 0
-
-        //距离值：  30-150
-        private var L_Value = 0
-
-        //气压值：  0-2000ml
-        private var QY_Value = 0
-
-        //蓝牙连接状态：   0-断开 1-连接
-        private var BLS_Value = 0
-
-        //USB连接状态: 0-断开 1-连接
-        private var ULS_Value = 0
-
-        //通道打开状态 0-关闭 1-打开
-        private var TOS_Value = 0
-
-        //连接方式  0-蓝牙 1-连接USB
-        private var LKS_Value = 0
-
-        //按压位置正确  0-错误  1-正确
-        private var PSR_Value = 0
-
-        //工作方式：00——休眠   01——工作    02——待机
-        private var WS_Value = 0
-
-        //按压频率：0-200
-        private var PF_Value = 0
-
-        //吹气频率：0-200
-        private var CF_Value = 0
-
-        //按压次数
-        private var PR_SUM = 0
-
-        //吹气次数
-        private var QY_SUM = 0
-
-        //吹气上升或下降标志位
-        private var top_flag = 0
-
-        //按压上升或下降标志位
-        private var low_flag = 0
-
-        private var Qliang = 0
-
-        private val dataDTO = BaseDataDTO()
-        private var L_d1 = 0
-        private var L_d2 = 0
-        private var L_d3 = 0
-
-        private var QY_d1 = 0
-        private var QY_d2 = 0
-        private var QY_d3 = 0
-
-
-        //是否开始数据传输
-        private var isStart = false
-
-        //按压或吹气模式：1为吹气，0为按压
-        private var work_Mode = 0
-
-        //上一次按压或吹气模式：1为吹气，0为按压
-        private var pre_work_Mode = 0
-
-        private var L_valueSet = mutableListOf<Int>()
-        private var QY_valueSet = mutableListOf<Int>()
-        private var QY_valueSet2 = mutableListOf<Int>()
-        private var QY_valueSet3 = mutableListOf<Int>()
-        private var pt_valueSet = mutableListOf<Int>()
-        private var py_valueSet = mutableListOf<Int>()
-
-        private var UNBACK_FLAG = 0
-        private var ERR_FLAG = 0
-        private var PR_DOTTIMSE_NUMBER = 0
-        private var PR_RUN_FLAG = 0
-        private var MIN_FLAG = 0;
-
-        private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
-        private var PR_TIME_SUM = 0    // 按压时间总和（ms）
-        private var QY_VOLUME_SUM = 0  //吹气量总和
-        private var QY_MAX_VOLUME_SUM = 0 //每次吹气峰值总和
-        private var QY_TIME_SUM = 0     //吹气时间总和
-        private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
-        private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
-        private var L_compare = 0;//距离参考值，记录上次的有效值
-
-        private var QY_RUN_FLAG = 0
-
         /**
          * 清空错误书
          */
         fun clearErrorData() {
-            ERR_PR_UNBACK = 0
-
-            ERR_PR_LOW = 0
-
-            ERR_PR_HIGH = 0
-
-            ERR_PR_POSI = 0
-
-            ERR_PR_TOOMORE = 0
-
-            ERR_PR_TOOLITTLE = 0
-
-            PR_CYCLE_TIMES = 0
-
-            QY_TIMES_TOOMORE = 0
-
-            ERR_QY_LOW = 0
-
-            ERR_QY_HIGH = 0
-
-            ERR_QY_DEAD = 0
-
-            QY_CYCLE_TIMES = 0
-
-            QY_TIMES_TOOLITTLE = 0
-
-            ERR_QY_CLOSE = 0
-
-            //MODEL = false
-//            isStart = false
-            //距离值：  30-150
-            L_Value = 0
-            //气压值：  0-2000ml
-            QY_Value = 0
-            //蓝牙连接状态：   0-断开 1-连接
-            BLS_Value = 0
-            //按压频率：0-200
-            PF_Value = 0
-            //吹气频率：0-200
-            CF_Value = 0
-            //按压次数
-            PR_SUM = 0
-            //吹气次数
-            QY_SUM = 0
-            PR_DEPTH_SUM = 0  //按压深度总和(mm)
-            PR_TIME_SUM = 0    // 按压时间总和（ms）
-            QY_VOLUME_SUM = 0  //吹气量总和
-            QY_TIME_SUM = 0     //吹气时间总和
-            QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
-            PR_SEQRIGHT_TOTAL = 0 //按压频率正常的次数
-            QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
-            PR_CYCLE_TIMES = 0
-            L_valueSet.clear()
-            QY_valueSet.clear()
-            QY_valueSet2.clear()
-            py_valueSet.clear()
-            pt_valueSet.clear()
+//            ERR_PR_UNBACK = 0
+//
+//            ERR_PR_LOW = 0
+//
+//            ERR_PR_HIGH = 0
+//
+//            ERR_PR_POSI = 0
+//
+//            ERR_PR_TOOMORE = 0
+//
+//            ERR_PR_TOOLITTLE = 0
+//
+//            PR_CYCLE_TIMES = 0
+//
+//            QY_TIMES_TOOMORE = 0
+//
+//            ERR_QY_LOW = 0
+//
+//            ERR_QY_HIGH = 0
+//
+//            ERR_QY_DEAD = 0
+//
+//            QY_CYCLE_TIMES = 0
+//
+//            QY_TIMES_TOOLITTLE = 0
+//
+//            ERR_QY_CLOSE = 0
+//
+//            //MODEL = false
+////            isStart = false
+//            //距离值：  30-150
+//            L_Value = 0
+//            //气压值：  0-2000ml
+//            QY_Value = 0
+//            //蓝牙连接状态：   0-断开 1-连接
+//            BLS_Value = 0
+//            //按压频率：0-200
+//            PF_Value = 0
+//            //吹气频率：0-200
+//            CF_Value = 0
+//            //按压次数
+//            PR_SUM = 0
+//            //吹气次数
+//            QY_SUM = 0
+//            PR_DEPTH_SUM = 0  //按压深度总和(mm)
+//            PR_TIME_SUM = 0    // 按压时间总和（ms）
+//            QY_VOLUME_SUM = 0  //吹气量总和
+//            QY_TIME_SUM = 0     //吹气时间总和
+//            QY_MAX_VOLUME_SUM = 0//吹气每次最大值总和
+//            PR_SEQRIGHT_TOTAL = 0 //按压频率正常的次数
+//            QY_SERRIGHT_TOTAL = 0 //吹气频率正确的次数
+//            PR_CYCLE_TIMES = 0
+//            L_valueSet.clear()
+//            QY_valueSet.clear()
+//            QY_valueSet2.clear()
+//            py_valueSet.clear()
+//            pt_valueSet.clear()
         }
     }
+    //按压错误-按压未回弹
+    private var ERR_PR_UNBACK = 0
+
+    //按压错误-按压不足
+    private var ERR_PR_LOW = 0
+
+    //按压错误-按压过大
+    private var ERR_PR_HIGH = 0
+
+    //按压错误-按压位置错误
+    private var ERR_PR_POSI = 0
+
+    //按压超次
+    private var ERR_PR_TOOMORE = 0
+
+    //按压少次
+    private var ERR_PR_TOOLITTLE = 0
+
+    //单次按压循环的次数
+    private var PR_CYCLE_TIMES = 0
+
+    //吹气错误-气压不足
+    private var ERR_QY_LOW = 0
+
+    //吹气错误-气压过大
+    private var ERR_QY_HIGH = 0
+
+    //吹气错误-气压进胃
+    private var ERR_QY_DEAD = 0
+
+    //单次循环吹气次数
+    private var QY_CYCLE_TIMES = 0
+
+    //吹气超次
+    private var QY_TIMES_TOOMORE = 0
+
+    //吹气少次
+    private var QY_TIMES_TOOLITTLE = 0
+
+    //吹气错误-气道未打开错误
+    private var ERR_QY_CLOSE = 0
+
+    //距离值：  30-150
+    private var L_Value = 0
+
+    //气压值：  0-2000ml
+    private var QY_Value = 0
+
+    //蓝牙连接状态：   0-断开 1-连接
+    private var BLS_Value = 0
+
+    //USB连接状态: 0-断开 1-连接
+    private var ULS_Value = 0
+
+    //通道打开状态 0-关闭 1-打开
+    private var TOS_Value = 0
+
+    //连接方式  0-蓝牙 1-连接USB
+    private var LKS_Value = 0
+
+    //按压位置正确  0-错误  1-正确
+    private var PSR_Value = 0
+
+    //工作方式：00——休眠   01——工作    02——待机
+    private var WS_Value = 0
+
+    //按压频率：0-200
+    private var PF_Value = 0
+
+    //吹气频率：0-200
+    private var CF_Value = 0
+
+    //按压次数
+    private var PR_SUM = 0
+
+    //吹气次数
+    private var QY_SUM = 0
+
+    //吹气上升或下降标志位
+    private var top_flag = 0
+
+    //按压上升或下降标志位
+    private var low_flag = 0
+
+    private var Qliang = 0
+
+    private val dataDTO = BaseDataDTO()
+    private var L_d1 = 0
+    private var L_d2 = 0
+    private var L_d3 = 0
+
+    private var QY_d1 = 0
+    private var QY_d2 = 0
+    private var QY_d3 = 0
+
+    //是否开始数据传输
+    private var isStart = false
+
+    //按压或吹气模式：1为吹气，0为按压
+    private var work_Mode = 0
+
+    //上一次按压或吹气模式：1为吹气，0为按压
+    private var pre_work_Mode = 0
+
+    private var L_valueSet = mutableListOf<Int>()
+    private var QY_valueSet = mutableListOf<Int>()
+    private var QY_valueSet2 = mutableListOf<Int>()
+    private var QY_valueSet3 = mutableListOf<Int>()
+    private var pt_valueSet = mutableListOf<Int>()
+    private var py_valueSet = mutableListOf<Int>()
+
+    private var UNBACK_FLAG = 0
+    private var ERR_FLAG = 0
+    private var PR_DOTTIMSE_NUMBER = 0
+    private var PR_RUN_FLAG = 0
+    private var MIN_FLAG = 0;
+
+    private var PR_DEPTH_SUM = 0  //按压深度总和(mm)
+    private var PR_TIME_SUM = 0    // 按压时间总和（ms）
+    private var QY_VOLUME_SUM = 0  //吹气量总和
+    private var QY_MAX_VOLUME_SUM = 0 //每次吹气峰值总和
+    private var QY_TIME_SUM = 0     //吹气时间总和
+    private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
+    private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
+    private var L_compare = 0;//距离参考值，记录上次的有效值
+
+    private var QY_RUN_FLAG = 0
 
     var deviceMAC: String? = null
 
