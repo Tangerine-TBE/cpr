@@ -30,6 +30,9 @@
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/chart_fragment.xml" value="0.33" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment.xml" value="0.1" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment_multi_item.xml" value="0.37135416666666665" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment_multi_item1.xml" value="0.30483112441214194" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment_multi_item2.xml" value="0.30483112441214194" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/cycle_fragment_multi_item3.xml" value="0.30483112441214194" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/empty_layout.xml" value="0.37135416666666665" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/event_fragment.xml" value="0.36564102564102563" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/item_bluetooth.xml" value="0.37135416666666665" />
@@ -39,6 +42,8 @@
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_bottom_right_light.xml" value="0.30483112441214194" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_check_event.xml" value="0.36564102564102563" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_check_result.xml" value="0.33" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_multi_lung.xml" value="0.30483112441214194" />
+        <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_multi_press.xml" value="0.30483112441214194" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_press.xml" value="0.2752895752895753" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_single_student.xml" value="0.2752895752895753" />
         <entry key="..\:/workSpace/perfect-recovery/app/src/main/res/layout/layout_top.xml" value="0.36564102564102563" />

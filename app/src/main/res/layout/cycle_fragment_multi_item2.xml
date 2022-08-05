@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/multi_item_bg"
+        android:layout_gravity="center"
+        >
+    <!-- ======= layout_score ===================================================== -->
+    <include
+            android:id="@+id/layout_score"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            layout="@layout/layout_multi_score"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+    <!-- ======= layout_test ===================================================== -->
+    <include
+            android:id="@+id/layout_test"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            layout="@layout/layout_multi_test"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_score"/>
+
+    <!-- ======= layout_press ===================================================== -->
+    <include
+            android:id="@+id/layout_press"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            layout="@layout/layout_multi_press"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_test"/>
+    <!-- ======= layout_lung ===================================================== -->
+    <include
+            android:id="@+id/layout_lung"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            layout="@layout/layout_multi_lung"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_press"/>
+    <!-- ======= position ===================================================== -->
+    <TextView
+            android:id="@+id/position1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="10sp"
+            android:textColor="@color/x_recycler_color_text_gray"
+            android:layout_marginStart="@dimen/dp_5"
+            android:layout_marginBottom="@dimen/dp_5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+            android:id="@+id/position2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="10sp"
+            android:textColor="@color/x_recycler_color_text_gray"
+            android:layout_marginEnd="@dimen/dp_5"
+            android:layout_marginBottom="@dimen/dp_5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -439,7 +439,6 @@ class MutiActivityNew : BaseActivity() {
         }
     }
 
-
     /**
      * 吹气状态
      */
@@ -509,7 +508,6 @@ class MutiActivityNew : BaseActivity() {
         }
     }
 
-
     private fun getItemViewByMac(mac: String): CycleFragmentMultiItemBinding? {
         var index = -1
         for (i in 0 until dataList.size) {
@@ -534,17 +532,27 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun observeData() {
-        StatusLiveData.data.observe(this, Observer {
-            it.forEach { item ->
-                Log.e("hunger_test_receive", it.toString())
-                item.let {
-                    val view = getItemViewByMac(item.mac)
-                    if (isStart && hasDoneMap[item.mac] != true)
-                        synchronized(Unit) {
-                            setViewData(view, item)
-                        }
+//        StatusLiveData.data.observe(this, Observer {
+//            it.forEach { item ->
+//                Log.e("hunger_test_receive", it.toString())
+//                item.let {
+//                    val view = getItemViewByMac(item.mac)
+//                    if (isStart && hasDoneMap[item.mac] != true)
+//                        synchronized(Unit) {
+//                            setViewData(view, item)
+//                        }
+//                }
+//            }
+//        })
+
+        StatusLiveData.dataSingle.observe(this, Observer {
+            val view = getItemViewByMac(it.mac)
+            Log.e("dataSingle", "MAC:=${it.mac}")
+            if (isStart && hasDoneMap[it.mac] != true)
+                synchronized(Unit) {
+                    setViewData(view, it)
                 }
-            }
+
         })
     }
 
@@ -574,7 +582,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun initMac(mac: String): String {
-        var new = mac.replace(":", "")
+        val new = mac.replace(":", "")
         return new.lowercase()
     }
 

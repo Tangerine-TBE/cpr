@@ -392,8 +392,6 @@ class CPRActivity : BaseActivity() {
             BaseConstant.EVENT_DO_MULTI_START -> {
                 isMulti = true
                 isStart = true
-                countParse = 0
-                countParse2 = 0
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, OPEN)
                 }
@@ -869,10 +867,6 @@ class CPRActivity : BaseActivity() {
     private var isStart = false
     private var isMulti = false
     private var deviceCount: Int = 0
-    private var mBaseDataDTO = BaseDataDTO()
-
-    private var countParse = 0
-    private var countParse2 = 0
     private var sb = StringBuffer()
 
     @Synchronized
@@ -880,49 +874,47 @@ class CPRActivity : BaseActivity() {
         if (TextUtils.isEmpty(formatHexString) || formatHexString.length < 18) {
             return
         }
-        val mDataVolatile = DataVolatile01()
-        val dataDTO = mDataVolatile.parseString(formatHexString)
         data.clear()
-        countParse += dataDTO.size
-        dataDTO.forEachIndexed { index, item ->
-            Log.e("forEachIndexed", "GSON：${GsonUtils.toJson(item)}")
-            countParse2++
-            Log.e("countParse", "countParse：${countParse} ==== countParse2：${countParse2} ")
-            if ("001b00000000" != item.mac) {
-                val dataVolatile = dataMap[item.mac]
-                val params = formatHexString.subSequence(
-                    20 * index,
-                    20 * (index + 1)
-                ).toString()
-                if (dataVolatile == null) {
-                    val newDataVolatile = DataVolatile01()
-                    newDataVolatile.initPreDistance(params, item.mac)
-                    dataMap[item.mac] = newDataVolatile
-                    mBaseDataDTO = newDataVolatile.baseDataDecode(params)
-                } else {
-                    mBaseDataDTO = dataVolatile.baseDataDecode(params)
-                }
-                if (isStart) {
-                    if (isMulti) {
-                        data.add(mBaseDataDTO)
-                    } else {
-//                    StatusLiveData.data.postValue(dataDTO)
-                        Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
-                        StatusLiveData.dataSingle.value = mBaseDataDTO
-                    }
-                }
+        val num = formatHexString.length.div(20)
+        if (formatHexString.length > 20) {
+            for (index in 1..num) {
+                val oneData = "" + formatHexString.substring(20 * (index - 1), 20 * index)
+                setData(oneData)
             }
+        } else if (formatHexString.length == 20) {
+            setData(formatHexString)
         }
-        if (isStart && isMulti) {
-            Log.e("hunger_test_post_multi", data.toString())
-            StatusLiveData.data.value = data
-        }
+
         //处理连接后电量显示
         if (isRefreshPower) {
             powerHandler.removeCallbacks(powerRunning)
             powerHandler.postDelayed(powerRunning, 10000)
             Handler().postDelayed(this::setPower, 500)
         }
+    }
+
+    private fun setData(data: String) {
+        val mDataVolatile = DataVolatile01()
+        val item = mDataVolatile.baseDataDecode(data)
+        val dataVolatile = dataMap[item.mac]
+        if (dataVolatile == null) {
+            val newDataVolatile = DataVolatile01()
+            newDataVolatile.initPreDistance(data, item.mac)
+            dataMap[item.mac] = newDataVolatile
+        }
+        if (dataVolatile != null) {
+            val mBaseDataDTO = dataVolatile.baseDataDecode(data)
+            if (isStart) {
+                if (isMulti) {
+                    //data.add(mBaseDataDTO)
+                    StatusLiveData.dataSingle.value = mBaseDataDTO
+                } else {
+                    Log.e("sendMessage", "mac ${mBaseDataDTO.mac}")
+                    StatusLiveData.dataSingle.value = mBaseDataDTO
+                }
+            }
+        }
+
     }
 
     val data = ArrayList<BaseDataDTO>()
