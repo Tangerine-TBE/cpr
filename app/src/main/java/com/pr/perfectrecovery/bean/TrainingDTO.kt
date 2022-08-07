@@ -14,6 +14,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var endTime: Long = 0//开始时间
     var pr_depth_sum = 0  //按压深度总和(mm)
     var pr_time_sum: Int = 0 // 按压时间总和（ms）
+    var qy_blow_error_count: Int = 0//吹气率错误数
     var qy_volume_sum = 0  //吹气量总和
     var qy_max_volume_sum: Int = 0//吹气每次最值大总和
     var qy_time_sum: Int = 0//吹气时间总和
@@ -194,8 +195,8 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 通气量合格率
      * 通气合格率 = 正确通气量次数 / 通气总次数
      */
-    fun getBlowAmount(): Int {
-        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - blowErrorCount) / qySum * 100).roundToInt() else 0
+    fun getVentilationAmount(): Int {
+        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - qy_blow_error_count) / qySum * 100) else 0
     }
 
     /**

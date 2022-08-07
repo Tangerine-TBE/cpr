@@ -60,6 +60,9 @@ class MutiActivityNew : BaseActivity() {
     //吹气多次
     private var qyManyCountMap = mutableMapOf<String, Int>()
 
+    //吹气率错误次数
+    private var mqy_blow_error_count = mutableMapOf<String, Int>()
+
     //中断计时累加
     private var timeOutTotalMap = mutableMapOf<String, Long>()
     private var prValueMap = mutableMapOf<String, Int>()
@@ -251,7 +254,7 @@ class MutiActivityNew : BaseActivity() {
             it.layoutPress.chart.visibility = View.VISIBLE
             it.layoutLung.chartQy.visibility = View.VISIBLE
             setRate(it.layoutPress.chart, 0)
-            setQyRate(it.layoutLung.chartQy, 0)
+            setQyRate("", it.layoutLung.chartQy, 0)
         }
     }
 
@@ -491,7 +494,7 @@ class MutiActivityNew : BaseActivity() {
         }
         qyValueMap[dataDTO.mac] = dataDTO.qySum
         //吹气频率
-        setQyRate(viewBinding.layoutLung.chartQy, dataDTO.cf)
+        setQyRate(dataDTO.mac, viewBinding.layoutLung.chartQy, dataDTO.cf)
         //吹气错误数统计
         viewBinding.layoutLung.tvLungError.text = "${(dataDTO.getQy_err_total())}"
         viewBinding.layoutLung.tvLungTotal.text = "/${dataDTO.qySum}"
@@ -656,11 +659,15 @@ class MutiActivityNew : BaseActivity() {
         view.invalidate()
     }
 
-    private fun setQyRate(view: DialChart07View, value: Int) {
+    private fun setQyRate(mac: String, view: DialChart07View, value: Int) {
         var pf = 0f
         if (value > 0) {
             when {
                 value < configBean.tidalFrequency -> {
+                    var count = mqy_blow_error_count[mac]
+                    if (count != null) {
+                        mqy_blow_error_count[mac] = count++
+                    }
                     pf = (0.33f / configBean.tidalFrequency) * value
                 }
                 value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
@@ -668,6 +675,10 @@ class MutiActivityNew : BaseActivity() {
                         (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
                 }
                 value > configBean.tidalFrequencyEnd -> {
+                    var count = mqy_blow_error_count[mac]
+                    if (count != null) {
+                        mqy_blow_error_count[mac] = count++
+                    }
                     pf =
                         (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
                 }
@@ -854,6 +865,7 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.blowScore = configBean.blowScore.toFloat()
         mTrainingDTO.processScore = configBean.processScore.toFloat()
         mTrainingDTO.deduction = configBean.deductionScore
+        mTrainingDTO.qy_blow_error_count = mqy_blow_error_count[mac] ?: 0
         resultBeanMap[mac] = mTrainingDTO
         return mTrainingDTO
     }
@@ -877,7 +889,7 @@ class MutiActivityNew : BaseActivity() {
     private fun initLung(binding: CycleFragmentMultiItemBinding) {
         binding.layoutLung.ivLung.setImageResource(R.mipmap.icon_lung_border)
         binding.layoutLung.ivAim.visibility = View.INVISIBLE
-        setQyRate(binding.layoutLung.chartQy, 0)
+        setQyRate("", binding.layoutLung.chartQy, 0)
     }
 
     private fun startTime(binding: CycleFragmentMultiItemBinding) {
@@ -978,7 +990,7 @@ class MutiActivityNew : BaseActivity() {
                 val binding = getItemViewByMac(it.mac)
                 binding?.let {
                     setRate(binding.layoutPress.chart, 0)
-                    setQyRate(binding.layoutLung.chartQy, 0)
+                    setQyRate("", binding.layoutLung.chartQy, 0)
                 }
             }
         }

@@ -59,7 +59,6 @@ import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 /**
  * CPR页面  蓝夜列表扫描链接
  */

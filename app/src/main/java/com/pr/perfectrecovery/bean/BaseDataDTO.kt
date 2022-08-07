@@ -58,6 +58,7 @@ data class BaseDataDTO(
     var pr_seqright_total: Int = 0, //按压频率正常的次数
     var qy_serright_total: Int = 0,//吹气频率正确的次数
     var qyMaxValue: Int = 0,//吹气最大值
+    var qy_blow_error_count: Int = 0,//吹气率错误次数
     var model: Boolean = false,//模式
     var PR_CYCLE_TIMES: Int = 0
 ) {

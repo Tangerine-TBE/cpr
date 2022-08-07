@@ -391,8 +391,27 @@ class DataVolatile01 {
                 pt(L_Value)
                 pre_work_Mode = 0
             }
-            /*   Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
-               Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")*/
+            py(QY_Value)
+            Log.e("TAG12", "当前的按压值$L_d1  $L_d2  $L_d3")
+            Log.e("TAG12", "当前的吹气值$QY_d1  $QY_d2  $QY_d3")
+            //判断是按压还是吹气，执行相应的动作
+            /*
+            * 吹气状态的判断：
+            * 1：当三个值均为0，代表完成一次按压；
+            * 2：当有一个值小于5也默认完成一次按压
+            * */
+
+            /*if (work_Mode == 1) {
+
+            } else {
+                //吹气数据
+
+            }*/
+
+            //频率
+            // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
+            // Log.e("TAG9", "按压频率：$pfvalue")
+            // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
             VI_Value = DataFormatUtils.byteArrayToInt(
                 DataFormatUtils.hexStr2Bytes(
                     "00" + data.substring(
@@ -785,19 +804,22 @@ class DataVolatile01 {
         if (MODEL && (PR_CYCLE_TIMES > PR_DEFAULT_TIMES)) {
             ERR_PR_TOOMORE++
         } else {
+            val value = abs(preDistance - l)
+            Log.e("TAG11", "value ：${PR_LOW_VALUE}")
+            Log.e("TAG11", "value HIGH ：${PR_HIGH_VALUE}")
+            Log.e("TAG11", "preDistance: $value")
             if (PSR_Value == 0) {
                 ERR_PR_POSI++
                 Log.e("TAG11", "按压位置错误")
             } else {
-                val value = abs(preDistance - l)
-                if (value < PR_LOW_VALUE * 1.4) {
+                if (value < PR_LOW_VALUE) {
                     ERR_PR_LOW++
-                    Log.e("TAG11", "$PR_LOW_VALUE")
+                    Log.e("TAG11", "PR_LOW_VALUE ：$PR_LOW_VALUE")
                     Log.e("TAG11", "按压不足")
                     Log.e("TAG11", "$value")
-                } else if (value > PR_HIGH_VALUE * 1.4) {
+                } else if (value > PR_HIGH_VALUE) {
                     ERR_PR_HIGH++
-                    Log.e("TAG11", "$PR_HIGH_VALUE")
+                    Log.e("TAG11", "ERR_PR_HIGH ： $PR_HIGH_VALUE")
                     Log.e("TAG11", "按压过深")
                     Log.e("TAG11", "$value")
                 }
@@ -849,10 +871,13 @@ class DataVolatile01 {
         if (QY_d1 <= 5 && QY_d2 <= 5 && QY_d3 <= 5) {
             QY_RUN_FLAG = 0
             if (top_flag == 1) {
+
                 val changTimePress = System.currentTimeMillis()
                 ++QY_SUM
                 QY_CYCLE_TIMES++
+
                 ERR_QyTotal(getQyMax(max(true)))//每次筛选最大吹气值，去做错误次数的判断
+
                 top_flag = 0
                 Qliang = 0
                 if (QY_SUM > 1) {

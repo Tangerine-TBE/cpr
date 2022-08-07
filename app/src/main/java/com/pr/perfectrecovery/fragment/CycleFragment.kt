@@ -300,6 +300,7 @@ class CycleFragment : Fragment() {
             trainingDTO.pr_seqright_total = pr_seqright_total
             trainingDTO.qy_serright_total = qy_serright_total
             trainingDTO.qy_max_volume_sum = qy_max_volume_sum
+            trainingDTO.qy_blow_error_count = mqy_blow_error_count
         }
 
         //超次少次
@@ -384,6 +385,7 @@ class CycleFragment : Fragment() {
     //是否吹气
     private var isQy = false
     private var isQyAim = false
+    private var mqy_blow_error_count = 0
 
     private var startTime: Long = 0
     private var endTime: Long = 0
@@ -686,12 +688,14 @@ class CycleFragment : Fragment() {
             when {
                 value < configBean.tidalFrequency -> {
                     pf = (0.33f / configBean.tidalFrequency) * value
+                    mqy_blow_error_count++
                 }
                 value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
                     pf =
                         (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
                 }
                 value > configBean.tidalFrequencyEnd -> {
+                    mqy_blow_error_count++
                     pf =
                         (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
                 }

@@ -255,13 +255,12 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         //吹气频率百分比
         viewBinding.tvClock2.text = "${trainingDTO.getBlowRate()}%"
         //通气合格率
-        viewBinding.tvBlow.text = "${trainingDTO.getBlowAmount()}%"
+        viewBinding.tvBlow.text = "${trainingDTO.getVentilationAmount()}%"
         //吹气平均值
         viewBinding.tvBlowEnd.text = "平均：${trainingDTO.getBlowAverageNumber()}ml"
     }
 
     private fun setExportData(scoreStar: Float, scoreTotal: Float, check: Boolean) {
-
         if (!check) {
             viewBinding.layoutExportNoCheck.tvScoreSetting.text = "分数设定：  " +
                     "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
@@ -329,7 +328,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             //吹气频率百分比
             viewBinding.layoutExportNoCheck.tvClock21.text = "${trainingDTO.getBlowRate()}%"
             //通气合格率
-            viewBinding.layoutExportNoCheck.tvBlow1.text = "${trainingDTO.getBlowAmount()}%"
+            viewBinding.layoutExportNoCheck.tvBlow1.text = "${trainingDTO.getVentilationAmount()}%"
             //吹气平均值
             viewBinding.layoutExportNoCheck.tvBlowEnd.text =
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
@@ -451,7 +450,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             //吹气频率百分比
             viewBinding.layoutExport.tvClock21.text = "${trainingDTO.getBlowRate()}%"
             //通气合格率
-            viewBinding.layoutExport.tvBlow1.text = "${trainingDTO.getBlowAmount()}%"
+            viewBinding.layoutExport.tvBlow1.text = "${trainingDTO.getVentilationAmount()}%"
             //吹气平均值
             viewBinding.layoutExport.tvBlowEnd.text =
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
@@ -602,16 +601,17 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val pdfDocument = PdfDocument()
         //分页
         val pageInfo = PdfDocument.PageInfo.Builder(
-            viewBinding.root.measuredWidth,
-            viewBinding.root.measuredHeight,
+            viewBinding.root.measuredWidth + 200,
+            viewBinding.root.measuredHeight + 200,
             1
         ).create()
-
         val page2 = pdfDocument.startPage(pageInfo)
+        val canvas = page2.canvas
+//        canvas.scale(1.1f, 1.1f);
         if (isCheck) {
-            viewBinding.layoutExport.clExportContent.draw(page2.canvas)
+            viewBinding.layoutExport.clExportContent.draw(canvas)
         } else {
-            viewBinding.layoutExportNoCheck.clExportContent.draw(page2.canvas)
+            viewBinding.layoutExportNoCheck.clExportContent.draw(canvas)
         }
         pdfDocument.finishPage(page2)
         GlobalScope.launch(Dispatchers.IO) {
