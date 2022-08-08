@@ -876,10 +876,10 @@ class CPRActivity : BaseActivity() {
         data.clear()
         val num = formatHexString.length.div(20)
         if (formatHexString.length > 20) {
-//            for (index in 1..num) {
-//                val oneData = formatHexString.substring(20 * (index - 1), 20 * index)
-//                setData(oneData)
-//            }
+            for (index in 1..num) {
+                val oneData = formatHexString.substring(20 * (index - 1), 20 * index)
+                setData(oneData)
+            }
         } else if (formatHexString.length == 20) {
             setData(formatHexString)
         }

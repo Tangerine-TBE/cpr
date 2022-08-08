@@ -6,6 +6,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.CheckBox
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.SizeUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -59,7 +60,7 @@ class StatisticalActivity : BaseActivity() {
         //mAdapter.setEmptyView(R.layout.empty_layout)
 
         //协程异步加载数据
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             mDataList = LitePal.findAll(TrainingDTO::class.java) as ArrayList<TrainingDTO>
             withContext(Dispatchers.Main) {
                 mAdapter.setList(mDataList)
@@ -72,9 +73,16 @@ class StatisticalActivity : BaseActivity() {
             if (isDel) {
                 binding.top.tvRight.text = "取消"
                 binding.top.tvDel.visibility = View.VISIBLE
+                mAdapter.setOnItemClickListener { adapter, view, position ->
+
+                }
             } else {
                 binding.top.tvRight.text = "管理"
                 binding.top.tvDel.visibility = View.INVISIBLE
+                mAdapter.setOnItemClickListener { adapter, view, position ->
+                    val item = mAdapter.getItem(position)
+                    TrainResultActivity.start(this, item, true)
+                }
             }
             mAdapter.notifyDataSetChanged()
         }

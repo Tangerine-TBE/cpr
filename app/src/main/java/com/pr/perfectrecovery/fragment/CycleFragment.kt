@@ -445,7 +445,7 @@ class CycleFragment : Fragment() {
     达到设定的次数结束整个流程，没有达到设定的次数，等待继续吹，如果一直没有吹，一直等到流程的时间用完，这个时候算出这个循环少次
      */
     private var isCycle: Boolean = false
-    private fun cycle(dataDTO: BaseDataDTO) {
+    private fun cycle() {
         cycleEnd()
         if (isQy && !isPr && !isCycle) {
             isCycle = true
@@ -627,7 +627,7 @@ class CycleFragment : Fragment() {
                 mHandler1.postDelayed(this::setQyAimVisibility, 2000)
             }
             //计算循环次数
-            cycle(dataDTO)
+            cycle()
         }
         qyValue = dataDTO.qySum
         //吹气频率

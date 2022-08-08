@@ -14,8 +14,7 @@
             android:background="#22231D"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/container">
+            app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
                 android:id="@+id/tvName"
@@ -96,7 +95,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/opr_layout"
             android:paddingStart="@dimen/dp_10"
             android:paddingEnd="@dimen/dp_10"
             android:paddingTop="@dimen/dp_15"

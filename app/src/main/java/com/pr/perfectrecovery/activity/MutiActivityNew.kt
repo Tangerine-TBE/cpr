@@ -352,7 +352,7 @@ class MutiActivityNew : BaseActivity() {
      */
     private fun cycleEnd(mac: String) {
         if (isCheck) {
-            if (cycleCountMap[mac] == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount) {
+            if (cycleCountMap[mac]!! > configBean.cycles || (cycleCountMap[mac]!! == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount)) {
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
@@ -710,6 +710,7 @@ class MutiActivityNew : BaseActivity() {
     private fun showAllResult() {
         dataList.forEach { data ->
             showSingleResult(data.mac)
+            getResultBean(data.mac)
         }
     }
 
@@ -723,6 +724,9 @@ class MutiActivityNew : BaseActivity() {
         }
     }
 
+    /**
+     * 显示检查分数
+     */
     private fun showCheckScore(mac: String) {
         val item = getItemViewByMac(mac)
         item?.let {
@@ -754,13 +758,16 @@ class MutiActivityNew : BaseActivity() {
             }
             item.layoutScore.tvScore.text = "${if (score > 0) getNoMoreThanTwoDigits(score) else 0}"
             ratingBar.rating = (5.0 * score / 100).toFloat()
-
+            getResultBean(mac)
             item.layoutScore.root.setOnClickListener {
                 gotoDetail(mac)
             }
         }
     }
 
+    /**
+     * 显示测试结果
+     */
     private fun showTestResult(mac: String) {
         val item = getItemViewByMac(mac)
         item?.let {
@@ -778,7 +785,7 @@ class MutiActivityNew : BaseActivity() {
                 "${if (mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.getQy_err_total() else 0}"
             item.layoutTest.testLungTotal.text =
                 "/${if (mBaseDataDTOMap[mac] != null) mBaseDataDTOMap[mac]!!.qySum else 0}"
-
+            getResultBean(mac)
             item.layoutTest.root.setOnClickListener {
                 gotoDetail(mac)
             }
@@ -791,7 +798,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun getResultBean(mac: String): TrainingDTO {
-        if (resultBeanMap[mac] != null) return resultBeanMap[mac]!!
+//        if (resultBeanMap[mac] != null) return resultBeanMap[mac]!!
         val mTrainingDTO = TrainingDTO()
         mTrainingDTO.isCheck = mTrainingBean!!.isCheck
         mTrainingBean?.list?.forEach {
@@ -867,6 +874,7 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.deduction = configBean.deductionScore
         mTrainingDTO.qy_blow_error_count = mqy_blow_error_count[mac] ?: 0
         resultBeanMap[mac] = mTrainingDTO
+        mTrainingDTO.save()
         return mTrainingDTO
     }
 
@@ -936,10 +944,7 @@ class MutiActivityNew : BaseActivity() {
                 } else if (isQyMap[it.mac] == true) {
                     b?.layoutLung?.ctLungTime?.stop()
                 }
-
-
                 qyMany(it.mac)
-
                 val cycleCount = cycleCountMap[it.mac] ?: 0
                 val cyclePrCount = cyclePrCountMap[it.mac] ?: 0
                 if (cycleCount < configBean.cycles) {
@@ -956,6 +961,7 @@ class MutiActivityNew : BaseActivity() {
                     qyLessCountMap[it.mac] = number * configBean.qyCount + qyLessCount
                 }
             }
+            getResultBean(it.mac)
         }
     }
 
