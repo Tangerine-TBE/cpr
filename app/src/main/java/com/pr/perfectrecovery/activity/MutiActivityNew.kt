@@ -300,10 +300,6 @@ class MutiActivityNew : BaseActivity() {
 
                 pr(viewBinding, dataDTO)
                 qy(viewBinding, dataDTO)
-
-                //计算循环次数
-                cycle(dataDTO.mac)
-
                 //更新循环次数
                 if (prValueMap[dataDTO.mac] != dataDTO.prSum && isTimeingMap[dataDTO.mac] == true) {
                     isTimeingMap[dataDTO.mac] = false
@@ -447,9 +443,21 @@ class MutiActivityNew : BaseActivity() {
      */
     private fun qy(viewBinding: CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
-        if (dataDTO.aisleType == 1) {
-            viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
-            if (qyValueMap[dataDTO.mac] ?: 0 != dataDTO.qySum) {
+//        if (dataDTO.aisleType == 1) {
+        //viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
+        if (qyValueMap[dataDTO.mac] ?: 0 != dataDTO.qySum) {
+            if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
+                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
+                stopOutTime(viewBinding, dataDTO.mac)
+                viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
+                isQyAimMap[dataDTO.mac] = true
+                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
+                cout++
+                cycleQyCountMap[dataDTO.mac] = cout
+                isQyMap[dataDTO.mac] = true
+                isPrMap[dataDTO.mac] = false
+                sendMsg(INIT_LUNG, viewBinding)
+            } else {
                 stopOutTime(viewBinding, dataDTO.mac)
                 var cout = cycleQyCountMap[dataDTO.mac] ?: 0
                 cout++
@@ -475,23 +483,26 @@ class MutiActivityNew : BaseActivity() {
                         viewBinding.layoutLung.ivLung.setImageResource(R.mipmap.icon_wm_lung_green)
                     }
                 }
-                //吹气变灰
-                sendMsg(INIT_LUNG, viewBinding)
             }
-        } else {
-            if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
-                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
-                stopOutTime(viewBinding, dataDTO.mac)
-                viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
-                isQyAimMap[dataDTO.mac] = true
-                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
-                cout++
-                cycleQyCountMap[dataDTO.mac] = cout
-                isQyMap[dataDTO.mac] = true
-                isPrMap[dataDTO.mac] = false
-                sendMsg(INIT_LUNG, viewBinding)
-            }
+            //吹气变灰
+            sendMsg(INIT_LUNG, viewBinding)
         }
+        //计算循环次数
+        cycle(dataDTO.mac)
+//        } else {
+//            if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
+//                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
+//                stopOutTime(viewBinding, dataDTO.mac)
+//                viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
+//                isQyAimMap[dataDTO.mac] = true
+//                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
+//                cout++
+//                cycleQyCountMap[dataDTO.mac] = cout
+//                isQyMap[dataDTO.mac] = true
+//                isPrMap[dataDTO.mac] = false
+//                sendMsg(INIT_LUNG, viewBinding)
+//            }
+//        }
         qyValueMap[dataDTO.mac] = dataDTO.qySum
         //吹气频率
         setQyRate(dataDTO.mac, viewBinding.layoutLung.chartQy, dataDTO.cf)
