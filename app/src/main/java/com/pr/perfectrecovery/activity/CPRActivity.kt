@@ -907,6 +907,8 @@ class CPRActivity : BaseActivity() {
         Log.e("setData", GsonUtils.toJson(dataDTO))
         if (isStart) {
             StatusLiveData.dataSingle.value = dataDTO
+            //曲线模型数据
+            StatusLiveData.dataSingleChart.value = dataDTO
         }
     }
 

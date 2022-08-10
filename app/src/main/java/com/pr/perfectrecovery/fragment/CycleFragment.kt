@@ -245,14 +245,14 @@ class CycleFragment : Fragment() {
         mHandler4.removeCallbacksAndMessages(null)
         mHandler5.removeCallbacksAndMessages(null)
         mHandler6.removeCallbacksAndMessages(null)
+        if (mMediaPlayer != null) {
+            mMediaPlayer!!.stop()
+            mMediaPlayer!!.release()
+            mMediaPlayer = null
+        }
         viewBinding.ctTime.stop()
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         StatusLiveData.dataSingle.value = null
-        if (mMediaPlayer != null) {
-            mMediaPlayer!!.stop()
-            mMediaPlayer?.release()
-            mMediaPlayer = null
-        }
         //返回成绩结果类
         endTime = System.currentTimeMillis()
         isStart = false
@@ -287,7 +287,7 @@ class CycleFragment : Fragment() {
             trainingDTO.err_qy_high = err_qy_high
             trainingDTO.err_qy_low = err_qy_low
             trainingDTO.err_qy_dead = err_qy_dead
-            trainingDTO.err_qy_close = err_qy_close
+            trainingDTO.err_qy_close = err_qy_close ?: 0
             //吹气总错误数s
             trainingDTO.blowErrorCount = mBaseDataDTO!!.getQy_err_total().toFloat()
             trainingDTO.prSum = prSum
@@ -342,10 +342,14 @@ class CycleFragment : Fragment() {
     private fun startMP3() {
         if (isYY && isStart) {//节奏音
             mMediaPlayer = MediaPlayer.create(activity, R.raw.wm_bg)
-            mMediaPlayer?.isLooping = true
+            //设置为true循环播放
+            mMediaPlayer?.isLooping = false
             mMediaPlayer?.seekTo(0)
 //            mMediaPlayer?.prepareAsync()
             mMediaPlayer?.setOnPreparedListener { // 装载完毕回调
+                mMediaPlayer?.start()
+            }
+            mMediaPlayer?.setOnCompletionListener { // 在播放完毕被回调
                 mMediaPlayer?.start()
             }
         }
@@ -585,7 +589,7 @@ class CycleFragment : Fragment() {
         //通气道是否打开 0-关闭 1-打开
         if (qyValue != dataDTO.qySum) {
             if (dataDTO.err_qy_close != err_qy_close) {
-                err_qy_close = dataDTO.err_qy_close
+                err_qy_close = dataDTO.err_qy_close ?: 0
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
                 viewBinding.ivAim.visibility = View.VISIBLE

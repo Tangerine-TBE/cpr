@@ -444,10 +444,10 @@ class MutiActivityNew : BaseActivity() {
     private fun qy(viewBinding: CycleFragmentMultiItemBinding, dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
 //        if (dataDTO.aisleType == 1) {
-        //viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
+        viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
         if (qyValueMap[dataDTO.mac] ?: 0 != dataDTO.qySum) {
             if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
-                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
+                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close ?: 0
                 stopOutTime(viewBinding, dataDTO.mac)
                 viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
                 isQyAimMap[dataDTO.mac] = true

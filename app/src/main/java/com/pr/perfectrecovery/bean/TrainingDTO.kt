@@ -196,7 +196,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 通气合格率 = 正确通气量次数 / 通气总次数
      */
     fun getVentilationAmount(): Int {
-        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - qy_blow_error_count) / qySum * 100) else 0
+        var amount =
+            if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - qy_blow_error_count) / qySum * 100) else 0
+        if (amount < 0) {
+            amount = 0
+        }
+        return amount
     }
 
     /**

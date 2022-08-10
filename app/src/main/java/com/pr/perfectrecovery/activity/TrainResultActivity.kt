@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
@@ -16,7 +15,6 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
-import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
@@ -601,16 +599,20 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val pdfDocument = PdfDocument()
         //分页
         val pageInfo = PdfDocument.PageInfo.Builder(
-            viewBinding.root.measuredWidth + 200,
-            viewBinding.root.measuredHeight + 200,
+            viewBinding.root.measuredWidth,
+            viewBinding.root.measuredHeight,
             1
         ).create()
         val page2 = pdfDocument.startPage(pageInfo)
         val canvas = page2.canvas
 //        canvas.scale(1.1f, 1.1f);
         if (isCheck) {
+            viewBinding.layoutExport.clExportContent.layoutParams.width = 1180
+            viewBinding.layoutExport.clExportContent.layoutParams.height = 2120
             viewBinding.layoutExport.clExportContent.draw(canvas)
         } else {
+            viewBinding.layoutExportNoCheck.clExportContent.layoutParams.width = 1180
+            viewBinding.layoutExportNoCheck.clExportContent.layoutParams.height = 2120
             viewBinding.layoutExportNoCheck.clExportContent.draw(canvas)
         }
         pdfDocument.finishPage(page2)

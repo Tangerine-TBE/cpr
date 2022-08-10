@@ -47,7 +47,7 @@ object FileUtils {
                 outputStream.flush()
             } catch (e: IOException) {
                 Log.e("程序出异常了", "写入本地文件成功：" + file.absolutePath)
-                ToastUtils.showShort("CPR日志写入异常")
+                //ToastUtils.showShort("CPR日志写入异常")
                 e.printStackTrace()
             } finally {
                 if (outputStream != null) {

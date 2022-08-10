@@ -47,7 +47,7 @@ data class BaseDataDTO(
     //吹气错误-气压进胃
     var err_qy_dead: Int = 0,
     //吹气错误-气道未打开错误
-    var err_qy_close: Int = 0,
+    var err_qy_close: Int? = null,
     var QY_TIMES_TOOMORE: Int = 0,
     var ERR_PR_TOOMORE: Int = 0,
     var pr_depth_sum: Int = 0,//按压深度总和(mm)
@@ -83,7 +83,7 @@ data class BaseDataDTO(
      * 获取吹气总数
      */
     fun getQy_err_total(): Int {
-        return err_qy_close + err_qy_low + err_qy_dead + err_qy_high + QY_TIMES_TOOMORE
+        return err_qy_close ?: 0 + err_qy_low + err_qy_dead + err_qy_high + QY_TIMES_TOOMORE
     }
 
     var PR_HIGH_VALUE: Int = 0

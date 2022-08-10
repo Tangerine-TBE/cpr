@@ -92,7 +92,7 @@ class ChartFragment : Fragment() {
         )
 //        initLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
-        StatusLiveData.dataSingle.observe(requireActivity()) {
+        StatusLiveData.dataSingleChart.observe(requireActivity()) {
             if (it != null) {
                 setData(it)
                 addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf))
