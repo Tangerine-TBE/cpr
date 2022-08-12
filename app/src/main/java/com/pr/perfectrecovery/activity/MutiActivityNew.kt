@@ -809,7 +809,7 @@ class MutiActivityNew : BaseActivity() {
     }
 
     private fun getResultBean(mac: String): TrainingDTO {
-//        if (resultBeanMap[mac] != null) return resultBeanMap[mac]!!
+        if (resultBeanMap[mac] != null) return resultBeanMap[mac]!!
         val mTrainingDTO = TrainingDTO()
         mTrainingDTO.isCheck = mTrainingBean!!.isCheck
         mTrainingBean?.list?.forEach {

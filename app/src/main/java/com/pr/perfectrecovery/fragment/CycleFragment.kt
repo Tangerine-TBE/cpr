@@ -251,7 +251,6 @@ class CycleFragment : Fragment() {
             mMediaPlayer = null
         }
         viewBinding.ctTime.stop()
-        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         StatusLiveData.dataSingle.value = null
         //返回成绩结果类
         endTime = System.currentTimeMillis()
@@ -318,6 +317,7 @@ class CycleFragment : Fragment() {
         trainingDTO.processScore = configBean.processScore.toFloat()
         trainingDTO.deduction = configBean.deductionScore
         mHandler.removeCallbacks(counter)
+        EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
         return trainingDTO
     }
 
@@ -722,7 +722,7 @@ class CycleFragment : Fragment() {
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_BLE_CLOSE, "", null))
 
         StatusLiveData.data.value = null
-        if (mMediaPlayer != null) {
+        if (mMediaPlayer != null && mMediaPlayer!!.isPlaying) {
             mMediaPlayer!!.stop()
             mMediaPlayer!!.release()
             mMediaPlayer = null

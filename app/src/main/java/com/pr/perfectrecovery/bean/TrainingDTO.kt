@@ -206,6 +206,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
 
     /**
      * 吹气频率合格率
+     * 吹气频率 = 正确吹气次数 / (总次数 * 100)
      */
     fun getBlowRate(): Int {
         return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - blowErrorCount) / qySum * 100).roundToInt() else 0
