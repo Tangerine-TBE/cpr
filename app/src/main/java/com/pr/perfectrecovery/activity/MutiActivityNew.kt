@@ -60,9 +60,6 @@ class MutiActivityNew : BaseActivity() {
     //吹气多次
     private var qyManyCountMap = mutableMapOf<String, Int>()
 
-    //吹气率错误次数
-    private var mqy_blow_error_count = mutableMapOf<String, Int>()
-
     //中断计时累加
     private var timeOutTotalMap = mutableMapOf<String, Long>()
     private var prValueMap = mutableMapOf<String, Int>()
@@ -364,7 +361,7 @@ class MutiActivityNew : BaseActivity() {
     private fun prMany(mac: String) {
         if (isCheck) {
             val cyclePrCount = cyclePrCountMap[mac] ?: 0
-            if (cyclePrCount > configBean.prCount && cyclePrCount > 0) {
+            if (cyclePrCount > configBean.prCount && cyclePrCount >= 0) {
                 //按压超次
                 val prManyCount = prManyCountMap[mac] ?: 0
                 prManyCountMap[mac] = cyclePrCount - configBean.prCount + prManyCount
@@ -421,7 +418,7 @@ class MutiActivityNew : BaseActivity() {
     private var qyManyCycleMap = mutableMapOf<String, Int>()
     private fun qyMany(mac: String) {
         val cycleQyCount = cycleQyCountMap[mac] ?: 0
-        if (isCheck && cycleCountMap[mac] != qyManyCycleMap[mac] && cycleQyCount > 0) {
+        if (isCheck && cycleCountMap[mac] != qyManyCycleMap[mac] && cycleQyCount >= 0) {
             qyManyCycleMap[mac] = cycleCountMap[mac] ?: 0
             if (cycleQyCount > configBean.qyCount) {
                 //吹气超次
@@ -446,6 +443,10 @@ class MutiActivityNew : BaseActivity() {
 //        if (dataDTO.aisleType == 1) {
         viewBinding.layoutLung.ivAim.visibility = View.INVISIBLE
         if (qyValueMap[dataDTO.mac] ?: 0 != dataDTO.qySum) {
+            //给一个初始值
+            if (err_qy_close_Map[dataDTO.mac] == null) {
+                err_qy_close_Map[dataDTO.mac] = 0
+            }
             if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
                 err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close ?: 0
                 stopOutTime(viewBinding, dataDTO.mac)
@@ -675,10 +676,6 @@ class MutiActivityNew : BaseActivity() {
         if (value > 0) {
             when {
                 value < configBean.tidalFrequency -> {
-                    var count = mqy_blow_error_count[mac]
-                    if (count != null) {
-                        mqy_blow_error_count[mac] = count++
-                    }
                     pf = (0.33f / configBean.tidalFrequency) * value
                 }
                 value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
@@ -686,10 +683,6 @@ class MutiActivityNew : BaseActivity() {
                         (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
                 }
                 value > configBean.tidalFrequencyEnd -> {
-                    var count = mqy_blow_error_count[mac]
-                    if (count != null) {
-                        mqy_blow_error_count[mac] = count++
-                    }
                     pf =
                         (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
                 }
@@ -883,9 +876,10 @@ class MutiActivityNew : BaseActivity() {
         mTrainingDTO.blowScore = configBean.blowScore.toFloat()
         mTrainingDTO.processScore = configBean.processScore.toFloat()
         mTrainingDTO.deduction = configBean.deductionScore
-        mTrainingDTO.qy_blow_error_count = mqy_blow_error_count[mac] ?: 0
         resultBeanMap[mac] = mTrainingDTO
-        mTrainingDTO.save()
+        if (!TextUtils.isEmpty(mTrainingDTO.name)) {
+            mTrainingDTO.save()
+        }
         return mTrainingDTO
     }
 

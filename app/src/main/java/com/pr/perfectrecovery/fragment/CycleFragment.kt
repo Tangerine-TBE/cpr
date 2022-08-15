@@ -268,7 +268,7 @@ class CycleFragment : Fragment() {
             } else {
                 prLessCount += number * configBean.prCount
             }
-            qyLessCount += number * configBean.qyCount
+            qyLessCount += number * configBean.qyCount - configBean.qyCount
         }
 //        qyMany()
         val trainingDTO = TrainingDTO()
@@ -299,7 +299,6 @@ class CycleFragment : Fragment() {
             trainingDTO.pr_seqright_total = pr_seqright_total
             trainingDTO.qy_serright_total = qy_serright_total
             trainingDTO.qy_max_volume_sum = qy_max_volume_sum
-            trainingDTO.qy_blow_error_count = mqy_blow_error_count
         }
 
         //超次少次
@@ -389,7 +388,7 @@ class CycleFragment : Fragment() {
     //是否吹气
     private var isQy = false
     private var isQyAim = false
-    private var mqy_blow_error_count = 0
+    private var mqy_blow_error_count: Int = 0
 
     private var startTime: Long = 0
     private var endTime: Long = 0
@@ -469,9 +468,9 @@ class CycleFragment : Fragment() {
         }
     }
 
-    private var qyManyCycle = 0
+    private var qyManyCycle = -1
     private fun qyMany() {
-        if (isCheck && cycleCount != qyManyCycle && cycleQyCount > 0) {
+        if (isCheck && cycleCount != qyManyCycle && cycleQyCount >= 0) {
             qyManyCycle = cycleCount
             if (cycleQyCount > configBean.qyCount) {
                 //吹气超次
@@ -511,7 +510,7 @@ class CycleFragment : Fragment() {
 
     private fun prMany() {
         if (isCheck) {
-            if (cyclePrCount > configBean.prCount && cyclePrCount > 0) {
+            if (cyclePrCount > configBean.prCount && cyclePrCount >= 0) {
                 //按压超次
                 prManyCount += cyclePrCount - configBean.prCount
             } else if (cyclePrCount < configBean.prCount) {
@@ -688,18 +687,17 @@ class CycleFragment : Fragment() {
     //吹气频率
     private fun setQyRate(view: DialChart07View, value: Int) {
         var pf: Float = 0f
-        if (value > 0) {
+        if (value > 10) {
             when {
                 value < configBean.tidalFrequency -> {
                     pf = (0.33f / configBean.tidalFrequency) * value
-                    mqy_blow_error_count++
                 }
                 value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
+                    mqy_blow_error_count++
                     pf =
                         (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
                 }
                 value > configBean.tidalFrequencyEnd -> {
-                    mqy_blow_error_count++
                     pf =
                         (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
                 }

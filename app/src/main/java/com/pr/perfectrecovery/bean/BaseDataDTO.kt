@@ -47,7 +47,7 @@ data class BaseDataDTO(
     //吹气错误-气压进胃
     var err_qy_dead: Int = 0,
     //吹气错误-气道未打开错误
-    var err_qy_close: Int? = null,
+    var err_qy_close: Int = 0,
     var QY_TIMES_TOOMORE: Int = 0,
     var ERR_PR_TOOMORE: Int = 0,
     var pr_depth_sum: Int = 0,//按压深度总和(mm)
@@ -56,7 +56,7 @@ data class BaseDataDTO(
     var qy_time_sum: Int = 0,  //吹气时间总和
     var qy_max_volume_sum: Int = 0,//吹气每次最值大总和
     var pr_seqright_total: Int = 0, //按压频率正常的次数
-    var qy_serright_total: Int = 0,//吹气频率正确的次数
+    var qy_serright_total: Int = 0,//吹气频率正常的次数
     var qyMaxValue: Int = 0,//吹气最大值
     var qy_blow_error_count: Int = 0,//吹气率错误次数
     var model: Boolean = false,//模式
@@ -83,7 +83,7 @@ data class BaseDataDTO(
      * 获取吹气总数
      */
     fun getQy_err_total(): Int {
-        return err_qy_close ?: 0 + err_qy_low + err_qy_dead + err_qy_high + QY_TIMES_TOOMORE
+        return err_qy_close + err_qy_low + err_qy_dead + err_qy_high + QY_TIMES_TOOMORE
     }
 
     var PR_HIGH_VALUE: Int = 0

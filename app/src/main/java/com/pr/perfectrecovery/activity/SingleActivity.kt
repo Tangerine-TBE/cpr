@@ -69,13 +69,10 @@ class SingleActivity : BaseActivity() {
         //定时器
         binding.bottom.ivStart.setOnClickListener {
             isStart = !isStart
-//            EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_STOP, "", null))
-            cycleFragment?.start()
             if (isStart) {
-//                DataVolatile.isStart = true
+                cycleFragment?.start()
                 EventBus.getDefault()
                     .post(MessageEventData(BaseConstant.EVENT_SINGLE_CHART_START, "", null))
-//                cycleFragment?.start()
                 binding.bottom.ivStart.setBackgroundResource(R.drawable.drawable_chart_bg)
                 binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_stop)
                 binding.tvTime.setTextColor(resources.getColor(R.color.color_37B48B))

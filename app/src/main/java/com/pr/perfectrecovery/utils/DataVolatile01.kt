@@ -88,6 +88,7 @@ class DataVolatile01 {
 //            pt_valueSet.clear()
         }
     }
+
     //按压错误-按压未回弹
     private var ERR_PR_UNBACK = 0
 
