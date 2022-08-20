@@ -265,10 +265,10 @@ class CycleFragment : Fragment() {
             if (number > 0 && cyclePrCount > 0) {
                 prLessCount += (number - 1) * configBean.prCount
                 prMany()
-            } else {
+            } else if (number > 0) {
                 prLessCount += number * configBean.prCount
             }
-            qyLessCount += number * configBean.qyCount - configBean.qyCount
+            qyLessCount += number * configBean.qyCount
         }
 //        qyMany()
         val trainingDTO = TrainingDTO()
@@ -476,9 +476,10 @@ class CycleFragment : Fragment() {
                 //吹气超次
                 qyManyCount += cycleQyCount - configBean.qyCount
                 Log.e("qyManyCount 吹气超次", "qyManyCount: $qyManyCount")
-            } else if (cycleQyCount < configBean.qyCount) {
+            } else if (cycleQyCount > 0 && cycleQyCount < configBean.qyCount && (configBean.qyCount - cycleQyCount) > 0) {
                 //吹气少次
                 qyLessCount += configBean.qyCount - cycleQyCount
+                Log.e("qyLessCount 吹气少次", "cycleQyCount: $cycleQyCount")
                 Log.e("qyLessCount 吹气少次", "qyLessCount: $qyLessCount")
             }
             cycleQyCount = 0
@@ -587,20 +588,19 @@ class CycleFragment : Fragment() {
     private fun qy(dataDTO: BaseDataDTO) {
         //通气道是否打开 0-关闭 1-打开
         if (qyValue != dataDTO.qySum) {
+            cycleQyCount++
             if (dataDTO.err_qy_close != err_qy_close) {
                 err_qy_close = dataDTO.err_qy_close ?: 0
                 stopOutTime()
                 setPlayVoice(VOICE_MP3_WDKQD)
                 viewBinding.ivAim.visibility = View.VISIBLE
                 isQyAim = true
-                cycleQyCount++
                 isQy = true
                 isPr = false
                 mHandler4.removeCallbacksAndMessages(null)
                 mHandler4.postDelayed(this::setQyAimVisibility, 2000)
             } else {
                 stopOutTime()
-                cycleQyCount++
                 isQy = true
                 isPr = false
                 val qyMax = dataDTO.qyMaxValue
