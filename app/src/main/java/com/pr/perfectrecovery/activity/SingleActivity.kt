@@ -99,6 +99,13 @@ class SingleActivity : BaseActivity() {
         }
     }
 
+    fun setViewPagerItem() {
+        binding.ctChart.isChecked = true
+        binding.ctCurve.isChecked = false
+        binding.ctEvent.isChecked = false
+        binding.viewPager.currentItem = 1
+    }
+
     private fun startResult() {
         val mTrainingDTO = cycleFragment?.stop()
         //开始时清空残留数据

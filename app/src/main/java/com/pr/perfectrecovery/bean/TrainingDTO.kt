@@ -196,7 +196,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      */
     fun getVentilationAmount(): Int {
         var amount =
-            if ((qyCount * cycles) > 0) ((1 - (blowErrorCount) / (qyCount * cycles)) * 100).toInt() else 0
+            if ((qyCount * cycles) > 0) ((1 - (blowErrorCount) / (qySum)) * 100).toInt() else 0
         if (amount < 0) {
             amount = 0
         }

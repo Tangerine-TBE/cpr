@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
 import com.pr.perfectrecovery.R
+import com.pr.perfectrecovery.activity.SingleActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.BaseDataDTO
 import com.pr.perfectrecovery.bean.ConfigBean
@@ -105,8 +106,13 @@ class CycleFragment : Fragment() {
 //        DataVolatile.PR_HIGH_VALUE = configBean.prHigh()
 //        DataVolatile.PR_LOW_VALUE = configBean.prLow()
         //按压通气比列
+        var isShow = false
         StatusLiveData.dataSingle.observe(requireActivity()) {
             if (it != null) {
+               if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck == true) {
+                    isShow = true
+                   (activity as SingleActivity).setViewPagerItem()
+                }
                 setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
                 viewBinding.tvPress3.text = "距离值：${it.distance}"
@@ -491,7 +497,7 @@ class CycleFragment : Fragment() {
      */
     private fun cycleEnd() {
         if (isCheck) {
-            if (cycleCount > configBean.cycles || (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount)) {
+            if ((cycleCount > configBean.cycles) || (cycleCount == configBean.cycles && cycleQyCount == configBean.qyCount)) {
                 //当前循环大于时默认等于设置循环数
                 if (cycleCount > configBean.cycles) {
                     cycleCount = configBean.cycles

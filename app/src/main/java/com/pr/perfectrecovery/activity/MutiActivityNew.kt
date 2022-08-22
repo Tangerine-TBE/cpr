@@ -425,7 +425,7 @@ class MutiActivityNew : BaseActivity() {
                 val qyManyCount = qyManyCountMap[mac] ?: 0
                 qyManyCountMap[mac] = cycleQyCount - configBean.qyCount + qyManyCount
                 Log.e("qyManyCount 吹气超次", "qyManyCount: $qyManyCount")
-            } else if (cycleQyCount < configBean.qyCount) {
+            } else if (cycleQyCount > 0 && cycleQyCount < configBean.qyCount) {
                 //吹气少次
                 val qyLessCount = qyLessCountMap[mac] ?: 0
                 qyLessCountMap[mac] = configBean.qyCount - cycleQyCount + qyLessCount
