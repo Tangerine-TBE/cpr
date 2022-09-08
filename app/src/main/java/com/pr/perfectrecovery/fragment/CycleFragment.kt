@@ -109,9 +109,9 @@ class CycleFragment : Fragment() {
         var isShow = false
         StatusLiveData.dataSingle.observe(requireActivity()) {
             if (it != null) {
-               if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck == true) {
+                if (!isShow && abs(it.preDistance - it.distance) > 10 && isCheck) {
                     isShow = true
-                   (activity as SingleActivity).setViewPagerItem()
+                    (activity as SingleActivity).setViewPagerItem()
                 }
                 setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
@@ -221,14 +221,6 @@ class CycleFragment : Fragment() {
         EventBus.getDefault().post(MessageEventData(BaseConstant.EVENT_CPR_START, "", null))
         DataVolatile01.clearErrorData()
         cycleCount = 0
-        //更新循环次数
-        EventBus.getDefault().post(
-            MessageEventData(
-                BaseConstant.EVENT_SINGLE_DATA_CYCLE,
-                "$cycleCount",
-                null
-            )
-        )
         viewBinding.ivPress.setImageResource(R.mipmap.icon_wm_normal)
         viewBinding.ivLung.setImageResource(R.mipmap.icon_lung_border)
         viewBinding.dashBoard.setImageResource(R.mipmap.icon_wm_bp_2)
@@ -462,6 +454,7 @@ class CycleFragment : Fragment() {
             isPr = false
             prMany()
             cycleCount++
+            Log.e("cycleCount", "$cycleCount")
             //更新循环次数
             EventBus.getDefault()
                 .post(
@@ -690,10 +683,14 @@ class CycleFragment : Fragment() {
         view.invalidate()
     }
 
+    private var qyValueRate: Int = 0
+
     //吹气频率
     private fun setQyRate(view: DialChart07View, value: Int) {
         var pf: Float = 0f
-        if (value > 10) {
+        if (value > 5 && qyValueRate != value) {
+            //qyValueRate = value
+            Log.e("setQyRate", "value: $value")
             when {
                 value < configBean.tidalFrequency -> {
                     pf = (0.33f / configBean.tidalFrequency) * value
@@ -708,6 +705,7 @@ class CycleFragment : Fragment() {
                         (0.33f / (60 - configBean.tidalFrequencyEnd) * (value - configBean.tidalFrequencyEnd) + 0.66f)
                 }
             }
+
         }
         Log.e("setQyRate", "Rate: $pf")
         view.setCurrentStatus(pf)

@@ -270,14 +270,18 @@ class DataVolatile01 {
     /**
      * 获取吹气值和
      */
-
     fun qyValue(): Int {
         var sum = 0
         for (i in QY_valueSet2.indices) {
-            sum += i
+            sum += if (i < 30) {
+                (i * 0.3).toInt()
+            } else {
+                i
+            }
+
         }
         QY_valueSet2.clear()
-        return sum
+        return QY_VOLUME_SUM
     }
 
     /**
@@ -421,8 +425,6 @@ class DataVolatile01 {
                     )
                 )
             )
-
-
         }
         val stringBuffer = StringBuffer()
         stringBuffer.append("电量值：").append(VI_Value)
@@ -513,8 +515,9 @@ class DataVolatile01 {
     /**
      * 吹气体积
      */
-    private fun getQyMax(value: Int): Int {
+    private fun getQyMax(v: Int): Int {
         var qy = 0
+        val value = (v * 0.6).toInt()
         when {
             value < 30 -> {
                 qy = abs(20 * value - 100)
@@ -673,7 +676,7 @@ class DataVolatile01 {
             } else {
                 if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                     //当最低点距离小于30时不作为按压一次处理
-                    if (preDistance - L_d2 < 30) {
+                    if (preDistance - L_d2 < 10) {
                         return L_d2
                     }
                     if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
@@ -684,9 +687,9 @@ class DataVolatile01 {
                         if (ERR_FLAG == 0) {
                             Err_PrTotal(L_d2)
                         } else {
-                            ERR_FLAG = 0;
+                            ERR_FLAG = 0
                         }
-                        PR_RUN_FLAG = 1;
+                        PR_RUN_FLAG = 1
                         //  Log.e("TAG8", "距离点数$PR_DOTTIMSE_NUMBER")
                         if (PR_SUM > 1) {
                             if (L_valueSet.size > 30) {
@@ -720,7 +723,7 @@ class DataVolatile01 {
         } else if (L_d2 < L_d3) {
             if (selectMax(abs(L_d1 - L_d2), abs(L_d1 - L_d3), abs(L_d2 - L_d3)) > 5) {
                 // PR_DOTTIMSE_NUMBER+=3
-                if (preDistance - L_d1 < 30) {
+                if (preDistance - L_d1 < 10) {
                     return L_d1
                 }
                 /* if(abs(L_d2-L_d1)<15&&abs(L_d3-L_d2)<15&&abs(L_d3-L_d1)<15){

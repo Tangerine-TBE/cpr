@@ -3,6 +3,7 @@ package com.pr.perfectrecovery.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.CheckedTextView
 import androidx.fragment.app.Fragment
@@ -143,6 +144,7 @@ class SingleActivity : BaseActivity() {
     fun onEvent(event: MessageEventData) {
         when (event.code) {
             BaseConstant.EVENT_SINGLE_DATA_CYCLE -> {
+                Log.e("onEvent cycleCount", "${event.cycleCount}")
                 //循环次数
                 binding.tvCycle.text = "${event.cycleCount}"
             }

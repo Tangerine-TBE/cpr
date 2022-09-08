@@ -346,6 +346,7 @@ class CPRActivity : BaseActivity() {
     public fun onEvent(event: MessageEventData) {
         when (event.code) {
             BaseConstant.EVENT_CPR_START -> {
+                clearMap()
                 isInitValueMap.clear()
 //                bindBluetooth()
                 isStart = true
@@ -382,13 +383,13 @@ class CPRActivity : BaseActivity() {
                 dataMap.clear()
                 isInitValueMap.clear()
                 Log.e("hunger_test_clear", " clear done")
-
             }
             BaseConstant.EVENT_DO_BIND -> {
                 isInitValueMap.clear()
                 bindBluetooth()
             }
             BaseConstant.EVENT_DO_MULTI_START -> {
+                clearMap()
                 isMulti = true
                 isStart = true
                 if (mBleDevice != null) {
@@ -404,10 +405,12 @@ class CPRActivity : BaseActivity() {
     }
 
     private fun clearMap() {
+        dataDTO = BaseDataDTO()
         dataMap.values.forEach { item ->
             item.dataClear()
             dataMap.remove(item.deviceMAC)
         }
+        dataMap.clear()
     }
 
     private fun bindBluetooth() {
@@ -892,7 +895,6 @@ class CPRActivity : BaseActivity() {
 //        }
     }
 
-    @Synchronized
     private fun setData(data: String) {
         val deviceMAC =
             "001b${data.substring(12)}"
@@ -907,6 +909,7 @@ class CPRActivity : BaseActivity() {
         Log.e("setData", GsonUtils.toJson(dataDTO))
         if (isStart) {
             StatusLiveData.dataSingle.value = dataDTO
+            Log.e("setDatacf", "${dataDTO.cf}")
             //曲线模型数据
             StatusLiveData.dataSingleChart.value = dataDTO
         }

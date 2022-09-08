@@ -31,6 +31,7 @@ import org.greenrobot.eventbus.ThreadMode
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.abs
+import kotlin.math.log
 
 
 class MutiActivityNew : BaseActivity() {
@@ -330,13 +331,14 @@ class MutiActivityNew : BaseActivity() {
 
     private fun cycle(mac: String) {
         cycleEnd(mac)
-        if (isQyMap[mac] == true && isPrMap[mac] != true && isCycleMap[mac] != true) {
+        if (isQyMap[mac] == true && !isPrMap[mac]!! && !isCycleMap[mac]!!) {
             isCycleMap[mac] = true
             isQyMap[mac] = false
             isPrMap[mac] = false
             prMany(mac)
             val cycleCount = cycleCountMap[mac] ?: 0
             cycleCountMap[mac] = cycleCount + 1
+            Log.e("cycle", "mac : ${mac}  cycleCount  = ${cycleCountMap[mac]}")
         }
     }
 
@@ -345,7 +347,8 @@ class MutiActivityNew : BaseActivity() {
      */
     private fun cycleEnd(mac: String) {
         if (isCheck) {
-            if (cycleCountMap[mac]!! > configBean.cycles || (cycleCountMap[mac]!! == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount)) {
+            Log.e("cycleEnd", "mac : $mac  cycleCount  = ${cycleCountMap[mac]}")
+            if ((cycleCountMap[mac]!! > configBean.cycles) || (cycleCountMap[mac]!! == configBean.cycles && cycleQyCountMap[mac] == configBean.qyCount)) {
                 /**
                  * 此处避免多次结算循环多次少次 -
                  * isCheck 只在当前页面不影响
@@ -354,6 +357,7 @@ class MutiActivityNew : BaseActivity() {
                 hasDoneMap[mac] = true
                 endTimeMap[mac] = System.currentTimeMillis()
                 showSingleResult(mac)
+                mBaseDataDTOMap.remove(mac)
             }
         }
     }
@@ -447,22 +451,19 @@ class MutiActivityNew : BaseActivity() {
             if (err_qy_close_Map[dataDTO.mac] == null) {
                 err_qy_close_Map[dataDTO.mac] = 0
             }
+            var cout = cycleQyCountMap[dataDTO.mac] ?: 0
+            cout++
+            cycleQyCountMap[dataDTO.mac] = cout
             if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
                 err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close ?: 0
                 stopOutTime(viewBinding, dataDTO.mac)
                 viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
                 isQyAimMap[dataDTO.mac] = true
-                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
-                cout++
-                cycleQyCountMap[dataDTO.mac] = cout
                 isQyMap[dataDTO.mac] = true
                 isPrMap[dataDTO.mac] = false
                 sendMsg(INIT_LUNG, viewBinding)
             } else {
                 stopOutTime(viewBinding, dataDTO.mac)
-                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
-                cout++
-                cycleQyCountMap[dataDTO.mac] = cout
                 isQyMap[dataDTO.mac] = true
                 isPrMap[dataDTO.mac] = false
 
@@ -487,30 +488,15 @@ class MutiActivityNew : BaseActivity() {
             }
             //吹气变灰
             sendMsg(INIT_LUNG, viewBinding)
+            //计算循环次数
+            cycle(dataDTO.mac)
         }
-        //计算循环次数
-        cycle(dataDTO.mac)
-//        } else {
-//            if (dataDTO.err_qy_close != err_qy_close_Map[dataDTO.mac]) {
-//                err_qy_close_Map[dataDTO.mac] = dataDTO.err_qy_close
-//                stopOutTime(viewBinding, dataDTO.mac)
-//                viewBinding.layoutLung.ivAim.visibility = View.VISIBLE
-//                isQyAimMap[dataDTO.mac] = true
-//                var cout = cycleQyCountMap[dataDTO.mac] ?: 0
-//                cout++
-//                cycleQyCountMap[dataDTO.mac] = cout
-//                isQyMap[dataDTO.mac] = true
-//                isPrMap[dataDTO.mac] = false
-//                sendMsg(INIT_LUNG, viewBinding)
-//            }
-//        }
         qyValueMap[dataDTO.mac] = dataDTO.qySum
         //吹气频率
         setQyRate(dataDTO.mac, viewBinding.layoutLung.chartQy, dataDTO.cf)
         //吹气错误数统计
         viewBinding.layoutLung.tvLungError.text = "${(dataDTO.getQy_err_total())}"
         viewBinding.layoutLung.tvLungTotal.text = "/${dataDTO.qySum}"
-
         //清空吹气图标
         if ((viewBinding.layoutLung.ivAim.isShown && isQyAimMap[dataDTO.mac] == true) || (dataDTO.bpValue <= 0 && qyRateMap[dataDTO.mac] ?: 0 > 0)) {
             qyRateMap[dataDTO.mac] = 0//用于清空数据
