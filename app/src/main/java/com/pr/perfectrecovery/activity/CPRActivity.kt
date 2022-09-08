@@ -313,7 +313,7 @@ class CPRActivity : BaseActivity() {
         viewBinding.tvConnections.text = "设备连接数：${bleList.size}"
     }
 
-    fun removeDuplicate(): MutableList<BleDevice> {
+    private fun removeDuplicate(): MutableList<BleDevice> {
         val set: MutableSet<BleDevice> = LinkedHashSet<BleDevice>()
         set.addAll(bleList)
         bleList.clear()
@@ -1044,10 +1044,13 @@ class CPRActivity : BaseActivity() {
             //Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
             try {
                 ToastUtils.showShort("打开设备成功!")
-                bleDevice?.isConnected = false
+                bleDevice?.isConnected = true
                 bleDevice?.isLoading = false
-                mDeviceAdapter.notifyItemChanged(position, bleDevice)
-                mDeviceAdapter.notifyDataSetChanged()
+                mBleDevice = bleDevice
+                if (bleDevice != null) {
+                    mDeviceAdapter.remove(bleDevice)
+                    mDeviceAdapter.addData(bleDevice)
+                }
                 Thread.sleep(200)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
