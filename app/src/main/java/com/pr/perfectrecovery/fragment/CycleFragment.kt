@@ -386,7 +386,6 @@ class CycleFragment : Fragment() {
     //是否吹气
     private var isQy = false
     private var isQyAim = false
-    private var mqy_blow_error_count: Int = 0
 
     private var startTime: Long = 0
     private var endTime: Long = 0
@@ -696,7 +695,6 @@ class CycleFragment : Fragment() {
                     pf = (0.33f / configBean.tidalFrequency) * value
                 }
                 value in configBean.tidalFrequency..configBean.tidalFrequencyEnd -> {
-                    mqy_blow_error_count++
                     pf =
                         (0.33f / (configBean.tidalFrequencyEnd - configBean.tidalFrequency) * (value - configBean.tidalFrequency) + 0.33f)
                 }
