@@ -195,13 +195,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 通气合格率 = 正确通气量次数 / 通气总次数
      */
     fun getVentilationAmount(): Int {
-        var number = (1 - (err_qy_high + err_qy_low + err_qy_dead + err_qy_close)).toFloat()
-        number = -1f
-        var amount = if (number > 0) ((number / (qySum)) * 100).toInt() else 0
-        if (amount < 0) {
-            amount = 0
-        }
-        return amount
+        return if ((qySum - blowErrorCount) > 0) ((qySum - blowErrorCount) / qySum * 100).roundToInt() else 0
     }
 
     /**
@@ -209,7 +203,12 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
      * 吹气频率 = 正确吹气次数 / (总次数 * 100)
      */
     fun getBlowRate(): Int {
-        return if ((qySum - blowErrorCount) > 0 && qySum > 0) ((qySum - blowErrorCount) / (qyCount * cycles) * 100).roundToInt() else 0
+        var amount =
+            if (qy_serright_total > 0) ((qy_serright_total.toFloat() / (qySum).toFloat()) * 100).toInt() else 0
+        if (amount < 0) {
+            amount = 0
+        }
+        return amount
     }
 
     /**
