@@ -2,6 +2,7 @@ package com.pr.perfectrecovery.activity
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.content.BroadcastReceiver
@@ -9,20 +10,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.location.LocationManager
 import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemClickListener
@@ -33,11 +33,9 @@ import com.clj.fastble.data.BleDevice
 import com.clj.fastble.exception.BleException
 import com.clj.fastble.scan.BleScanRuleConfig
 import com.clj.fastble.utils.HexUtil
-import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
-import com.hoho.android.usbserial.driver.ProbeTable
-import com.hoho.android.usbserial.driver.UsbSerialDriver
-import com.hoho.android.usbserial.driver.UsbSerialProber
-import com.pr.perfectrecovery.BaseApplication
+import com.hoho.android.usbserial.BuildConfig
+import com.hoho.android.usbserial.driver.*
+import com.hoho.android.usbserial.util.SerialInputOutputManager
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.adapter.DeviceBluetoothAdapter
 import com.pr.perfectrecovery.base.BaseActivity
@@ -56,13 +54,13 @@ import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * CPR页面  蓝夜列表扫描链接
  */
-class CPRActivity : BaseActivity() {
+class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
     private lateinit var viewBinding: ActivityCpractivityBinding
     private var isRefresh = false
     private val mDeviceAdapter = DeviceBluetoothAdapter()
@@ -82,34 +80,17 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    //监听USB连接状态
-    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            val action = intent.action
-            if (action == "android.hardware.usb.action.USB_STATE") {
-                val connected = intent.extras!!.getBoolean("connected")
-                if (connected) {
-//                    Toast.makeText(this@CPRActivity, "USB已连接", Toast.LENGTH_SHORT).show()
-//                    viewBinding.tvMsg.text = "USB已连接"
-                } else {
-//                    viewBinding.tvMsg.text = "USB已断开"
-//                    Toast.makeText(this@CPRActivity, "USB已断开", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCpractivityBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         EventBus.getDefault().register(this)
+        mainLooper = Handler(Looper.getMainLooper())
         registerBroadcast()
         initView()
         //初始化蓝牙管理器
         initBluetooth()
         initBle()
-        ttl()
         viewBinding.cbBle.isChecked = true
     }
 
@@ -132,13 +113,7 @@ class CPRActivity : BaseActivity() {
                     mDeviceAdapter.addData(bleDevice)
                 }
             }
-            if (bleDevice != null) {
-                openTTL(bleDevice, 0)
-            }
             stopRefresh()
-            //listAdapter.notifyDataSetChanged()
-            //        handler.removeCallbacks(runnable)
-            //        handler.postDelayed(runnable, 2000)
         }
     }
 
@@ -199,7 +174,7 @@ class CPRActivity : BaseActivity() {
         viewBinding.cbBle.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 mDeviceAdapter.setList(null)
-                BaseApplication.driver?.CloseDevice()
+
                 searchBle()
                 viewBinding.cbUsb.isChecked = !isChecked
                 viewBinding.cbBle.isChecked = isChecked
@@ -267,6 +242,9 @@ class CPRActivity : BaseActivity() {
         Log.e("bleConnect", "bleWrite: $mac")
         Log.e("bleConnect", "hexStringToBytes: ${HexUtil.hexStringToBytes(mac).toString()}")
         //监听当前蓝牙是否写入
+        if (mBleDevice == null) {
+            return
+        }
         val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
         val services = gatt.services
         val bluetoothGattService = services[2]
@@ -399,11 +377,6 @@ class CPRActivity : BaseActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        sb = StringBuffer()
-    }
-
     private fun clearMap() {
         dataDTO = BaseDataDTO()
         dataMap.values.forEach { item ->
@@ -432,7 +405,7 @@ class CPRActivity : BaseActivity() {
                 viewBinding.tvMsg.visibility = View.INVISIBLE
                 val bleDevice = mDeviceAdapter.getItem(position)
                 if (bleDevice.getmUsbSerialDriver() != null) {
-                    openTTL(bleDevice, position)
+                    connect()
                 } else {
                     if (!BleManager.getInstance().isConnected(bleDevice)) {
                         if (count >= 6) {//处理提示语设备连接过多提示
@@ -465,10 +438,21 @@ class CPRActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        refresh()
-//        showConnectedDevice()
-//        startRefresh()
-//        checkPermissions()
+        registerReceiver(
+            broadcastReceiver,
+            IntentFilter(INTENT_ACTION_GRANT_USB)
+        )
+        if (usbPermission == UsbPermission.Unknown || usbPermission == UsbPermission.Granted) mainLooper!!.post { this.connect() }
+    }
+
+    override fun onPause() {
+        if (connected) {
+            Log.e("onPause", "disconnected")
+            disconnect()
+        }
+        unregisterReceiver(broadcastReceiver)
+        super.onPause()
+        sb = StringBuffer()
     }
 
     private fun initBluetooth() {
@@ -856,10 +840,10 @@ class CPRActivity : BaseActivity() {
                     )
                     sb.append(formatHexString)
                     sb.append("\n")
-                    if (!BaseApplication.driver?.isConnected!! && characteristic != null) {
-                        runOnUiThread { Log.e("CPRActivity", formatHexString) }
-                        sendMessage(formatHexString)
-                    }
+//                    if (!BaseApplication.driver?.isConnected!! && characteristic != null) {
+//                        runOnUiThread { Log.e("CPRActivity", formatHexString) }
+//                        sendMessage(formatHexString)
+//                    }
                 }
             })
     }
@@ -959,124 +943,128 @@ class CPRActivity : BaseActivity() {
         BleManager.getInstance().destroy()
     }
 
-    private fun initTTL() {
-        if (BaseApplication.driver!!.isConnected) {
-            val retval: Int? = BaseApplication.driver?.ResumeUsbPermission()
-            if (retval == 0) {
-                if (BaseApplication.driver!!.SetConfig(
-                        115200, 8, 1, 0, 0
-                    )//配置串口波特率，函数说明可参照编程手册
-                ) {
-                    ToastUtils.showShort("串口设置成功!")
-                } else {
-                    ToastUtils.showShort("串口设置失败!")
-                }
-            } else if (retval == -2) {
-                ToastUtils.showShort("获取权限失败!")
+    private var usbIoManager: SerialInputOutputManager? = null
+    private var usbSerialPort: UsbSerialPort? = null
+
+    private enum class UsbPermission {
+        Unknown, Requested, Granted, Denied
+    }
+
+    private val deviceId = 1
+    private var portNum: Int = 0
+    private var baudRate: Int = 115200
+    private val withIoManager = false
+    private val INTENT_ACTION_GRANT_USB: String = "android.hardware.usb.action.USB_STATE"
+    private var usbPermission: UsbPermission = UsbPermission.Unknown
+    private var connected = false
+    private var mainLooper: Handler? = null
+    private var broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (INTENT_ACTION_GRANT_USB == intent.action) {
+                usbPermission = if (intent.getBooleanExtra(
+                        UsbManager.EXTRA_PERMISSION_GRANTED,
+                        false
+                    )
+                ) UsbPermission.Granted else UsbPermission.Denied
+                Log.e("broadcastReceiver", "broadcastReceiver Success")
+                connect()
             }
         }
     }
 
-    private fun ttl() {
-        if (!BaseApplication.driver?.UsbFeatureSupported()!!) // 判断系统是否支持USB HOST
-        {
-            val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
-            dialog.setCancelable(true)
-            dialog.setTitle("提示")
-            dialog.setMessage("您的手机不支持USB HOST，请更换其他手机再试！")
-            dialog.setButton(
-                androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "确定"
-            ) { dialog, which -> }
-            dialog.show()
-            val lp = dialog.window!!.attributes
-//设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
-            //设置宽高，高度默认是自适应的，宽度根据屏幕宽度比例设置
-            lp.width = ScreenUtils.getScreenWidth() * 9 / 10
-//这里设置居中
-            //这里设置居中
-            lp.gravity = Gravity.CENTER
-            dialog.window!!.attributes = lp
+    /*
+     * Serial + UI
+     */
+    private fun connect() {
+        var device: UsbDevice? = null
+        val usbManager = getSystemService(USB_SERVICE) as UsbManager
+        for (v in usbManager.deviceList.values) if (v.deviceId > 0) device = v
+        if (device == null) {
+            //status("connection failed: device not found")
+            return
+        }
+        var driver = UsbSerialProber.getDefaultProber().probeDevice(device)
+        if (driver == null) {
+            driver = CustomProber.getCustomProber().probeDevice(device)
+        }
+        if (driver == null) {
+            //status("connection failed: no driver for device")
+            return
+        }
+        if (driver.ports.size < portNum) {
+            //status("connection failed: not enough ports at device")
+            return
+        }
+        usbSerialPort = driver.ports[portNum]
+        val usbConnection = usbManager.openDevice(driver.device)
+        if (usbConnection == null && usbPermission == UsbPermission.Unknown && !usbManager.hasPermission(
+                driver.device
+            )
+        ) {
+            usbPermission = UsbPermission.Requested
+            val flags =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+            val usbPermissionIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                Intent(INTENT_ACTION_GRANT_USB),
+                flags
+            )
+            usbManager.requestPermission(driver.device, usbPermissionIntent)
+            return
+        }
+        if (usbConnection == null) {
+            if (!usbManager.hasPermission(driver.device))
+                ToastUtils.showShort("connection failed: permission denied")
+            else
+                ToastUtils.showShort("connection failed: open failed")
+            return
+        }
+        try {
+            usbSerialPort!!.open(usbConnection)
+            usbSerialPort!!.setParameters(baudRate, 8, 1, UsbSerialPort.PARITY_NONE)
+            if (withIoManager) {
+                usbIoManager = SerialInputOutputManager(usbSerialPort, this)
+                usbIoManager!!.start()
+            }
+            ToastUtils.showShort("connected")
+            connected = true
+//            controlLines.start()
+        } catch (e: Exception) {
+            ToastUtils.showShort("connection failed: " + e.message)
+            disconnect()
         }
     }
 
-    private fun openTTL(bleDevice: BleDevice?, position: Int) {
-        if (BaseApplication.driver?.isConnected!!) {
-            when (BaseApplication.driver?.ResumeUsbList()) {
-                -1 -> { // ResumeUsbList方法用于枚举CH34X设备以及打开相关设备
-                    ToastUtils.showShort("打开设备失败!")
-                    BaseApplication.driver?.CloseDevice()
-                }
-                0 -> {
-                    if (!BaseApplication.driver?.UartInit()!!) { //对串口设备进行初始化操作
-                        ToastUtils.showShort("设备初始化失败!")
-                        return
-                    }
-                    ToastUtils.showShort("打开设备成功!")
-                    bleDevice?.isConnected = true
-                    bleDevice?.isLoading = false
-                    mDeviceAdapter.notifyItemChanged(position, bleDevice)
-                    mDeviceAdapter.notifyDataSetChanged()
-                    initTTL()
-                    ReadThread().start() //开启读线程读取串口接收的数据
-                }
-                else -> {
-                    Toast.makeText(this, "USB未授权限!", Toast.LENGTH_SHORT).show()
-//                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-//                    builder.setIcon(R.mipmap.icon_wm_logo)
-//                    builder.setTitle("未授权限")
-//                    builder.setMessage("确认退出吗？")
-//                    builder.setPositiveButton(
-//                        "确定"
-//                    ) { dialog, which ->
-//                        //System.exit(0)
-//                        dialog.dismiss()
-//                    }
-//                    builder.setNegativeButton(
-//                        "返回"
-//                    ) { dialog, which ->
-//                        dialog.dismiss()
-//                    }
-//                    builder.show()
-                }
-            }
-        } else {
-            //关闭USB TTL
-            //Toast.makeText(this, "关闭USB串口!", Toast.LENGTH_SHORT).show()
-            try {
-                ToastUtils.showShort("打开设备成功!")
-                bleDevice?.isConnected = true
-                bleDevice?.isLoading = false
-                mBleDevice = bleDevice
-                if (bleDevice != null) {
-                    mDeviceAdapter.remove(bleDevice)
-                    mDeviceAdapter.addData(bleDevice)
-                }
-                Thread.sleep(200)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            }
-            BaseApplication.driver?.CloseDevice()
-//            totalrecv = 0
+    private fun disconnect() {
+        connected = false
+//        controlLines.stop()
+        if (usbIoManager != null) {
+            usbIoManager!!.listener = null
+            usbIoManager!!.stop()
+        }
+        usbIoManager = null
+        try {
+            usbSerialPort!!.close()
+        } catch (ignored: IOException) {
+        }
+        usbSerialPort = null
+    }
+
+    /*
+     * Serial
+     */
+    override fun onNewData(data: ByteArray?) {
+        mainLooper!!.post {
+            val formatHexString = ConvertUtil.toHexString(data, 60)
+            sendMessage(formatHexString)
         }
     }
 
-    inner class ReadThread : Thread() {
-        override fun run() {
-            val buffer = ByteArray(60)
-            while (true) {
-                val msg = Message.obtain()
-                if (!BaseApplication.driver?.isConnected!!) {
-                    break
-                }
-                val length: Int = BaseApplication.driver!!.ReadData(buffer, 60)
-                if (length > 0) {
-                    runOnUiThread {
-                        val formatHexString = ConvertUtil.toHexString(buffer, length)
-                        Log.i("CPRActivity", "data -- ${formatHexString.trim()}")
-                        sendMessage(formatHexString.trim())
-                    }
-                }
-            }
+    override fun onRunError(e: java.lang.Exception) {
+        mainLooper!!.post {
+            Log.e("onRunError", "connection lost: " + e.message)
+            disconnect()
         }
     }
 
@@ -1086,3 +1074,4 @@ class CPRActivity : BaseActivity() {
         BleManager.getInstance().destroy()
     }
 }
+

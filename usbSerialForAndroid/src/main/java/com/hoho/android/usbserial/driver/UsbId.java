@@ -61,6 +61,7 @@ public final class UsbId {
     public static final int VENDOR_QINHENG = 0x1a86;
     public static final int QINHENG_CH340 = 0x7523;
     public static final int QINHENG_CH341A = 0x5523;
+    public static final int QINHENG_CH9102F = 0x55D4;
 
     // at www.linux-usb.org/usb.ids listed for NXP/LPC1768, but all processors supported by ARM mbed DAPLink firmware report these ids
     public static final int VENDOR_ARM = 0x0d28;
@@ -71,6 +72,7 @@ public final class UsbId {
 
     public static final int VENDOR_RASPBERRY_PI = 0x2e8a;
     public static final int RASPBERRY_PI_PICO_MICROPYTHON = 0x0005;
+    public static final int RASPBERRY_PI_PICO_SDK = 0x000a;
 
     private UsbId() {
         throw new IllegalAccessError("Non-instantiable class");
