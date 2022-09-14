@@ -35,7 +35,7 @@ public class ProlificSerialDriver implements UsbSerialDriver {
             28800, 38400, 57600, 115200, 128000, 134400, 161280, 201600, 230400, 268800,
             403200, 460800, 614400, 806400, 921600, 1228800, 2457600, 3000000, 6000000
     };
-    protected enum DeviceType { DEVICE_TYPE_01, DEVICE_TYPE_T, DEVICE_TYPE_HX, DEVICE_TYPE_HXN}
+    protected enum DeviceType { DEVICE_TYPE_01, DEVICE_TYPE_T, DEVICE_TYPE_HX, DEVICE_TYPE_HXN }
 
     private final UsbDevice mDevice;
     private final UsbSerialPort mPort;
@@ -139,7 +139,7 @@ public class ProlificSerialDriver implements UsbSerialDriver {
             byte[] buffer = new byte[length];
             int result = mConnection.controlTransfer(requestType, request, value, index, buffer, length, USB_READ_TIMEOUT_MILLIS);
             if (result != length) {
-                throw new IOException(String.format("ControlTransfer 0x%x failed: %d",value, result));
+                throw new IOException(String.format("ControlTransfer %s 0x%x failed: %d",mDeviceType.name(), value, result));
             }
             return buffer;
         }
@@ -148,7 +148,7 @@ public class ProlificSerialDriver implements UsbSerialDriver {
             int length = (data == null) ? 0 : data.length;
             int result = mConnection.controlTransfer(requestType, request, value, index, data, length, USB_WRITE_TIMEOUT_MILLIS);
             if (result != length) {
-                throw new IOException( String.format("ControlTransfer 0x%x failed: %d", value, result));
+                throw new IOException( String.format("ControlTransfer %s 0x%x failed: %d", mDeviceType.name(), value, result));
             }
         }
 
@@ -299,15 +299,19 @@ public class ProlificSerialDriver implements UsbSerialDriver {
             byte maxPacketSize0 = rawDescriptors[7];
             if (mDevice.getDeviceClass() == 0x02 || maxPacketSize0 != 64) {
                 mDeviceType = DeviceType.DEVICE_TYPE_01;
-            } else if(deviceVersion == 0x300 && usbVersion == 0x200) {
-                mDeviceType = DeviceType.DEVICE_TYPE_T; // TA
-            } else if(deviceVersion == 0x500) {
-                mDeviceType = DeviceType.DEVICE_TYPE_T; // TB
-            } else if(usbVersion == 0x200 && !testHxStatus()) {
-                mDeviceType = DeviceType.DEVICE_TYPE_HXN;
+            } else if(usbVersion == 0x200) {
+                if(deviceVersion == 0x300 && testHxStatus()) {
+                    mDeviceType = DeviceType.DEVICE_TYPE_T; // TA
+                } else if(deviceVersion == 0x500 && testHxStatus()) {
+                    mDeviceType = DeviceType.DEVICE_TYPE_T; // TB
+                } else {
+                    mDeviceType = DeviceType.DEVICE_TYPE_HXN;
+                }
             } else {
                 mDeviceType = DeviceType.DEVICE_TYPE_HX;
             }
+            Log.d(TAG, String.format("usbVersion=%x, deviceVersion=%x, deviceClass=%d, packetSize=%d => deviceType=%s",
+                    usbVersion, deviceVersion, mDevice.getDeviceClass(), maxPacketSize0, mDeviceType.name()));
             resetDevice();
             doBlackMagic();
             setControlLines(mControlLinesValue);
