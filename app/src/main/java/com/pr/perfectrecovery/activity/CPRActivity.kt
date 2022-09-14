@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.location.LocationManager
 import android.os.*
@@ -57,6 +58,7 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.io.IOException
 import java.util.*
+
 
 /**
  * CPR页面  蓝夜列表扫描链接
@@ -139,6 +141,7 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
 
         viewBinding.cbUsb.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
+                openUsbDevice()
                 mDeviceAdapter.setList(null)
                 unBindBluetooth()
                 viewBinding.cbBle.isChecked = !isChecked
@@ -419,7 +422,7 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
         super.onResume()
         refresh()
         if (usbPermission == UsbPermission.Unknown || usbPermission == UsbPermission.Granted) {
-            //mainLooper!!.post { connectUsb() }
+//            mainLooper!!.post { connectUsb() }
         }
     }
 
@@ -941,6 +944,93 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
     private var usbPermission: UsbPermission = UsbPermission.Unknown
     private var connected = false
 
+    //usb权限
+    private var manager: UsbManager? = null
+    private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
+    private var availableDrivers: List<UsbSerialDriver>? = null
+    private var driver: UsbSerialDriver? = null
+    private var connection: UsbDeviceConnection? = null
+
+    /**
+     * 获得 usb 权限
+     */
+    private fun openUsbDevice() {
+        //before open usb device
+        //should try to get usb permission
+        tryGetUsbPermission()
+    }
+
+    private fun tryGetUsbPermission() {
+        manager = getSystemService(USB_SERVICE) as UsbManager
+        val filter: IntentFilter = IntentFilter(ACTION_USB_PERMISSION)
+        registerReceiver(mUsbPermissionActionReceiver, filter)
+        val mPermissionIntent =
+            PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), 0)
+        //here do emulation to ask all connected usb device for permission
+        if (manager == null) {
+            return
+        }
+        for (usbDevice in manager!!.deviceList.values) {
+            //add some conditional check if necessary
+            //if(isWeCaredUsbDevice(usbDevice)){
+            if (manager!!.hasPermission(usbDevice)) {
+                //if has already got permission, just goto connect it
+                //that means: user has choose yes for your previously popup window asking for grant perssion for this usb device
+                //and also choose option: not ask again
+                afterGetUsbPermission(usbDevice)
+            } else {
+                //this line will let android popup window, ask user whether to allow this app to have permission to operate this usb device
+                manager!!.requestPermission(usbDevice, mPermissionIntent)
+            }
+            //}
+        }
+    }
+
+    private fun afterGetUsbPermission(usbDevice: UsbDevice) {
+        //call method to set up device communication
+        //Toast.makeText(this, String.valueOf("Got permission for usb device: " + usbDevice), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, String.valueOf("Found USB device: VID=" + usbDevice.getVendorId() + " PID=" + usbDevice.getProductId()), Toast.LENGTH_LONG).show();
+        doYourOpenUsbDevice(usbDevice);
+    }
+
+    private fun doYourOpenUsbDevice(usbDevice: UsbDevice) {
+        //now follow line will NOT show: User has not given permission to device UsbDevice
+        availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+        if (availableDrivers == null || driver == null) {
+            return
+        }
+        driver = availableDrivers!![0]
+        connection = manager!!.openDevice(driver!!.device)
+    }
+
+
+    private val mUsbPermissionActionReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            if (ACTION_USB_PERMISSION == action) {
+                synchronized(this) {
+                    val usbDevice =
+                        intent.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as UsbDevice?
+                    if (intent.getBooleanExtra(
+                            UsbManager.EXTRA_PERMISSION_GRANTED,
+                            false
+                        )
+                    ) {
+                        //user choose YES for your previously popup window asking for grant perssion for this usb device
+                        usbDevice?.let { afterGetUsbPermission(it) }
+                    } else {
+                        //user choose NO for your previously popup window asking for grant perssion for this usb device
+                        Toast.makeText(
+                            context,
+                            "Permission denied for device$usbDevice",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (INTENT_ACTION_GRANT_USB == intent.action) {
@@ -949,7 +1039,7 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
                         false
                     )
                 ) UsbPermission.Granted else UsbPermission.Denied
-                connectUsb()
+                //connectUsb()
             }
         }
     }
