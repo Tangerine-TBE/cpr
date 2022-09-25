@@ -20,18 +20,17 @@ public class ConvertUtil {
      * @return 转换后的String队形
      */
     public static String toHexString(byte[] arg, int length) {
-        String result = new String();
+        StringBuilder result = new StringBuilder("");
         if (arg != null) {
             for (int i = 0; i < length; i++) {
-                result = result
-                        + (Integer.toHexString(
+                result.append(Integer.toHexString(
                         arg[i] < 0 ? arg[i] + 256 : arg[i]).length() == 1 ? "0"
                         + Integer.toHexString(arg[i] < 0 ? arg[i] + 256
                         : arg[i])
                         : Integer.toHexString(arg[i] < 0 ? arg[i] + 256
-                        : arg[i])) + "";
+                        : arg[i]));
             }
-            return result;
+            return result.toString();
         }
         return "";
     }
