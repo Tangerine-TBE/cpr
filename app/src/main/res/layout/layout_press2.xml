@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="75dp"
-        android:layout_height="95dp"
+        android:layout_height="96dp"
         android:layout_gravity="center"
         android:background="@color/theme_color">
 
@@ -88,4 +88,13 @@
                 android:visibility="invisible" />
     </LinearLayout>
 
+    <CheckedTextView
+            android:id="@+id/ctBottomError"
+            android:layout_width="45dp"
+            android:layout_height="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/press_error_bg"
+            android:checked="false"
+            app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

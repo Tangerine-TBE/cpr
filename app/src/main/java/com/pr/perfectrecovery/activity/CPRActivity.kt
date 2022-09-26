@@ -100,7 +100,6 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
         )
     }
 
-
     private fun initView() {
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         val configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
@@ -164,49 +163,11 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
     }
 
     /**
-     * 读取蓝牙写入
-     */
-    private fun bleRead(bleDevice: BleDevice) {
-        val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
-        val services = gatt.services
-        val bluetoothGattService = services[0]
-        val characteristic = bluetoothGattService.characteristics[0]
-        BleManager.getInstance().read(
-            bleDevice,
-            characteristic?.service?.uuid.toString(),
-            characteristic?.uuid.toString(),
-            object : BleReadCallback() {
-                override fun onReadSuccess(data: ByteArray) {
-                    val formatHexString = HexUtil.formatHexString(data)
-                    Log.e("bleConnect", "onReadSuccess: $formatHexString")
-                    if (!TextUtils.isEmpty(formatHexString)
-                        && formatHexString.substring(formatHexString.length - 2) == "01"
-                    ) {
-                        //连接成功
-                        Log.e("bleConnect", "onReadSuccess: 成功")
-                    } else {
-                        //连接失败
-                        Log.e("bleConnect", "onReadSuccess: 失败")
-                    }
-                    //runOnUiThread { addText(txt, HexUtil.formatHexString(data, true)) }
-                }
-
-                override fun onReadFailure(exception: BleException) {
-                    //runOnUiThread { addText(txt, exception.toString()) }
-                    //连接异常 == 失败
-                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
-                }
-            })
-    }
-
-    /**
      * 写入蓝牙
      * code 03 开始 04 结束
      */
     private val OPEN = "03"
     private val END = "04"
-    private val CONNECT_SUCCESS = "01"
-    private val CONNECT_FAIL = "02"
     private fun bleWrite(bleDevice: BleDevice, code: String?) {
         if (mBleDevice == null) {
             ToastUtils.showShort("未连接蓝牙，请重新连接。")
@@ -235,9 +196,7 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
             object : BleWriteCallback() {
                 override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
                     Log.e("bleConnect", "onWriteSuccess: current${current}-  total $total")
-                    setBleDevice(bleDevice)
-                    //Handler().postDelayed({ searchBle() }, 3000)
-                    bleRead(mBleDevice!!)
+                    bleRead(mBleDevice!!, bleDevice)
                 }
 
                 override fun onWriteFailure(exception: BleException) {
@@ -246,27 +205,87 @@ class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
             })
     }
 
+    /**
+     * 读取蓝牙写入
+     */
+    private fun bleRead(bleDevice: BleDevice, bleDeviceNew: BleDevice) {
+        val gatt = BleManager.getInstance().getBluetoothGatt(mBleDevice)
+        val services = gatt.services
+        val bluetoothGattService = services[0]
+        val characteristic = bluetoothGattService.characteristics[0]
+        BleManager.getInstance().read(
+            bleDevice,
+            characteristic?.service?.uuid.toString(),
+            characteristic?.uuid.toString(),
+            object : BleReadCallback() {
+                override fun onReadSuccess(data: ByteArray) {
+                    val formatHexString = HexUtil.formatHexString(data)
+                    Log.e("bleConnect", "onReadSuccess: $formatHexString")
+                    if (!TextUtils.isEmpty(formatHexString)) {
+                        //连接成功
+                        Log.e("bleConnect", " 成功")
+                        setBleDevice(bleDeviceNew)
+                    } else {
+                        //连接失败
+                        Log.e("bleConnect", " 失败")
+                    }
+                }
+
+                override fun onReadFailure(exception: BleException) {
+                    //runOnUiThread { addText(txt, exception.toString()) }
+                    //连接异常 == 失败
+                    Log.e("bleConnect", "onReadFailure: ${exception.description}")
+                }
+            })
+    }
+
     private fun setBleDevice(bleDevice: BleDevice) {
-        count++
         //处理已连接的设备靠前
         mDeviceAdapter.remove(bleDevice)
-        bleDevice.isConnected = true
-        bleDevice.isLoading = false
-        bleDevice.count = count
-        //添加已连接蓝牙
-        if (mDeviceAdapter.data.size == 0) {
-            mDeviceAdapter.addData(bleDevice)
-        } else {
-            if (count - 1 <= mDeviceAdapter.data.size) {
-                mDeviceAdapter.addData(count - 1, bleDevice)
-            } else {
+        //处理已连接的设备靠前
+        if (!bleDevice.isConnected) {
+            count++
+            bleDevice.isConnected = true
+            bleDevice.isLoading = false
+            bleDevice.count = count
+            //添加已连接蓝牙
+            if (mDeviceAdapter.data.size == 0) {
                 mDeviceAdapter.addData(bleDevice)
+            } else {
+                if (count - 1 <= mDeviceAdapter.data.size) {
+                    mDeviceAdapter.addData(count - 1, bleDevice)
+                } else {
+                    mDeviceAdapter.addData(bleDevice)
+                }
             }
+            //                viewBinding.textView.text = "$count"
+            bleList.add(bleDevice)
+            bleList = removeDuplicate()
+        } else {
+            delBle(bleDevice)
         }
-        //                viewBinding.textView.text = "$count"
-        bleList.add(bleDevice)
-        bleList = removeDuplicate()
         viewBinding.tvConnections.text = "设备连接数：${bleList.size}"
+    }
+
+    private fun delBle(bleDevice: BleDevice) {
+        if (count > 1) {
+            count--
+        }
+        bleList.remove(bleDevice)
+        val newList = mutableListOf<BleDevice>()
+        for (item in mDeviceAdapter.data) {
+            if (item.count > bleDevice.count) {
+                item.count--
+            }
+            newList.add(item)
+        }
+        mDeviceAdapter.remove(bleDevice)
+        newList.remove(bleDevice)
+        bleDevice.isConnected = false
+        bleDevice.isLoading = false
+        bleDevice.count = 0
+        newList.add(bleDevice)
+        mDeviceAdapter.setList(dedupList(newList))
     }
 
     private fun removeDuplicate(): MutableList<BleDevice> {

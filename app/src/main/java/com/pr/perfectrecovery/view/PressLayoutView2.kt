@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.view
 
 import android.content.Context
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,10 @@ import kotlin.math.abs
  */
 class PressLayoutView2 : LinearLayout {
     private var scroller: Scroller? = null
+    private val mHandler = object : android.os.Handler(Looper.getMainLooper()) {}
+    private val runnable = Runnable {
+        ctBottomError?.isChecked = false
+    }
 
     constructor(context: Context) : super(context) {
         initView(context)
@@ -66,6 +71,7 @@ class PressLayoutView2 : LinearLayout {
     private var linearLayout: LinearLayout? = null
     private var ivArrowUp: ImageView? = null
     private var ivArrowDown: ImageView? = null
+    private var ctBottomError: CheckedTextView? = null
 
     //初始化UI，可根据业务需求设置默认值。
     private fun initView(context: Context) {
@@ -73,6 +79,7 @@ class PressLayoutView2 : LinearLayout {
         viewLayout = LayoutInflater.from(context).inflate(R.layout.layout_press2, this, true)
         viewTop = findViewById(R.id.viewTop)
         viewBottom = findViewById(R.id.viewBottom)
+        ctBottomError = findViewById(R.id.ctBottomError)
         viewCenter = findViewById(R.id.viewCenter)
         viewPress = findViewById(R.id.viewPress)
         linearLayout = findViewById(R.id.linearLayout)
@@ -106,6 +113,12 @@ class PressLayoutView2 : LinearLayout {
             viewPress!!.visibility = INVISIBLE
             ivArrowUp!!.visibility = INVISIBLE
             ivArrowDown!!.visibility = INVISIBLE
+        } else if (destY > 9) {
+            Log.e("smoothScrollTo", "按压过大")
+            ctBottomError?.visibility = View.VISIBLE
+            ctBottomError?.isChecked = true
+            mHandler.removeCallbacks(runnable)
+            mHandler.postDelayed(runnable, 250)
         }
         invalidate()
     }
