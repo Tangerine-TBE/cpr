@@ -1,0 +1,80 @@
+Index: FastBleLib/build/intermediates/incremental/packageDebugResources/compile-file-map.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#Fri Sep 09 11:49:23 CST 2022\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FastBleLib/build/intermediates/incremental/packageDebugResources/compile-file-map.properties b/FastBleLib/build/intermediates/incremental/packageDebugResources/compile-file-map.properties
+--- a/FastBleLib/build/intermediates/incremental/packageDebugResources/compile-file-map.properties	(revision b514efedb847b393cec63887e0fb0513c6e76491)
++++ b/FastBleLib/build/intermediates/incremental/packageDebugResources/compile-file-map.properties	(date 1664109579553)
+@@ -1,1 +1,1 @@
+-#Fri Sep 09 11:49:23 CST 2022
++#Sun Sep 25 20:39:39 CST 2022
+Index: usbSerialForAndroid/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>1<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n2<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n3    package=\"com.hoho.android.usbserial\" >\r\n4\r\n5    <uses-sdk\r\n6        android:minSdkVersion=\"17\"\r\n6-->E:\\workspace\\perfect-recovery\\usbSerialForAndroid\\src\\main\\AndroidManifest.xml\r\n7        android:targetSdkVersion=\"30\" />\r\n7-->E:\\workspace\\perfect-recovery\\usbSerialForAndroid\\src\\main\\AndroidManifest.xml\r\n8\r\n9</manifest>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/usbSerialForAndroid/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/usbSerialForAndroid/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+--- a/usbSerialForAndroid/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt	(revision b514efedb847b393cec63887e0fb0513c6e76491)
++++ b/usbSerialForAndroid/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt	(date 1664109581932)
+@@ -4,8 +4,8 @@
+ 4
+ 5    <uses-sdk
+ 6        android:minSdkVersion="17"
+-6-->E:\workspace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
+-7        android:targetSdkVersion="30" />
+-7-->E:\workspace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
++6-->E:\workSpace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
++7        android:targetSdkVersion="32" />
++7-->E:\workSpace\perfect-recovery\usbSerialForAndroid\src\main\AndroidManifest.xml
+ 8
+ 9</manifest>
+Index: FastBleLib/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<merger version=\"3\"><dataSet config=\"main\" ignore_pattern=\"!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~\"><source path=\"E:\\workspace\\perfect-recovery\\FastBleLib\\src\\main\\jniLibs\"/></dataSet><dataSet config=\"debug\" ignore_pattern=\"!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~\"><source path=\"E:\\workspace\\perfect-recovery\\FastBleLib\\src\\debug\\jniLibs\"/></dataSet></merger>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FastBleLib/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/FastBleLib/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+--- a/FastBleLib/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml	(revision b514efedb847b393cec63887e0fb0513c6e76491)
++++ b/FastBleLib/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml	(date 1664109608560)
+@@ -1,2 +1,2 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workspace\perfect-recovery\FastBleLib\src\main\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workspace\perfect-recovery\FastBleLib\src\debug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workSpace\perfect-recovery\FastBleLib\src\main\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workSpace\perfect-recovery\FastBleLib\src\debug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
+Index: usbSerialForAndroid/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<merger version=\"3\"><dataSet config=\"main\" ignore_pattern=\"!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~\"><source path=\"E:\\workspace\\perfect-recovery\\usbSerialForAndroid\\src\\main\\jniLibs\"/></dataSet><dataSet config=\"debug\" ignore_pattern=\"!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~\"><source path=\"E:\\workspace\\perfect-recovery\\usbSerialForAndroid\\src\\debug\\jniLibs\"/></dataSet></merger>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/usbSerialForAndroid/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/usbSerialForAndroid/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+--- a/usbSerialForAndroid/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml	(revision b514efedb847b393cec63887e0fb0513c6e76491)
++++ b/usbSerialForAndroid/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml	(date 1664109608639)
+@@ -1,2 +1,2 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workspace\perfect-recovery\usbSerialForAndroid\src\main\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workspace\perfect-recovery\usbSerialForAndroid\src\debug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workSpace\perfect-recovery\usbSerialForAndroid\src\main\jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\workSpace\perfect-recovery\usbSerialForAndroid\src\debug\jniLibs"/></dataSet></merger>
+\ No newline at end of file
+Index: usbSerialForAndroid/build/intermediates/incremental/packageDebugResources/compile-file-map.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#Fri Sep 09 11:49:23 CST 2022\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/usbSerialForAndroid/build/intermediates/incremental/packageDebugResources/compile-file-map.properties b/usbSerialForAndroid/build/intermediates/incremental/packageDebugResources/compile-file-map.properties
+--- a/usbSerialForAndroid/build/intermediates/incremental/packageDebugResources/compile-file-map.properties	(revision b514efedb847b393cec63887e0fb0513c6e76491)
++++ b/usbSerialForAndroid/build/intermediates/incremental/packageDebugResources/compile-file-map.properties	(date 1664109579757)
+@@ -1,1 +1,1 @@
+-#Fri Sep 09 11:49:23 CST 2022
++#Sun Sep 25 20:39:39 CST 2022
