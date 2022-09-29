@@ -52,6 +52,7 @@ import com.pr.perfectrecovery.livedata.StatusLiveData
 import com.pr.perfectrecovery.utils.ConvertUtil
 import com.pr.perfectrecovery.utils.DataVolatile01
 import com.pr.perfectrecovery.utils.FileUtils
+import com.pr.perfectrecovery.utils.TimeUtils
 import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -357,6 +358,7 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
 //                }
             }
             BaseConstant.EVENT_CPR_BLE_CLOSE -> {
+                //handler.removeCallbacks(runnable)
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, END)
                 }
@@ -364,6 +366,7 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
                 FileUtils.saveThrowableMessage(sb.toString())
             }
             BaseConstant.EVENT_CPR_STOP -> {
+                //handler.removeCallbacks(runnable)
                 isStart = false
                 //unBindBluetooth()
                 disconnectUsb()
@@ -397,8 +400,41 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
                 isStart = true
                 if (mBleDevice != null) {
                     bleWrite(mBleDevice!!, OPEN)
+                    initBleTime()
                 }
             }
+        }
+    }
+
+    private fun initBleTime() {
+//        bleList.forEach {
+//            it.timestampNanos = System.currentTimeMillis()
+//        }
+//        handler.postDelayed(runnable, 5000)
+    }
+
+    private fun setBleDeviceTime(mac: String?) {
+//        mac?.let {
+//            bleList.forEach {
+//                Log.i("setBleDeviceTime", "bleList.Mac =${it.mac}  --- mac = ${mac}")
+//                if (it.mac == mac) {
+//                    it.timestampNanos = System.currentTimeMillis()
+//                }
+//            }
+//        }
+    }
+
+    private val runnable = Counter()
+    private val handler = Handler(Looper.getMainLooper())
+
+    private inner class Counter : Runnable {
+        override fun run() {
+            bleList.forEach {
+                if (System.currentTimeMillis() - it.timestampNanos >= 3) {
+                    delBle(it)
+                }
+            }
+            handler.postDelayed(this, 5000)
         }
     }
 
@@ -917,11 +953,21 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
         }
         //Log.e("setData", GsonUtils.toJson(dataDTO))
         if (isStart) {
+            setBleDeviceTime(deviceMAC)
             StatusLiveData.dataSingle.value = dataDTO
             Log.e("setDatacf", "${dataDTO.cf}")
             //曲线模型数据
             StatusLiveData.dataSingleChart.value = dataDTO
         }
+    }
+
+    /**
+     * 数据监控-超时的蓝牙会被移除已连接状态
+     * @time 3000 ms
+     *
+     */
+    private fun verifyBle() {
+
     }
 
     val data = ArrayList<BaseDataDTO>()

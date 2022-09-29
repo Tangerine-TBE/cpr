@@ -125,10 +125,12 @@ class TrainingSingleActivity : BaseActivity() {
                     mTrainingBean.isCheck = true
                     binding.more.cbCheck.setTextColor(resources.getColor(R.color.color_37B48B))
                     binding.more.cbTraining.setTextColor(resources.getColor(R.color.white))
+                    DataVolatile01.MODEL = true
                 }
                 //练习模式
                 R.id.cbTraining -> {
                     mTrainingBean.isCheck = false
+                    DataVolatile01.MODEL = false
                     binding.more.cbCheck.setTextColor(resources.getColor(R.color.white))
                     binding.more.cbTraining.setTextColor(resources.getColor(R.color.color_37B48B))
                 }

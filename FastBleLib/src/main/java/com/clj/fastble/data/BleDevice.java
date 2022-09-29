@@ -23,6 +23,7 @@ public class BleDevice implements Parcelable {
     public BleDevice(UsbSerialDriver device) {
         mUsbSerialDriver = device;
     }
+
     private boolean isConnected;
 
     public BleDevice(BluetoothDevice device) {

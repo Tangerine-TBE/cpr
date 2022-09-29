@@ -1,5 +1,7 @@
 package com.pr.perfectrecovery.bean
 
+import android.util.Log
+
 data class BaseDataDTO(
     //mac地址
     var mac: String = "",
@@ -76,6 +78,7 @@ data class BaseDataDTO(
      * 获取按压错误总数
      */
     fun getPr_err_total(): Int {
+        Log.e("getPr_err_total", "ERR_PR_TOOMORE = $ERR_PR_TOOMORE")
         return err_pr_unback + err_pr_low + err_pr_high + err_pr_posi + ERR_PR_TOOMORE
     }
 
