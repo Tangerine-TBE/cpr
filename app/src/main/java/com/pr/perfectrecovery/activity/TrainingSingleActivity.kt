@@ -147,7 +147,7 @@ class TrainingSingleActivity : BaseActivity() {
         binding.bottom.ivStart.setOnClickListener {
             mTrainingBean.list.clear()
             for (name in nameList) {
-                if (name.text.toString().isEmpty()) {
+                if (TextUtils.isEmpty(name.text.toString())) {
                     ToastUtils.showShort(
                         String.format(
                             resources.getString(R.string.please_input_student_name),

@@ -16,7 +16,7 @@ import com.pr.perfectrecovery.R;
  * 自定义水平\垂直电池控件
  */
 public class BatteryView extends View {
-    private int mPower = 100;
+    private int mPower = 0;
     private int orientation;
     private int width;
     private int height;
@@ -31,7 +31,7 @@ public class BatteryView extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Battery);
         mColor = typedArray.getColor(R.styleable.Battery_batteryColor, 0xFFFFFFFF);
         orientation = typedArray.getInt(R.styleable.Battery_batteryOrientation, 0);
-        mPower = typedArray.getInt(R.styleable.Battery_batteryPower, 100);
+        mPower = typedArray.getInt(R.styleable.Battery_batteryPower, 0);
         width = getMeasuredWidth();
         height = getMeasuredHeight();
         /**
@@ -138,7 +138,7 @@ public class BatteryView extends View {
     public void setPower(int power) {
         this.mPower = power;
         if (mPower < 0) {
-            mPower = 100;
+            mPower = 0;
         }
         invalidate();//刷新VIEW
     }
