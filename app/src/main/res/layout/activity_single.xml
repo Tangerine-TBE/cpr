@@ -54,12 +54,12 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_14"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tvBattery"
+                app:layout_constraintEnd_toStartOf="@+id/battery"
                 app:layout_constraintStart_toEndOf="@+id/tvTime"
                 app:layout_constraintTop_toTopOf="parent" />
 
         <com.pr.perfectrecovery.view.BatteryView
-                android:id="@+id/tvBattery"
+                android:id="@+id/battery"
                 android:layout_width="40dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="@dimen/dp_28"

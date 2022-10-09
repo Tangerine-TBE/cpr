@@ -13,6 +13,8 @@ object BaseConstant {
     //配置
     val MMKV_WM_CONFIGURATION: String = "mmkv_wm_configuration"
 
+    val MMKV_LOG = "isLog"
+
     val MMKV_WM_ = 1
 
     val EVENT_SINGLE_CHART_START = 10000
@@ -26,6 +28,7 @@ object BaseConstant {
     val EVENT_CPR_TIMEING = 10007
     val EVENT_CPR_CLEAR = 10008
     val EVENT_SINGLE_END = 10009
+    val EVEBT_ELECTRICITY = 10010
 
     //假的蓝牙地址
     val FAKE_MAC = "FAKE_MAC"

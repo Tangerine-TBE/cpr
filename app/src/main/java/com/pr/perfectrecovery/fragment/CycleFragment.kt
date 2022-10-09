@@ -60,6 +60,7 @@ class CycleFragment : Fragment() {
     private var timeOutTotal: Long = 0
 
     //按压总数统计
+    private var isLog = false
 
     companion object {
 
@@ -115,19 +116,22 @@ class CycleFragment : Fragment() {
                 }
                 setViewDate(it)
                 Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
-                viewBinding.tvPress3.text = "距离值：${it.distance}"
-                viewBinding.tvPress5.text = "按压频率：${it.pf}"
-                viewBinding.tvPress6.text = "吹气频率：${it.cf}"
-                viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
-                viewBinding.tvPress8.text = "按压位置：${it.psrType}"
-                viewBinding.tvPress9.text = "初始值：${it.preDistance}"
-                viewBinding.tvPress10.text =
-                    "模式：${it.model}\n" +
-                            "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
-                            "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
-                            "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
-                            "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
-                            "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
+                if (isLog) {
+                    viewBinding.tvPress3.text = "距离值：${it.distance}"
+                    viewBinding.tvPress5.text = "按压频率：${it.pf}"
+                    viewBinding.tvPress6.text = "吹气频率：${it.cf}"
+                    viewBinding.tvPress7.text = "气道状态：${it.aisleType}"
+                    viewBinding.tvPress8.text = "按压位置：${it.psrType}"
+                    viewBinding.tvPress9.text = "初始值：${it.preDistance}"
+                    viewBinding.tvPress10.text =
+                        "模式：${it.model}\n" +
+                                "按压次数：${it.PR_CYCLE_TIMES}\n按压深度：${abs(it.preDistance - it.distance)}" +
+                                "\n未回弹错误：${it.err_pr_unback} \n按压不足：${it.err_pr_low}" +
+                                "\n按压过大：${it.err_pr_high} \n按压位置：${it.err_pr_posi}" +
+                                "\n按压超次：${it.ERR_PR_TOOMORE}\n本页超次：${prManyCount}" +
+                                "\n吹气超次：${it.QY_TIMES_TOOMORE} \n气压值：${it.bpValue}\n当前循环数${cycleCount}"
+                }
+
             }
         }
 
@@ -139,6 +143,10 @@ class CycleFragment : Fragment() {
 //            setViewDate(dataDTO)
         }
 
+        viewBinding.dashBoard.setOnLongClickListener {
+            isLog = !isLog
+            true
+        }
         //事件监听器，时间发生变化时可进行操作
         viewBinding.ctTime.setOnChronometerTickListener {
             //SystemClock.elapsedRealtime()系统当前时间
@@ -389,11 +397,18 @@ class CycleFragment : Fragment() {
 
     private var startTime: Long = 0
     private var endTime: Long = 0
+    private var powerCount = 0
 
     //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
+            //发送电量
+            if (powerCount == 100 || powerCount == 0) {
+                (activity as SingleActivity).setElectricity(dataDTO.electricity)
+                powerCount = 0
+            }
+            powerCount++
             //中断超时
             if (!isTimeOut && dataDTO.distance == dataDTO.preDistance
                 && dataDTO.bpValue <= 0 && dataDTO.prSum > 0

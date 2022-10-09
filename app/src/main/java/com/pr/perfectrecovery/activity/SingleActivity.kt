@@ -140,6 +140,10 @@ class SingleActivity : BaseActivity() {
         finish()
     }
 
+    fun setElectricity(power: Int) {
+        binding.battery.power = power
+    }
+
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onEvent(event: MessageEventData) {
         when (event.code) {
@@ -159,6 +163,9 @@ class SingleActivity : BaseActivity() {
             }
             BaseConstant.EVENT_SINGLE_END -> {
                 startResult()
+            }
+            BaseConstant.EVEBT_ELECTRICITY -> {
+                binding.battery.power = event.power
             }
         }
     }

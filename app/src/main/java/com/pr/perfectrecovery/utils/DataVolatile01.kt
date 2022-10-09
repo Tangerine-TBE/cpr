@@ -302,7 +302,7 @@ class DataVolatile01 {
                     )
                 )
             )
-            Log.e("TAG11", "${state}")
+            Log.e("TAG11", "$state")
             if (state and 1 == 1) {
                 BLS_Value = 1
             } else {
@@ -417,15 +417,12 @@ class DataVolatile01 {
             // var pfvalue=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(24, 26)));
             // Log.e("TAG9", "按压频率：$pfvalue")
             // CF_Value=DataFormatUtils.byteArrayToInt( DataFormatUtils.hexStr2Bytes("00" + data.substring(26, 28)));
+            val power = data.substring(8, 10)
             VI_Value = DataFormatUtils.byteArrayToInt(
-                DataFormatUtils.hexStr2Bytes(
-                    "00" + data.substring(
-                        8,
-                        10
-                    )
-                )
+                DataFormatUtils.hexStr2Bytes("00$power")
             )
         }
+        Log.e("VI_Value", "电量值：${VI_Value}")
         val stringBuffer = StringBuffer()
         stringBuffer.append("电量值：").append(VI_Value)
         stringBuffer.append("距离值：").append(L_Value)
