@@ -13,6 +13,8 @@ object BaseConstant {
     //配置
     val MMKV_WM_CONFIGURATION: String = "mmkv_wm_configuration"
 
+    val MMKV_MODEL = "mmkv_model"
+
     val MMKV_LOG = "isLog"
 
     val MMKV_WM_ = 1

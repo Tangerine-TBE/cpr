@@ -1,5 +1,7 @@
 package com.pr.perfectrecovery.bean
 
+import com.pr.perfectrecovery.base.BaseConstant
+import com.tencent.mmkv.MMKV
 import java.io.Serializable
 
 /**
@@ -27,7 +29,12 @@ data class ConfigBean(
 ) : Serializable {
     //按压比列计算
     fun prHigh(): Int {
-        return (depthEnd * 10).toInt()
+        val model = MMKV.defaultMMKV().getBoolean(BaseConstant.MMKV_MODEL, false)
+        return if (model) {
+            (depthEnd * 10 * 1.2).toInt()
+        } else {
+            (depthEnd * 10).toInt()
+        }
     }
 
     fun prLow(): Int {

@@ -40,6 +40,10 @@ class ConfigActivity : BaseActivity() {
     private fun initView() {
         setData()
         viewBinding.bottom.tvContinue.visibility = View.INVISIBLE
+        viewBinding.bottom.switchBeat.visibility = View.VISIBLE
+        viewBinding.bottom.switchBeat.setOnCheckedChangeListener { buttonView, isChecked ->
+            MMKV.defaultMMKV().putBoolean(BaseConstant.MMKV_MODEL, isChecked)
+        }
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         //按压深度
         viewBinding.etDepth.addTextChangedListener(editTextDepth)
