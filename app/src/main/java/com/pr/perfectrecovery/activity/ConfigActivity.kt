@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.view.MotionEvent
 import android.view.View
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.KeyboardUtils
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.base.BaseConstant
 import com.pr.perfectrecovery.bean.ConfigBean
@@ -79,6 +81,10 @@ class ConfigActivity : BaseActivity() {
     }
 
     private fun setData() {
+
+        val model = MMKV.defaultMMKV().getBoolean(BaseConstant.MMKV_MODEL, false)
+        viewBinding.bottom.switchBeat.isChecked = model
+
         val decodeString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         dataDTO = GsonUtils.fromJson(decodeString, ConfigBean::class.java)
         dataDTO.let {
@@ -103,6 +109,18 @@ class ConfigActivity : BaseActivity() {
 
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        when (ev!!.action) {
+            MotionEvent.ACTION_DOWN -> {
+                //获取当前获得焦点的View
+                val view = currentFocus
+                //调用方法判断是否需要隐藏键盘
+                KeyboardUtils.hideSoftInput(this)
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     private val editTextDepth = object : TextWatcher {
