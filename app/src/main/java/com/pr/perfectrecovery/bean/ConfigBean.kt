@@ -31,9 +31,9 @@ data class ConfigBean(
     fun prHigh(): Int {
         val model = MMKV.defaultMMKV().getBoolean(BaseConstant.MMKV_MODEL, false)
         return if (model) {
-            (depthEnd * 10 * 1.2).toInt()
-        } else {
             (depthEnd * 10).toInt()
+        } else {
+            (depthEnd * 10 * 1.2).toInt()
         }
     }
 

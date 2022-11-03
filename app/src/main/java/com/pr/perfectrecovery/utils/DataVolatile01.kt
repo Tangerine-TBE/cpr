@@ -519,13 +519,13 @@ class DataVolatile01 {
             value < 30 -> {
                 qy = abs(20 * value - 100)
             }
-            value in 30..60 -> {
+            value in 30..72 -> {
                 qy = abs((10.0f / 3.0f) * value + 400).toInt()
             }
-            value in 60..105 -> {
+            value in 72..120 -> {
                 qy = abs((40.0f / 3.0f) * value - 200).toInt()
             }
-            value > 105 -> {
+            value > 120 -> {
                 qy = 1200
             }
         }
