@@ -18,6 +18,7 @@ import android.os.*
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -128,6 +129,10 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
             connectList.clear()
             connectList.addAll(bleList)
             connectList.distinctBy { listOf(it.mac, it.mac) }
+            if (connectList.isEmpty()){
+                ToastUtils.make().setGravity(Gravity.CENTER,0,0).show(R.string.please_select_device)
+                return@setOnClickListener;
+            }
             intent.putParcelableArrayListExtra(BaseConstant.CONNECT_BLE_DEVICES, connectList)
             startActivity(intent)
         }

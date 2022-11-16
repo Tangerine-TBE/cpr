@@ -29,6 +29,7 @@
 
     <string name="please_input_name">请输入姓名</string>
     <string name="please_select_model">请选择模式</string>
+    <string name="please_select_device">请先选择蓝牙设备</string>
     <string name="please_input_student_name">请输入学员%1$d姓名</string>
 
     <string name="searching_for_available_models">正在搜索可用的模型</string>
