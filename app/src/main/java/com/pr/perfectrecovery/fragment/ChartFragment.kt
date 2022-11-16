@@ -1,7 +1,10 @@
 package com.pr.perfectrecovery.fragment
 
 import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,21 +41,30 @@ import java.util.*
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
     private lateinit var configBean: ConfigBean
-    private val TAG = ChartFragment::class.java.simpleName
 
     companion object {
-        fun newInstance() = ChartFragment()
+        private const val ARG_PARAM1 = "param1"
+
+        fun newInstance(isVoice: Boolean) = ChartFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(ARG_PARAM1, isVoice)
+            }
+        }
     }
+
+    private val TAG = ChartFragment::class.java.simpleName
+
 
     private lateinit var viewModel: ChartViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         viewBinding = ChartFragmentBinding.inflate(layoutInflater)
         return viewBinding.root
     }
+
+    private lateinit var handler: Handler
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -60,6 +72,7 @@ class ChartFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
         val jsonString = MMKV.defaultMMKV().decodeString(BaseConstant.MMKV_WM_CONFIGURATION)
         configBean = GsonUtils.fromJson(jsonString, ConfigBean::class.java)
+        handler = Handler(Looper.getMainLooper())
         initView()
     }
 
@@ -71,6 +84,10 @@ class ChartFragment : Fragment() {
         val data: LineData = getData(0f, false)
         val data1: LineData = getData(0f, true)
         val data2: LineData = getData(0f, false)
+        val isVoice: Boolean = arguments?.getBoolean(ARG_PARAM1) == true
+        if (!isVoice) {
+            viewBinding.constraintLayoutMiddle.visibility = View.GONE
+        }
 //        depth_threshold_low = configBean.depth * 2 - 28    //下限值放大8mm  需要定义变量  上下限阈值要放缩
 //        depth_threshold_high = configBean.depthEnd * 2 - 12  //上限值放大8mm
         depth_threshold_low = configBean.prLow()  //下限值放大8mm  需要定义变量  上下限阈值要放缩
@@ -85,10 +102,7 @@ class ChartFragment : Fragment() {
         // add some transparency to the color with "& 0x90FFFFFF"
         initLineChart(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(
-            viewBinding.lineChart1,
-            data1,
-            6,
-            9
+            viewBinding.lineChart1, data1, 6, 9
         )
 //        initLineChart(viewBinding.lineChart1, data1)
         initLineChart(viewBinding.lineChart2, data2)
@@ -176,6 +190,7 @@ class ChartFragment : Fragment() {
      */
     private var depth_Frequency_low = 0
     private var depth_Frequency_high = 0
+
     private fun getFrequencyValue(depth: Int): Float {
         Log.e(TAG, "$depth")
         var value = depth
@@ -222,6 +237,73 @@ class ChartFragment : Fragment() {
                 9.9f   // 按压显示到极限高度10
             }
         }
+    }
+
+    private val VOICE_MP3_AYBZ: Int = 2//按压不足
+    private val VOICE_MP3_AYGD: Int = 3//按压过大
+    private val VOICE_MP3_AYWZCW: Int = 4//按压位置错误
+    private val VOICE_MP3_CQBZ: Int = 5//吹气不足
+    private val VOICE_MP3_CQGD: Int = 6//吹气过大
+    private val VOICE_MP3_CQJW: Int = 7//吹气进胃
+    private val VOICE_MP3_WDKQD: Int = 8//未打开气道
+    private val VOICE_MP3_WHT: Int = 9//未回弹
+    private val resetRemindTextTask: Runnable = Runnable {
+        viewBinding.tvReminder.text = ""
+        if (viewBinding.ivReminder.visibility == View.VISIBLE) {
+            viewBinding.ivReminder.visibility = View.INVISIBLE;
+        }
+    }
+
+    fun setRemindText(type: Int) {
+        handler.removeCallbacks(resetRemindTextTask)
+        handler.postDelayed(resetRemindTextTask, 2000)
+        when (type) {
+            VOICE_MP3_AYBZ -> {
+                viewBinding.ivReminder.visibility = View.INVISIBLE
+                viewBinding.tvReminder.setTextColor(Color.YELLOW)
+                viewBinding.tvReminder.text = "按压不足"
+            }
+            VOICE_MP3_AYGD -> {
+                viewBinding.ivReminder.visibility = View.INVISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "按压过大"
+            }
+
+            VOICE_MP3_CQBZ -> {
+                viewBinding.ivReminder.visibility = View.INVISIBLE
+                viewBinding.tvReminder.setTextColor(Color.YELLOW)
+                viewBinding.tvReminder.text = "吹气不足"
+            }
+            VOICE_MP3_AYWZCW -> {
+                viewBinding.ivReminder.visibility = View.VISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "按压位置错误"
+            }
+            VOICE_MP3_CQGD -> {
+                viewBinding.ivReminder.visibility = View.VISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "吹气过大"
+            }
+            VOICE_MP3_CQJW -> {
+                viewBinding.ivReminder.visibility = View.VISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "吹气进胃"
+            }
+            VOICE_MP3_WDKQD -> {
+                viewBinding.ivReminder.visibility = View.VISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "未打开气道"
+            }
+            VOICE_MP3_WHT -> {
+                viewBinding.ivReminder.visibility = View.VISIBLE
+                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.text = "未回弹"
+            }
+
+
+        }
+
+
     }
 
     private fun setViewData() {
@@ -407,8 +489,7 @@ class ChartFragment : Fragment() {
                         value2 > 6 -> {
                             colors.add(
                                 ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.color_text_selected
+                                    requireContext(), R.color.color_text_selected
                                 )
                             )
                         }

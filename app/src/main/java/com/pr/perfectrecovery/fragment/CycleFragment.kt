@@ -219,6 +219,7 @@ class CycleFragment : Fragment() {
                 mpType = -1
             }
             mMediaPlayer?.start()
+            (activity as SingleActivity).eventFra2Fra(type)
         } else {
             mpType = type
         }

@@ -21,6 +21,8 @@
  */
 package com.pr.perfectrecovery.view;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -31,6 +33,7 @@ import android.graphics.PathDashPathEffect;
 import android.graphics.PathEffect;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.animation.DecelerateInterpolator;
 
 import org.xclcharts.chart.DialChart;
 import org.xclcharts.common.DensityUtil;
@@ -148,8 +151,7 @@ public class DialChart07View extends GraphicalView {
         for (int i = 0; i < 5; i++) {
             if (0 == i) {
                 rlabels3.add("");
-            } else
-                rlabels3.add(Integer.toString(i * 10));
+            } else rlabels3.add(Integer.toString(i * 10));
         }
     }
 
@@ -166,7 +168,9 @@ public class DialChart07View extends GraphicalView {
         paintTB.setAntiAlias(true);
     }
 
+    //进入这里的：1.按压频率，2.呼吸频率
     public void setCurrentStatus(float percentage) {
+        Log.e("TAg",""+percentage);
         mPercentage = percentage;
         chart180.clearAll();
         //设置当前百分比

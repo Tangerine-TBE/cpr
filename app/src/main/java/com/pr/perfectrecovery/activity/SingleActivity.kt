@@ -61,10 +61,7 @@ class SingleActivity : BaseActivity() {
         operateTime = (configBean!!.operationTime * 1000).toLong()
         if (mTrainingBean?.isCheck == true) {
             binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                resources.getDrawable(R.mipmap.icon_wm_countdown),
-                null,
-                null,
-                null
+                resources.getDrawable(R.mipmap.icon_wm_countdown), null, null, null
             )
         }
         //定时器
@@ -80,17 +77,11 @@ class SingleActivity : BaseActivity() {
                 binding.tvCycle.setTextColor(resources.getColor(R.color.color_37B48B))
                 if (mTrainingBean?.isCheck!!) {
                     binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                        resources.getDrawable(R.mipmap.icon_wm_countdown),
-                        null,
-                        null,
-                        null
+                        resources.getDrawable(R.mipmap.icon_wm_countdown), null, null, null
                     )
                 } else {
                     binding.tvTime.setCompoundDrawablesWithIntrinsicBounds(
-                        resources.getDrawable(R.mipmap.icon_wm_time),
-                        null,
-                        null,
-                        null
+                        resources.getDrawable(R.mipmap.icon_wm_time), null, null, null
                     )
                 }
                 counter.let { mHandler.post(it) }
@@ -171,6 +162,7 @@ class SingleActivity : BaseActivity() {
     }
 
     private var cycleFragment: CycleFragment? = null
+    private var chartFragment: ChartFragment? = null;
     private var checkEventFragment: CheckEventFragment? = CheckEventFragment.newInstance()
     private fun initViewPager() {
         var curItem = 0
@@ -190,17 +182,15 @@ class SingleActivity : BaseActivity() {
         }
 
         cycleFragment = CycleFragment.newInstance(
-            mTrainingBean!!.isVoice,
-            mTrainingBean!!.isBeat,
-            mTrainingBean!!.isCheck
+            mTrainingBean!!.isVoice, mTrainingBean!!.isBeat, mTrainingBean!!.isCheck
         )
         fragments.add(cycleFragment!!)
         val indexChar = curItem++
         binding.ctChart.setOnClickListener { binding.viewPager.currentItem = indexChar }
         binding.ctChart.isChecked = indexChar == 0
         titleBtns.add(binding.ctChart)
-
-        fragments.add(ChartFragment.newInstance())
+        chartFragment = ChartFragment.newInstance(mTrainingBean!!.isVoice);
+        fragments.add(chartFragment!!)
         val indexCure = curItem++
         binding.ctCurve.setOnClickListener { binding.viewPager.currentItem = indexCure }
         titleBtns.add(binding.ctCurve)
@@ -257,6 +247,9 @@ class SingleActivity : BaseActivity() {
     //实际操作时长
     private var operateTime2: Long = 0
     private val mHandler = object : Handler(Looper.getMainLooper()) {}
+    fun eventFra2Fra(type: Int) {
+        chartFragment?.setRemindText(type)
+    }
 
     private inner class Counter : Runnable {
         override fun run() {
