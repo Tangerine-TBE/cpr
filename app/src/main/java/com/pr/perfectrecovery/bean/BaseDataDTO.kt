@@ -4,6 +4,7 @@ import android.util.Log
 
 data class BaseDataDTO(
     //mac地址
+    var count:Int = 0,
     var mac: String = "",
     var preDistance: Int = 0,//初始值
     // 吹气总和

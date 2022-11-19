@@ -399,23 +399,22 @@ class CycleFragment : Fragment() {
     private var startTime: Long = 0
     private var endTime: Long = 0
     private var powerCount = 0
-
     //按压切换到吹气，算一个循环
     private fun setViewDate(dataDTO: BaseDataDTO?) {
-        if (dataDTO != null) {
+        if (dataDTO != null && dataDTO.count==1) {
             mBaseDataDTO = dataDTO
             //发送电量信息前实时查询是否正在充电，通过判断是否有usb串口链接来达成
             if(dataDTO.usbConnectType == 1){
                 (activity as SingleActivity).setElectricityState(true)
             }else{
+                //发送电量
                 (activity as SingleActivity).setElectricityState(false)
+                if (powerCount == 150 || powerCount== 0  ) {
+                    (activity as SingleActivity).setElectricity(dataDTO.electricity)
+                    powerCount = 0
+                }
+                powerCount++
             }
-            //发送电量
-            if (powerCount == 50 || powerCount == 1) {
-                (activity as SingleActivity).setElectricity(dataDTO.electricity)
-                powerCount = 0
-            }
-            powerCount++
             //中断超时
             if (!isTimeOut && dataDTO.distance == dataDTO.preDistance
                 && dataDTO.bpValue <= 0 && dataDTO.prSum > 0

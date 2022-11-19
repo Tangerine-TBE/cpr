@@ -214,6 +214,7 @@ class DataVolatile01 {
     private var PR_SEQRIGHT_TOTAL = 0; //按压频率正常的次数
     private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
     private var L_compare = 0;//距离参考值，记录上次的有效值
+    private var COUNT = 1
 
     private var QY_RUN_FLAG = 0
 
@@ -422,7 +423,7 @@ class DataVolatile01 {
                 DataFormatUtils.hexStr2Bytes("00$power")
             )
         }
-        Log.e("VI_Value", "电量值：${VI_Value}")
+        COUNT = 1
         val stringBuffer = StringBuffer()
         stringBuffer.append("电量值：").append(VI_Value)
         stringBuffer.append("距离值：").append(L_Value)
@@ -435,9 +436,9 @@ class DataVolatile01 {
         stringBuffer.append("工作方式值：").append(WS_Value)
         stringBuffer.append("按压频率值：").append(PF_Value)
         stringBuffer.append("吹气频率值：").append(CF_Value)
-
         val dataDTO = BaseDataDTO()
         dataDTO.mac = deviceMAC.toString()
+        dataDTO.count = COUNT;
         dataDTO.prSum = PR_SUM
         dataDTO.qySum = QY_SUM
         dataDTO.electricity = VI_Value
@@ -918,7 +919,7 @@ class DataVolatile01 {
     }
 
     //判断按压是否停止
-    private val count = 20
+    private var count = 20
     private fun pt(p: Int): Boolean {
         if (p > (preDistance - 5)) {
             if (pt_valueSet.size == count) pt_valueSet.removeFirst()
