@@ -70,20 +70,9 @@ class BaseApplication : Application() {
         AutoSizeConfig.getInstance().setDesignHeightInDp(height)
             .setDesignWidthInDp(width).onAdaptListener = object : onAdaptListener {
             override fun onAdaptBefore(target: Any?, activity: Activity?) {
-                AutoSizeLog.e(
-                    String.format(
-                        Locale.ENGLISH, "%s onAdaptBefore!", target!!.javaClass.name
-                    )
-                )
-
             }
 
             override fun onAdaptAfter(target: Any?, activity: Activity?) {
-                AutoSizeLog.e(
-                    String.format(
-                        Locale.ENGLISH, "%s onAdaptAfter!", target!!.javaClass.name
-                    )
-                )
             }
         }
 

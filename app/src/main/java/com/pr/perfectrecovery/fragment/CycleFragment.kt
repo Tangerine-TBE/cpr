@@ -405,7 +405,7 @@ class CycleFragment : Fragment() {
         if (dataDTO != null) {
             mBaseDataDTO = dataDTO
             //发送电量
-            if (powerCount == 100 || powerCount == 0) {
+            if (powerCount == 100 || powerCount == 1) {
                 (activity as SingleActivity).setElectricity(dataDTO.electricity)
                 powerCount = 0
             }

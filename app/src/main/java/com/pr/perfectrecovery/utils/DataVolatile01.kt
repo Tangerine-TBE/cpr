@@ -291,7 +291,7 @@ class DataVolatile01 {
      */
     fun baseDataDecode(data: String?): BaseDataDTO {
         if (data != null && data.length == 20) {
-            deviceMAC = "001b${data.substring(12, 20)}"
+            deviceMAC = "001b${data.substring(12, 20)} + deviceData${data}"
             Log.e("deviceMAC", "$deviceMAC")
             //模型状态需先判断
             val state = DataFormatUtils.byteArrayToInt(
