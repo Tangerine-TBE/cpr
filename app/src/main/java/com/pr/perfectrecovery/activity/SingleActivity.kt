@@ -134,6 +134,15 @@ class SingleActivity : BaseActivity() {
     fun setElectricity(power: Int) {
         binding.battery.power = power
     }
+    fun setElectricityState(state:Boolean){
+        if (state){
+            binding.battery.visibility = View.INVISIBLE
+            binding.charge.visibility = View.VISIBLE
+        }else{
+            binding.charge.visibility = View.INVISIBLE
+            binding.battery.visibility = View.VISIBLE
+        }
+    }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onEvent(event: MessageEventData) {

@@ -57,6 +57,18 @@
                 app:layout_constraintEnd_toStartOf="@+id/battery"
                 app:layout_constraintStart_toEndOf="@+id/tvTime"
                 app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+                android:id="@+id/charge"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/battery"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="@dimen/dp_28"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/charge"
+                android:visibility="invisible"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
 
         <com.pr.perfectrecovery.view.BatteryView
                 android:id="@+id/battery"
