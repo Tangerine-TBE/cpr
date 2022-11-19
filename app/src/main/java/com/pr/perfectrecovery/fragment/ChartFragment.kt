@@ -265,7 +265,7 @@ class ChartFragment : Fragment() {
             }
             VOICE_MP3_AYGD -> {
                 viewBinding.ivReminder.visibility = View.INVISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "按压过大"
             }
 
@@ -276,27 +276,27 @@ class ChartFragment : Fragment() {
             }
             VOICE_MP3_AYWZCW -> {
                 viewBinding.ivReminder.visibility = View.VISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "按压位置错误"
             }
             VOICE_MP3_CQGD -> {
                 viewBinding.ivReminder.visibility = View.VISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "吹气过大"
             }
             VOICE_MP3_CQJW -> {
                 viewBinding.ivReminder.visibility = View.VISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "吹气进胃"
             }
             VOICE_MP3_WDKQD -> {
                 viewBinding.ivReminder.visibility = View.VISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "未打开气道"
             }
             VOICE_MP3_WHT -> {
                 viewBinding.ivReminder.visibility = View.VISIBLE
-                viewBinding.tvReminder.setTextColor(Color.RED)
+                viewBinding.tvReminder.setTextColor(Color.parseColor("#e16c6c"))
                 viewBinding.tvReminder.text = "未回弹"
             }
 
