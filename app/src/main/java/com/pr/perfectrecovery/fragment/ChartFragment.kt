@@ -33,7 +33,9 @@ import com.tencent.mmkv.MMKV
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.xclcharts.chart.PointD
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * 曲线
@@ -41,7 +43,10 @@ import java.util.*
 class ChartFragment : Fragment() {
     private lateinit var viewBinding: ChartFragmentBinding
     private lateinit var configBean: ConfigBean
-
+    private lateinit var lineChartYData: ArrayList<Float>
+    private lateinit var lineChartYData1: ArrayList<Float>
+    private lateinit var lineChartYData2: ArrayList<Float>
+    private lateinit var barChartData: ArrayList<Int>
     companion object {
         private const val ARG_PARAM1 = "param1"
 
@@ -65,7 +70,21 @@ class ChartFragment : Fragment() {
     }
 
     private lateinit var handler: Handler
+    fun getLineChartYData():ArrayList<Float>{
+        return lineChartYData
+    }
+    fun getLineChartY1Data():ArrayList<Float>{
+        return lineChartYData1
 
+    }
+    fun getLineaChart2Data():ArrayList<Float>{
+        return lineChartYData2
+
+    }
+    fun getBarChartData():ArrayList<Int>{
+        return barChartData
+
+    }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         EventBus.getDefault().register(this)
@@ -81,6 +100,10 @@ class ChartFragment : Fragment() {
 
     private fun initView() {
         //曲线图表
+        lineChartYData = ArrayList()
+        lineChartYData1 = ArrayList()
+        lineChartYData2 = ArrayList()
+        barChartData = ArrayList()
         val data: LineData = getData(0f, false)
         val data1: LineData = getData(0f, true)
         val data2: LineData = getData(0f, false)
@@ -109,18 +132,25 @@ class ChartFragment : Fragment() {
         StatusLiveData.dataSingleChart.observe(requireActivity()) {
             if (it != null) {
                 setData(it)
-                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf))
-                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it))
+                /*TrainResultActivity 只需要一个值比如从 getBlowFrequencyValue  setValue getFrequencyValue 中获取到的数值*/
+                /*每一次动态回来的数值都需要进行存储*/
+                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf),lineChartYData)
+                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it),lineChartYData1)
 //                addEntry(data2, viewBinding.lineChart1, it)
-                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf))
+                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf),lineChartYData2)
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
                     val qyMax = it.qyMaxValue
                     Log.e(TAG, "getBarValue qyMax = $qyMax")
                     Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
                     addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
+                    barChartData.add(it.qyValueSum)
+                    barChartData.add(getBarValue(qyMax).toInt())
+
                 } else {
                     addBarEntry(0, 0)
+                    barChartData.add(0)
+                    barChartData.add(0)
                 }
             }
         }
@@ -588,7 +618,7 @@ class ChartFragment : Fragment() {
      *
      * @param yValues y值
      */
-    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
+    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float,arrayList: ArrayList<Float>) {
         Log.e(TAG, "addEntry: $yValues")
         val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
         val entry = Entry(
@@ -600,6 +630,24 @@ class ChartFragment : Fragment() {
         //通知数据已经改变
         lineData.notifyDataChanged()
         lineChart.notifyDataSetChanged()
+        //把yValues移到指定索引的位置
+        lineChart.moveViewToAnimated(entryCount - 1f, yValues, YAxis.AxisDependency.LEFT, 100)
+        lineChart.setVisibleXRangeMaximum(30f)
+        //        lineChart.moveViewToX((lineData.entryCount - 4).toFloat())/**/
+        lineChart.moveViewToX((lineData.entryCount - 29).toFloat())
+        lineChart.invalidate()
+        arrayList.add(entryCount.toFloat())
+        arrayList.add(yValues)
+    }
+    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
+        Log.e(TAG, "addEntry: $yValues")
+        val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
+        val entry = Entry(
+            entryCount.toFloat(), yValues
+        )
+        // 创建一个点
+        lineData.addEntry(entry, 0) // 将entry添加到指定索引处的折线中
+        lineChart.data = lineData
         //通知数据已经改变
         lineData.notifyDataChanged()
         lineChart.notifyDataSetChanged()

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
@@ -15,11 +16,20 @@ import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ToastUtils
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
+import com.pr.perfectrecovery.fragment.LineChartUtils
 import com.pr.perfectrecovery.utils.TimeUtils
 import kotlinx.coroutines.*
 import pub.devrel.easypermissions.AppSettingsDialog
@@ -40,6 +50,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     EasyPermissions.RationaleCallbacks {
     private lateinit var viewBinding: ActivityTrainResultBinding
     private val TAG = TrainResultActivity::class.java.simpleName
+    private val values = ArrayList<BarEntry>()
 
     companion object {
         val DATADTO = "dataDTO"
@@ -60,28 +71,318 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         }
     }
 
+    var mBarDataSet: BarDataSet? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTrainResultBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        initView()
+        initBarChart()
         initData()
+        initView()
+    }
+
+    private fun initBarChart() {
+        viewBinding.barChart.apply {
+            description.isEnabled = false
+            isDragEnabled = true
+            setTouchEnabled(true)
+            setDrawBorders(false)
+            setScaleEnabled(false)
+            setPinchZoom(false)
+            isHighlightPerTapEnabled = false
+            isHighlightPerDragEnabled = false
+            setDrawBorders(false) //显示边界
+            setDrawBarShadow(false) //设置每个直方图阴影为false
+            setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+            description.isEnabled = false //设置描述文字不显示，默认显示
+            setDrawGridBackground(false) //设置不显示网格
+            //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
+            legend.isEnabled = false //设置不显示比例图
+            setScaleEnabled(false) //设置是否可以缩放
+            setTouchEnabled(false)
+            // if more than 60 entries are displayed in the chart, no values will be
+            // drawn
+
+            isHighlightFullBarEnabled = false
+//            scaleX = 1.5f
+            //x轴设置
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
+                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
+                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
+                granularity = 1f // only intervals of 1 day
+                mAxisMinimum = 0f
+            }
+            xAxis.setLabelCount(3, false)
+
+            xAxis.isEnabled = false
+            axisLeft.isEnabled = true
+            axisLeft.setDrawGridLines(true)
+            axisLeft.textColor = Color.WHITE
+            axisLeft.gridColor = Color.TRANSPARENT
+            axisLeft.labelCount = 3
+            axisLeft.axisMaxLabels = 3
+            axisLeft.mAxisMaximum = 10f
+            axisRight.isEnabled = false
+            axisLeft.setValueFormatter { value, axis ->
+                ""//${value.toInt()}
+            }
+            setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
+            isScaleXEnabled = false                             //支持x轴缩放
+            isScaleYEnabled = false
+
+            // if more than 60 entries are displayed in the chart, no values will be
+            //保证Y轴从0开始，不然会上移一点
+            axisLeft.axisMinimum = 0f
+            axisRight.axisMinimum = 0f
+            mBarDataSet = BarDataSet(values, "Data Set")
+            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+            mBarDataSet!!.setDrawValues(false)
+            val dataSets = ArrayList<IBarDataSet>()
+            dataSets.add(mBarDataSet!!)
+            colors.add(
+                ContextCompat.getColor(context, R.color.tran)
+            )
+            mBarDataSet!!.colors = colors
+            val barData = BarData(dataSets)
+            barData.addEntry(BarEntry(0f, 9.9f), 0)
+            data = barData
+//            data.barWidth = 0.3f
+//            addBarEntry(0, 100)
+        }
+    }
+
+    private val colors = ArrayList<Int>()
+    private fun getData(data: ArrayList<Float>, isBezier: Boolean): LineData {
+        val values = ArrayList<Entry>()
+        for (item in data.indices) {
+            val entry = Entry()
+            if (item == 0 || item % 2 == 0) {
+                entry.y = data[item + 1]
+                entry.x = data[item]
+                values.add(entry)
+            }
+        }
+
+        val VORDIPLOM_COLORS = intArrayOf(
+            Color.rgb(61, 179, 142)
+        )
+        val lineDataSet = LineDataSet(values, "data set1")
+        lineDataSet.lineWidth = 1.0f
+        lineDataSet.circleRadius = 0f
+        lineDataSet.circleHoleRadius = 0f
+        lineDataSet.valueTextColor = Color.WHITE
+        lineDataSet.color = Color.parseColor("#3DB38E")
+//        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
+        lineDataSet.circleColors = VORDIPLOM_COLORS.asList()
+        lineDataSet.highLightColor = Color.parseColor("#3DB38E")
+        lineDataSet.setDrawValues(false)
+        lineDataSet.setDrawCircles(false)
+        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
+//        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+        if (isBezier) {
+            lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        }
+        val sets = ArrayList<ILineDataSet>()
+//        val d = LineDataSet(values, "")
+//        d.lineWidth = 0f
+//        d.circleRadius = 0f
+//        d.circleHoleRadius = 0f
+//        d.valueTextColor = Color.TRANSPARENT
+//        d.color = Color.TRANSPARENT
+//        d.setCircleColor(Color.TRANSPARENT)
+//        d.highLightColor = Color.TRANSPARENT
+//        d.setDrawValues(false)
+//        d.setDrawCircles(false)
+//
+//        d.axisDependency = YAxis.AxisDependency.LEFT
+//        d.mode = LineDataSet.Mode.CUBIC_BEZIER
+//        d.highLightColor = Color.argb(0, 0, 0, 0)
+//        //d.setCircleColor(Color.argb(0, 0, 0, 0))
+//        d.color = Color.argb(0, 0, 0, 0)
+//        d.addEntry(Entry(0f, 99f))
+//        sets.add(d)
+        lineDataSet.addEntry(Entry(0f, 9.8f))
+        sets.add(lineDataSet)
+        // create a data object with the data sets
+        return LineData(sets)
+    }
+
+    private var filterValue = 0
+    private fun addBarEntry(value: Int, value2: Int) {
+        if (value2 > 0) {
+            Log.e("addBarEntry", "$value2")
+        }
+        viewBinding.barChart.apply {
+            if (barData != null) {
+                val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
+                if (value2 > 0) {
+                    data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
+                    when {
+                        value2 < 3 -> {
+                            colors.add(
+                                ContextCompat.getColor(context, R.color.color_FDC457)
+                            )
+                        }
+                        value2 in 3..6 -> {
+                            colors.add(
+                                ContextCompat.getColor(context, R.color.color_37B48B)
+                            )
+                        }
+                        value2 > 6 -> {
+                            colors.add(
+                                ContextCompat.getColor(
+                                    context, R.color.color_text_selected
+                                )
+                            )
+                        }
+                    }
+                } else {
+                    //延迟移动度
+                    if (filterValue == 0) {
+                        filterValue = 1
+                        colors.add(
+                            ContextCompat.getColor(context, R.color.color_FDC457)
+                        )
+                        data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                    } else {
+                        filterValue = 0
+                    }
+                }
+                mBarDataSet!!.colors = colors
+                data.notifyDataChanged()
+                notifyDataSetChanged()
+                //设置在图表中显示的最大X轴数量
+                setVisibleXRangeMaximum(12f)
+                //这里用29是因为30的话，最后一条柱子只显示了一半
+                moveViewToX(barData.entryCount.toFloat() - 12)
+                //moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
+//                val mMatrix = Matrix()
+//                mMatrix.postScale(1.5f, 1f)
+//                viewPortHandler.refresh(mMatrix, this, false)
+//                animateY(1000)
+            }
+        }
+        viewBinding.barChart.invalidate()
     }
 
     private fun initView() {
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+        initChartView(viewBinding.lineChart, data)
+        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 6, 9)
+        viewBinding.lineChart1.data = data1
+        viewBinding.lineChart1.setVisibleXRangeMaximum(30f)
+        viewBinding.lineChart1.isDragEnabled = true
+        viewBinding.lineChart1.setTouchEnabled(true)
+        viewBinding.lineChart1.setDrawBorders(false)
+        viewBinding.lineChart1.setScaleEnabled(false)
+        viewBinding.lineChart1.setPinchZoom(false)
+        viewBinding.lineChart1.isHighlightPerTapEnabled = false
+        viewBinding.lineChart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.lineChart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(trainingDTO.barChartData[item], trainingDTO.barChartData[item + 1])
+            }
+
+        }
+
+    }
+
+    private fun initChartView(lineChart: LineChart, lineData: LineData) {
+        lineChart.description.isEnabled = false
+        lineChart.isDragEnabled = true
+        lineChart.setTouchEnabled(true)
+        lineChart.setDrawBorders(false)
+        lineChart.setScaleEnabled(false)
+        lineChart.setPinchZoom(false)
+        lineChart.isHighlightPerTapEnabled = false
+        lineChart.isHighlightPerDragEnabled = false
+        lineChart.setBorderWidth(0f)
+        lineChart.setDrawGridBackground(false)
+        lineChart.setNoDataText("暂无数据")
+        val xAxis: XAxis = lineChart.xAxis
+        xAxis.setDrawAxisLine(false)
+        xAxis.granularity = 1f
+//        xAxis.setLabelCount(30, true)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+
+        val leftAxis: YAxis = lineChart.axisLeft
+        leftAxis.setLabelCount(3, false)
+        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+        leftAxis.mAxisMinimum = 0f
+        leftAxis.mAxisMaximum = 10f
+        leftAxis.textColor = Color.WHITE
+
+        val rightAxis: YAxis = lineChart.axisRight
+        rightAxis.setDrawGridLines(false)
+        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+
+        lineData.setDrawValues(false)
+        xAxis.setDrawGridLines(false)
+        lineData.setValueTextColor(Color.WHITE)
+        xAxis.isEnabled = false
+        leftAxis.isEnabled = true
+        leftAxis.gridColor = Color.TRANSPARENT
+        leftAxis.zeroLineColor = Color.TRANSPARENT
+        leftAxis.setDrawGridLines(true)
+        leftAxis.setValueFormatter { value, axis ->
+            ""//${value.toInt()}
+        }
+        rightAxis.isEnabled = false
+        xAxis.textColor = Color.WHITE
+
+        //设置限制线 70代表某个该轴某个值，也就是要画到该轴某个值上
+        val limitLine = LimitLine(3.3f)
+        //设置限制线的宽
+        limitLine.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine.label = ""
+        limitLine.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine.enableDashedLine(10f, 10f, 0f)
+
+        val limitLine2 = LimitLine(6.6f)
+        //设置限制线的宽
+        limitLine2.lineWidth = 1f
+        //设置限制线的颜色
+        limitLine2.lineColor = Color.parseColor("#3DB38E")
+        //设置基线的位置
+        limitLine2.labelPosition = LimitLine.LimitLabelPosition.LEFT_TOP
+        limitLine2.label = ""
+        limitLine2.textColor = Color.WHITE
+        //设置限制线为虚线
+        limitLine2.enableDashedLine(10f, 10f, 0f)
+        //左边Y轴添加限制线
+        leftAxis.addLimitLine(limitLine)
+        leftAxis.addLimitLine(limitLine2)
+        val l = lineChart.legend
+        l.isEnabled = false
+        // set data
+        lineChart.data = lineData
+        // do not forget to refresh the chart
+        // holder.chart.invalidate();
+        lineChart.animateX(750)
+        lineChart.setVisibleXRangeMaximum(30f)
     }
 
     var trainingDTO = TrainingDTO()
     var perms = arrayOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
     private fun initPermissions() {
         EasyPermissions.requestPermissions(
-            this, "获取手机文件读写权限", 123,
+            this,
+            "获取手机文件读写权限",
+            123,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
@@ -99,8 +400,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         alertDialog.show()
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { v ->
             alertDialog.dismiss() //去获取文件管理
-            val intent: Intent =
-                Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            val intent: Intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.data = Uri.parse("package:$packageName")
             startActivityForResult(intent, 0x99)
         }
@@ -115,7 +415,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             } else {
                 ToastUtils.showShort("暂未授权文件读写")
                 if (EasyPermissions.hasPermissions(
-                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE
                     )
                 ) {
@@ -260,11 +561,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
     private fun setExportData(scoreStar: Float, scoreTotal: Float, check: Boolean) {
         if (!check) {
-            viewBinding.layoutExportNoCheck.tvScoreSetting.text = "分数设定：  " +
-                    "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
-                    "  按压${trainingDTO.pressScore}分" +
-                    "  中断${trainingDTO.deduction}分" +
-                    "  通气${trainingDTO.blowScore}分"
+            viewBinding.layoutExportNoCheck.tvScoreSetting.text =
+                "分数设定：  " + "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" + "  按压${trainingDTO.pressScore}分" + "  中断${trainingDTO.deduction}分" + "  通气${trainingDTO.blowScore}分"
 
             viewBinding.layoutExportNoCheck.tvName.text = "学员姓名：   ${trainingDTO.name}"
             viewBinding.layoutExportNoCheck.tvTime.text =
@@ -332,11 +630,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
         } else {
 
-            viewBinding.layoutExport.tvScoreSetting.text = "分数设定：  " +
-                    "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" +
-                    "  按压${trainingDTO.pressScore}分" +
-                    "  中断${trainingDTO.deduction}分" +
-                    "  通气${trainingDTO.blowScore}分"
+            viewBinding.layoutExport.tvScoreSetting.text =
+                "分数设定：  " + "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" + "  按压${trainingDTO.pressScore}分" + "  中断${trainingDTO.deduction}分" + "  通气${trainingDTO.blowScore}分"
 
             viewBinding.layoutExport.tvName.text = "学员姓名：   ${trainingDTO.name}"
             viewBinding.layoutExport.tvTime.text =
@@ -538,9 +833,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // Forward results to EasyPermissions
@@ -580,9 +873,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             val no = "文件写入未授权"
             // Do something after user returned from app settings screen, like showing a Toast.
             Toast.makeText(
-                this,
-                if (hasStoragePermission()) yes else no,
-                Toast.LENGTH_LONG
+                this, if (hasStoragePermission()) yes else no, Toast.LENGTH_LONG
             ).show()
         }
     }
@@ -599,9 +890,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val pdfDocument = PdfDocument()
         //分页
         val pageInfo = PdfDocument.PageInfo.Builder(
-            viewBinding.root.measuredWidth,
-            viewBinding.root.measuredHeight,
-            1
+            viewBinding.root.measuredWidth, viewBinding.root.measuredHeight, 1
         ).create()
         val page2 = pdfDocument.startPage(pageInfo)
         val canvas = page2.canvas

@@ -49,8 +49,13 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var prLessCount: Int = 0//按压少次
     var qyManyCount: Int = 0//吹气多次
     var qyLessCount: Int = 0//吹气少次
-
     var score: Float = 0f//成绩分数
+
+    var lineChartYData: ArrayList<Float> = ArrayList()
+    var lineChartYData1: ArrayList<Float> = ArrayList()
+    var lineChartYData2: ArrayList<Float> = ArrayList()
+    var barChartData: ArrayList<Int> = ArrayList()
+
 
     //检查环境
     var check1 = false

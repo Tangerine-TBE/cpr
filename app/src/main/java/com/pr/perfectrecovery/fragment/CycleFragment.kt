@@ -10,9 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.blankj.utilcode.util.GsonUtils
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.activity.SingleActivity
 import com.pr.perfectrecovery.base.BaseConstant
@@ -307,7 +310,6 @@ class CycleFragment : Fragment() {
             trainingDTO.qy_serright_total = qy_serright_total
             trainingDTO.qy_max_volume_sum = qy_max_volume_sum
         }
-
         //超次少次
         trainingDTO.prManyCount = prManyCount
         trainingDTO.prLessCount = prLessCount
