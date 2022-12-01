@@ -21,6 +21,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ToastUtils
+import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -86,7 +87,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initBarChart()
         initData()
         initView()
-        viewBinding.mainLayout.setOnTouchListener(object:View.OnTouchListener{
+        viewBinding.mainLayout.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 viewBinding.barChart.onTouchEvent(event)
                 viewBinding.lineChart.onTouchEvent(event)
@@ -224,11 +225,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private var filterValue = 0
-    private fun addBarEntry(value: Int, value2: Int) {
+    private fun addBarEntry(barChart: BarChart, value2: Int) {
         if (value2 > 0) {
             Log.e("addBarEntry", "$value2")
         }
-        viewBinding.barChart.apply {
+        barChart.apply {
             if (barData != null) {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 if (value2 > 0) {
@@ -268,7 +269,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 data.notifyDataChanged()
                 notifyDataSetChanged()
                 //设置在图表中显示的最大X轴数量
-                setVisibleXRangeMaximum(12f)
                 //这里用29是因为30的话，最后一条柱子只显示了一半
                 moveViewToX(barData.entryCount.toFloat() - 12)
                 //moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
@@ -278,7 +278,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 //                animateY(1000)
             }
         }
-        viewBinding.barChart.invalidate()
+        barChart.invalidate()
     }
 
     private fun initView() {
@@ -290,7 +290,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.lineChart, data)
         LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 6, 9)
         viewBinding.lineChart1.data = data1
-        viewBinding.lineChart1.setVisibleXRangeMaximum(30f)
         viewBinding.lineChart1.isDragEnabled = true
         viewBinding.lineChart1.setTouchEnabled(true)
         viewBinding.lineChart1.setDrawBorders(false)
@@ -301,12 +300,58 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
             if (item == 0 || item % 2 == 0) {
-                addBarEntry(trainingDTO.barChartData[item], trainingDTO.barChartData[item + 1])
+                addBarEntry(viewBinding.barChart, trainingDTO.barChartData[item + 1])
             }
-
         }
+        viewBinding.lineChart.setVisibleXRangeMaximum(30f)
+        viewBinding.lineChart1.setVisibleXRangeMaximum(30f)
+        viewBinding.lineChart2.setVisibleXRangeMaximum(30f)
+        viewBinding.barChart.setVisibleXRangeMaximum(12f)
 
     }
+    private fun exportNoReportChart(){
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+        initChartView(viewBinding.layoutExportNoCheck.lineChart, data)
+        LineChartUtils.setLineChart(viewBinding.layoutExportNoCheck.lineChart1, data1, 6, 9)
+        viewBinding.layoutExportNoCheck.lineChart1.data = data1
+        viewBinding.layoutExportNoCheck.lineChart1.isDragEnabled = true
+        viewBinding.layoutExportNoCheck.lineChart1.setTouchEnabled(true)
+        viewBinding.layoutExportNoCheck.lineChart1.setDrawBorders(false)
+        viewBinding.layoutExportNoCheck.lineChart1.setScaleEnabled(false)
+        viewBinding.layoutExportNoCheck.lineChart1.setPinchZoom(false)
+        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerTapEnabled = false
+        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(viewBinding.layoutExportNoCheck.barChart,trainingDTO.barChartData[item + 1])
+            }
+        }
+    }
+    private fun exportReportChart(){
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+        initChartView(viewBinding.layoutExport.lineChart, data)
+        LineChartUtils.setLineChart(viewBinding.layoutExport.lineChart1, data1, 6, 9)
+        viewBinding.layoutExport.lineChart1.data = data1
+        viewBinding.layoutExport.lineChart1.isDragEnabled = true
+        viewBinding.layoutExport.lineChart1.setTouchEnabled(true)
+        viewBinding.layoutExport.lineChart1.setDrawBorders(false)
+        viewBinding.layoutExport.lineChart1.setScaleEnabled(false)
+        viewBinding.layoutExport.lineChart1.setPinchZoom(false)
+        viewBinding.layoutExport.lineChart1.isHighlightPerTapEnabled = false
+        viewBinding.layoutExport.lineChart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.layoutExport.lineChart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(viewBinding.layoutExport.barChart,trainingDTO.barChartData[item + 1])
+            }
+        }
+    }
+
 
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
         lineChart.description.isEnabled = false
@@ -385,7 +430,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         // do not forget to refresh the chart
         // holder.chart.invalidate();
         lineChart.animateX(750)
-        lineChart.setVisibleXRangeMaximum(30f)
     }
 
     var trainingDTO = TrainingDTO()
@@ -576,6 +620,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
     private fun setExportData(scoreStar: Float, scoreTotal: Float, check: Boolean) {
         if (!check) {
+            exportNoReportChart()
             viewBinding.layoutExportNoCheck.tvScoreSetting.text =
                 "分数设定：  " + "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" + "  按压${trainingDTO.pressScore}分" + "  中断${trainingDTO.deduction}分" + "  通气${trainingDTO.blowScore}分"
 
@@ -644,7 +689,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.layoutExportNoCheck.tvBlowEnd.text =
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
         } else {
-
+            exportReportChart()
             viewBinding.layoutExport.tvScoreSetting.text =
                 "分数设定：  " + "流程 ${if (isMulti) 0 else trainingDTO.processScore}分" + "  按压${trainingDTO.pressScore}分" + "  中断${trainingDTO.deduction}分" + "  通气${trainingDTO.blowScore}分"
 
@@ -763,6 +808,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.layoutExport.tvBlowEnd.text =
                 "平均潮气量：${trainingDTO.getBlowAverageNumber()}ml"
         }
+        /*输出曲线图*/
+
+
     }
 
     /**
@@ -905,7 +953,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val pdfDocument = PdfDocument()
         //分页
         val pageInfo = PdfDocument.PageInfo.Builder(
-            viewBinding.root.measuredWidth, viewBinding.root.measuredHeight, 1
+            viewBinding.layoutExport.clExportContent.measuredWidth, viewBinding.layoutExport.clExportContent.measuredHeight, 1
         ).create()
         val page2 = pdfDocument.startPage(pageInfo)
         val canvas = page2.canvas
@@ -914,10 +962,12 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.layoutExport.clExportContent.layoutParams.width = 1180
             viewBinding.layoutExport.clExportContent.layoutParams.height = 2120
             viewBinding.layoutExport.clExportContent.draw(canvas)
+
         } else {
             viewBinding.layoutExportNoCheck.clExportContent.layoutParams.width = 1180
             viewBinding.layoutExportNoCheck.clExportContent.layoutParams.height = 2120
             viewBinding.layoutExportNoCheck.clExportContent.draw(canvas)
+
         }
         pdfDocument.finishPage(page2)
         GlobalScope.launch(Dispatchers.IO) {
