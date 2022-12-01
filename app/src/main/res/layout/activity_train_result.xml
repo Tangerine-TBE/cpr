@@ -781,12 +781,17 @@
                             app:layout_constraintStart_toStartOf="@+id/tvBlow" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
+            <com.pr.perfectrecovery.view.MyConstraintLayout
+                    android:id="@+id/main_layout"
+                    app:layout_constraintTop_toBottomOf="@+id/info_constraintLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintlayout"
+                        app:layout_constraintTop_toTopOf="parent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@+id/info_constraintLayout">
+                        >
 
                     <TextView
                             android:id="@+id/tvTop"
@@ -880,7 +885,7 @@
                         android:layout_marginStart="15dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/constraintlayout"
-                        app:layout_constraintTop_toBottomOf="@+id/info_constraintLayout" />
+                        app:layout_constraintTop_toTopOf="parent" />
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/constraintlayout2"
                         android:layout_width="match_parent"
@@ -1220,6 +1225,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
+            </com.pr.perfectrecovery.view.MyConstraintLayout>
+
 
                 <include
                         android:id="@+id/layout_export"

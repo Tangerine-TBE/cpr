@@ -1,6 +1,7 @@
 package com.pr.perfectrecovery.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,8 @@ import android.os.Environment
 import android.provider.Settings
 import android.text.Html
 import android.util.Log
+import android.view.DragEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
@@ -23,8 +26,12 @@ import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.listener.ChartTouchListener
+import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
@@ -79,13 +86,21 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initBarChart()
         initData()
         initView()
+        viewBinding.mainLayout.setOnTouchListener(object:View.OnTouchListener{
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                viewBinding.barChart.onTouchEvent(event)
+                viewBinding.lineChart.onTouchEvent(event)
+                viewBinding.lineChart1.onTouchEvent(event)
+                viewBinding.lineChart2.onTouchEvent(event)
+                return true
+            }
+        })
     }
 
     private fun initBarChart() {
         viewBinding.barChart.apply {
             description.isEnabled = false
             isDragEnabled = true
-            setTouchEnabled(true)
             setDrawBorders(false)
             setScaleEnabled(false)
             setPinchZoom(false)
@@ -99,7 +114,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
             legend.isEnabled = false //设置不显示比例图
             setScaleEnabled(false) //设置是否可以缩放
-            setTouchEnabled(false)
+            setTouchEnabled(true)
             // if more than 60 entries are displayed in the chart, no values will be
             // drawn
 
