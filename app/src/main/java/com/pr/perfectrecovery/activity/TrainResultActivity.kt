@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -19,6 +20,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
@@ -282,6 +284,35 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private fun initView() {
+        viewBinding.top.tvDel.visibility = View.VISIBLE
+        viewBinding.top.tvDel.text = "数值"
+        viewBinding.top.tvDel.background =
+            AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+        viewBinding.top.tvRight.visibility = View.VISIBLE
+        viewBinding.top.tvRight.text = "曲线"
+        viewBinding.top.tvRight.background =
+            AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+        viewBinding.top.tvDel.setOnClickListener {
+            viewBinding.top.tvRight.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            viewBinding.clResult.visibility = View.VISIBLE
+            viewBinding.mainLayout.visibility =View.GONE
+
+        }
+        viewBinding.top.tvRight.setOnClickListener {
+            viewBinding.top.tvRight.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+
+            viewBinding.mainLayout.visibility = View.VISIBLE
+            viewBinding.clResult.visibility =View.GONE
+        }
+
+
+
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
         val data: LineData = getData(trainingDTO.lineChartYData, false)

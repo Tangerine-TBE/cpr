@@ -31,9 +31,9 @@
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/clResult"
+                    android:visibility="visible"
                     android:background="@color/theme_color"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -781,9 +781,26 @@
                             app:layout_constraintStart_toStartOf="@+id/tvBlow" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <include
+                        android:id="@+id/layout_export"
+                        layout="@layout/activity_train_result_export"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                <include
+                        android:id="@+id/layout_export_no_check"
+                        layout="@layout/activity_train_result_export_check"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <com.pr.perfectrecovery.view.MyConstraintLayout
                     android:id="@+id/main_layout"
-                    app:layout_constraintTop_toBottomOf="@+id/info_constraintLayout"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1228,20 +1245,6 @@
             </com.pr.perfectrecovery.view.MyConstraintLayout>
 
 
-                <include
-                        android:id="@+id/layout_export"
-                        layout="@layout/activity_train_result_export"
-                        android:visibility="invisible"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                <include
-                        android:id="@+id/layout_export_no_check"
-                        layout="@layout/activity_train_result_export_check"
-                        android:visibility="invisible"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>
 
