@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
@@ -90,21 +91,23 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTrainResultBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        initBarChart()
         initData()
         initView()
         viewBinding.mainLayout.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                viewBinding.barChart.onTouchEvent(event)
-                viewBinding.lineChart.onTouchEvent(event)
-                viewBinding.lineChart1.onTouchEvent(event)
-                viewBinding.lineChart2.onTouchEvent(event)
+                viewBinding.bar.onTouchEvent(event)
+                viewBinding.chart.onTouchEvent(event)
+                viewBinding.chart1.onTouchEvent(event)
+                viewBinding.chart2.onTouchEvent(event)
                 return true
             }
         })
+        viewBinding.bar.visibility = View.INVISIBLE
     }
 
     private fun initBarChart() {
-        viewBinding.barChart.apply {
+        viewBinding.bar.apply {
             description.isEnabled = false
             isDragEnabled = true
             setDrawBorders(false)
@@ -300,6 +303,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             viewBinding.clResult.visibility = View.VISIBLE
             viewBinding.mainLayout.visibility = View.GONE
 
@@ -309,12 +313,40 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
-
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             viewBinding.mainLayout.visibility = View.VISIBLE
             viewBinding.clResult.visibility = View.GONE
         }
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
+        viewBinding.bottom.ivBack.setOnClickListener { finish() }
+        viewBinding.bottom.ivExport.visibility = View.VISIBLE
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+        initChartView(viewBinding.chart, data)
+        LineChartUtils.setLineChart(viewBinding.chart1, data1, 6, 9)
+        viewBinding.chart1.data = data1
+        viewBinding.chart1.setVisibleXRangeMaximum(30f)
+        viewBinding.chart1.isDragEnabled = true
+        viewBinding.chart1.setTouchEnabled(true)
+        viewBinding.chart1.setDrawBorders(false)
+        viewBinding.chart1.setScaleEnabled(false)
+        viewBinding.chart1.setPinchZoom(false)
+        viewBinding.chart1.isHighlightPerTapEnabled = false
+        viewBinding.chart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.chart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(viewBinding.bar, trainingDTO.barChartData[item + 1])
+            }
+        }
+        viewBinding.chart.setVisibleXRangeMaximum(30f)
+
+        viewBinding.chart2.setVisibleXRangeMaximum(30f)
+        viewBinding.bar.setVisibleXRangeMaximum(30f)
+
+
     }
 
     private fun exportNoReportChart() {
@@ -457,6 +489,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
     }
+
     private fun getManager() {
         val alertDialog: AlertDialog //生成一个对话框 可跳转设置里手动开启权限
         val builder: AlertDialog.Builder =
@@ -953,19 +986,20 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         /*先在xml布局中设置InVisisble,当获取完宽高信息后再进行Gone操作*/
-         measureHeight = if (trainingDTO.isCheck){
+        measureHeight = if (trainingDTO.isCheck) {
             viewBinding.layoutExport.clExportContent.measuredHeight
-        }else{
+        } else {
             viewBinding.layoutExportNoCheck.clExportContent.measuredHeight
         }
-         measureWidth = if (trainingDTO.isCheck){
+        measureWidth = if (trainingDTO.isCheck) {
             viewBinding.layoutExport.clExportContent.measuredWidth
-        }else{
+        } else {
             viewBinding.layoutExportNoCheck.clExportContent.measuredWidth
         }
         viewBinding.layoutExportNoCheck.root.visibility = View.GONE
         viewBinding.layoutExport.root.visibility = View.GONE
     }
+
     private var measureHeight = 0
     private var measureWidth = 0
 

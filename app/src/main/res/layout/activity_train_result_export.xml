@@ -967,7 +967,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:text="次/分"
-                        android:textColor="#ffffffff"
                         android:textSize="10sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -979,7 +978,6 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="8"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTop" />
@@ -1004,7 +1002,6 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginTop="@dimen/dp_14"
                         android:text="6"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequencyEnd" />
@@ -1016,7 +1013,6 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginTop="@dimen/dp_12"
                         android:text="0"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalFrequency" />
@@ -1070,7 +1066,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
                         android:text="毫升"
-                        android:textColor="#ffffffff"
                         android:textSize="10sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -1082,7 +1077,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="600"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTop2" />
@@ -1107,7 +1101,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="400"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalVolumeEnd" />
@@ -1119,7 +1112,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="0"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTidalVolume"
@@ -1199,7 +1191,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="厘米\n0"
-                        android:textColor="#ffffffff"
                         android:textSize="10sp"
                         android:gravity="center"
                         android:layout_marginStart="5dp"
@@ -1226,7 +1217,6 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="44dp"
                         android:text="5"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvDepth" />
@@ -1262,7 +1252,6 @@
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="6"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView22" />
@@ -1306,7 +1295,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_5"
                         android:text="次/分"
-                        android:textColor="#ffffffff"
                         android:textSize="10sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -1318,7 +1306,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="120"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvTop4" />
@@ -1343,7 +1330,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_14"
                         android:text="100"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequencyEnd" />
@@ -1355,7 +1341,6 @@
                         android:layout_marginStart="@dimen/dp_5"
                         android:layout_marginTop="@dimen/dp_10"
                         android:text="0"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvDepthFrequency"

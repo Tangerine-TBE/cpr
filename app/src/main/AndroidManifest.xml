@@ -53,6 +53,7 @@
         <activity
                 android:name=".activity.TrainResultActivity"
                 android:exported="false"
+                android:configChanges="orientation|keyboardHidden|screenSize"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".activity.StarLevelActivity"
