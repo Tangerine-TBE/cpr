@@ -31,6 +31,8 @@ object LineChartUtils {
         xl.axisMinimum = 0f
         xl.setDrawGridLines(false)
         xl.isEnabled = true
+        xl.setDrawAxisLine(false)
+        xl.setDrawLabels(false)
 //        xl.axisLineWidth = 1f
         xl.granularity = 0f
         xl.axisLineColor = Color.WHITE

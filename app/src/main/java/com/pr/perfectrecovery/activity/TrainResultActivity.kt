@@ -15,10 +15,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.text.Html
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -51,6 +53,8 @@ import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.log
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 /**
@@ -84,14 +88,13 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         }
     }
 
-    var mBarDataSet: BarDataSet? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         viewBinding = ActivityTrainResultBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        initBarChart()
         initData()
         initView()
         viewBinding.mainLayout.setOnTouchListener(object : View.OnTouchListener {
@@ -103,299 +106,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 return true
             }
         })
-        viewBinding.bar.visibility = View.INVISIBLE
     }
-
-    private fun initBarChart() {
-        viewBinding.bar.apply {
-            description.isEnabled = false
-            isDragEnabled = true
-            setDrawBorders(false)
-            setScaleEnabled(false)
-            setPinchZoom(false)
-            isHighlightPerTapEnabled = false
-            isHighlightPerDragEnabled = false
-            setDrawBorders(false) //显示边界
-            setDrawBarShadow(false) //设置每个直方图阴影为false
-            setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
-            description.isEnabled = false //设置描述文字不显示，默认显示
-            setDrawGridBackground(false) //设置不显示网格
-            //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
-            legend.isEnabled = false //设置不显示比例图
-            setScaleEnabled(false) //设置是否可以缩放
-            setTouchEnabled(true)
-            // if more than 60 entries are displayed in the chart, no values will be
-            // drawn
-
-            isHighlightFullBarEnabled = false
-//            scaleX = 1.5f
-            //x轴设置
-            xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
-                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
-                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
-                granularity = 1f // only intervals of 1 day
-                mAxisMinimum = 0f
-            }
-            xAxis.setLabelCount(3, false)
-
-            xAxis.isEnabled = false
-            axisLeft.isEnabled = true
-            axisLeft.setDrawGridLines(true)
-            axisLeft.textColor = Color.WHITE
-            axisLeft.gridColor = Color.TRANSPARENT
-            axisLeft.labelCount = 3
-            axisLeft.axisMaxLabels = 3
-            axisLeft.mAxisMaximum = 10f
-            axisRight.isEnabled = false
-            axisLeft.setValueFormatter { value, axis ->
-                ""//${value.toInt()}
-            }
-            setScaleMinima(1.5f, 1.0f)           //x轴默认放大1.2倍 要不然x轴数据展示不全
-            isScaleXEnabled = false                             //支持x轴缩放
-            isScaleYEnabled = false
-
-            // if more than 60 entries are displayed in the chart, no values will be
-            //保证Y轴从0开始，不然会上移一点
-            axisLeft.axisMinimum = 0f
-            axisRight.axisMinimum = 0f
-            mBarDataSet = BarDataSet(values, "Data Set")
-            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-            mBarDataSet!!.setDrawValues(false)
-            val dataSets = ArrayList<IBarDataSet>()
-            dataSets.add(mBarDataSet!!)
-            colors.add(
-                ContextCompat.getColor(context, R.color.tran)
-            )
-            mBarDataSet!!.colors = colors
-            val barData = BarData(dataSets)
-            barData.addEntry(BarEntry(0f, 9.9f), 0)
-            data = barData
-//            data.barWidth = 0.3f
-//            addBarEntry(0, 100)
-        }
-    }
-
-    private val colors = ArrayList<Int>()
-    private fun getData(data: ArrayList<Float>, isBezier: Boolean): LineData {
-        val values = ArrayList<Entry>()
-        for (item in data.indices) {
-            val entry = Entry()
-            if (item == 0 || item % 2 == 0) {
-                entry.y = data[item + 1]
-                entry.x = data[item]
-                values.add(entry)
-            }
-        }
-
-        val VORDIPLOM_COLORS = intArrayOf(
-            Color.rgb(61, 179, 142)
-        )
-        val lineDataSet = LineDataSet(values, "data set1")
-        lineDataSet.lineWidth = 1.0f
-        lineDataSet.circleRadius = 0f
-        lineDataSet.circleHoleRadius = 0f
-        lineDataSet.valueTextColor = Color.WHITE
-        lineDataSet.color = Color.parseColor("#3DB38E")
-//        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
-        lineDataSet.circleColors = VORDIPLOM_COLORS.asList()
-        lineDataSet.highLightColor = Color.parseColor("#3DB38E")
-        lineDataSet.setDrawValues(false)
-        lineDataSet.setDrawCircles(false)
-        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
-//        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-        if (isBezier) {
-            lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-        }
-        val sets = ArrayList<ILineDataSet>()
-//        val d = LineDataSet(values, "")
-//        d.lineWidth = 0f
-//        d.circleRadius = 0f
-//        d.circleHoleRadius = 0f
-//        d.valueTextColor = Color.TRANSPARENT
-//        d.color = Color.TRANSPARENT
-//        d.setCircleColor(Color.TRANSPARENT)
-//        d.highLightColor = Color.TRANSPARENT
-//        d.setDrawValues(false)
-//        d.setDrawCircles(false)
-//
-//        d.axisDependency = YAxis.AxisDependency.LEFT
-//        d.mode = LineDataSet.Mode.CUBIC_BEZIER
-//        d.highLightColor = Color.argb(0, 0, 0, 0)
-//        //d.setCircleColor(Color.argb(0, 0, 0, 0))
-//        d.color = Color.argb(0, 0, 0, 0)
-//        d.addEntry(Entry(0f, 99f))
-//        sets.add(d)
-        lineDataSet.addEntry(Entry(0f, 9.8f))
-        sets.add(lineDataSet)
-        // create a data object with the data sets
-        return LineData(sets)
-    }
-
-    private var filterValue = 0
-    private fun addBarEntry(barChart: BarChart, value2: Int) {
-        if (value2 > 0) {
-            Log.e("addBarEntry", "$value2")
-        }
-        barChart.apply {
-            if (barData != null) {
-                val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
-                if (value2 > 0) {
-                    data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
-                    when {
-                        value2 < 3 -> {
-                            colors.add(
-                                ContextCompat.getColor(context, R.color.color_FDC457)
-                            )
-                        }
-                        value2 in 3..6 -> {
-                            colors.add(
-                                ContextCompat.getColor(context, R.color.color_37B48B)
-                            )
-                        }
-                        value2 > 6 -> {
-                            colors.add(
-                                ContextCompat.getColor(
-                                    context, R.color.color_text_selected
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    //延迟移动度
-                    if (filterValue == 0) {
-                        filterValue = 1
-                        colors.add(
-                            ContextCompat.getColor(context, R.color.color_FDC457)
-                        )
-                        data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
-                    } else {
-                        filterValue = 0
-                    }
-                }
-                mBarDataSet!!.colors = colors
-                data.notifyDataChanged()
-                notifyDataSetChanged()
-                //设置在图表中显示的最大X轴数量
-                //这里用29是因为30的话，最后一条柱子只显示了一半
-                moveViewToX(barData.entryCount.toFloat() - 12)
-                //moveViewToAnimated(entryCount - 4f, value.toFloat(), YAxis.AxisDependency.RIGHT, 1000)
-//                val mMatrix = Matrix()
-//                mMatrix.postScale(1.5f, 1f)
-//                viewPortHandler.refresh(mMatrix, this, false)
-//                animateY(1000)
-            }
-        }
-        barChart.invalidate()
-    }
-
-    private fun initView() {
-        viewBinding.top.tvDel.visibility = View.VISIBLE
-        viewBinding.top.tvDel.text = "数值"
-        viewBinding.top.tvDel.background =
-            AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
-        viewBinding.top.tvRight.visibility = View.VISIBLE
-        viewBinding.top.tvRight.text = "曲线"
-        viewBinding.top.tvRight.background =
-            AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
-        viewBinding.top.tvDel.setOnClickListener {
-            viewBinding.top.tvRight.background =
-                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
-            viewBinding.top.tvDel.background =
-                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            viewBinding.clResult.visibility = View.VISIBLE
-            viewBinding.mainLayout.visibility = View.GONE
-
-        }
-        viewBinding.top.tvRight.setOnClickListener {
-            viewBinding.top.tvRight.background =
-                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
-            viewBinding.top.tvDel.background =
-                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            viewBinding.mainLayout.visibility = View.VISIBLE
-            viewBinding.clResult.visibility = View.GONE
-        }
-        viewBinding.bottom.ivBack.setOnClickListener { finish() }
-        viewBinding.bottom.ivExport.visibility = View.VISIBLE
-        viewBinding.bottom.ivBack.setOnClickListener { finish() }
-        viewBinding.bottom.ivExport.visibility = View.VISIBLE
-        val data: LineData = getData(trainingDTO.lineChartYData, false)
-        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
-        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-        initChartView(viewBinding.chart, data)
-        LineChartUtils.setLineChart(viewBinding.chart1, data1, 6, 9)
-        viewBinding.chart1.data = data1
-        viewBinding.chart1.setVisibleXRangeMaximum(30f)
-        viewBinding.chart1.isDragEnabled = true
-        viewBinding.chart1.setTouchEnabled(true)
-        viewBinding.chart1.setDrawBorders(false)
-        viewBinding.chart1.setScaleEnabled(false)
-        viewBinding.chart1.setPinchZoom(false)
-        viewBinding.chart1.isHighlightPerTapEnabled = false
-        viewBinding.chart1.isHighlightPerDragEnabled = false
-        initChartView(viewBinding.chart2, data2)
-        for (item in trainingDTO.barChartData.indices) {
-            if (item == 0 || item % 2 == 0) {
-                addBarEntry(viewBinding.bar, trainingDTO.barChartData[item + 1])
-            }
-        }
-        viewBinding.chart.setVisibleXRangeMaximum(30f)
-
-        viewBinding.chart2.setVisibleXRangeMaximum(30f)
-        viewBinding.bar.setVisibleXRangeMaximum(30f)
-
-
-    }
-
-    private fun exportNoReportChart() {
-        val data: LineData = getData(trainingDTO.lineChartYData, false)
-        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
-        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-        initChartView(viewBinding.layoutExportNoCheck.lineChart, data)
-        LineChartUtils.setLineChart(viewBinding.layoutExportNoCheck.lineChart1, data1, 6, 9)
-        viewBinding.layoutExportNoCheck.lineChart1.data = data1
-        viewBinding.layoutExportNoCheck.lineChart1.isDragEnabled = true
-        viewBinding.layoutExportNoCheck.lineChart1.setTouchEnabled(true)
-        viewBinding.layoutExportNoCheck.lineChart1.setDrawBorders(false)
-        viewBinding.layoutExportNoCheck.lineChart1.setScaleEnabled(false)
-        viewBinding.layoutExportNoCheck.lineChart1.setPinchZoom(false)
-        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerTapEnabled = false
-        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerDragEnabled = false
-        initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
-        for (item in trainingDTO.barChartData.indices) {
-            if (item == 0 || item % 2 == 0) {
-                addBarEntry(
-                    viewBinding.layoutExportNoCheck.barChart, trainingDTO.barChartData[item + 1]
-                )
-            }
-        }
-    }
-
-    private fun exportReportChart() {
-        val data: LineData = getData(trainingDTO.lineChartYData, false)
-        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
-        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-        initChartView(viewBinding.layoutExport.lineChart, data)
-        LineChartUtils.setLineChart(viewBinding.layoutExport.lineChart1, data1, 6, 9)
-        viewBinding.layoutExport.lineChart1.data = data1
-        viewBinding.layoutExport.lineChart1.isDragEnabled = true
-        viewBinding.layoutExport.lineChart1.setTouchEnabled(true)
-        viewBinding.layoutExport.lineChart1.setDrawBorders(false)
-        viewBinding.layoutExport.lineChart1.setScaleEnabled(false)
-        viewBinding.layoutExport.lineChart1.setPinchZoom(false)
-        viewBinding.layoutExport.lineChart1.isHighlightPerTapEnabled = false
-        viewBinding.layoutExport.lineChart1.isHighlightPerDragEnabled = false
-        initChartView(viewBinding.layoutExport.lineChart2, data2)
-        for (item in trainingDTO.barChartData.indices) {
-            if (item == 0 || item % 2 == 0) {
-                addBarEntry(viewBinding.layoutExport.barChart, trainingDTO.barChartData[item + 1])
-            }
-        }
-    }
-
-
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
         lineChart.description.isEnabled = false
         lineChart.isDragEnabled = true
@@ -415,7 +126,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         xAxis.position = XAxis.XAxisPosition.BOTTOM
 
         val leftAxis: YAxis = lineChart.axisLeft
-        leftAxis.setLabelCount(3, false)
         leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
         leftAxis.mAxisMinimum = 0f
         leftAxis.mAxisMaximum = 10f
@@ -475,11 +185,288 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         lineChart.animateX(750)
     }
 
-    var trainingDTO = TrainingDTO()
-    var perms = arrayOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
-    )
+    private fun initBarChart(barChart: BarChart):BarDataSet {
+        barChart. setTouchEnabled(true)
+        barChart. isDragEnabled = true
+        barChart.   setScaleEnabled(false)
+        barChart.    setPinchZoom(false)
+        barChart.   isHighlightPerTapEnabled = false
+        barChart.   isHighlightPerDragEnabled = false
+        barChart.    setDrawBorders(false) //显示边界
+        barChart.    setDrawBarShadow(false) //设置每个直方图阴影为false
+        barChart.   setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+        barChart.   description.isEnabled = false //设置描述文字不显示，默认显示
+        barChart.    setDrawGridBackground(false) //设置不显示网格
+        barChart.   //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
+            legend.isEnabled = false //设置不显示比例图
+            // if more than 60 entries are displayed in the chart, no values will be
+            // drawn
 
+        barChart.     isHighlightFullBarEnabled = false
+//            scaleX = 1.5f
+            //x轴设置
+        barChart.     xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
+                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
+                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
+                granularity = 1f // only intervals of 1 day
+            }
+        barChart.      xAxis.isEnabled = false
+        barChart.     axisLeft.isEnabled = true
+        barChart.     axisLeft.setDrawGridLines(true)
+        barChart.    axisLeft.textColor = Color.WHITE
+        barChart.     axisLeft.gridColor = Color.TRANSPARENT
+        barChart.   axisLeft.labelCount = 3
+        barChart.   axisLeft.axisMaxLabels = 3
+        barChart. axisLeft.mAxisMaximum = 10f
+        barChart.     axisRight.isEnabled = false
+        barChart.     axisLeft.setValueFormatter { value, axis ->
+                ""//${value.toInt()}
+            }
+        barChart.    isScaleXEnabled = false                             //支持x轴缩放
+        barChart.   isScaleYEnabled = false
+
+            // if more than 60 entries are displayed in the chart, no values will be
+            //保证Y轴从0开始，不然会上移一点
+        barChart.   axisLeft.axisMinimum = 0f
+        barChart.   axisRight.axisMinimum = 0f
+           val mBarDataSet = BarDataSet(values, barChart.toString())
+            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+             mBarDataSet.setDrawValues(false)
+            val dataSets = ArrayList<IBarDataSet>()
+            dataSets.add(mBarDataSet)
+            colors.add(
+                ContextCompat.getColor(this, R.color.tran)
+            )
+            mBarDataSet.colors = colors
+            val barData = BarData(dataSets)
+            barData.addEntry(BarEntry(0f, 9.9f), 0)
+        barChart. data = barData
+            return mBarDataSet
+//            data.barWidth = 0.3f
+//            addBarEntry(0, 100)
+    }
+
+    private val colors = ArrayList<Int>()
+    private fun getData(data: ArrayList<Float>, isBezier: Boolean): LineData {
+        val values = ArrayList<Entry>()
+        for (item in data.indices) {
+            val entry = Entry()
+            if (item == 0 || item % 2 == 0) {
+                entry.y = data[item + 1]
+                entry.x = data[item]
+                values.add(entry)
+            }
+        }
+
+        val VORDIPLOM_COLORS = intArrayOf(
+            Color.rgb(61, 179, 142)
+        )
+        val lineDataSet = LineDataSet(values, "data set1")
+        lineDataSet.lineWidth = 1.0f
+        lineDataSet.circleRadius = 0f
+        lineDataSet.circleHoleRadius = 0f
+        lineDataSet.valueTextColor = Color.WHITE
+        lineDataSet.color = Color.parseColor("#3DB38E")
+//        lineDataSet.setCircleColor(Color.parseColor("#3DB38E"))
+        lineDataSet.circleColors = VORDIPLOM_COLORS.asList()
+        lineDataSet.highLightColor = Color.parseColor("#3DB38E")
+        lineDataSet.setDrawValues(false)
+        lineDataSet.setDrawCircles(false)
+        lineDataSet.axisDependency = YAxis.AxisDependency.LEFT
+//        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+        if (isBezier) {
+            lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        }
+        val sets = ArrayList<ILineDataSet>()
+//        val d = LineDataSet(values, "")
+//        d.lineWidth = 0f
+//        d.circleRadius = 0f
+//        d.circleHoleRadius = 0f
+//        d.valueTextColor = Color.TRANSPARENT
+//        d.color = Color.TRANSPARENT
+//        d.setCircleColor(Color.TRANSPARENT)
+//        d.highLightColor = Color.TRANSPARENT
+//        d.setDrawValues(false)
+//        d.setDrawCircles(false)
+//
+//        d.axisDependency = YAxis.AxisDependency.LEFT
+//        d.mode = LineDataSet.Mode.CUBIC_BEZIER
+//        d.highLightColor = Color.argb(0, 0, 0, 0)
+//        //d.setCircleColor(Color.argb(0, 0, 0, 0))
+//        d.color = Color.argb(0, 0, 0, 0)
+//        d.addEntry(Entry(0f, 99f))
+//        sets.add(d)
+        lineDataSet.addEntry(Entry(0f, 9.8f))
+        sets.add(lineDataSet)
+        // create a data object with the data sets
+        return LineData(sets)
+    }
+
+    private var filterValue = 0
+    private fun addBarEntry(barChart: BarChart, value2: Int,mBarDataSet:BarDataSet) {
+        if (barChart.barData != null) {
+            val entryCount = (barChart.data.getDataSetByIndex(0) as BarDataSet).entryCount
+            if (value2 > 0) {
+                barChart.data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
+                when {
+                    value2 < 3 -> {
+                        colors.add(
+                            ContextCompat.getColor(this, R.color.color_FDC457)
+                        )
+                    }
+                    value2 in 3..6 -> {
+                        colors.add(
+                            ContextCompat.getColor(this, R.color.color_37B48B)
+                        )
+                    }
+                    value2 > 6 -> {
+                        colors.add(
+                            ContextCompat.getColor(
+                                this, R.color.color_text_selected
+                            )
+                        )
+                    }
+                }
+            } else {
+                //延迟移动度
+                if (filterValue == 0) {
+                    filterValue = 1
+                    colors.add(
+                        ContextCompat.getColor(this, R.color.color_FDC457)
+                    )
+                    barChart.data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                } else {
+                    filterValue = 0
+                }
+            }
+            mBarDataSet.colors = colors
+        }
+        barChart.invalidate()
+    }
+
+    private fun initView() {
+        viewBinding.top.tvDel.visibility = View.VISIBLE
+        viewBinding.top.tvDel.text = "数值"
+        viewBinding.top.tvDel.background =
+            AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+        viewBinding.top.tvRight.visibility = View.VISIBLE
+        viewBinding.top.tvRight.text = "曲线"
+        viewBinding.top.tvRight.background =
+            AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+        viewBinding.top.tvDel.setOnClickListener {
+            viewBinding.top.tvRight.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            viewBinding.nsContent.visibility = View.VISIBLE
+            viewBinding.mainLayout.visibility = View.GONE
+
+        }
+        viewBinding.top.tvRight.setOnClickListener {
+            viewBinding.top.tvRight.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            if (isPad()) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            } else {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+            viewBinding.mainLayout.visibility = View.VISIBLE
+            viewBinding.nsContent.visibility = View.GONE
+        }
+        viewBinding.bottom.ivBack.setOnClickListener { finish() }
+        viewBinding.bottom.ivExport.visibility = View.VISIBLE
+        viewBinding.bottom.ivBack.setOnClickListener { finish() }
+        viewBinding.bottom.ivExport.visibility = View.VISIBLE
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+        initChartView(viewBinding.chart, data)
+       val dataset =  initBarChart(viewBinding.bar)
+        LineChartUtils.setLineChart(viewBinding.chart1, data1, 6, 9)
+        viewBinding.chart1.data = data1
+        viewBinding.chart1.setVisibleXRangeMaximum(30f)
+        viewBinding.chart1.isDragEnabled = true
+        viewBinding.chart1.setTouchEnabled(true)
+        viewBinding.chart1.setDrawBorders(false)
+        viewBinding.chart1.setScaleEnabled(false)
+        viewBinding.chart1.setPinchZoom(false)
+        viewBinding.chart1.isHighlightPerTapEnabled = false
+        viewBinding.chart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.chart2, data2)
+        viewBinding.chart.setVisibleXRangeMaximum(30f)
+        viewBinding.chart2.setVisibleXRangeMaximum(30f)
+        viewBinding.bar.setVisibleXRangeMaximum(12f)
+
+    }
+
+    private fun isPad(): Boolean {
+
+        val wm: WindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = wm.defaultDisplay;
+        val dm = DisplayMetrics();
+        display.getMetrics(dm)
+        val x = (dm.widthPixels / dm.xdpi).toDouble().pow(2.0)
+        val y = (dm.heightPixels / dm.ydpi).toDouble().pow(2.0)
+        val screenInches = sqrt(x + y)
+        return screenInches >= 7.0
+
+    }
+
+    private fun exportNoReportChart() {
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+      val dataset =   initBarChart(viewBinding.layoutExportNoCheck.barChart)
+        initChartView(viewBinding.layoutExportNoCheck.lineChart, data)
+        LineChartUtils.setLineChart(viewBinding.layoutExportNoCheck.lineChart1, data1, 6, 9)
+        viewBinding.layoutExportNoCheck.lineChart1.data = data1
+        viewBinding.layoutExportNoCheck.lineChart1.isDragEnabled = true
+        viewBinding.layoutExportNoCheck.lineChart1.setTouchEnabled(true)
+        viewBinding.layoutExportNoCheck.lineChart1.setDrawBorders(false)
+        viewBinding.layoutExportNoCheck.lineChart1.setScaleEnabled(false)
+        viewBinding.layoutExportNoCheck.lineChart1.setPinchZoom(false)
+        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerTapEnabled = false
+        viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            addBarEntry(
+                viewBinding.layoutExportNoCheck.barChart,
+                trainingDTO.barChartData[item]
+           ,dataset )
+        }
+    }
+
+    private fun exportReportChart() {
+        val data: LineData = getData(trainingDTO.lineChartYData, false)
+        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
+        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
+      val dataset =   initBarChart(viewBinding.layoutExport.barChart)
+        initChartView(viewBinding.layoutExport.lineChart, data)
+        LineChartUtils.setLineChart(viewBinding.layoutExport.lineChart1, data1, 6, 9)
+        viewBinding.layoutExport.lineChart1.data = data1
+        viewBinding.layoutExport.lineChart1.isDragEnabled = true
+        viewBinding.layoutExport.lineChart1.setTouchEnabled(true)
+        viewBinding.layoutExport.lineChart1.setDrawBorders(false)
+        viewBinding.layoutExport.lineChart1.setScaleEnabled(false)
+        viewBinding.layoutExport.lineChart1.setPinchZoom(false)
+        viewBinding.layoutExport.lineChart1.isHighlightPerTapEnabled = false
+        viewBinding.layoutExport.lineChart1.isHighlightPerDragEnabled = false
+        initChartView(viewBinding.layoutExport.lineChart2, data2)
+        for (item in trainingDTO.barChartData.indices) {
+            addBarEntry(
+                viewBinding.layoutExport.barChart,
+                trainingDTO.barChartData[item]
+                ,dataset )
+        }
+    }
+
+
+
+    var trainingDTO = TrainingDTO()
     private fun initPermissions() {
         EasyPermissions.requestPermissions(
             this,

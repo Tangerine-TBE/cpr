@@ -144,12 +144,10 @@ class ChartFragment : Fragment() {
                     Log.e(TAG, "getBarValue qyMax = $qyMax")
                     Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
                     addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
-                    barChartData.add(it.qyValueSum)
                     barChartData.add(getBarValue(qyMax).toInt())
 
                 } else {
                     addBarEntry(0, 0)
-                    barChartData.add(0)
                     barChartData.add(0)
                 }
             }

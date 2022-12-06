@@ -62,8 +62,7 @@ class BaseApplication : Application() {
         var height = 750
         var width = 375
         if (isPad()) {
-            height = 900
-            width = 500
+            width = 575
         }
 
         AutoSize.initCompatMultiProcess(this)
