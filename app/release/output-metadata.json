@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.pr.perfectrecovery",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 2,
+      "versionName": "1.0.1",
+      "outputFile": "PR_APK_release_V1.0.1_2022_11_30_18_25.apk"
+    }
+  ],
+  "elementType": "File"
+}

@@ -22,6 +22,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.viewbinding.ViewBinding
 import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -48,6 +49,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import kotlin.math.log
 
 
 /**
@@ -82,11 +84,12 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     var mBarDataSet: BarDataSet? = null
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTrainResultBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        initBarChart()
         initData()
         initView()
         viewBinding.mainLayout.setOnTouchListener(object : View.OnTouchListener {
@@ -298,7 +301,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
             viewBinding.clResult.visibility = View.VISIBLE
-            viewBinding.mainLayout.visibility =View.GONE
+            viewBinding.mainLayout.visibility = View.GONE
 
         }
         viewBinding.top.tvRight.setOnClickListener {
@@ -308,39 +311,13 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
 
             viewBinding.mainLayout.visibility = View.VISIBLE
-            viewBinding.clResult.visibility =View.GONE
+            viewBinding.clResult.visibility = View.GONE
         }
-
-
-
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
-        val data: LineData = getData(trainingDTO.lineChartYData, false)
-        val data1: LineData = getData(trainingDTO.lineChartYData1, true)
-        val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-        initChartView(viewBinding.lineChart, data)
-        LineChartUtils.setLineChart(viewBinding.lineChart1, data1, 6, 9)
-        viewBinding.lineChart1.data = data1
-        viewBinding.lineChart1.isDragEnabled = true
-        viewBinding.lineChart1.setTouchEnabled(true)
-        viewBinding.lineChart1.setDrawBorders(false)
-        viewBinding.lineChart1.setScaleEnabled(false)
-        viewBinding.lineChart1.setPinchZoom(false)
-        viewBinding.lineChart1.isHighlightPerTapEnabled = false
-        viewBinding.lineChart1.isHighlightPerDragEnabled = false
-        initChartView(viewBinding.lineChart2, data2)
-        for (item in trainingDTO.barChartData.indices) {
-            if (item == 0 || item % 2 == 0) {
-                addBarEntry(viewBinding.barChart, trainingDTO.barChartData[item + 1])
-            }
-        }
-        viewBinding.lineChart.setVisibleXRangeMaximum(30f)
-        viewBinding.lineChart1.setVisibleXRangeMaximum(30f)
-        viewBinding.lineChart2.setVisibleXRangeMaximum(30f)
-        viewBinding.barChart.setVisibleXRangeMaximum(12f)
-
     }
-    private fun exportNoReportChart(){
+
+    private fun exportNoReportChart() {
         val data: LineData = getData(trainingDTO.lineChartYData, false)
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
@@ -357,11 +334,14 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
             if (item == 0 || item % 2 == 0) {
-                addBarEntry(viewBinding.layoutExportNoCheck.barChart,trainingDTO.barChartData[item + 1])
+                addBarEntry(
+                    viewBinding.layoutExportNoCheck.barChart, trainingDTO.barChartData[item + 1]
+                )
             }
         }
     }
-    private fun exportReportChart(){
+
+    private fun exportReportChart() {
         val data: LineData = getData(trainingDTO.lineChartYData, false)
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
@@ -378,7 +358,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.layoutExport.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
             if (item == 0 || item % 2 == 0) {
-                addBarEntry(viewBinding.layoutExport.barChart,trainingDTO.barChartData[item + 1])
+                addBarEntry(viewBinding.layoutExport.barChart, trainingDTO.barChartData[item + 1])
             }
         }
     }
@@ -477,7 +457,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
     }
-
     private fun getManager() {
         val alertDialog: AlertDialog //生成一个对话框 可跳转设置里手动开启权限
         val builder: AlertDialog.Builder =
@@ -841,7 +820,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         }
         /*输出曲线图*/
 
-
     }
 
     /**
@@ -972,20 +950,43 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        /*先在xml布局中设置InVisisble,当获取完宽高信息后再进行Gone操作*/
+         measureHeight = if (trainingDTO.isCheck){
+            viewBinding.layoutExport.clExportContent.measuredHeight
+        }else{
+            viewBinding.layoutExportNoCheck.clExportContent.measuredHeight
+        }
+         measureWidth = if (trainingDTO.isCheck){
+            viewBinding.layoutExport.clExportContent.measuredWidth
+        }else{
+            viewBinding.layoutExportNoCheck.clExportContent.measuredWidth
+        }
+        viewBinding.layoutExportNoCheck.root.visibility = View.GONE
+        viewBinding.layoutExport.root.visibility = View.GONE
+    }
+    private var measureHeight = 0
+    private var measureWidth = 0
+
     /**
      * 导出当前页为PDF
      */
     @OptIn(DelicateCoroutinesApi::class)
     private fun exPortPDF(fileName: String?, isCheck: Boolean) {
         showLoadingDialog()
+        /**/
         val path =
             Environment.getExternalStorageDirectory().path + File.separator + "${fileName + "_" + System.currentTimeMillis()}.pdf"
         //创建pdf文本
         val pdfDocument = PdfDocument()
         //分页
-        val pageInfo = PdfDocument.PageInfo.Builder(
-            viewBinding.layoutExport.clExportContent.measuredWidth, viewBinding.layoutExport.clExportContent.measuredHeight, 1
-        ).create()
+        val pageInfo =
+            PdfDocument.PageInfo.Builder(
+                measureWidth,
+                measureHeight,
+                1
+            ).create()
         val page2 = pdfDocument.startPage(pageInfo)
         val canvas = page2.canvas
 //        canvas.scale(1.1f, 1.1f);
@@ -1018,6 +1019,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 pdfDocument.close()
                 ToastUtils.showShort("PDF成绩文件存放位置：${path}")
                 hideLoadingDialog()
+                if (isCheck) {
+                    viewBinding.layoutExport.clExportContent.visibility = View.GONE
+                } else {
+                    viewBinding.layoutExportNoCheck.clExportContent.visibility = View.GONE
+                }
             }
         }
     }

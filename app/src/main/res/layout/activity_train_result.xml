@@ -784,22 +784,22 @@
 
 
                 <include
-                        android:id="@+id/layout_export"
+                        android:id="@+id/layoutExport"
                         layout="@layout/activity_train_result_export"
                         android:visibility="invisible"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content" />
 
                 <include
-                        android:id="@+id/layout_export_no_check"
+                        android:id="@+id/layoutExportNoCheck"
                         layout="@layout/activity_train_result_export_check"
                         android:visibility="invisible"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.pr.perfectrecovery.view.MyConstraintLayout
-                    android:id="@+id/main_layout"
+                    android:id="@+id/mainLayout"
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -1243,7 +1243,6 @@
                         app:layout_constraintStart_toStartOf="@+id/constraintlayout4"
                         app:layout_constraintTop_toBottomOf="@+id/constraintlayout3" />
             </com.pr.perfectrecovery.view.MyConstraintLayout>
-
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>
