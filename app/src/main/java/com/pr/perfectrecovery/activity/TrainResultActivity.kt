@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -17,7 +16,6 @@ import android.provider.Settings
 import android.text.Html
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
@@ -25,20 +23,18 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import androidx.viewbinding.ViewBinding
 import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.listener.ChartTouchListener
-import com.github.mikephil.charting.listener.OnChartGestureListener
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.utils.MPPointF
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
 import com.pr.perfectrecovery.bean.TrainingDTO
@@ -52,7 +48,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import kotlin.math.log
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -106,6 +101,73 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 return true
             }
         })
+    }
+    private fun  initScatterChart(){
+        /*1.主要对按压的数值进行坐标分析*/
+        /*2.对源数据进行三种类型的划为 1.几近过期的 2.中间生成的 3.最近生成的*/
+        /*3.这里简单点，对数据进行按照时间节点均等划分为三份，一一对应上方所说*/
+        /*4.对于几近过期的数据点位采用蓝色区分，中间生成的数据点位采用橙色划分，最近生成的数据点位用红色划分*/
+        /*5.对于三种类型数据出现重叠时，一般会按照时间节点进行累积*/
+        /*6.x轴为按压单位为按压次数 0~120 y轴为按压深度 0~8*/
+
+        /*1.初始化坐标轴控件*/
+        /*2.x轴为置于上方，y轴为置于右方*/
+
+        viewBinding.scatterChart.apply {
+            /*一般为通用设置*/
+            setTouchEnabled(false)
+            isDragEnabled = false
+            setScaleEnabled(false)
+            setPinchZoom(false)
+           isHighlightPerTapEnabled = false
+            isHighlightPerDragEnabled = false
+            setDrawBorders(false) //显示边界
+            description.isEnabled = false //设置描述文字不显示，默认显示
+            setDrawGridBackground(false) //设置不显示网格
+             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
+            legend.isEnabled = false //设置不显示比例图
+            /*最大可视x轴*/
+            setMaxVisibleValueCount(120)
+            val l: Legend = legend
+            l.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+            l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
+            l.orientation = Legend.LegendOrientation.VERTICAL
+            l.setDrawInside(false)
+            val yl: YAxis = axisRight
+            yl.spaceTop = 30f
+            yl.spaceBottom = 30f
+            yl.setDrawZeroLine(false)
+            axisRight.isEnabled = false
+            val xl: XAxis = xAxis
+            xl.position = XAxis.XAxisPosition.TOP
+        }
+        /*3.初始化坐标系绘制归属线,划分数据*/
+        val values1 = ArrayList<BubbleEntry>()
+        val values2 = ArrayList<BubbleEntry>()
+        val values3 = ArrayList<BubbleEntry>()
+
+
+        val set1 = BubbleDataSet(values1, "DS 1")
+        set1.setDrawIcons(false)
+        set1.setColor(ColorTemplate.COLORFUL_COLORS[0], 130)
+        set1.setDrawValues(true)
+        val set2 = BubbleDataSet(values2, "DS 2")
+        set2.setDrawIcons(false)
+        set2.iconsOffset = MPPointF(0F, 15F)
+        set2.setColor(ColorTemplate.COLORFUL_COLORS[1], 130)
+        set2.setDrawValues(true)
+        val set3 = BubbleDataSet(values3, "DS 3")
+        set3.setColor(ColorTemplate.COLORFUL_COLORS[2], 130)
+        set3.setDrawValues(true)
+
+        /*4.判断是否需要限制线*/
+
+    }
+    private fun  prepareScatterData(){
+
+
+
+
     }
 
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
@@ -344,6 +406,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private fun initView() {
+        /*有点傻，但也就先这样吧*/
+        viewBinding.top.tvCoodinare.visibility = View.VISIBLE
+        viewBinding.top.tvCoodinare.text = "坐标"
+        viewBinding.top.tvCoodinare.background =
+            AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
         viewBinding.top.tvDel.visibility = View.VISIBLE
         viewBinding.top.tvDel.text = "数值"
         viewBinding.top.tvDel.background =
@@ -360,20 +427,37 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             viewBinding.nsContent.visibility = View.VISIBLE
             viewBinding.mainLayout.visibility = View.GONE
-
+            viewBinding.scatterChart.visibility = View.GONE
         }
         viewBinding.top.tvRight.setOnClickListener {
             viewBinding.top.tvRight.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
-            if (isPad()) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            requestedOrientation = if (isPad()) {
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
             viewBinding.mainLayout.visibility = View.VISIBLE
             viewBinding.nsContent.visibility = View.GONE
+            viewBinding.scatterChart.visibility = View.GONE
+
+        }
+        viewBinding.top.tvCoodinare.setOnClickListener {
+            viewBinding.top.tvRight.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            requestedOrientation = if (isPad()) {
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            } else {
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+            viewBinding.mainLayout.visibility = View.GONE
+            viewBinding.nsContent.visibility = View.GONE
+            viewBinding.scatterChart.visibility = View.VISIBLE
+
         }
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE

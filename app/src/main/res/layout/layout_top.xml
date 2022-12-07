@@ -16,6 +16,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+            android:id="@+id/tvCoodinare"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_30"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="invisible"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:text="删除"
+            app:layout_constraintEnd_toStartOf="@+id/tvDel" />
+
+
+    <TextView
             android:id="@+id/tvDel"
             android:layout_width="@dimen/dp_50"
             android:layout_height="@dimen/dp_30"
