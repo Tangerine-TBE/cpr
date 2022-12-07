@@ -144,11 +144,6 @@ class ChartFragment : Fragment() {
                     Log.e(TAG, "getBarValue qyMax = $qyMax")
                     Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
                     addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
-                    barChartData.add(getBarValue(qyMax).toInt())
-
-                } else {
-                    addBarEntry(0, 0)
-                    barChartData.add(0)
                 }
             }
         }
@@ -503,6 +498,9 @@ class ChartFragment : Fragment() {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 if (value2 > 0) {
                     data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
+                    barChartData.add(entryCount)
+                    barChartData.add(value2)
+
                     when {
                         value2 < 3 -> {
                             colors.add(
@@ -530,6 +528,8 @@ class ChartFragment : Fragment() {
                             ContextCompat.getColor(requireContext(), R.color.color_FDC457)
                         )
                         data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                        barChartData.add(entryCount)
+                        barChartData.add(0)
                     } else {
                         filterValue = 0
                     }

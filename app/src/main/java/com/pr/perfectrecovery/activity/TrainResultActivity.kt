@@ -107,6 +107,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             }
         })
     }
+
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
         lineChart.description.isEnabled = false
         lineChart.isDragEnabled = true
@@ -185,64 +186,66 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         lineChart.animateX(750)
     }
 
-    private fun initBarChart(barChart: BarChart):BarDataSet {
-        barChart. setTouchEnabled(true)
-        barChart. isDragEnabled = true
-        barChart.   setScaleEnabled(false)
-        barChart.    setPinchZoom(false)
-        barChart.   isHighlightPerTapEnabled = false
-        barChart.   isHighlightPerDragEnabled = false
-        barChart.    setDrawBorders(false) //显示边界
-        barChart.    setDrawBarShadow(false) //设置每个直方图阴影为false
-        barChart.   setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
-        barChart.   description.isEnabled = false //设置描述文字不显示，默认显示
-        barChart.    setDrawGridBackground(false) //设置不显示网格
+    private fun initBarChart(barChart: BarChart): BarDataSet {
+        barChart.setTouchEnabled(true)
+        barChart.isDragEnabled = true
+        barChart.setScaleEnabled(false)
+        barChart.setPinchZoom(false)
+        barChart.isHighlightPerTapEnabled = false
+        barChart.isHighlightPerDragEnabled = false
+        barChart.setDrawBorders(false) //显示边界
+        barChart.setDrawBarShadow(false) //设置每个直方图阴影为false
+        barChart.setDrawValueAboveBar(false) //这里设置为true每一个直方图的值就会显示在直方图的顶部
+        barChart.description.isEnabled = false //设置描述文字不显示，默认显示
+        barChart.setDrawGridBackground(false) //设置不显示网格
         barChart.   //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
-            legend.isEnabled = false //设置不显示比例图
-            // if more than 60 entries are displayed in the chart, no values will be
-            // drawn
+        legend.isEnabled = false //设置不显示比例图
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
 
-        barChart.     isHighlightFullBarEnabled = false
+        barChart.isHighlightFullBarEnabled = false
 //            scaleX = 1.5f
-            //x轴设置
-        barChart.     xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
-                setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
-                //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
-                granularity = 1f // only intervals of 1 day
-            }
-        barChart.      xAxis.isEnabled = false
-        barChart.     axisLeft.isEnabled = true
-        barChart.     axisLeft.setDrawGridLines(true)
-        barChart.    axisLeft.textColor = Color.WHITE
-        barChart.     axisLeft.gridColor = Color.TRANSPARENT
-        barChart.   axisLeft.labelCount = 3
-        barChart.   axisLeft.axisMaxLabels = 3
-        barChart. axisLeft.mAxisMaximum = 10f
-        barChart.     axisRight.isEnabled = false
-        barChart.     axisLeft.setValueFormatter { value, axis ->
-                ""//${value.toInt()}
-            }
-        barChart.    isScaleXEnabled = false                             //支持x轴缩放
-        barChart.   isScaleYEnabled = false
+        //x轴设置
+        barChart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM//X轴的位置 默认为上面
+            setDrawGridLines(false)  //是否绘制X轴上的网格线（背景里面的竖线）
+            //axisRight.isEnabled = false//隐藏右侧Y轴   默认是左右两侧都有Y轴
+            granularity = 1f // only intervals of 1 day
+            mAxisMinimum = 0f
+        }
+        barChart. xAxis.setLabelCount(3, false)
+        barChart.xAxis.isEnabled = false
+        barChart.axisLeft.isEnabled = true
+        barChart.axisLeft.setDrawGridLines(true)
+        barChart.axisLeft.textColor = Color.WHITE
+        barChart.axisLeft.gridColor = Color.TRANSPARENT
+        barChart.axisLeft.labelCount = 3
+        barChart.axisLeft.axisMaxLabels = 3
+        barChart.axisLeft.mAxisMaximum = 10f
+        barChart.axisRight.isEnabled = false
+        barChart.axisLeft.setValueFormatter { value, axis ->
+            ""//${value.toInt()}
+        }
+        barChart.isScaleXEnabled = false                             //支持x轴缩放
+        barChart.isScaleYEnabled = false
 
-            // if more than 60 entries are displayed in the chart, no values will be
-            //保证Y轴从0开始，不然会上移一点
-        barChart.   axisLeft.axisMinimum = 0f
-        barChart.   axisRight.axisMinimum = 0f
-           val mBarDataSet = BarDataSet(values, barChart.toString())
-            //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-             mBarDataSet.setDrawValues(false)
-            val dataSets = ArrayList<IBarDataSet>()
-            dataSets.add(mBarDataSet)
-            colors.add(
-                ContextCompat.getColor(this, R.color.tran)
-            )
-            mBarDataSet.colors = colors
-            val barData = BarData(dataSets)
-            barData.addEntry(BarEntry(0f, 9.9f), 0)
-        barChart. data = barData
-            return mBarDataSet
+        // if more than 60 entries are displayed in the chart, no values will be
+        //保证Y轴从0开始，不然会上移一点
+        barChart.axisLeft.axisMinimum = 0f
+        barChart.axisRight.axisMinimum = 0f
+        val mBarDataSet = BarDataSet(values, barChart.toString())
+        //set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        mBarDataSet.setDrawValues(false)
+        val dataSets = ArrayList<IBarDataSet>()
+        dataSets.add(mBarDataSet)
+        colors.add(
+            ContextCompat.getColor(this, R.color.tran)
+        )
+        mBarDataSet.colors = colors
+        val barData = BarData(dataSets)
+        barData.addEntry(BarEntry(0f, 9.9f), 0)
+        barChart.data = barData
+        return mBarDataSet
 //            data.barWidth = 0.3f
 //            addBarEntry(0, 100)
     }
@@ -304,7 +307,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private var filterValue = 0
-    private fun addBarEntry(barChart: BarChart, value2: Int,mBarDataSet:BarDataSet) {
+    private fun addBarEntry(barChart: BarChart, value2: Int, mBarDataSet: BarDataSet) {
         if (barChart.barData != null) {
             val entryCount = (barChart.data.getDataSetByIndex(0) as BarDataSet).entryCount
             if (value2 > 0) {
@@ -330,15 +333,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             } else {
                 //延迟移动度
-                if (filterValue == 0) {
-                    filterValue = 1
-                    colors.add(
-                        ContextCompat.getColor(this, R.color.color_FDC457)
-                    )
-                    barChart.data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
-                } else {
-                    filterValue = 0
-                }
+                colors.add(
+                    ContextCompat.getColor(this, R.color.color_FDC457)
+                )
+                barChart.data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
             }
             mBarDataSet.colors = colors
         }
@@ -382,10 +380,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
         val data: LineData = getData(trainingDTO.lineChartYData, false)
+        Log.e("lineData","${data.entryCount}")
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
         initChartView(viewBinding.chart, data)
-       val dataset =  initBarChart(viewBinding.bar)
+        val dataset = initBarChart(viewBinding.bar)
         LineChartUtils.setLineChart(viewBinding.chart1, data1, 6, 9)
         viewBinding.chart1.data = data1
         viewBinding.chart1.setVisibleXRangeMaximum(30f)
@@ -399,7 +398,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.chart2, data2)
         viewBinding.chart.setVisibleXRangeMaximum(30f)
         viewBinding.chart2.setVisibleXRangeMaximum(30f)
-        viewBinding.bar.setVisibleXRangeMaximum(12f)
+        viewBinding.bar.setVisibleXRangeMaximum(30f)
 
     }
 
@@ -420,7 +419,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val data: LineData = getData(trainingDTO.lineChartYData, false)
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-      val dataset =   initBarChart(viewBinding.layoutExportNoCheck.barChart)
+        val dataset = initBarChart(viewBinding.layoutExportNoCheck.barChart)
         initChartView(viewBinding.layoutExportNoCheck.lineChart, data)
         LineChartUtils.setLineChart(viewBinding.layoutExportNoCheck.lineChart1, data1, 6, 9)
         viewBinding.layoutExportNoCheck.lineChart1.data = data1
@@ -434,17 +433,18 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
             addBarEntry(
-                viewBinding.layoutExportNoCheck.barChart,
-                trainingDTO.barChartData[item]
-           ,dataset )
+                viewBinding.layoutExportNoCheck.barChart, trainingDTO.barChartData[item], dataset
+            )
         }
+        Log.e("BarData","${dataset.entryCount}")
+
     }
 
     private fun exportReportChart() {
         val data: LineData = getData(trainingDTO.lineChartYData, false)
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
-      val dataset =   initBarChart(viewBinding.layoutExport.barChart)
+        val dataset = initBarChart(viewBinding.layoutExport.barChart)
         initChartView(viewBinding.layoutExport.lineChart, data)
         LineChartUtils.setLineChart(viewBinding.layoutExport.lineChart1, data1, 6, 9)
         viewBinding.layoutExport.lineChart1.data = data1
@@ -458,12 +458,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initChartView(viewBinding.layoutExport.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
             addBarEntry(
-                viewBinding.layoutExport.barChart,
-                trainingDTO.barChartData[item]
-                ,dataset )
+                viewBinding.layoutExport.barChart, trainingDTO.barChartData[item], dataset
+            )
         }
     }
-
 
 
     var trainingDTO = TrainingDTO()
@@ -1002,12 +1000,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         //创建pdf文本
         val pdfDocument = PdfDocument()
         //分页
-        val pageInfo =
-            PdfDocument.PageInfo.Builder(
-                measureWidth,
-                measureHeight,
-                1
-            ).create()
+        val pageInfo = PdfDocument.PageInfo.Builder(
+            measureWidth, measureHeight, 1
+        ).create()
         val page2 = pdfDocument.startPage(pageInfo)
         val canvas = page2.canvas
 //        canvas.scale(1.1f, 1.1f);
