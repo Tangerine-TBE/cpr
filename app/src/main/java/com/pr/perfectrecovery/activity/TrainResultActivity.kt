@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.ScatterChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
@@ -33,14 +34,17 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.MPPointF
 import com.pr.perfectrecovery.R
 import com.pr.perfectrecovery.base.BaseActivity
+import com.pr.perfectrecovery.bean.Coordinates
 import com.pr.perfectrecovery.bean.TrainingDTO
 import com.pr.perfectrecovery.databinding.ActivityTrainResultBinding
 import com.pr.perfectrecovery.fragment.LineChartUtils
 import com.pr.perfectrecovery.utils.TimeUtils
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -102,7 +106,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             }
         })
     }
-    private fun  initScatterChart(){
+
+    @SuppressLint("CheckResult")
+    private fun initScatterChart() {
         /*1.主要对按压的数值进行坐标分析*/
         /*2.对源数据进行三种类型的划为 1.几近过期的 2.中间生成的 3.最近生成的*/
         /*3.这里简单点，对数据进行按照时间节点均等划分为三份，一一对应上方所说*/
@@ -112,61 +118,80 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         /*1.初始化坐标轴控件*/
         /*2.x轴为置于上方，y轴为置于右方*/
+        viewBinding.scatterChart.description.isEnabled = false
+        viewBinding.scatterChart.setTouchEnabled(true)
+        viewBinding.scatterChart.maxHighlightDistance = 50f
 
-        viewBinding.scatterChart.apply {
-            /*一般为通用设置*/
-            setTouchEnabled(false)
-            isDragEnabled = false
-            setScaleEnabled(false)
-            setPinchZoom(false)
-           isHighlightPerTapEnabled = false
-            isHighlightPerDragEnabled = false
-            setDrawBorders(false) //显示边界
-            description.isEnabled = false //设置描述文字不显示，默认显示
-            setDrawGridBackground(false) //设置不显示网格
-             //setBackgroundColor(Color.parseColor("#F3F3F3")) //设置图表的背景颜色
-            legend.isEnabled = false //设置不显示比例图
-            /*最大可视x轴*/
-            setMaxVisibleValueCount(120)
-            val l: Legend = legend
-            l.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-            l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-            l.orientation = Legend.LegendOrientation.VERTICAL
-            l.setDrawInside(false)
-            val yl: YAxis = axisRight
-            yl.spaceTop = 30f
-            yl.spaceBottom = 30f
-            yl.setDrawZeroLine(false)
-            axisRight.isEnabled = false
-            val xl: XAxis = xAxis
-            xl.position = XAxis.XAxisPosition.TOP
-        }
+        // enable scaling and dragging
+        viewBinding.scatterChart.isDragEnabled = true
+        viewBinding.scatterChart.setScaleEnabled(true)
+        viewBinding.scatterChart.setDrawGridBackground(false)
+        viewBinding.scatterChart.setMaxVisibleValueCount(200)
+        viewBinding.scatterChart.setPinchZoom(true)
+        val l: Legend = viewBinding.scatterChart.legend
+        l.isEnabled = false
+        val yl: YAxis = viewBinding.scatterChart.axisLeft
+        yl.axisLineColor = Color.WHITE
+        yl.axisMinimum = 0f // this replaces setStartAtZero(true)
+        yl.axisMaximum = 10f
+        yl.textColor=Color.WHITE
+        viewBinding.scatterChart.axisRight.isEnabled = false
+        val xl: XAxis = viewBinding.scatterChart.xAxis
+        xl.axisLineColor = Color.WHITE
+        xl.textColor = Color.WHITE
+        xl.axisMinimum = 0f //90~130怎么分配的呢
+        xl.axisMaximum = 10f
+        io.reactivex.Observable.create<ArrayList<ArrayList<Entry>>> {
+            val values1 = ArrayList<Entry>()
+            val values2 = ArrayList<Entry>()
+            val values3 = ArrayList<Entry>()
+            val beans = ArrayList<Coordinates>()
+            val size = trainingDTO.lineChartYData1.size / 2
+            for (item in trainingDTO.lineChartYData1.indices) {
+                /*筛选y坐标出来,这里由于只能插入一个情况相同的x作为键，有很大可能是有两个相同x的，所以不用hashmap 用一个实体类进行存储以及排序*/
+                if (item == 0 || item % 2 == 0) {
+                    val coordinates = Coordinates()
+                    coordinates.y = trainingDTO.lineChartYData1[item + 1]
+                    coordinates.x = trainingDTO.lineChartYData2[item + 1]
+                    beans.add(coordinates)
+                }
+            }
+            //对key进行排序
+            val sortedList = beans.sortedBy { bean ->  bean.x }
+            for (item in sortedList) {
+                val y = item.y
+                val x = item.x
+                val entry = Entry()
+                entry .x = x
+                entry.y = y
+                values1.add(entry)
+            }
+            val valuesDataSet = ArrayList<ArrayList<Entry>>()
+            valuesDataSet.add(values1)
+            it.onNext(valuesDataSet)
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+            if (it.isNotEmpty()) {
+                val values1 = it[0]
+                val set1 = ScatterDataSet(values1, "DS 1")
+                set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                set1.color = ColorTemplate.COLORFUL_COLORS[0]
+                set1.setDrawValues(false)
+                set1.scatterShapeSize = 30f
+                val dataSets = ArrayList<IScatterDataSet>()
+                dataSets.add(set1)
+                val data = ScatterData(dataSets)
+                viewBinding.scatterChart.data = data
+                viewBinding.scatterChart.invalidate()
+
+            }
+
+        }, {
+            Log.e("Throwable", "${it.message}")
+        })
         /*3.初始化坐标系绘制归属线,划分数据*/
-        val values1 = ArrayList<BubbleEntry>()
-        val values2 = ArrayList<BubbleEntry>()
-        val values3 = ArrayList<BubbleEntry>()
 
-
-        val set1 = BubbleDataSet(values1, "DS 1")
-        set1.setDrawIcons(false)
-        set1.setColor(ColorTemplate.COLORFUL_COLORS[0], 130)
-        set1.setDrawValues(true)
-        val set2 = BubbleDataSet(values2, "DS 2")
-        set2.setDrawIcons(false)
-        set2.iconsOffset = MPPointF(0F, 15F)
-        set2.setColor(ColorTemplate.COLORFUL_COLORS[1], 130)
-        set2.setDrawValues(true)
-        val set3 = BubbleDataSet(values3, "DS 3")
-        set3.setColor(ColorTemplate.COLORFUL_COLORS[2], 130)
-        set3.setDrawValues(true)
 
         /*4.判断是否需要限制线*/
-
-    }
-    private fun  prepareScatterData(){
-
-
-
 
     }
 
@@ -275,7 +300,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             granularity = 1f // only intervals of 1 day
             mAxisMinimum = 0f
         }
-        barChart. xAxis.setLabelCount(3, false)
+        barChart.xAxis.setLabelCount(3, false)
         barChart.xAxis.isEnabled = false
         barChart.axisLeft.isEnabled = true
         barChart.axisLeft.setDrawGridLines(true)
@@ -424,6 +449,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+            viewBinding.top.tvCoodinare.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             viewBinding.nsContent.visibility = View.VISIBLE
             viewBinding.mainLayout.visibility = View.GONE
@@ -433,6 +460,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.top.tvRight.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
             viewBinding.top.tvDel.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            viewBinding.top.tvCoodinare.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             requestedOrientation = if (isPad()) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -449,6 +478,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             viewBinding.top.tvDel.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
+            viewBinding.top.tvCoodinare.background =
+                AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
+
             requestedOrientation = if (isPad()) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
@@ -464,11 +496,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
         viewBinding.bottom.ivExport.visibility = View.VISIBLE
         val data: LineData = getData(trainingDTO.lineChartYData, false)
-        Log.e("lineData","${data.entryCount}")
+        Log.e("lineData", "${data.entryCount}")
         val data1: LineData = getData(trainingDTO.lineChartYData1, true)
         val data2: LineData = getData(trainingDTO.lineChartYData2, false)
         initChartView(viewBinding.chart, data)
-        val dataset = initBarChart(viewBinding.bar)
+        initBarChart(viewBinding.bar)
         LineChartUtils.setLineChart(viewBinding.chart1, data1, 6, 9)
         viewBinding.chart1.data = data1
         viewBinding.chart1.setVisibleXRangeMaximum(30f)
@@ -483,6 +515,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.chart.setVisibleXRangeMaximum(30f)
         viewBinding.chart2.setVisibleXRangeMaximum(30f)
         viewBinding.bar.setVisibleXRangeMaximum(30f)
+        initScatterChart()
 
     }
 
@@ -520,7 +553,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 viewBinding.layoutExportNoCheck.barChart, trainingDTO.barChartData[item], dataset
             )
         }
-        Log.e("BarData","${dataset.entryCount}")
+        Log.e("BarData", "${dataset.entryCount}")
 
     }
 
