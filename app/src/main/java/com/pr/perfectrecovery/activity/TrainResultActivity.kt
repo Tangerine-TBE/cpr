@@ -197,8 +197,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val xl: XAxis = scatterChart.xAxis
         xl.axisLineColor = Color.WHITE
         xl.textColor = Color.WHITE
-        xl.axisMinimum = 0f //90~130怎么分配的呢
-        xl.axisMaximum = 15f
+        xl.axisMinimum = 3f //90~130怎么分配的呢
+        xl.granularity =3f
+        xl.axisMaximum = 12f
         xl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return when (value.toString()) {
