@@ -54,7 +54,7 @@ data class TrainingDTO(var name: String = "") : Serializable, LitePalSupport() {
     var lineChartYData: ArrayList<Float> = ArrayList()
     var lineChartYData1: ArrayList<Float> = ArrayList()
     var lineChartYData2: ArrayList<Float> = ArrayList()
-    var barChartData: ArrayList<Int> = ArrayList()
+    var barChartData: ArrayList<Float> = ArrayList()
 
 
     //检查环境

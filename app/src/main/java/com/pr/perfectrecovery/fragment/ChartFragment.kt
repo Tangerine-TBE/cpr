@@ -46,7 +46,8 @@ class ChartFragment : Fragment() {
     private lateinit var lineChartYData: ArrayList<Float>
     private lateinit var lineChartYData1: ArrayList<Float>
     private lateinit var lineChartYData2: ArrayList<Float>
-    private lateinit var barChartData: ArrayList<Int>
+    private lateinit var barChartData: ArrayList<Float>
+
     companion object {
         private const val ARG_PARAM1 = "param1"
 
@@ -70,21 +71,25 @@ class ChartFragment : Fragment() {
     }
 
     private lateinit var handler: Handler
-    fun getLineChartYData():ArrayList<Float>{
+    fun getLineChartYData(): ArrayList<Float> {
         return lineChartYData
     }
-    fun getLineChartY1Data():ArrayList<Float>{
+
+    fun getLineChartY1Data(): ArrayList<Float> {
         return lineChartYData1
 
     }
-    fun getLineaChart2Data():ArrayList<Float>{
+
+    fun getLineaChart2Data(): ArrayList<Float> {
         return lineChartYData2
 
     }
-    fun getBarChartData():ArrayList<Int>{
+
+    fun getBarChartData(): ArrayList<Float> {
         return barChartData
 
     }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         EventBus.getDefault().register(this)
@@ -134,16 +139,18 @@ class ChartFragment : Fragment() {
                 setData(it)
                 /*TrainResultActivity 只需要一个值比如从 getBlowFrequencyValue  setValue getFrequencyValue 中获取到的数值*/
                 /*每一次动态回来的数值都需要进行存储*/
-                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf),lineChartYData)
-                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it),lineChartYData1)
+                addEntry(data, viewBinding.lineChart, getBlowFrequencyValue(it.cf), lineChartYData)
+                addEntry(data1, viewBinding.lineChart1, setValue(it.distance, it), lineChartYData1)
 //                addEntry(data2, viewBinding.lineChart1, it)
-                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf),lineChartYData2)
+                addEntry(data2, viewBinding.lineChart2, getFrequencyValue(it.pf), lineChartYData2)
                 if (qyValue != it.qySum) {
                     qyValue = it.qySum
                     val qyMax = it.qyMaxValue
                     Log.e(TAG, "getBarValue qyMax = $qyMax")
                     Log.e(TAG, "getBarValue ${getBarValue(qyMax).toInt()}")
                     addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
+                } else {
+                    addBarEntry(0, 0)
                 }
             }
         }
@@ -498,9 +505,8 @@ class ChartFragment : Fragment() {
                 val entryCount = (data.getDataSetByIndex(0) as BarDataSet).entryCount
                 if (value2 > 0) {
                     data.addEntry(BarEntry(entryCount.toFloat(), value2.toFloat()), 0)
-                    barChartData.add(entryCount)
-                    barChartData.add(value2)
-
+                    barChartData.add(entryCount.toFloat())
+                    barChartData.add(value2.toFloat())
                     when {
                         value2 < 3 -> {
                             colors.add(
@@ -522,17 +528,12 @@ class ChartFragment : Fragment() {
                     }
                 } else {
                     //延迟移动度
-                    if (filterValue == 0) {
-                        filterValue = 1
-                        colors.add(
-                            ContextCompat.getColor(requireContext(), R.color.color_FDC457)
-                        )
-                        data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
-                        barChartData.add(entryCount)
-                        barChartData.add(0)
-                    } else {
-                        filterValue = 0
-                    }
+                    colors.add(
+                        ContextCompat.getColor(requireContext(), R.color.color_FDC457)
+                    )
+                    data.addEntry(BarEntry(entryCount.toFloat(), 0f), 0)
+                    barChartData.add(entryCount.toFloat())
+                    barChartData.add(0f)
                 }
                 mBarDataSet!!.colors = colors
                 data.notifyDataChanged()
@@ -616,7 +617,9 @@ class ChartFragment : Fragment() {
      *
      * @param yValues y值
      */
-    private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float,arrayList: ArrayList<Float>) {
+    private fun addEntry(
+        lineData: LineData, lineChart: LineChart, yValues: Float, arrayList: ArrayList<Float>
+    ) {
         Log.e(TAG, "addEntry: $yValues")
         val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
         val entry = Entry(
@@ -637,6 +640,7 @@ class ChartFragment : Fragment() {
         arrayList.add(entryCount.toFloat())
         arrayList.add(yValues)
     }
+
     private fun addEntry(lineData: LineData, lineChart: LineChart, yValues: Float) {
         Log.e(TAG, "addEntry: $yValues")
         val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount

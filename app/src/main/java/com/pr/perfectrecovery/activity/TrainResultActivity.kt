@@ -27,11 +27,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.ScatterChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.LimitLine
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.*
 import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
@@ -52,6 +50,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.HashMap
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -107,8 +106,38 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         })
     }
 
+    private fun <A> splitList(
+        list: MutableList<A>
+    ): Map<String, MutableList<A>> {
+        val num = list.size / 3
+        var index = 1
+        val listSize = list.size //list 长度
+        val stringListHashMap = HashMap<String, MutableList<A>>() //用户封装返回的多个list
+        var stringlist: MutableList<A> = java.util.ArrayList()
+        //用于承装每个等分list
+        for (i in 0 until listSize) {                        //for循环依次放入每个list中
+            stringlist.add(list[i]) //先将string对象放入list,以防止最后一个没有放入
+            if ((i + 1) % num == 0 || i + 1 == listSize) { //如果l+1 除以 要分的份数 为整除,或者是最后一份,为结束循环.那就算作一份list,
+                if (index >= 4) {
+                    stringListHashMap["3"]?.addAll(stringlist)
+                } else {
+                    stringListHashMap["$index"] = stringlist //将这一份放入Map中.
+                }
+                index++
+                stringlist = java.util.ArrayList() //新建一个list,用于继续存储对象
+            }
+        }
+        return stringListHashMap //将map返回
+    }
+
+
     @SuppressLint("CheckResult")
-    private fun initScatterChart() {
+    private fun initScatterChart(
+        scatterChart: ScatterChart,
+        lineChartY1: ArrayList<Float>,
+        lineChartY2: ArrayList<Float>,
+        type: Int
+    ) {
         /*1.主要对按压的数值进行坐标分析*/
         /*2.对源数据进行三种类型的划为 1.几近过期的 2.中间生成的 3.最近生成的*/
         /*3.这里简单点，对数据进行按照时间节点均等划分为三份，一一对应上方所说*/
@@ -118,71 +147,178 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         /*1.初始化坐标轴控件*/
         /*2.x轴为置于上方，y轴为置于右方*/
-        viewBinding.scatterChart.description.isEnabled = false
-        viewBinding.scatterChart.setTouchEnabled(true)
-        viewBinding.scatterChart.maxHighlightDistance = 50f
-
+        scatterChart.description.isEnabled = false
+        scatterChart.setTouchEnabled(false)
+        scatterChart.isHighlightPerTapEnabled = false
+        scatterChart.isHighlightPerDragEnabled = false
         // enable scaling and dragging
-        viewBinding.scatterChart.isDragEnabled = true
-        viewBinding.scatterChart.setScaleEnabled(true)
-        viewBinding.scatterChart.setDrawGridBackground(false)
-        viewBinding.scatterChart.setMaxVisibleValueCount(200)
-        viewBinding.scatterChart.setPinchZoom(true)
-        val l: Legend = viewBinding.scatterChart.legend
+        scatterChart.isDragEnabled = true
+        scatterChart.setScaleEnabled(false)
+        scatterChart.setDrawGridBackground(false)
+        scatterChart.setPinchZoom(false)
+        val l: Legend = scatterChart.legend
         l.isEnabled = false
-        val yl: YAxis = viewBinding.scatterChart.axisLeft
+        val yl: YAxis = scatterChart.axisRight
         yl.axisLineColor = Color.WHITE
-        yl.axisMinimum = 0f // this replaces setStartAtZero(true)
-        yl.axisMaximum = 10f
-        yl.textColor=Color.WHITE
-        viewBinding.scatterChart.axisRight.isEnabled = false
-        val xl: XAxis = viewBinding.scatterChart.xAxis
+        yl.axisMinimum = 2f // this replaces setStartAtZero(true)
+        yl.axisMaximum = 8f
+        yl.granularity = 2f
+        yl.isInverted = true
+        yl.textColor = Color.WHITE
+        yl.valueFormatter = object : IAxisValueFormatter {
+            override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+                return when (value.toString()) {
+                    "0.0" -> {
+                        return ""
+                    }
+                    "2.0" -> {
+                        return ""
+                    }
+                    "4.0" -> {
+                        return if (type == 2) "4CM" else "400ML"
+                    }
+                    "6.0" -> {
+                        return if (type == 2) "6CM" else "600ML"
+                    }
+                    "8.0" -> {
+                        return ""
+                    }
+                    "10.0" -> {
+                        return ""
+                    }
+
+                    else -> {
+                        return ""
+                    }
+                }
+            }
+        }
+        scatterChart.axisLeft.isEnabled = false
+        val xl: XAxis = scatterChart.xAxis
         xl.axisLineColor = Color.WHITE
         xl.textColor = Color.WHITE
         xl.axisMinimum = 0f //90~130怎么分配的呢
-        xl.axisMaximum = 10f
+        xl.axisMaximum = 15f
+        xl.valueFormatter = object : IAxisValueFormatter {
+            override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+                return when (value.toString()) {
+                    "0.0" -> {
+                        return ""
+                    }
+                    "3.0" -> {
+                        return ""
+                    }
+                    "6.0" -> {
+                        return if (type == 2) "100CPM" else "6VPM"
+                    }
+                    "9.0" -> {
+                        return if (type == 2) "120CPM" else "8VPM"
+                    }
+                    "12.0" -> {
+                        return ""
+                    }
+                    "15.0" -> {
+                        return ""
+                    }
+                    else -> {
+                        return ""
+                    }
+                }
+            }
+        }
         io.reactivex.Observable.create<ArrayList<ArrayList<Entry>>> {
             val values1 = ArrayList<Entry>()
             val values2 = ArrayList<Entry>()
             val values3 = ArrayList<Entry>()
             val beans = ArrayList<Coordinates>()
-            val size = trainingDTO.lineChartYData1.size / 2
-            for (item in trainingDTO.lineChartYData1.indices) {
+            for (item in lineChartY1.indices) {
                 /*筛选y坐标出来,这里由于只能插入一个情况相同的x作为键，有很大可能是有两个相同x的，所以不用hashmap 用一个实体类进行存储以及排序*/
                 if (item == 0 || item % 2 == 0) {
                     val coordinates = Coordinates()
-                    coordinates.y = trainingDTO.lineChartYData1[item + 1]
-                    coordinates.x = trainingDTO.lineChartYData2[item + 1]
+                    coordinates.y = lineChartY1[item + 1]
+                    coordinates.x = lineChartY2[item + 1]
                     beans.add(coordinates)
                 }
             }
-            //对key进行排序
-            val sortedList = beans.sortedBy { bean ->  bean.x }
-            for (item in sortedList) {
-                val y = item.y
-                val x = item.x
-                val entry = Entry()
-                entry .x = x
-                entry.y = y
-                values1.add(entry)
+            //对有效坐标进行切割
+            val coordinatesMap = splitList(beans)
+            val beanSetValue1 = coordinatesMap["1"]
+            val beanSetValue2 = coordinatesMap["2"]
+            val beanSetValue3 = coordinatesMap["3"]
+            if (beanSetValue1?.isNotEmpty()!!) {
+                val sortedList = beanSetValue1.sortedBy { bean -> bean.x }
+                for (item in sortedList) {
+                    val y = item.y
+                    val x = item.x
+                    val entry = Entry()
+                    entry.x = x
+                    entry.y = y
+                    values1.add(entry)
+                }
+            }
+            if (beanSetValue2?.isNotEmpty()!!) {
+                val sortedList = beanSetValue2.sortedBy { bean -> bean.x }
+                for (item in sortedList) {
+                    val y = item.y
+                    val x = item.x
+                    val entry = Entry()
+                    entry.x = x
+                    entry.y = y
+                    values2.add(entry)
+                }
+            }
+            if (beanSetValue3?.isNotEmpty()!!) {
+                val sortedList = beanSetValue3.sortedBy { bean -> bean.x }
+                for (item in sortedList) {
+                    val y = item.y
+                    val x = item.x
+                    val entry = Entry()
+                    entry.x = x
+                    entry.y = y
+                    values3.add(entry)
+                }
             }
             val valuesDataSet = ArrayList<ArrayList<Entry>>()
             valuesDataSet.add(values1)
+            valuesDataSet.add(values2)
+            valuesDataSet.add(values3)
             it.onNext(valuesDataSet)
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             if (it.isNotEmpty()) {
-                val values1 = it[0]
-                val set1 = ScatterDataSet(values1, "DS 1")
+                var values1 = it[0] //几近过期
+                var values2 = it[1] //中间时期
+                var values3 = it[2] //最近时期
+                values1 = filterValues(values1)
+                values2 = filterValues(values2)
+                values3 = filterValues(values3)
+                //对于原点坐标进行剔除处理
+
+                val set1 = ScatterDataSet(values3, "DS 1")
                 set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set1.color = ColorTemplate.COLORFUL_COLORS[0]
                 set1.setDrawValues(false)
-                set1.scatterShapeSize = 30f
+                set1.scatterShapeSize = 15f
+
+                val set2 = ScatterDataSet(values2, "DS 2")
+                set2.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                set2.color = Color.BLUE
+                set2.setDrawValues(false)
+
+                set2.scatterShapeSize = 25f
+                val set3 = ScatterDataSet(values1, "DS 2")
+                set3.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                set3.color = Color.YELLOW
+                set3.setDrawValues(false)
+
+                set3.scatterShapeSize = 35f
+
                 val dataSets = ArrayList<IScatterDataSet>()
                 dataSets.add(set1)
+                dataSets.add(set2)
+                dataSets.add(set3)
                 val data = ScatterData(dataSets)
-                viewBinding.scatterChart.data = data
-                viewBinding.scatterChart.invalidate()
-
+                scatterChart.data = data
+                scatterChart.invalidate()
             }
 
         }, {
@@ -193,6 +329,16 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         /*4.判断是否需要限制线*/
 
+    }
+
+    private fun filterValues(values: java.util.ArrayList<Entry>) :java.util.ArrayList<Entry>{
+        val arrayList = java.util.ArrayList<Entry>();
+        for (item in values.indices) {
+            if (values[item].x.toInt() != 0 || values[item].y.toInt() != 0) {
+                arrayList.add(values[item])
+            }
+        }
+        return arrayList;
     }
 
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
@@ -394,7 +540,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private var filterValue = 0
-    private fun addBarEntry(barChart: BarChart, value2: Int, mBarDataSet: BarDataSet) {
+    private fun addBarEntry(barChart: BarChart, value2: Float, mBarDataSet: BarDataSet) {
         if (barChart.barData != null) {
             val entryCount = (barChart.data.getDataSetByIndex(0) as BarDataSet).entryCount
             if (value2 > 0) {
@@ -405,7 +551,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                             ContextCompat.getColor(this, R.color.color_FDC457)
                         )
                     }
-                    value2 in 3..6 -> {
+                    value2.toInt() in 3..6 -> {
                         colors.add(
                             ContextCompat.getColor(this, R.color.color_37B48B)
                         )
@@ -454,7 +600,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             viewBinding.nsContent.visibility = View.VISIBLE
             viewBinding.mainLayout.visibility = View.GONE
-            viewBinding.scatterChart.visibility = View.GONE
+            viewBinding.coodinareLayout.visibility = View.GONE
         }
         viewBinding.top.tvRight.setOnClickListener {
             viewBinding.top.tvRight.background =
@@ -470,7 +616,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             }
             viewBinding.mainLayout.visibility = View.VISIBLE
             viewBinding.nsContent.visibility = View.GONE
-            viewBinding.scatterChart.visibility = View.GONE
+            viewBinding.coodinareLayout.visibility = View.GONE
 
         }
         viewBinding.top.tvCoodinare.setOnClickListener {
@@ -480,15 +626,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 AppCompatResources.getDrawable(baseContext, R.color.color_text_bg_normal)
             viewBinding.top.tvCoodinare.background =
                 AppCompatResources.getDrawable(baseContext, R.color.color_37B48B)
-
-            requestedOrientation = if (isPad()) {
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             viewBinding.mainLayout.visibility = View.GONE
             viewBinding.nsContent.visibility = View.GONE
-            viewBinding.scatterChart.visibility = View.VISIBLE
+            viewBinding.coodinareLayout.visibility = View.VISIBLE
 
         }
         viewBinding.bottom.ivBack.setOnClickListener { finish() }
@@ -515,7 +656,13 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.chart.setVisibleXRangeMaximum(30f)
         viewBinding.chart2.setVisibleXRangeMaximum(30f)
         viewBinding.bar.setVisibleXRangeMaximum(30f)
-        initScatterChart()
+        /*1气压 2.按压*/
+        initScatterChart(
+            viewBinding.scatterChart, trainingDTO.lineChartYData1, trainingDTO.lineChartYData2, 2
+        )
+        initScatterChart(
+            viewBinding.scatterChart1, trainingDTO.barChartData, trainingDTO.lineChartYData, 1
+        )
 
     }
 
@@ -549,9 +696,15 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.layoutExportNoCheck.lineChart1.isHighlightPerDragEnabled = false
         initChartView(viewBinding.layoutExportNoCheck.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
-            addBarEntry(
-                viewBinding.layoutExportNoCheck.barChart, trainingDTO.barChartData[item], dataset
-            )
+
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(
+                    viewBinding.layoutExportNoCheck.barChart,
+                    trainingDTO.barChartData[item + 1],
+                    dataset
+                )
+            }
+
         }
         Log.e("BarData", "${dataset.entryCount}")
 
@@ -717,8 +870,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         //按压错误数
         viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
+        viewBinding.tvLungCount1.text = "${trainingDTO.pressErrorCount}"
+
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
+        viewBinding.tvLungTotal1.text = "/${trainingDTO.prSum.toInt()}"
         //按压位置错误
         viewBinding.tvLocation.text = "${trainingDTO.err_pr_posi}"
         //按压不足
@@ -743,8 +899,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.tvPressCenter.text = "${trainingDTO.getPressTime()}%"
         //吹气错误数
         viewBinding.tvHeartCount.text = "${trainingDTO.blowErrorCount.toInt()}"
+        viewBinding.tvHeartCount2.text = "${trainingDTO.blowErrorCount.toInt()}"
         //吹气总数
         viewBinding.tvHeartTotal.text = "/${trainingDTO.qySum}"
+        viewBinding.tvHeartTotal2.text = "/${trainingDTO.qySum}"
         //吹气错误
         viewBinding.tvAirway.text = "${trainingDTO.err_qy_close}"
         //吹气不足
