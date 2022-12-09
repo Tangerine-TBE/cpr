@@ -676,7 +676,6 @@ class MutiActivityNew : BaseActivity() {
         }
         Log.e("setQyRate", "Rate: $pf")
         view.setCurrentStatus(pf)
-        view.invalidate()
     }
 
     private fun stop() {

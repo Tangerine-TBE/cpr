@@ -171,15 +171,29 @@ public class DialChart07View extends GraphicalView {
     //进入这里的：1.按压频率，2.呼吸频率
     public void setCurrentStatus(float percentage) {
         Log.e("TAg",""+percentage);
-        mPercentage = percentage;
-        chart180.clearAll();
-        //设置当前百分比
-        addAxis();
-        //增加指针
-        addPointer();
-        addAttrInfo();
-        chartRender180();
-        chart180.getPointer().setPercentage(mPercentage);
+        /*这里进行动画*/
+        ValueAnimator animator = ObjectAnimator.ofFloat(0f,percentage);
+        animator.setDuration(200);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Float mValue = (Float) animation.getAnimatedValue();
+                // 设置横向偏移量
+                Log.e("tag",mValue+"");
+                mPercentage = mValue;
+                chart180.clearAll();
+                //设置当前百分比
+                addAxis();
+                //增加指针
+                addPointer();
+                addAttrInfo();
+                chartRender180();
+                chart180.getPointer().setPercentage(mValue);
+                invalidate();
+            }
+        });
+        animator.start();
+
     }
 
     @Override
