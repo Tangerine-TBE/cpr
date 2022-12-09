@@ -129,10 +129,10 @@ open class CPRActivity : BaseActivity(), SerialInputOutputManager.Listener {
             connectList.clear()
             connectList.addAll(bleList)
             connectList.distinctBy { listOf(it.mac, it.mac) }
-            if (connectList.isEmpty()){
-                ToastUtils.make().setGravity(Gravity.CENTER,0,0).show(R.string.please_select_device)
-                return@setOnClickListener;
-            }
+//            if (connectList.isEmpty()){
+//                ToastUtils.make().setGravity(Gravity.CENTER,0,0).show(R.string.please_select_device)
+//                return@setOnClickListener;
+//            }
             intent.putParcelableArrayListExtra(BaseConstant.CONNECT_BLE_DEVICES, connectList)
             startActivity(intent)
         }

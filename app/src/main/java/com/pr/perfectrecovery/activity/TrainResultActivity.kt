@@ -289,10 +289,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 var values1 = it[0] //几近过期
                 var values2 = it[1] //中间时期
                 var values3 = it[2] //最近时期
+                //对于原点坐标进行剔除处理
                 values1 = filterValues(values1)
                 values2 = filterValues(values2)
                 values3 = filterValues(values3)
-                //对于原点坐标进行剔除处理
+                //不合格坐标进行压缩处理
                 val set1 = ScatterDataSet(values3, "DS 1")
                 set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set1.color = ColorTemplate.COLORFUL_COLORS[0]
