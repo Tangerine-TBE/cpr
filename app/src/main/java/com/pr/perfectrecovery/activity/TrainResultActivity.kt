@@ -271,8 +271,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             if (beanSetValue3?.isNotEmpty()!!) {
                 val sortedList = beanSetValue3.sortedBy { bean -> bean.x }
                 for (item in sortedList) {
-                    val y = item.y
                     val x = item.x
+                    val y = item.y
                     val entry = Entry()
                     entry.x = x
                     entry.y = y
@@ -293,7 +293,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 values2 = filterValues(values2)
                 values3 = filterValues(values3)
                 //对于原点坐标进行剔除处理
-
                 val set1 = ScatterDataSet(values3, "DS 1")
                 set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set1.color = ColorTemplate.COLORFUL_COLORS[0]
@@ -314,9 +313,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 set3.scatterShapeSize = 35f
 
                 val dataSets = ArrayList<IScatterDataSet>()
-                dataSets.add(set1)
-                dataSets.add(set2)
+                /*这里数值不能改变*/
                 dataSets.add(set3)
+                dataSets.add(set2)
+                dataSets.add(set1)
                 val data = ScatterData(dataSets)
                 scatterChart.data = data
                 scatterChart.invalidate()
@@ -662,7 +662,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.scatterChart, trainingDTO.lineChartYData1, trainingDTO.lineChartYData2, 2
         )
         initScatterChart(
-            viewBinding.scatterChart1, trainingDTO.barChartData, trainingDTO.lineChartYData, 1
+            viewBinding.scatterChart1,trainingDTO.barChartData, trainingDTO.lineChartYData, 1
         )
 
     }
@@ -871,7 +871,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         //按压错误数
         viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
-        viewBinding.tvLungCount1.text = "${trainingDTO.pressErrorCount}"
+        viewBinding.tvLungCountC.text = "${trainingDTO.pressErrorCount}"
 
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
