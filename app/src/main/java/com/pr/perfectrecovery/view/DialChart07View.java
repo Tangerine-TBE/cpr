@@ -167,13 +167,17 @@ public class DialChart07View extends GraphicalView {
         paintTB.setTextSize(22);
         paintTB.setAntiAlias(true);
     }
-
+    private float doingPercentage;
     //进入这里的：1.按压频率，2.呼吸频率
     public void setCurrentStatus(float percentage) {
         Log.e("TAg",""+percentage);
         /*这里进行动画*/
-        ValueAnimator animator = ObjectAnimator.ofFloat(0f,percentage);
-        animator.setDuration(200);
+        if (percentage == 0 || doingPercentage == percentage){
+            return;
+        }
+        doingPercentage = percentage;
+        ValueAnimator animator = ObjectAnimator.ofFloat(0f,percentage,0f);
+        animator.setDuration(500);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
