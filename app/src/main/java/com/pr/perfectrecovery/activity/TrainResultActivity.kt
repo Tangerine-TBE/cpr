@@ -152,18 +152,19 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         scatterChart.isHighlightPerTapEnabled = false
         scatterChart.isHighlightPerDragEnabled = false
         // enable scaling and dragging
-        scatterChart.isDragEnabled = true
+        scatterChart.isDragEnabled = false
         scatterChart.setScaleEnabled(false)
         scatterChart.setDrawGridBackground(false)
         scatterChart.setPinchZoom(false)
         val l: Legend = scatterChart.legend
         l.isEnabled = false
-        val yl: YAxis = scatterChart.axisRight
+        val yl: YAxis = scatterChart.axisLeft
         yl.axisLineColor = Color.WHITE
-        yl.axisMinimum = 2f // this replaces setStartAtZero(true)
-        yl.axisMaximum = 8f
-        yl.granularity = 2f
-        yl.isInverted = true
+        yl.axisMinimum = 3f // this replaces setStartAtZero(true)
+        yl.axisMaximum = 12f
+        yl.granularity = 3f
+        yl.isEnabled = true
+        yl.isGranularityEnabled= true
         yl.textColor = Color.WHITE
         yl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
@@ -171,34 +172,30 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                     "0.0" -> {
                         return ""
                     }
-                    "2.0" -> {
+                    "3.0" -> {
                         return ""
-                    }
-                    "4.0" -> {
-                        return if (type == 2) "4CM" else "400ML"
                     }
                     "6.0" -> {
+                        return if (type == 2) "4CM" else "400ML"
+                    }
+                    "9.0" -> {
                         return if (type == 2) "6CM" else "600ML"
                     }
-                    "8.0" -> {
+                    "12.0" -> {
                         return ""
                     }
-                    "10.0" -> {
-                        return ""
-                    }
-
                     else -> {
                         return ""
                     }
                 }
             }
         }
-        scatterChart.axisLeft.isEnabled = false
+        scatterChart.axisRight.isEnabled = false
         val xl: XAxis = scatterChart.xAxis
         xl.axisLineColor = Color.WHITE
         xl.textColor = Color.WHITE
         xl.axisMinimum = 3f //90~130怎么分配的呢
-        xl.granularity =3f
+        xl.granularity = 3f
         xl.axisMaximum = 12f
         xl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
@@ -232,13 +229,37 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             val values2 = ArrayList<Entry>()
             val values3 = ArrayList<Entry>()
             val beans = ArrayList<Coordinates>()
-            for (item in lineChartY1.indices) {
-                /*筛选y坐标出来,这里由于只能插入一个情况相同的x作为键，有很大可能是有两个相同x的，所以不用hashmap 用一个实体类进行存储以及排序*/
-                if (item == 0 || item % 2 == 0) {
-                    val coordinates = Coordinates()
-                    coordinates.y = lineChartY1[item + 1]
-                    coordinates.x = lineChartY2[item + 1]
-                    beans.add(coordinates)
+            val maxValues = trainingDTO.lineChartMaxValue
+            if (type == 2) {
+                //按压
+                for (i in maxValues.indices) {
+                    val maxValue = maxValues[i]
+                    for (j in lineChartY1.indices) {
+                        if (j == 0 || j % 2 == 0) {
+                            val currentValue = lineChartY1[j + 1]
+                            if (currentValue == maxValue) {
+                                val coordinates = Coordinates()
+                                val y = lineChartY1[j + 1]
+                                Log.e("按压深度y", "$y")
+                                coordinates.y = y
+                                coordinates.x = lineChartY2[j + 1]
+                                beans.add(coordinates)
+                                break
+                            }
+                        }
+
+                    }
+
+                }
+            } else {
+                for (item in lineChartY1.indices) {
+                    /*筛选y坐标出来,这里由于只能插入一个情况相同的x作为键，有很大可能是有两个相同x的，所以不用hashmap 用一个实体类进行存储以及排序*/
+                    if (item == 0 || item % 2 == 0) {
+                        val coordinates = Coordinates()
+                        coordinates.y = lineChartY1[item + 1]
+                        coordinates.x = lineChartY2[item + 1]
+                        beans.add(coordinates)
+                    }
                 }
             }
             //对有效坐标进行切割
@@ -310,9 +331,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 set3.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set3.color = Color.YELLOW
                 set3.setDrawValues(false)
-
                 set3.scatterShapeSize = 35f
-
                 val dataSets = ArrayList<IScatterDataSet>()
                 /*这里数值不能改变*/
                 dataSets.add(set3)
@@ -333,7 +352,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
     }
 
-    private fun filterValues(values: java.util.ArrayList<Entry>) :java.util.ArrayList<Entry>{
+    private fun filterValues(values: java.util.ArrayList<Entry>): java.util.ArrayList<Entry> {
         val arrayList = java.util.ArrayList<Entry>();
         for (item in values.indices) {
             if (values[item].x.toInt() != 0 || values[item].y.toInt() != 0) {
@@ -663,7 +682,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             viewBinding.scatterChart, trainingDTO.lineChartYData1, trainingDTO.lineChartYData2, 2
         )
         initScatterChart(
-            viewBinding.scatterChart1,trainingDTO.barChartData, trainingDTO.lineChartYData, 1
+            viewBinding.scatterChart1, trainingDTO.barChartData, trainingDTO.lineChartYData, 1
         )
 
     }

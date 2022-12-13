@@ -193,6 +193,7 @@ class DataVolatile01 {
     //上一次按压或吹气模式：1为吹气，0为按压
     private var pre_work_Mode = 0
 
+    private var L_VALUE_MAXSet = mutableListOf<Int>()
     private var L_valueSet = mutableListOf<Int>()
     private var QY_valueSet = mutableListOf<Int>()
     private var QY_valueSet2 = mutableListOf<Int>()
@@ -215,9 +216,11 @@ class DataVolatile01 {
     private var QY_SERRIGHT_TOTAL = 0; //吹气频率正确的次数
     private var L_compare = 0;//距离参考值，记录上次的有效值
     private var COUNT = 1
-
     private var QY_RUN_FLAG = 0
-
+    //是否完成一次按压
+    private var finish = false
+    //本次按压中最大距离
+    private var L_VALUE_MAX = 0;
     var deviceMAC: String? = null
 
     //电量值：  0-100%
@@ -393,6 +396,17 @@ class DataVolatile01 {
                 )
                 Log.e("TAG12", "判断为按压状态")
                 L_Value = selectValue_P(L_d1, L_d2, L_d3)
+                if (L_VALUE_MAX != 0){
+                    L_VALUE_MAX = 0 //重置最大值为0
+                }
+                if (L_Value != 150){
+                    L_VALUE_MAXSet.add(L_Value)
+                    if (finish){
+                        L_VALUE_MAX = L_VALUE_MAXSet.minOrNull()!!
+                        finish = false //重置标记
+                        L_VALUE_MAXSet.clear() //清空数组
+                    }
+                }
                 //清空频率
                 pt(L_Value)
                 pre_work_Mode = 0
@@ -469,6 +483,7 @@ class DataVolatile01 {
         dataDTO.qy_serright_total = QY_SERRIGHT_TOTAL //吹气频率正确的次数
 //        deviceMAC?.let { mapObject.put(it, dataDTO) }
         dataDTO.preDistance = preDistance.toInt()
+        dataDTO.MAX_DISTANCE = L_VALUE_MAX
         if (QY_SUM != qy) {
             qy = QY_SUM
             val max = qyMax()
@@ -679,7 +694,8 @@ class DataVolatile01 {
                     }
                     if (low_flag == 0) {//防止在上升到最高点出现抖动导致次数误增加
                         low_flag = 1
-                        PR_SUM++
+                        PR_SUM++ //按压次数+1
+                        finish = true
                         PR_CYCLE_TIMES++
                         //  Log.e("TAG5", "$PR_SUM")
                         if (ERR_FLAG == 0) {
@@ -729,8 +745,9 @@ class DataVolatile01 {
             }*/
                 if (low_flag == 0) {
                     low_flag = 1
-
+                    //当完成一次按压周期
                     PR_SUM++
+                    finish = true
                     PR_CYCLE_TIMES++
                     // Log.e("TAG5", "$PR_SUM")
                     if (ERR_FLAG == 0) {

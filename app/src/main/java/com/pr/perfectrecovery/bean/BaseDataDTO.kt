@@ -63,7 +63,8 @@ data class BaseDataDTO(
     var qyMaxValue: Int = 0,//吹气最大值
     var qy_blow_error_count: Int = 0,//吹气率错误次数
     var model: Boolean = false,//模式
-    var PR_CYCLE_TIMES: Int = 0
+    var PR_CYCLE_TIMES: Int = 0,
+    var MAX_DISTANCE :Int =0,//当前存储的最大距离
 ) {
     var L_d1 = 0
     var L_d2 = 0

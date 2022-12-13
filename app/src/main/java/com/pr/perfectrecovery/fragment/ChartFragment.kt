@@ -47,6 +47,7 @@ class ChartFragment : Fragment() {
     private lateinit var lineChartYData1: ArrayList<Float>
     private lateinit var lineChartYData2: ArrayList<Float>
     private lateinit var barChartData: ArrayList<Float>
+    private lateinit var maxValueData: ArrayList<Float>
 
     companion object {
         private const val ARG_PARAM1 = "param1"
@@ -89,6 +90,9 @@ class ChartFragment : Fragment() {
         return barChartData
 
     }
+    fun getMaxValueData(): ArrayList<Float>{
+        return maxValueData
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -108,6 +112,7 @@ class ChartFragment : Fragment() {
         lineChartYData = ArrayList()
         lineChartYData1 = ArrayList()
         lineChartYData2 = ArrayList()
+        maxValueData = ArrayList()
         barChartData = ArrayList()
         val data: LineData = getData(0f, false)
         val data1: LineData = getData(0f, true)
@@ -151,6 +156,11 @@ class ChartFragment : Fragment() {
                     addBarEntry(it.qyValueSum, getBarValue(qyMax).toInt())
                 } else {
                     addBarEntry(0, 0)
+                }
+                if (it.MAX_DISTANCE > 0){
+                    val maxValue = setValue(it.MAX_DISTANCE, it);
+                    Log.e("最大深度为:","$maxValue")
+                    maxValueData.add(maxValue)
                 }
             }
         }
@@ -620,7 +630,9 @@ class ChartFragment : Fragment() {
     private fun addEntry(
         lineData: LineData, lineChart: LineChart, yValues: Float, arrayList: ArrayList<Float>
     ) {
-        Log.e(TAG, "addEntry: $yValues")
+        if(yValues.toInt() != 0){
+            Log.e(TAG, "addEntry: $yValues")
+        }
         val entryCount = (lineData.getDataSetByIndex(0) as LineDataSet).entryCount
         val entry = Entry(
             entryCount.toFloat(), yValues

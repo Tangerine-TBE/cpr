@@ -105,6 +105,7 @@ class SingleActivity : BaseActivity() {
         mTrainingDTO?.lineChartYData1 = chartFragment?.getLineChartY1Data()!!
         mTrainingDTO?.lineChartYData2 = chartFragment?.getLineaChart2Data()!!
         mTrainingDTO?.barChartData = chartFragment?.getBarChartData()!!
+        mTrainingDTO?.lineChartMaxValue =chartFragment?.getMaxValueData()!!
         //开始时清空残留数据
         binding.bottom.ivStart.setBackgroundResource(R.drawable.start_play_hight)
         binding.bottom.ivStart.setImageResource(R.mipmap.icon_wm_start_white)

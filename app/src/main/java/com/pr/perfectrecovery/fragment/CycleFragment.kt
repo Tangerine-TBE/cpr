@@ -115,7 +115,9 @@ class CycleFragment : Fragment() {
                     (activity as SingleActivity).setViewPagerItem()
                 }
                 setViewDate(it)
-                Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
+               if ( abs(it.preDistance - it.distance) > 0){
+                   Log.e("StatusLiveData", "按压深度：${abs(it.preDistance - it.distance)}")
+               }
                 if (isLog) {
                     viewBinding.tvPress3.text = "距离值：${it.distance}"
                     viewBinding.tvPress5.text = "按压频率：${it.pf}"
