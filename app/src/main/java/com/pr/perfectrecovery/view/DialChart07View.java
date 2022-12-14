@@ -23,6 +23,7 @@ package com.pr.perfectrecovery.view;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -43,14 +44,21 @@ import org.xclcharts.view.GraphicalView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class DialChart07View extends GraphicalView {
 
     private String TAG = "DialChart07View";
 
     private DialChart chart180 = new DialChart();
-    private float mPercentage = 0.9f;
-
+    private float mPercentage = 0f;
+    private Disposable mDisposable;
     public DialChart07View(Context context) {
         super(context);
         initView();
@@ -167,17 +175,31 @@ public class DialChart07View extends GraphicalView {
         paintTB.setTextSize(22);
         paintTB.setAntiAlias(true);
     }
-    private float doingPercentage;
     //进入这里的：1.按压频率，2.呼吸频率
+    @SuppressLint("CheckResult")
     public void setCurrentStatus(float percentage) {
         Log.e("TAg",""+percentage);
         /*这里进行动画*/
-        if (percentage == 0 || doingPercentage == percentage){
+        if (percentage == 0){
             return;
         }
-        doingPercentage = percentage;
-        ValueAnimator animator = ObjectAnimator.ofFloat(0f,percentage,0f);
-        animator.setDuration(500);
+        drawAnimator(percentage);
+        if (mDisposable != null && !mDisposable.isDisposed()){
+            mDisposable.dispose();
+
+        }
+        mDisposable =  Observable.interval(2000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Long>() {
+            @Override
+            public void accept(Long aLong) throws Exception {
+                drawAnimator(0f);
+            }
+        });
+
+    }
+
+    private void drawAnimator(float percentage){
+        ValueAnimator animator = ObjectAnimator.ofFloat(mPercentage,percentage);
+        animator.setDuration(200);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -197,7 +219,6 @@ public class DialChart07View extends GraphicalView {
             }
         });
         animator.start();
-
     }
 
     @Override

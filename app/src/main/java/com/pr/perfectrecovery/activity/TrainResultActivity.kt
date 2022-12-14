@@ -159,58 +159,108 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val l: Legend = scatterChart.legend
         l.isEnabled = false
         val yl: YAxis = scatterChart.axisLeft
+        val yrl: YAxis = scatterChart.axisRight
+        yrl.isEnabled = false
+        yrl.textColor = Color.WHITE
+        yrl.textColor = Color.TRANSPARENT
+        yrl.spaceBottom = 0f
+
         yl.axisLineColor = Color.WHITE
-        yl.axisMinimum = 3f // this replaces setStartAtZero(true)
-        yl.axisMaximum = 12f
-        yl.granularity = 3f
         yl.isEnabled = true
-        yl.isGranularityEnabled= true
         yl.textColor = Color.WHITE
-        yl.valueFormatter = object : IAxisValueFormatter {
-            override fun getFormattedValue(value: Float, axis: AxisBase?): String {
-                return when (value.toString()) {
-                    "0.0" -> {
-                        return ""
+        yl.spaceBottom = 0f
+
+        if (type == 2) {
+            //按压
+            yl.axisMinimum = 3f // this replaces setStartAtZero(true)
+            yl.axisMaximum = 12f
+            yl.granularity = 3f
+
+            yrl.axisMinimum = 3f // this replaces setStartAtZero(true)
+            yrl.axisMaximum = 12f
+            yrl.granularity = 3f
+
+            yl.valueFormatter = object : IAxisValueFormatter {
+                override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+                    return when (value.toString()) {
+                        "0.0" -> {
+                            return ""
+                        }
+                        "3.0" -> {
+                            return ""
+                        }
+                        "6.0" -> {
+                            return if (type == 2) "4CM" else "400ML"
+                        }
+                        "9.0" -> {
+                            return if (type == 2) "6CM" else "600ML"
+                        }
+                        "12.0" -> {
+                            return ""
+                        }
+                        else -> {
+                            return ""
+                        }
                     }
-                    "3.0" -> {
-                        return ""
-                    }
-                    "6.0" -> {
-                        return if (type == 2) "4CM" else "400ML"
-                    }
-                    "9.0" -> {
-                        return if (type == 2) "6CM" else "600ML"
-                    }
-                    "12.0" -> {
-                        return ""
-                    }
-                    else -> {
-                        return ""
+                }
+            }
+        } else {
+            yl.axisMaximum = 0f
+            yl.axisMaximum = 9.0f
+            yl.granularity = 3.0f
+
+
+            yrl.axisMaximum = 0f
+            yrl.axisMaximum = 9.0f
+            yrl.granularity = 3.0f
+
+
+            yl.valueFormatter = object : IAxisValueFormatter {
+                override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+                    return when (value.toString()) {
+                        "0.0" -> {
+                            return ""
+                        }
+                        "3.0" -> {
+                            return if (type == 2) "4CM" else "400ML"
+
+                        }
+                        "6.0" -> {
+                            return if (type == 2) "6CM" else "600ML"
+                        }
+                        "9.0" -> {
+                            return ""
+                        }
+                        else -> {
+                            return ""
+                        }
                     }
                 }
             }
         }
-        scatterChart.axisRight.isEnabled = false
+
         val xl: XAxis = scatterChart.xAxis
         xl.axisLineColor = Color.WHITE
         xl.textColor = Color.WHITE
-        xl.axisMinimum = 3f //90~130怎么分配的呢
-        xl.granularity = 3f
-        xl.axisMaximum = 12f
+        xl.axisMinimum = 0f //90~130怎么分配的呢
+        xl.granularity = 3.3f
+        xl.axisMaximum = 9.9f
         xl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return when (value.toString()) {
                     "0.0" -> {
                         return ""
                     }
-                    "3.0" -> {
-                        return ""
-                    }
-                    "6.0" -> {
+                    "3.3" -> {
                         return if (type == 2) "100CPM" else "6VPM"
+
                     }
-                    "9.0" -> {
+                    "6.6" -> {
                         return if (type == 2) "120CPM" else "8VPM"
+
+                    }
+                    "9.9" -> {
+                        return ""
                     }
                     "12.0" -> {
                         return ""
@@ -314,8 +364,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 values1 = filterValues(values1)
                 values2 = filterValues(values2)
                 values3 = filterValues(values3)
+                val values4 = ArrayList<Entry>()
+                values4.add(Entry(4.9f, 1f))
                 //不合格坐标进行压缩处理
-                val set1 = ScatterDataSet(values3, "DS 1")
+                val set1 = ScatterDataSet(values1, "DS 1")
                 set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set1.color = ColorTemplate.COLORFUL_COLORS[0]
                 set1.setDrawValues(false)
@@ -327,18 +379,25 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 set2.setDrawValues(false)
 
                 set2.scatterShapeSize = 25f
-                val set3 = ScatterDataSet(values1, "DS 2")
+                val set3 = ScatterDataSet(values3, "DS 2")
                 set3.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                 set3.color = Color.YELLOW
                 set3.setDrawValues(false)
                 set3.scatterShapeSize = 35f
+                val set4 = ScatterDataSet(values4, "DS 3")
+                set4.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                set4.color = Color.TRANSPARENT
+                set4.setDrawValues(false)
+                set4.scatterShapeSize = 35f
                 val dataSets = ArrayList<IScatterDataSet>()
                 /*这里数值不能改变*/
                 dataSets.add(set3)
                 dataSets.add(set2)
                 dataSets.add(set1)
+                dataSets.add(set4)
                 val data = ScatterData(dataSets)
                 scatterChart.data = data
+                scatterChart.axisLeft.spaceTop = 0f
                 scatterChart.invalidate()
             }
 

@@ -17,17 +17,14 @@ object LineChartUtils {
         // no description text
         chart.description.isEnabled = false
         chart.setNoDataText("")
-        // enable touch gestures
-        chart.setTouchEnabled(false)
-        chart.setDrawBorders(false)
         // enable scaling and dragging
         chart.isDragEnabled = true
-        chart.setScaleEnabled(true)
-        // if disabled, scaling can be done on x- and y-axis separately
+        chart.setTouchEnabled(true)
+        chart.setDrawBorders(false)
+        chart.setScaleEnabled(false)
         chart.setPinchZoom(false)
 
         val xl: XAxis = chart.xAxis
-        xl.setAvoidFirstLastClipping(true)
         xl.axisMinimum = 0f
         xl.setDrawGridLines(false)
         xl.isEnabled = true
@@ -63,11 +60,13 @@ object LineChartUtils {
 
         val leftAxis: YAxis = chart.axisLeft
         leftAxis.isInverted = true
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+        leftAxis.axisMinimum = -2f // this replaces setStartAtZero(true)
         leftAxis.mAxisMaximum = 10f
-        leftAxis.labelCount = 10
+        leftAxis.labelCount = 0
         leftAxis.isEnabled = true
-        leftAxis.textSize = 12f
+        leftAxis.spaceTop = 0f
+        Log.e("spaceTop","${leftAxis.spaceTop}")
+        leftAxis.textSize = 0f
         leftAxis.textColor = Color.WHITE
         leftAxis.gridColor = Color.TRANSPARENT
 //        leftAxis.zeroLineColor = Color.TRANSPARENT
@@ -75,6 +74,8 @@ object LineChartUtils {
         leftAxis.setValueFormatter { value, axis ->
             ""//${value.toInt()}
         }
+        leftAxis.spaceBottom = 0f
+        leftAxis.spaceTop = 0f
         //左边Y轴添加限制线
         leftAxis.addLimitLine(limitLine)
         leftAxis.addLimitLine(limitLine2)
@@ -91,5 +92,6 @@ object LineChartUtils {
 
         // don't forget to refresh the drawing
         chart.invalidate()
+        chart.isLogEnabled = true
     }
 }
