@@ -172,8 +172,8 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         if (type == 2) {
             //按压
-            yl.axisMinimum = 3f // this replaces setStartAtZero(true)
-            yl.axisMaximum = 12f
+            yl.axisMinimum = 5f // this replaces setStartAtZero(true)
+            yl.axisMaximum = 10f
             yl.granularity = 3f
 
             yrl.axisMinimum = 3f // this replaces setStartAtZero(true)
@@ -205,12 +205,12 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             }
         } else {
-            yl.axisMaximum = 0f
-            yl.axisMaximum = 9.0f
+            yl.axisMinimum = 2f
+            yl.axisMaximum = 7.0f
             yl.granularity = 3.0f
 
 
-            yrl.axisMaximum = 0f
+            yrl.axisMinimum = 0f
             yrl.axisMaximum = 9.0f
             yrl.granularity = 3.0f
 
@@ -242,9 +242,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         val xl: XAxis = scatterChart.xAxis
         xl.axisLineColor = Color.WHITE
         xl.textColor = Color.WHITE
-        xl.axisMinimum = 0f //90~130怎么分配的呢
+        xl.axisMinimum = 2f //90~130怎么分配的呢
         xl.granularity = 3.3f
-        xl.axisMaximum = 9.9f
+        xl.axisMaximum = 7.9f
         xl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return when (value.toString()) {
