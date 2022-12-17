@@ -109,9 +109,13 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     private fun <A> splitList(
         list: MutableList<A>
     ): Map<String, MutableList<A>> {
-        val num = list.size / 3
-        var index = 1
+
         val listSize = list.size //list 长度
+        var num = list.size / 3
+        if (listSize < 3) {
+            num = list.size
+        }
+        var index = 1
         val stringListHashMap = HashMap<String, MutableList<A>>() //用户封装返回的多个list
         var stringlist: MutableList<A> = java.util.ArrayList()
         //用于承装每个等分list
@@ -172,13 +176,11 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
         if (type == 2) {
             //按压
-            yl.axisMinimum = 5f // this replaces setStartAtZero(true)
-            yl.axisMaximum = 10f
+            yl.axisMinimum = 5.5f // this replaces setStartAtZero(true)
+            yl.axisMaximum = 9.5f
             yl.granularity = 3f
 
-            yrl.axisMinimum = 3f // this replaces setStartAtZero(true)
-            yrl.axisMaximum = 12f
-            yrl.granularity = 3f
+
 
             yl.valueFormatter = object : IAxisValueFormatter {
                 override fun getFormattedValue(value: Float, axis: AxisBase?): String {
@@ -205,15 +207,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             }
         } else {
-            yl.axisMinimum = 2f
-            yl.axisMaximum = 7.0f
+            yl.axisMinimum = 2.5f
+            yl.axisMaximum = 6.5f
             yl.granularity = 3.0f
-
-
-            yrl.axisMinimum = 0f
-            yrl.axisMaximum = 9.0f
-            yrl.granularity = 3.0f
-
 
             yl.valueFormatter = object : IAxisValueFormatter {
                 override fun getFormattedValue(value: Float, axis: AxisBase?): String {
@@ -308,98 +304,112 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                         val coordinates = Coordinates()
                         coordinates.y = lineChartY1[item + 1]
                         coordinates.x = lineChartY2[item + 1]
+                        if (item == 0 && coordinates.y > 0) {
+                            coordinates.x = 3.0f
+                        }
                         beans.add(coordinates)
                     }
                 }
             }
             //对有效坐标进行切割
+            val valuesDataSet = ArrayList<ArrayList<Entry>>()
             val coordinatesMap = splitList(beans)
             val beanSetValue1 = coordinatesMap["1"]
             val beanSetValue2 = coordinatesMap["2"]
             val beanSetValue3 = coordinatesMap["3"]
-            if (beanSetValue1?.isNotEmpty()!!) {
-                val sortedList = beanSetValue1.sortedBy { bean -> bean.x }
-                for (item in sortedList) {
-                    val y = item.y
-                    val x = item.x
-                    val entry = Entry()
-                    entry.x = x
-                    entry.y = y
-                    values1.add(entry)
+            if (beanSetValue1 != null) {
+                if (beanSetValue1.isNotEmpty()) {
+                    val sortedList = beanSetValue1.sortedBy { bean -> bean.x }
+                    for (item in sortedList) {
+                        val y = item.y
+                        val x = item.x
+                        val entry = Entry()
+                        entry.x = x
+                        entry.y = y
+                        values1.add(entry)
+                    }
                 }
+                valuesDataSet.add(values1)
             }
-            if (beanSetValue2?.isNotEmpty()!!) {
-                val sortedList = beanSetValue2.sortedBy { bean -> bean.x }
-                for (item in sortedList) {
-                    val y = item.y
-                    val x = item.x
-                    val entry = Entry()
-                    entry.x = x
-                    entry.y = y
-                    values2.add(entry)
+            if (beanSetValue2 != null) {
+                if (beanSetValue2.isNotEmpty()) {
+                    val sortedList = beanSetValue2.sortedBy { bean -> bean.x }
+                    for (item in sortedList) {
+                        val y = item.y
+                        val x = item.x
+                        val entry = Entry()
+                        entry.x = x
+                        entry.y = y
+                        values2.add(entry)
+                    }
                 }
+                valuesDataSet.add(values2)
             }
-            if (beanSetValue3?.isNotEmpty()!!) {
-                val sortedList = beanSetValue3.sortedBy { bean -> bean.x }
-                for (item in sortedList) {
-                    val x = item.x
-                    val y = item.y
-                    val entry = Entry()
-                    entry.x = x
-                    entry.y = y
-                    values3.add(entry)
+            if (beanSetValue3 != null) {
+                if (beanSetValue3.isNotEmpty()) {
+                    val sortedList = beanSetValue3.sortedBy { bean -> bean.x }
+                    for (item in sortedList) {
+                        val x = item.x
+                        val y = item.y
+                        val entry = Entry()
+                        entry.x = x
+                        entry.y = y
+                        values3.add(entry)
+                    }
                 }
+                valuesDataSet.add(values3)
             }
-            val valuesDataSet = ArrayList<ArrayList<Entry>>()
-            valuesDataSet.add(values1)
-            valuesDataSet.add(values2)
-            valuesDataSet.add(values3)
             it.onNext(valuesDataSet)
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
-            if (it.isNotEmpty()) {
-                var values1 = it[0] //几近过期
-                var values2 = it[1] //中间时期
-                var values3 = it[2] //最近时期
-                //对于原点坐标进行剔除处理
-                values1 = filterValues(values1)
-                values2 = filterValues(values2)
-                values3 = filterValues(values3)
-                val values4 = ArrayList<Entry>()
-                values4.add(Entry(4.9f, 1f))
-                //不合格坐标进行压缩处理
-                val set1 = ScatterDataSet(values1, "DS 1")
-                set1.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
-                set1.color = ColorTemplate.COLORFUL_COLORS[0]
-                set1.setDrawValues(false)
-                set1.scatterShapeSize = 15f
+            val dataSets = ArrayList<IScatterDataSet>()
+            for (item in it.indices) {
+                var valuesBean = it[item]
+                valuesBean = filterValues(valuesBean)
+                val set = ScatterDataSet(valuesBean, "DS$item")
+                if (item == it.size - 1) {
+                    set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    set.color = Color.YELLOW
+                    set.setDrawValues(false)
+                    set.scatterShapeSize = 35f
+                } else {
+                    when (item) {
+                        0 -> {
+                            set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                            set.color = ColorTemplate.COLORFUL_COLORS[0]
+                            set.setDrawValues(false)
+                            set.scatterShapeSize = 15f
+                        }
+                        1 -> {
+                            set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                            set.color = Color.BLUE
+                            set.setDrawValues(false)
+                            set.scatterShapeSize = 25f
 
-                val set2 = ScatterDataSet(values2, "DS 2")
-                set2.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
-                set2.color = Color.BLUE
-                set2.setDrawValues(false)
-
-                set2.scatterShapeSize = 25f
-                val set3 = ScatterDataSet(values3, "DS 2")
-                set3.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
-                set3.color = Color.YELLOW
-                set3.setDrawValues(false)
-                set3.scatterShapeSize = 35f
-                val set4 = ScatterDataSet(values4, "DS 3")
-                set4.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
-                set4.color = Color.TRANSPARENT
-                set4.setDrawValues(false)
-                set4.scatterShapeSize = 35f
-                val dataSets = ArrayList<IScatterDataSet>()
-                /*这里数值不能改变*/
-                dataSets.add(set3)
-                dataSets.add(set2)
-                dataSets.add(set1)
-                dataSets.add(set4)
-                val data = ScatterData(dataSets)
-                scatterChart.data = data
-                scatterChart.axisLeft.spaceTop = 0f
-                scatterChart.invalidate()
+                        }
+                        2 -> {
+                            set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                            set.color = Color.YELLOW
+                            set.setDrawValues(false)
+                            set.scatterShapeSize = 35f
+                        }
+                    }
+                }
+                dataSets.add(set)
             }
+            val values4 = ArrayList<Entry>()
+            values4.add(Entry(0f, 0f))
+            //不合格坐标进行压缩处理
+            val set4 = ScatterDataSet(values4, "DS 100")
+            set4.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+            set4.color = Color.TRANSPARENT
+            set4.setDrawValues(false)
+            set4.scatterShapeSize = 35f
+            /*这里数值不能改变*/
+            dataSets.add(set4)
+            val data = ScatterData(dataSets)
+            scatterChart.data = data
+            scatterChart.axisLeft.spaceTop = 0f
+            scatterChart.invalidate()
 
         }, {
             Log.e("Throwable", "${it.message}")
@@ -807,9 +817,15 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         viewBinding.layoutExport.lineChart1.isHighlightPerDragEnabled = false
         initChartView(viewBinding.layoutExport.lineChart2, data2)
         for (item in trainingDTO.barChartData.indices) {
-            addBarEntry(
-                viewBinding.layoutExport.barChart, trainingDTO.barChartData[item], dataset
-            )
+
+            if (item == 0 || item % 2 == 0) {
+                addBarEntry(
+                    viewBinding.layoutExport.barChart,
+                    trainingDTO.barChartData[item + 1],
+                    dataset
+                )
+            }
+
         }
     }
 
@@ -951,7 +967,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         //按压错误数
         viewBinding.tvLungCount.text = "${trainingDTO.pressErrorCount}"
         viewBinding.tvLungCountC.text = "${trainingDTO.pressErrorCount}"
-
         //按压总数
         viewBinding.tvLungTotal.text = "/${trainingDTO.prSum.toInt()}"
         viewBinding.tvLungTotal1.text = "/${trainingDTO.prSum.toInt()}"
