@@ -200,6 +200,8 @@
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
+
+
                         </androidx.appcompat.widget.LinearLayoutCompat>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -1263,12 +1265,8 @@
 
         <com.github.mikephil.charting.charts.ScatterChart
                 android:id="@+id/scatterChart"
-                android:layout_weight="1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginEnd="@dimen/dp_20"
-                android:layout_marginStart="@dimen/dp_20"
-
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/cardView11"
@@ -1281,21 +1279,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
         <com.github.mikephil.charting.charts.ScatterChart
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/dp_20"
-                android:layout_marginEnd="@dimen/dp_20"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/cardView11"
                 app:layout_constraintStart_toEndOf="@id/guide_line_1"
                 android:id="@+id/scatterChart1"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp" />
 
         <androidx.constraintlayout.widget.Guideline
@@ -1312,7 +1306,7 @@
         <androidx.cardview.widget.CardView
                 android:id="@+id/cardView11"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/dp_44"
+                android:layout_height="@dimen/dp_30"
                 app:cardBackgroundColor="@color/theme_color"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp"
@@ -1324,7 +1318,7 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center">
 
                 <ImageView
@@ -1355,7 +1349,7 @@
         <androidx.cardview.widget.CardView
                 android:id="@+id/cardView22"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/dp_44"
+                android:layout_height="@dimen/dp_30"
                 app:cardBackgroundColor="@color/theme_color"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp"
@@ -1366,7 +1360,7 @@
 
             <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     >
 
@@ -1379,7 +1373,6 @@
                         android:id="@+id/tvHeartCount2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
                         android:textColor="@color/color_text_selected"
                         android:textSize="24sp"
                         app:layout_constraintEnd_toStartOf="@+id/tvHeartTotal"
@@ -1389,7 +1382,6 @@
                         android:id="@+id/tvHeartTotal2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/0"
                         android:textColor="#ffffffff"
                         android:textSize="24sp"
                         app:layout_constraintBottom_toBottomOf="parent"

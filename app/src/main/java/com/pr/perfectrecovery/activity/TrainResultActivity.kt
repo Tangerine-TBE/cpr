@@ -23,6 +23,7 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.util.toRange
 import com.blankj.utilcode.util.ToastUtils
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -51,6 +52,7 @@ import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.HashMap
+import java.util.Random
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -135,7 +137,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SuspiciousIndentation")
     private fun initScatterChart(
         scatterChart: ScatterChart,
         lineChartY1: ArrayList<Float>,
@@ -169,19 +171,17 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         yrl.textColor = Color.TRANSPARENT
         yrl.spaceBottom = 0f
 
-        yl.axisLineColor = Color.WHITE
+        yl.axisLineColor = Color.TRANSPARENT
         yl.isEnabled = true
         yl.textColor = Color.WHITE
         yl.spaceBottom = 0f
+        yl.gridColor = Color.WHITE
 
         if (type == 2) {
             //按压
-            yl.axisMinimum = 5.5f // this replaces setStartAtZero(true)
-            yl.axisMaximum = 9.5f
+            yl.axisMinimum = 4f // this replaces setStartAtZero(true)
+            yl.axisMaximum = 11f
             yl.granularity = 3f
-
-
-
             yl.valueFormatter = object : IAxisValueFormatter {
                 override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                     return when (value.toString()) {
@@ -207,10 +207,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             }
         } else {
-            yl.axisMinimum = 2.5f
-            yl.axisMaximum = 6.5f
+            yl.axisMinimum = 1f
+            yl.axisMaximum = 8f
             yl.granularity = 3.0f
-
             yl.valueFormatter = object : IAxisValueFormatter {
                 override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                     return when (value.toString()) {
@@ -234,13 +233,18 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                 }
             }
         }
-
         val xl: XAxis = scatterChart.xAxis
-        xl.axisLineColor = Color.WHITE
+        xl.axisLineColor = Color.TRANSPARENT
         xl.textColor = Color.WHITE
-        xl.axisMinimum = 2f //90~130怎么分配的呢
+        xl.axisMinimum = 1.5f //90~130怎么分配的呢
         xl.granularity = 3.3f
-        xl.axisMaximum = 7.9f
+        xl.axisMaximum = 8.4f //
+        xl.gridColor = Color.WHITE
+        /*x轴视图内的显示*/
+        /*视图内：错误区域范围为:1.5f<= x < 3.3      6.6f < x <= 8.4f*/
+        /*数据内：错误区域范围为:0.0f<= x < 3.3      6.6f < x <= 9.9f*/
+        /*当数据为0.0f的时候 实际视图显示为1.5f      当数据为9.9f的时候 实际视图显示为8.4f*/
+
         xl.valueFormatter = object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return when (value.toString()) {
@@ -286,9 +290,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                             if (currentValue == maxValue) {
                                 val coordinates = Coordinates()
                                 val y = lineChartY1[j + 1]
-                                Log.e("按压深度y", "$y")
-                                coordinates.y = y
-                                coordinates.x = lineChartY2[j + 1]
+                                val x = lineChartY2[j + 1]
+                                coordinates.y = convertValue(y,4f,11f,6.0f,9.0f,0f,9.9f)
+                                coordinates.x = convertValue(x,1.5f,8.4f,3.3f,6.6f,0f,9.9f)
                                 beans.add(coordinates)
                                 break
                             }
@@ -302,11 +306,10 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
                     /*筛选y坐标出来,这里由于只能插入一个情况相同的x作为键，有很大可能是有两个相同x的，所以不用hashmap 用一个实体类进行存储以及排序*/
                     if (item == 0 || item % 2 == 0) {
                         val coordinates = Coordinates()
-                        coordinates.y = lineChartY1[item + 1]
-                        coordinates.x = lineChartY2[item + 1]
-                        if (item == 0 && coordinates.y > 0) {
-                            coordinates.x = 3.0f
-                        }
+                        val x = lineChartY2[item + 1]
+                        val y = lineChartY1[item + 1]
+                        coordinates.y = convertValue(y,1f,8f,3.3f,6.6f,0f,9.9f)
+                        coordinates.x = convertValue(x,1.5f,8.4f,3.3f,6.6f,0f,9.9f)
                         beans.add(coordinates)
                     }
                 }
@@ -364,40 +367,32 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             val dataSets = ArrayList<IScatterDataSet>()
             for (item in it.indices) {
                 var valuesBean = it[item]
-                valuesBean = filterValues(valuesBean)
+                valuesBean = filterValues(valuesBean,type)
                 val set = ScatterDataSet(valuesBean, "DS$item")
-                if (item == it.size - 1) {
-                    set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
-                    set.color = Color.YELLOW
-                    set.setDrawValues(false)
-                    set.scatterShapeSize = 35f
-                } else {
                     when (item) {
                         0 -> {
                             set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                             set.color = ColorTemplate.COLORFUL_COLORS[0]
                             set.setDrawValues(false)
-                            set.scatterShapeSize = 15f
+                            set.scatterShapeSize = 20f
                         }
                         1 -> {
                             set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                             set.color = Color.BLUE
                             set.setDrawValues(false)
-                            set.scatterShapeSize = 25f
-
+                            set.scatterShapeSize = 15f
                         }
                         2 -> {
                             set.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                             set.color = Color.YELLOW
                             set.setDrawValues(false)
-                            set.scatterShapeSize = 35f
+                            set.scatterShapeSize = 10f
                         }
-                    }
                 }
                 dataSets.add(set)
             }
             val values4 = ArrayList<Entry>()
-            values4.add(Entry(0f, 0f))
+            values4.add(Entry(1.5f, if (type == 2) 4f else 1f))
             //不合格坐标进行压缩处理
             val set4 = ScatterDataSet(values4, "DS 100")
             set4.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
@@ -408,7 +403,6 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             dataSets.add(set4)
             val data = ScatterData(dataSets)
             scatterChart.data = data
-            scatterChart.axisLeft.spaceTop = 0f
             scatterChart.invalidate()
 
         }, {
@@ -421,14 +415,40 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
     }
 
-    private fun filterValues(values: java.util.ArrayList<Entry>): java.util.ArrayList<Entry> {
+    private fun convertValue(x: Float,miniView: Float,maxView:Float,miniValue:Float,maxValue:Float,mini:Float,max:Float): Float {
+        if (x in miniValue..maxValue) {
+            return x
+        }
+        if (x < miniValue) {
+            return if (x.toInt() == mini.toInt()) {
+                miniView
+            } else {
+                x / miniValue * (miniValue - miniView) + miniView
+            }
+        }
+        if (x > maxValue) {
+            return if (x == max) {
+                maxView
+            } else {
+                (x-maxValue) / miniValue *(maxView-maxValue)+maxValue
+            }
+        }
+        return 0.0f
+    }
+
+    private fun filterValues(values: java.util.ArrayList<Entry>,type: Int): java.util.ArrayList<Entry> {
         val arrayList = java.util.ArrayList<Entry>();
         for (item in values.indices) {
-            if (values[item].x.toInt() != 0 || values[item].y.toInt() != 0) {
+            if (values[item].x != 1.5f || values[item].y != if (type == 2) 4f else 1f) {
+                val base = (1..10).random() * 0.02f
+                val x = values[item].x+ base
+                val y = values[item].y + base
+                values[item].x = x
+                values[item].y = y
                 arrayList.add(values[item])
             }
         }
-        return arrayList;
+        return arrayList
     }
 
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
@@ -820,9 +840,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
 
             if (item == 0 || item % 2 == 0) {
                 addBarEntry(
-                    viewBinding.layoutExport.barChart,
-                    trainingDTO.barChartData[item + 1],
-                    dataset
+                    viewBinding.layoutExport.barChart, trainingDTO.barChartData[item + 1], dataset
                 )
             }
 

@@ -41,6 +41,23 @@ public class ScatterChart extends BarLineChartBase<ScatterData> implements Scatt
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        if (width < height) {
+            height = width;
+        } else {
+            width = height;
+        }
+        int heightMeasureRemake = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+        int widthMeasureRemake = MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY);
+        setMeasuredDimension(widthMeasureRemake, heightMeasureRemake);
+
+
+    }
+
+    @Override
     public ScatterData getScatterData() {
         return mData;
     }
