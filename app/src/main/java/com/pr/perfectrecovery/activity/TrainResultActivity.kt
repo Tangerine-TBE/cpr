@@ -368,6 +368,9 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             for (item in it.indices) {
                 var valuesBean = it[item]
                 valuesBean = filterValues(valuesBean,type)
+                val lists =  ArrayList<Entry>()
+                //重新对增加了x随机数的数值进行排序
+                valuesBean = valuesBean.sortedBy { it -> it.x}.toCollection(lists)
                 val set = ScatterDataSet(valuesBean, "DS$item")
                     when (item) {
                         0 -> {
