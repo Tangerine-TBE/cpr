@@ -53,6 +53,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.HashMap
 import java.util.Random
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -398,7 +399,7 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
             set4.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
             set4.color = Color.TRANSPARENT
             set4.setDrawValues(false)
-            set4.scatterShapeSize = 35f
+            set4.scatterShapeSize = 10f
             /*这里数值不能改变*/
             dataSets.add(set4)
             val data = ScatterData(dataSets)
@@ -437,18 +438,41 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
     }
 
     private fun filterValues(values: java.util.ArrayList<Entry>,type: Int): java.util.ArrayList<Entry> {
-        val arrayList = java.util.ArrayList<Entry>();
+        val arrayList = ArrayList<Entry>();
         for (item in values.indices) {
             if (values[item].x != 1.5f || values[item].y != if (type == 2) 4f else 1f) {
+                if (type == 1){
+                    if (values[item].y == 1f){
+                        continue
+                    }
+                }
                 val base = (1..10).random() * 0.02f
-                val x = values[item].x+ base
-                val y = values[item].y + base
+                var x = values[item].x
+                x = if (x == 8.4f){
+                    values[item].x- abs(base)
+                }else{
+                    values[item].x + base
+                }
+                var y = values[item].y
+                if (type == 2 ){
+                    y = if (y == 11f){
+                        values[item].y - abs(base)
+                    }else{
+                        values[item].y+base
+                    }
+                }else if (type == 1){
+                    y = if (y == 8f){
+                        values[item].y - abs(base)
+                    }else{
+                        values[item].y+base
+                    }
+                }
                 values[item].x = x
                 values[item].y = y
                 arrayList.add(values[item])
             }
         }
-        return arrayList
+        return arrayList.sortedBy { item -> item.x }.toCollection(java.util.ArrayList())
     }
 
     private fun initChartView(lineChart: LineChart, lineData: LineData) {
@@ -773,7 +797,17 @@ class TrainResultActivity : BaseActivity(), EasyPermissions.PermissionCallbacks,
         initScatterChart(
             viewBinding.scatterChart1, trainingDTO.barChartData, trainingDTO.lineChartYData, 1
         )
-
+        val i =  ArrayList<Float>();
+        for (item in trainingDTO.barChartData.indices){
+            if (item == 0 || item % 2 == 0){
+                if (trainingDTO.barChartData[item+1] == 0.0f){
+                    continue
+                }
+                i .add(trainingDTO.barChartData[item+1])
+                Log.e("num","Size num ${trainingDTO.barChartData[item+1]}")
+            }
+        }
+        Log.e("Size","Size is ${i.size}")
     }
 
     private fun isPad(): Boolean {
